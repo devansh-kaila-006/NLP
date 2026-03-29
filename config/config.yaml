@@ -1,0 +1,60 @@
+# Multi-Modal RAG System Configuration
+
+# Model Settings
+models:
+  embedding_model: "all-MiniLM-L6-v2"
+  embedding_dimension: 384
+  llm_model: "gemini-1.5-flash"
+  temperature: 0.7
+  max_tokens: 1024
+
+# Data Processing
+processing:
+  pdf:
+    chunk_size: 800
+    chunk_overlap: 100
+    min_chunk_size: 400
+    extract_metadata: true
+
+  video:
+    chunk_duration: 180
+    overlap: 30
+    min_chunk_size: 60
+    frame_extraction_interval: 5
+    slide_detection_threshold: 0.85
+
+# Retrieval Settings
+retrieval:
+  default_k: 5
+  similarity_threshold: 0.7
+  use_l2_normalization: true
+  index_type: "IndexFlatIP"
+
+# Vector Store
+vector_store:
+  index_type: "faiss"
+  separate_indices: true
+  save_interval: 100
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/rag_system.log"
+  console: true
+
+# Evaluation
+evaluation:
+  metrics:
+    - "recall@k"
+    - "precision@k"
+    - "mrr"
+    - "ndcg@k"
+  k_values: [3, 5, 10]
+  test_split: 0.2
+
+# Cross-Modal Reranking
+reranking:
+  modality_boost: 0.2
+  coherence_weight: 0.3
+  relevance_weight: 0.7

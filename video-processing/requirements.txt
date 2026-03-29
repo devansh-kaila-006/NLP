@@ -1,0 +1,23 @@
+# Video Processing Dependencies
+# For Kaggle notebooks with GPU
+
+# Core video processing
+yt-dlp>=2023.0.0
+whisper-openai>=20230314
+opencv-python>=4.8.0
+pillow>=10.0.0
+
+# OCR
+pytesseract>=0.3.10
+# paddleocr>=2.6.0  # Alternative to tesseract (uncomment if using)
+
+# Image processing
+scikit-image>=0.21.0
+
+# Utilities
+numpy>=1.24.0
+torch>=2.0.0
+transformers>=4.35.0
+
+# Note: Tesseract must be installed separately on Kaggle
+# It's usually pre-installed, but verify with: !tesseract --version
