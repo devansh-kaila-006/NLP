@@ -23,7 +23,7 @@ Usage:
 
 import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional, List
 
 import yaml
 
@@ -116,7 +116,7 @@ def get_env_var(var_name: str, default: Optional[str] = None) -> str:
     return value
 
 
-def chunk_list(items: list, chunk_size: int) -> list[list]:
+def chunk_list(items: List[Any], chunk_size: int) -> List[List[Any]]:
     """
     Split a list into chunks of specified size.
 

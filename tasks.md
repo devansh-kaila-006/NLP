@@ -9,7 +9,9 @@
 ## Phase 1: Base System Setup (Weeks 1-2)
 
 ### Environment & Dependencies
-- [ ] Set up project repository (Git, branching strategy)
+- [x] Set up project repository (Git, branching strategy)
+- [x] Create project directory structure
+- [x] Set up logging and error handling framework
 - [ ] Configure Python virtual environment
 - [ ] Install core dependencies:
   - [ ] LangChain + LangChain Community
@@ -25,16 +27,15 @@
   - [ ] Tesseract/paddleocr (OCR)
   - [ ] MoviePy (video processing)
 - [ ] Set up Gemini API key and environment variables
-- [ ] Test API connection with sample query
-- [ ] Create project directory structure
-- [ ] Set up logging and error handling framework
+- [ ] Test API connection
 
 ### PDF Processing Pipeline
-- [ ] Download sample PDFs:
-  - [ ] CS229 Machine Learning notes
-  - [ ] Deep Learning Book (Goodfellow) chapters
-  - [ ] PyTorch documentation excerpts
-  - [ ] Scikit-learn documentation excerpts
+- [ ] Download full PDF corpus:
+  - [ ] CS229 Machine Learning notes (complete)
+  - [ ] Deep Learning Book (Goodfellow) - full book
+  - [ ] PyTorch documentation (tutorials and API reference)
+  - [ ] Scikit-learn documentation (user guide and API)
+  - [ ] Additional ML/DL textbooks and resources
 - [ ] Implement PDF text extraction (PyPDF)
 - [ ] Implement PDF chunking:
   - [ ] Fixed-size chunks (400-800 tokens)
@@ -45,19 +46,20 @@
   - [ ] Topic classification
   - [ ] Difficulty level
   - [ ] Page numbers
-- [ ] Test PDF processing with all sources
-- [ ] Create sample PDF chunks (100-200 chunks)
+- [ ] Process all PDFs and create production chunk database
+- [ ] Create comprehensive PDF chunks (1000+ chunks covering all material)
 
 ### Video Processing Pipeline
-- [ ] Download Stanford course playlists:
-  - [ ] CS231n (CNNs) - 1-2 lectures initially
-  - [ ] CS224n (NLP) - 1-2 lectures initially
-  - [ ] CS230 (Deep Learning) - 1-2 lectures initially
+- [ ] Download complete Stanford course playlists:
+  - [ ] CS231n (CNNs) - complete course
+  - [ ] CS224n (NLP) - complete course
+  - [ ] CS230 (Deep Learning) - complete course
+  - [ ] Additional relevant courses (MIT 6.S191, Fast.ai, etc.)
 - [ ] Implement audio extraction from videos
 - [ ] Set up Whisper transcription:
-  - [ ] Test transcription on sample video
-  - [ ] Generate timestamped transcripts
+  - [ ] Generate timestamped transcripts for all videos
   - [ ] Save transcripts with metadata
+  - [ ] Handle transcription errors and edge cases
 - [ ] Implement frame extraction:
   - [ ] Extract keyframes every 5 seconds
   - [ ] Save frames with timestamps
@@ -68,25 +70,26 @@
 - [ ] Implement OCR on keyframes:
   - [ ] Extract text from slides
   - [ ] Store OCR results with timestamps
-- [ ] Test video processing on sample lectures
-- [ ] Create sample video chunks (50-100 chunks)
+- [ ] Process all video lectures end-to-end
+- [ ] Create comprehensive video chunks (500+ chunks covering all lectures)
 
 ### Embedding Generation
 - [ ] Set up sentence-transformers model (all-MiniLM-L6-v2)
-- [ ] Generate embeddings for PDF chunks
-- [ ] Generate embeddings for video transcripts
-- [ ] Test embedding quality (similarity checks)
+- [ ] Generate embeddings for all PDF chunks
+- [ ] Generate embeddings for all video transcripts
+- [ ] Validate embedding quality (similarity checks)
 - [ ] Save embeddings with metadata
+- [ ] Create embedding backup and versioning
 
 ### Vector Database Setup
 - [ ] Set up FAISS index:
   - [ ] Choose index type (IndexFlatIP for cosine similarity)
   - [ ] Configure embedding dimension (384)
   - [ ] Implement L2 normalization for cosine similarity
-- [ ] Store PDF embeddings in FAISS
-- [ ] Store video embeddings in FAISS (separate index or combined)
+- [ ] Store all PDF embeddings in FAISS
+- [ ] Store all video embeddings in FAISS (separate index or combined)
 - [ ] Implement metadata storage alongside vectors
-- [ ] Test vector search with sample queries
+- [ ] Create index persistence and loading mechanism
 
 ### Basic Retrieval System
 - [ ] Implement query embedding generation
@@ -96,8 +99,8 @@
   - [ ] Filter by source type (pdf/video)
   - [ ] Filter by difficulty
   - [ ] Filter by topic
-- [ ] Test retrieval with sample queries (10-20 queries)
-- [ ] Evaluate retrieval quality manually
+- [ ] Validate retrieval with diverse query types
+- [ ] Create retrieval performance benchmarks
 
 ### Prompt Construction & LLM Integration
 - [ ] Design base prompt template:
@@ -110,14 +113,14 @@
   - [ ] Video timestamps/links
 - [ ] Integrate Gemini 1.5 Flash API
 - [ ] Implement response generation
-- [ ] Test end-to-end with sample queries (5-10 queries)
+- [ ] Validate end-to-end query responses
 
 ### Phase 1 Deliverables
-- [ ] Working multi-modal RAG system (PDF + video)
-- [ ] Basic retrieval functioning
-- [ ] End-to-end query responses
-- [ ] Test results on 10 sample queries
-- [ ] Documentation of setup and architecture
+- [ ] Production-ready multi-modal RAG system (PDF + video)
+- [ ] Full corpus processed and indexed
+- [ ] End-to-end query responses working
+- [ ] Retrieval benchmarks established
+- [ ] Complete documentation of setup and architecture
 
 ---
 
@@ -130,7 +133,7 @@
   - [ ] TextTiling
   - [ ] Topic segmentation methods
   - [ ] Slide change detection
-- [ ] Implement topic segmentation on transcripts:
+- [ ] Implement topic segmentation on all transcripts:
   - [ ] Sentence tokenization
   - [ ] Similarity computation between sentences
   - [ ] Boundary detection algorithm
@@ -140,30 +143,30 @@
 - [ ] Combine transcript and slide boundaries:
   - [ ] Align transcript with slide changes
   - [ ] Identify coherent topic segments
-- [ ] Create smart video chunks:
+- [ ] Create smart video chunks for all lectures:
   - [ ] Chunk at topic boundaries (not fixed intervals)
   - [ ] Ensure 2-5 minute segments
   - [ ] Store with topic labels and timestamps
-- [ ] Evaluate chunk quality:
-  - [ ] Manual inspection of 20-30 chunks
+- [ ] Evaluate chunk quality across entire corpus:
+  - [ ] Systematic quality assessment
   - [ ] Compare with fixed-interval chunking
-- [ ] Generate embeddings for smart chunks
+- [ ] Generate embeddings for all smart chunks
 - [ ] Update FAISS index with smart chunks
 
 #### Testing & Optimization
-- [ ] Test timestamp-aware retrieval:
-  - [ ] Query for specific topics
+- [ ] Test timestamp-aware retrieval systematically:
+  - [ ] Query for specific topics across all courses
   - [ ] Verify retrieved segments are relevant
   - [ ] Check timestamps are accurate
 - [ ] Compare with baseline (fixed-interval chunking):
-  - [ ] Retrieval precision comparison
-  - [ ] User evaluation (5-10 test queries)
+  - [ ] Retrieval precision comparison on full dataset
+  - [ ] Comprehensive evaluation queries
 - [ ] Optimize boundary detection parameters
 - [ ] Document improvements over baseline
 
 **Deliverables:**
-- [ ] Working timestamp-aware video chunking
-- [ ] Evaluation vs fixed-interval chunking
+- [ ] Production timestamp-aware video chunking for all lectures
+- [ ] Comprehensive evaluation vs fixed-interval chunking
 - [ ] Documentation of algorithm and results
 
 ---
@@ -202,23 +205,23 @@
 
 #### Testing & Evaluation
 - [ ] Design evaluation queries:
-  - [ ] Queries requiring multiple segments (10-20)
+  - [ ] Queries requiring multiple segments (50+ across all topics)
   - [ ] Step-by-step explanation queries
   - [ ] Complex concept queries
-- [ ] Test temporal coherence:
+- [ ] Test temporal coherence systematically:
   - [ ] Do segments flow logically?
   - [ ] Are temporal jumps minimized?
-  - [ ] User evaluation (5-10 test queries)
+  - [ ] Comprehensive evaluation across all courses
 - [ ] Compare with baseline (no coherence):
-  - [ ] User ratings of flow
-  - [ ] Segment sequence quality
+  - [ ] Systematic evaluation of flow quality
+  - [ ] Segment sequence quality metrics
 - [ ] Document coherence improvements
 
 **Deliverables:**
-- [ ] Working temporal coherence system
-- [ ] Temporal dependency graph
+- [ ] Production temporal coherence system
+- [ ] Complete temporal dependency graph for all lectures
 - [ ] Coherence scoring algorithm
-- [ ] Evaluation vs baseline
+- [ ] Comprehensive evaluation vs baseline
 
 ---
 
@@ -243,7 +246,7 @@
   - [ ] NLP-based classification
   - [ ] Keyword matching
   - [ ] Pattern detection
-- [ ] Test feature extraction on sample queries
+- [ ] Validate feature extraction on diverse query types
 
 #### Training Data Creation
 - [ ] Create heuristic rules for modality preference:
@@ -255,9 +258,9 @@
     "explanation_keywords": ["explain", "what is", "how does"] → video_or_pdf
   }
   ```
-- [ ] Apply heuristics to training queries (50-100)
+- [ ] Apply heuristics to comprehensive training dataset (500+ queries)
 - [ ] Create labeled dataset: query → best modality
-- [ ] Optionally: Manual labeling of 50-100 queries
+- [ ] Manual labeling and validation of queries
 - [ ] Split dataset: train/validation/test
 
 #### Modality Classifier Training
@@ -271,7 +274,7 @@
   - [ ] Confusion matrix
   - [ ] Per-class precision/recall
 - [ ] Optimize classifier parameters
-- [ ] Test on held-out queries
+- [ ] Validate on held-out test set
 
 #### Adaptive Retrieval Integration
 - [ ] Implement modality-based weight adjustment:
@@ -288,18 +291,18 @@
   - [ ] Adjust chunk scores based on prediction
   - [ ] Re-rank chunks
   - [ ] Return top results
-- [ ] Test adaptive retrieval:
+- [ ] Validate adaptive retrieval:
   - [ ] Verify modality prediction works
   - [ ] Check that boosted modalities appear in results
   - [ ] Ensure quality doesn't decrease
 
 #### Testing & Evaluation
-- [ ] Design evaluation queries (50-100):
+- [ ] Design comprehensive evaluation queries (200+):
   - [ ] Visual questions (should prefer video)
   - [ ] Math questions (should prefer PDF)
   - [ ] Code questions (should prefer docs)
   - [ ] Mixed questions
-- [ ] Test cross-modal reranking:
+- [ ] Test cross-modal reranking systematically:
   - [ ] Accuracy of modality prediction
   - [ ] User satisfaction with modality choices
   - [ ] Compare with uniform weighting
@@ -309,10 +312,10 @@
 - [ ] Document cross-modal improvements
 
 **Deliverables:**
-- [ ] Working modality classifier
+- [ ] Production modality classifier
 - [ ] Adaptive retrieval system
-- [ ] Evaluation vs uniform weighting
-- [ ] Training dataset
+- [ ] Comprehensive evaluation vs uniform weighting
+- [ ] Complete training dataset
 
 ---
 
@@ -320,13 +323,13 @@
 
 #### Evaluation Dataset Creation
 - [ ] Design evaluation question categories:
-  - [ ] Basic concepts (10 questions)
-  - [ ] Intermediate concepts (20 questions)
-  - [ ] Advanced concepts (20 questions)
-  - [ ] Implementation questions (10 questions)
-  - [ ] Comparative questions (10 questions)
-- [ ] Create evaluation questions (70-100 total):
-  - [ ] Ensure coverage of all topics
+  - [ ] Basic concepts (20+ questions)
+  - [ ] Intermediate concepts (40+ questions)
+  - [ ] Advanced concepts (40+ questions)
+  - [ ] Implementation questions (20+ questions)
+  - [ ] Comparative questions (20+ questions)
+- [ ] Create comprehensive evaluation questions (200+ total):
+  - [ ] Ensure coverage of all topics across all courses
   - [ ] Include different question types
   - [ ] Add difficulty ratings
   - [ ] Add expected source types
@@ -422,12 +425,13 @@
   - [ ] Test prompt formats
 
 ### End-to-End Testing
-- [ ] Test full system with diverse queries (20-30):
+- [ ] Test full system with comprehensive query suite (100+ queries):
   - [ ] Visual/conceptual queries
   - [ ] Mathematical queries
   - [ ] Implementation queries
   - [ ] Multi-segment queries
   - [ ] Different difficulty levels
+  - [ ] All courses and topics covered
 - [ ] Verify all components work together:
   - [ ] Video chunks are timestamp-aware
   - [ ] Multiple segments maintain coherence
@@ -475,8 +479,8 @@
     - [ ] Without timestamp-aware
     - [ ] Without temporal coherence
     - [ ] Without cross-modal reranking
-- [ ] Run evaluation on all baselines:
-  - [ ] Use evaluation dataset (70-100 questions)
+- [ ] Run comprehensive evaluation on all baselines:
+  - [ ] Use full evaluation dataset (200+ questions)
   - [ ] Collect all metrics
   - [ ] Generate comparison reports
 
@@ -545,13 +549,13 @@
   - [ ] Create comprehensive documentation
   - [ ] Add setup instructions (local + Kaggle)
 - [ ] Create demo:
-  - [ ] Prepare 10-15 demo queries showcasing all 3 contributions
+  - [ ] Prepare comprehensive demo queries showcasing all 3 contributions
   - [ ] Create demo script that runs end-to-end
   - [ ] Test demo thoroughly (multiple times)
   - [ ] Prepare demo video/screencast
 - [ ] Archive evaluation data:
-  - [ ] Evaluation dataset (70-100 questions with ground truth)
-  - [ ] Evaluation results (all metrics, baselines, ablations)
+  - [ ] Complete evaluation dataset (200+ questions with ground truth)
+  - [ ] All evaluation results (metrics, baselines, ablations)
   - [ ] Statistical analysis data
   - [ ] Performance benchmarks
 
@@ -575,7 +579,7 @@
 ### Final Testing & Validation
 - [ ] End-to-end system testing:
   - [ ] Test all 3 contributions working together
-  - [ ] Test with diverse queries (20-30)
+  - [ ] Test with comprehensive query suite (100+ queries)
   - [ ] Verify all baselines work
   - [ ] Confirm evaluation pipeline runs without errors
 - [ ] Performance validation:
@@ -618,11 +622,12 @@
 
 ## Notes
 
+- **Production-scale system:** This is a full production system, not a prototype - process all available data
 - **Parallel work encouraged:** Multiple team members can work on different tasks simultaneously
 - **Regular sync:** Weekly team meetings to track progress
 - **Flexible timeline:** Some tasks may take more/less time than estimated
 - **Buffer time:** Build in extra time for unexpected issues
-- **Focus on MVP:** Prioritize core functionality over nice-to-haves
+- **Focus on quality:** Prioritize comprehensive coverage over quick prototypes
 - **Test early and often:** Don't wait until end to test
 - **Document everything:** Keep track of decisions, results, and issues
 - **Use AI assistant:** Claude is available to help with coding, debugging, and documentation

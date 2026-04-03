@@ -18,11 +18,13 @@ Usage:
     >>> raise PDFProcessingError("Failed to process PDF file")
 """
 
+from typing import Optional, Dict, Any
+
 
 class RAGSystemError(Exception):
     """Base exception class for RAG system errors."""
 
-    def __init__(self, message: str, details: Optional[dict] = None):
+    def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
         """
         Initialize RAG system error.
 
@@ -95,5 +97,3 @@ class ValidationError(RAGSystemError):
 
     pass
 
-
-from typing import Optional
