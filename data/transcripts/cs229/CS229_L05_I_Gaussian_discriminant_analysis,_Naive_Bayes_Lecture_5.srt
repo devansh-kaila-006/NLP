@@ -1,0 +1,496 @@
+1
+00:00:05,000 --> 00:01:09,000
+from today I guess um you're gonna see me for at least a few weeks um we're gonna cover um like some more like super starting algorithms and we're going to talk about deep learning and then uh I'll pass on to Chris to talk about Express learning so so I think I'm going to be in charge in the next three or four weeks um and I'm going to use the board partly because I think there is a little bit more memory on the board right like uh like I can write you can you can review
+
+2
+00:00:37,000 --> 00:01:38,000
+things that I can see I I wrote like a like 10 minutes ago even I don't know whether that's you know the best for everyone I think in the past I've surveyed students and someone prefer the board someone prefers the zoom the the iPad so I'll give it a try uh with this but any comments or any kind of suggestions are welcome and we we're open to change the format as well so um but for today at least I'm going to use the board um and I think the the video is able to capture the board almost the same as the
+
+3
+00:01:08,000 --> 00:02:39,000
+the um the iPad I hope um okay so um okay so I'm going to talk about um the so-called generative learning algorithms so the next two lectures will be about this I'm going to Define what does it mean by generative learning algorithms and there are two type of General learning algorithms that we are going to cover one is called gaussian discriminative analysis I guess these are all new words that I have to Define as I'm introducing these things GDA and another type of algorithms is called naive Bayes
+
+4
+00:02:05,000 --> 00:03:15,000
+okay so I guess let me get started so um I'll start by defining what do I mean by generative learning algorithms to kind of Define these terms I think it's useful to compare with what Chris has introduced in the last two weeks so in the last two weeks I think the type of algorithms Chris introduced we call them discriminated discriminative learning algorithms so discriminative learning algorithms so the reason we call them discriminative learning algorithms is the following so in some sense the
+
+5
+00:02:52,000 --> 00:04:01,000
+definition is that if you model or you parametrize the relationship the conditional relationship of Y given X then we call this discriminative learning algorithms and I think you know if you recall this is the the type of algorithm the type of kind of models we considered in the last two weeks right so we model y as a linear function of X maybe Y is linear function of X Plus gaussian noise or maybe Y is linear function of X Plus exponential family or something like that right so for example uh in the most General format in the
+
+6
+00:03:30,000 --> 00:04:43,000
+last two ways can be summarized as you think of the X the Y given X parameters where Theta this is a distribution of Y given X parametric space Theta you write this as some exponential family exponential there's some distributions in exponential family with some parameter with some input ETA and this ETA is a linear function of X right for example you can say this is a gaussian distribution which means ETA and that's just the standard linear regression right so so this is why we call them um discriminative learning
+
+7
+00:04:09,000 --> 00:05:33,000
+algorithms and today we're going to talk about a so-called generative version generative learning algorithms the the basic idea is that you are going to model or parameters here model means is a word means basically means parameterized or you have a mathematical model for the conditional for the drawn distribution P of X comma y a joint distribution of X and Y you know using the simple chain rule you can write this as x given y times Q of Y so you model both these two quantities is this the there's some light is
+
+8
+00:05:01,000 --> 00:06:06,000
+flashing right some should I are you bothered by it or not I'm fine with it just okay no worries okay um I think it flashes after every minute or something uh anyway so you model the drawing distribution by modeling each part of this tool and particularly you model the drawing distribution by modeling the distribution of Y and the distribution of X condition y 0 X and Y are not symmetric Y is the label X is the input and typically they'll have very different meanings y could be something like you know like the price
+
+9
+00:05:34,000 --> 00:06:48,000
+of the house and X is uh the features the all like what you know about the houses right so like the the square feet you know the Lost size so and so forth so um and recall that axis the input or the and and this is maybe something like a label or some kind of class right if you have classification this is about cast class like maybe positive sentiment negative sentiment and so so basically this is the distribution of the input given the label and this is the distribution of the label itself and sometimes we also call this you know
+
+10
+00:06:11,000 --> 00:07:27,000
+a prior for the label a prior for the class or the label because this is what you believe like for example suppose Y is one means positive sentiment Y is zero means you know negative sentiment right suppose you are classifying the text then this is a distribution over two labels where positive and negative and this is the the prior that you have for how many positive examples all negative samples uh are in your data set and and then um so after you uh you mode on paramax this you can learn these two distributions right you can
+
+11
+00:06:49,000 --> 00:07:51,000
+learn the distributions learn P of x and y and p of Y we're going to say how do we learn them and after you learn both of this you are going to still solve the classification problem your goal is still the same you are trying to classify you are still trying to compute so this is the test time you are still trying to compute for example P of Y given X right you're still trying to classify what's the chance of each of the label or you probably want to get the max of y g Max you know we are going to talk
+
+12
+00:07:22,000 --> 00:08:47,000
+about exactly um you care about um but essentially you still care about the relationship of Y uh conditional X and how do you get this you get this by base rule foreign meaning so recall that PO for example y given X is equals to P of x given y times P of Y over P of x so you know this quantity you know this quantity and your you know this I'm assuming you already learned this too right and how do you know the denominator then you can just write this as the denominator is really just the uh
+
+13
+00:08:07,000 --> 00:09:20,000
+you take sum over y P of x given y times P of Y uh maybe just uh for the same quotation let's call this y Prime right so so this is the the standard the um total law of probabilities when you complete the marginal probability of P of X used as the denominator and then you also compute use these two volumes um on the top actually in many cases you don't necessarily have to compute the PO Box we will see exactly how it works but roughly speaking after you know these two things you can know uh after you
+
+14
+00:08:46,000 --> 00:09:57,000
+know x given Y and Y you can know y gonna ask by doing some base rule because by the way feel free to stop me at any point you know just to reach handle us to speak um maybe first it's good so let me repeat the question is it true that the discriminative learning algorithms cannot work on non-iscriminal understand right um no I think the discriminate learning algorithms can also work with other possible uh distributions here so as long as you specify y given X and your parameterize that by some parameter
+
+15
+00:09:27,000 --> 00:10:25,000
+Theta you can in theory you can still learn them using similar type of methodology I'm going to discuss the methodology as well uh um um but if you have expanded family then it's gonna be um there are several benefits for example you know Chris discuss this many properties nice properties of expenditure family if you don't have them then um you don't you cannot use those properties you have to use something else or you can you have to rely on optimization or sometimes it's challenging
+
+16
+00:09:56,000 --> 00:11:11,000
+um depending on the cases but in principle you can you can have other distributions here yeah maybe let's just do this order yeah yeah this is just a general framework so the difference between the two that I can guess is actually you will have parameters because I'm going to parametrize these two distributions and and learn them so um yeah I'm going to talk about that as well foreign so this is a yes so I'm also going to discuss uh the differences you know why like what's the high level differences
+
+17
+00:10:51,000 --> 00:11:57,000
+why you want to do this but I think it's easier to discuss those you know once I tell you a little more about concretely how this works um but so far you are right basically this is a somewhat seemingly Securities way to get P of YG Max right it's not direct right um um yeah I think I'm going to discuss discuss that you know discuss the differences you know probably later in the lecture just because you know it's easier when I have some examples okay any other questions oh would it be possible to write a
+
+18
+00:11:28,000 --> 00:12:34,000
+little bigger please oh sure yeah that's a great suggestion I think that's probably also useful for the recording as well um and also feel free to remind me again because I this this happens to in the past as well like every time after like a few lectures I I stopped writing big you know even after a few minutes sometimes maybe um okay so this is just a very high level introduction um so and just uh so we're gonna talk about two instantiations of this general idea so one is called this one so the
+
+19
+00:12:10,000 --> 00:13:18,000
+difference is it's really just in one case it's a continuous ax and the other case is discrete discrete X so and this continuous guys look it's called This is the gaussian discriminate analysis and the discrete acts we are going to focus on our application which is the the span filtering right so and today I think we're going to mostly talk about the continuous case and next lecture um I'm going to talk about the the spam filtering all right so so so now one example how how do we
+
+20
+00:12:48,000 --> 00:13:54,000
+instantiate this plant um so so for GTA what you do is you say I'm going to suppose X in Rd um I'm going to drop the convention just because here I'm not going to use the uh the bias at least you know in the modeling part I'm not going to use the bias um don't worry too much about it you know it's just though we don't have the X series one I know it doesn't really matter that much so um and I'm so the main thing is I'm going to assume you can say this is assumption you can
+
+21
+00:13:27,000 --> 00:14:44,000
+say this is a modeling assumption I'm going to assume P of x given y is a gaussian gaussian distribution so what does that really mean that really means that you write this you know you say x given Y is following some gaussian distribution with some mean and said Can converts and here note that X is a high dimensional Vector so I'm going to have a high dimensional multivariate gaussian disclosure so and we submit and be some covalent Sigma so um I think it used like a uh it's probably useful for me to briefly that
+
+22
+00:14:14,000 --> 00:15:26,000
+that word um kind of digress a little bit to briefly talk about some Basics about Matic varied gaussian description these are just some very quick review if you haven't seen this um but I'm assuming that you know something about one-dimensional gaussian distribution so just a very quick uh digression so if you have a multi-dimensional gaussian random variable foreign so what happens is that you suppose you have some random variable Z sample from this gaussian distribution which means mu and sigma covarian Sigma so here mu
+
+23
+00:14:53,000 --> 00:16:29,000
+is a d dimensional vector and sigma is a matrix is the so-called covariance Matrix so and the definition so the property you know you need to know is that you know as the name suggests the expectation of the Z is supposed to be the mean of the uh the mean parameter right so and the covarence of the random variable Z which is defined to be the expectation of Z minus expectation Z times Z minus expectation Z transpose this is you know is the The covariance Matrix so so this is how the you know you
+
+24
+00:15:42,000 --> 00:16:52,000
+generate the C from this gaussian distribution parameters by these two parameters mu and sigma and the the resulting random variable Z would have these two properties the mean is Mu and covariance is sigma and and you only need two set of parameters to describe unique like a gaussian distribution um and you also know that um you also know the density of discussion distribution so the density of the gaussian distribution is something like this I don't expect you to remember the formula because I
+
+25
+00:16:17,000 --> 00:17:36,000
+now I remember it after I teach teachers so many times but you know before I taught it I don't think I remembered in my graduate school um but the the formula is that I'm not sure whether you can see this um something like this um and here this is the is the determinant okay great I see some questions um sure maybe I'll start with the one one what does the denominator say what is the denominator so this is 2 pi to the power of theta over 2 and the determinant of Sigma so power of half and I'll write even bigger
+
+26
+00:17:18,000 --> 00:18:27,000
+oh this is just the oh one why I'm doing this oh this is just a definition of the code bar in case you don't know the definition so thank you yeah um yeah I'm just using that as a to indicate this definition um and and by the way this formula you know I don't think we really have to remember it um the most important thing is we have a constant times some exponential of some quadratic form of Z oh Z is a vector yeah that's a good question so this is why this is a little more complicated than God than than one
+
+27
+00:17:55,000 --> 00:19:16,000
+dimensional case right if you are familiar with the randomizable case then this will be still a scared of meal and this will be a long neck together sometimes people write a sigma square right so and the sigma will be just the um the uh um so for one master case this is just a virus and now it's the so-called coal virus and I guess you know if you are um so so in some sense if you look at Sigma of i j this is really just the the correlation between this will be uh the expectation of z z I say the ice chord minus UI times
+
+28
+00:18:34,000 --> 00:19:44,000
+ZJ minus mu J in some sense the entry of the covariance Matrix is capturing the correlation between two coordinates of course you have to remove the mean to match the correlation the right way but you match the correlation of the two coordinates of this random variable I saw some other questions [Music] um yes so x and z are the same thing here I use Z because I want to be my abstract so in a few in later I'm going to have a little more I'm going to I have to change this a little bit uh yeah
+
+29
+00:19:10,000 --> 00:20:09,000
+but this is just the for abstraction I use a different variable the second term is Sigma here so here because there are scalars so that's why I didn't have the transpose so this is a scalar this is a scalar right but and and here the reason why I have transpose is because then I need making Matrix so um I don't know I think some of you probably are familiar with this so I don't want to spend a lot of time on this but some of you probably not very familiar so I I think I used to have
+
+30
+00:19:48,000 --> 00:20:55,000
+some let me show you some other pictures to get a little bit more sense on the covers um let me see how do I connect to this Maybe do they know this um how do I signals anything to them I don't see they are capturing the video the the screen um anyway um anyway these are these slides so it should be oh yeah okay great so it used to be the case that I make slides for this part of the talk I just mix three slides but then I realized that maybe it's just easier for me to show you the lecture notes because then you know
+
+31
+00:20:48,000 --> 00:21:56,000
+where to find them again right so I'm not being lazy here it's just the uh you know it's also easier for me of course um okay so so these are some visualizations of the density function here so the first set of the just look at the figures this is a two-dimensional case right you have for these two and uh and you visualize the density of this um of the gaussian distribution so density you know always look like something like this right so and these are the cases where uh the co-virus is analytic it
+
+32
+00:21:23,000 --> 00:22:35,000
+means that when the covariance is identity it means that so that when the covariance is identity Matrix one one one it means that there's no correlation between any pairs of coordinates right like I and J with ing another same they have no correlation and and the results the um the the kind of the shape of this um discussion is always spherical so basically when it's identity it means that you have equal strength in all the um like like a basically you just have like a on the same strength in all the
+
+33
+00:22:00,000 --> 00:23:09,000
+directions because because like every Dimension like looks the same in some sense um so um so basically that's that's when you um uh see this kind of like very spherical shape of the density function and then you can uh the one thing is that the size of this density function depends on the the scalar in terms of the analytics right so if you have identity then I think this is uh uh the leftmost one but if you make the covalents two times bigger then your density function will be uh supported on
+
+34
+00:22:35,000 --> 00:23:39,000
+in some sense like a most exploring a larger region so that I think that's the uh the last one um and then in the middle one you have a smaller uh covert so in some sense the covalents um is um describing how at least how large this like how large this uh um this the shape of this density function is and also it's declaring two things right one is the the size and the other thing is that what's the correlation what's the kind of orientation of the shape so maybe one way to think about this is
+
+35
+00:23:07,000 --> 00:24:12,000
+that if you look at um the second like a rows of the figures so these are cases where the covariance Matrix are no longer identity and and they're for example in the the third figure here um so you have some correlations between two directions and then you see this the this uh this ellipsoid kind of shape is rotated into that direction just because in that direction the two corners are more correlated so it's more likely that these two chords are simultaneously bigger or smaller so that's why in that
+
+36
+00:23:39,000 --> 00:24:33,000
+direction you have you have more kind of like mass in that direction and you can see that the the difference between these three figures is that the correlation along that direction is bigger and bigger in the first one there's no correlation in that special Direction axis equals to y direction and the second one you have a little correlation so that's why it Tails towards the direction and then in the third one you have more correlation um so so it's even more skilled in some sense
+
+37
+00:24:07,000 --> 00:25:22,000
+any questions so I guess uh maybe another way to look at this is that you can look at the Contours right the um the like of this thing so so basically you look at the uh uh the the level set of of this density function levels that means that the set of um the basically the the set of like points with the equal or equal density right so and then you can see that you get this kind of ellipsoids and the same thing right so so um um so if you have more correlations then this ellipsoid will become you know more
+
+38
+00:24:48,000 --> 00:25:49,000
+tail towards one special Direction so for example here I guess if you can see my pointer so this means that in this direction like a so I think if this is X1 this is X2 right so if you see this kind of Contours then it means that uh X1 X2 are equally are likely to be simultaneously bigger or smaller and so that's why they have correlation uh and uh and if you see in in this one then you're gonna have some reverse type of things right so if X1 is bigger than X2 is likely to be smaller and that's
+
+39
+00:25:18,000 --> 00:26:21,000
+that's when you see this kind of shape um there's no need to you know exactly you know like understand this right so like uh um it's just some kind of rough intuition you know in reality you don't necessarily have to exactly you know uh visualize all of this but these are any questions you know I know sometimes this could be confusing sometimes this could be very enlightening I don't know like depending on but if we ask any questions okay okay so um okay so I guess we'll move on back to
+
+40
+00:25:53,000 --> 00:27:04,000
+the more messy stuff um Okay cool so so I've introduced the multivari gaussian discussion and now I'm going to go back to the gaussian discriminate discriminative analysis so we are going to parameter as x given y as a gaussian distribution so so by the way I think I forgot to mention that here in both of these two cases the Y is always discrete um you can you can make white non-discrate as well but here we're only looking at a case where y the label is always discrete so now let's let me continue with the
+
+41
+00:26:38,000 --> 00:28:15,000
+GDA so so as I said why is this great and we are only going to assume that there are two labels say one zero and one zero could mean for example um I guess I don't know why oh I I think I missed one small thing here but let me just so I guess uh one of the running examples we used to have for this uh uh for this uh gdr application is that you can think of like you have some kind of like um I guess for example cancer classification so like a benign a monument classification so you have some maybe X1 X2 two
+
+42
+00:27:38,000 --> 00:28:50,000
+dimensional uh inputs and you see a bunch of data like this so so these are cases where you have in eye cancer think of maybe X1 and X2 as a measurement right of the patients right so maybe blood pressure or some size of certain kind of tumors and uh and and for every patient or every case you have you know whether this is a benign cancer or not right these are the the Bad Case right malignant cancers so and and the question is that you want to kind of classify this right examples into two classes right so that in the future if
+
+43
+00:28:17,000 --> 00:29:24,000
+you see one more example one more example here maybe you want to know whether this is a benign one or not and the label is basically here let's call this label zero on this label one so that's kind of the the the the target applications we are thinking about so now I'm going to parameterize what is x given y right excellent y and I need to specify two cases where one one case is that what is the X distribution of x given y zero and the other cases there was the distribution of excellent Y is one
+
+44
+00:28:51,000 --> 00:30:07,000
+I'm going to make both of this gaussian distribution so I'm going to assume that x given y 0 is a gaussian distribution and the gaussian distribution has mean mu zero and covalent Sigma so here I mean the high dimension okay so mu zero is in Rd in this case these two and sigma is in r d by D and for the other one my modeling assumption is the same I'm going to assume this as Mu 1. and sigma Okay so the same covariance that's just for convenience I can use different covariance Matrix but here I have to use
+
+45
+00:29:29,000 --> 00:30:27,000
+a different mean because clearly if you fade a gaussian distribution to this part bunch of points and you have a gaussian distribution for these kind of points you're going to have different mean right so that's why I'm gonna have mu 1 here and mu 0 here so mu 1 mu zero Sigma these are the parameters yeah so this is mostly just for convenience and for like you can make them not the same Converse Matrix then um in terms of like the optimization in terms of learning this uh these things
+
+46
+00:30:01,000 --> 00:31:16,000
+is going to be more complicated um so it's still learnable um at least with some Advanced Techniques but it's going to be more complicated so so here is really in some sense a simplification uh simplified assumption this oh um oh yeah so that's a good question so this is like this so you're given this event y 0 it was the distribution of x [Music] and that's a good question right so uh so how do you model the accident y right so in many cases you have you have many many different choices right you have
+
+47
+00:30:51,000 --> 00:31:58,000
+different covariants you know you have different means or you can even model them in different ways so here I think you know at least you know um if you look at the data you see that the distribution of X you know Y is one and X gamma y zero sounds quite different so probably it makes sense to model them separately right if you model the whole thing as a John Golson I think it doesn't look like a ghost that's pretty much the reason okay who so so are we done so we haven't done with the modeling yet because we only model X
+
+48
+00:31:29,000 --> 00:32:32,000
+given y right before remember that we also have to model P of Y right you need to P of y and p of X and Y to know the joint probability distribution and then you can use the base rule so how do we model the P of Y this is relatively easier because P of Y is only a distribution over two possible choices right why I only have two choices zero and one so basically you just have to have two parameters right so one parameter is supposed to model P of Y is one let's call this V and then you have P of Y is user zero let's call
+
+49
+00:32:01,000 --> 00:33:21,000
+this one minus V what's the sum of these two has to be zero so sum of these two has to be one so um and so in some sense you say Y is from this Bernoulli distribution with parameter V this is just another way to say this okay so basically in summarize what are the parameters so the parameters I guess this goes back to the question someone asked this question right so we do have to have parameters even for the general learning algorithm and the parameters are mu zero mu one Sigma and Phi and our goal our next step would be we
+
+50
+00:32:47,000 --> 00:33:53,000
+want to learn these parameters so that we know P of x equals y and p of Y so that we can compute P of Y and X okay so the next part is about fitting parameters okay so how do we learn the parameters from data right so we learn the parameters the general principle is maximum likelihood I think probably you know Chris has talked about this word maximum likelihood in you know probably once or twice in the previous lectures but here the maximum likelihood is a little bit different I'm going to compare what's
+
+51
+00:33:42,000 --> 00:34:51,000
+the difference between this likelihood from the uh from the one that we discussed before so first let me Define what maximum likelihood here means in this setting so by maximum likelihood I mean I first have to Define likelihood so likelihood is this basically the chance of seeing a data given the parameters so it's a function of the parameter so if you have these parameters V mu 1 mu zero mu zero mu 1 Sigma you can Define the likelihood of these parameters this is the chance of seeing all your data
+
+52
+00:34:16,000 --> 00:35:47,000
+foreign given the parameters so you hypothetically think that all the data generated from this dispute distribution and and you look at the what's the density of the of your data under these parameters sorry oh it's even bigger okay yeah sure okay so and let me let me also clarify the notation here so x superscript i I think probably Chris defined this right so we're going to use this through other uh throughout the uh the lecture lectures so x i y i this is the ice example so so we have this data set with other
+
+53
+00:35:18,000 --> 00:36:33,000
+examples I'm only I'm looking at the likelihood of all of these examples under the parameter V 0 mu zero mu one Sigma so for every parameter you have a likelihood and this likelihood uh can have this sounds like kind of complicated but actually you can somewhat simplify it a little bit because um these examples are independent right so you assume that your data are drawn independently from you know uh each examples are drawn independently so then you can factorize this so this is the product of the likelihood of all the
+
+54
+00:35:54,000 --> 00:37:32,000
+examples because you use Independence P of x i y i giving and you can even factorize this a little bit more to say that you can use the chain rule to get P of x i given y i and the parameter the parameters n times P of y i given the parameters note that not all everything depends on on everything else um okay let me I don't think I have a different color so um so here you can have some simplification because y i the distribution of Y only depends on Phi right the MU 1 mu 2 mu zero mu 1 and sigma are described are describing the
+
+55
+00:37:08,000 --> 00:38:10,000
+conditional probability right so y only depends on fee so you don't have to write here these things right because they are the there is no such dependencies and also the same thing x i condition y I only depends on mu 0 mu 1 Sigma it doesn't depend on C so you don't have to necessary write V here even though you write it it's the same so okay so this is the um the so-called maximum likelihood and what you do is you want to say I'm going to maximize maximize this IL V mu zero mu one at the
+
+56
+00:37:44,000 --> 00:38:49,000
+same so basically you say I'm going to maximize so um so the the Learned parameters will be the maximizer of this likelihood function all right if you need to find the maximum you want to find the parameters such that the likelihood is the is the largest so this is the so-called maximum likelihood in our context so uh why the question is why you make this independent assumptions um I think in short you know if I I have a very short answer I think this is almost like always assumed in all machine learning settings even in most
+
+57
+00:38:27,000 --> 00:39:17,000
+advanced settings and and the reason is that um there I think there are multiple reasons you know you can say this is uh in some sense you know one thing that you can imagine is that you do clock data somewhat independently from a very large pool that's probably the simplest way to say it of course there are cases that this Independence is known to for example if you have interruptions for example suppose I first get some data from you and then I do something and then I get some other data from you and
+
+58
+00:38:53,000 --> 00:39:54,000
+maybe these data are not no longer independent or maybe um the second time you provide me data you also look at the first time sometimes you know there's something about this dependencies especially in reinforcement learning like where you have interactions so in those cases we will drop this kind of Independence assumption but in most of the cases we do assume the data are sampled from a large pool independent 2. please find the stuff going right C is a scale yes you are right and the Visa scalar and is also a scalar in zero
+
+59
+00:39:24,000 --> 00:40:23,000
+that's a good question do you have the freedom to change feet yeah uh we are on the fee is a parameter right so you're going to learn feet You're Gonna Learn what is the right thing from date so so how do you learn free so you have to find out the maximizer of this and the maximizer will be when we for example some training that's better using pictures [Music] um you are exactly right you are ahead of me yeah so and but we are going to prove that we are going to show that that's
+
+60
+00:40:01,000 --> 00:41:06,000
+actually the solution so there's a reason for that no you have the very good intuition right the fee is pretty much the proportion of the the positive examples or the proportional positive examples right but we haven't actually so that's actually the case if you use this black adults is right so the maximum likelihood is you are maximizing the chance of the data given the parameters so the parameters are just some you you look at all possible parameters and you see which one which parameter can give the light the most
+
+61
+00:40:40,000 --> 00:41:42,000
+likelihood oh right and uh so yeah like this so so this is the maximum likelihood this is the methodology we're going to use for generative learning algorithm not only today's algorithm but also for next lecture where we have other settings we still maximize select and just to compare this with the discriminative learning algorithm there we also use maximum code and but the meaning of the the phrase maximum likelihood could could be a little bit different so so here you are maximizing the so-called joint
+
+62
+00:41:12,000 --> 00:42:33,000
+the The Joint density right of both X and Y you're maximizing the probability to see um the pairs of X and Y but for discriminative algorithms so for discriminative algorithm so what you do instead is that you're maximizing the so-called conditional likelihood even though many cases people just drop the word conditional when that is clear from the context so in the conditional likelihood is this probability of seeing the the family of labels conditioned on the inputs and the parameter state
+
+63
+00:42:12,000 --> 00:43:14,000
+so and you can also factorize this you can factorize this as so here I'm using Theta as a generic parameter just to be abstract you know because I'm talking about the abstract setting right so you can think of this data as the linear linear model family so and you can still factorize this you can factorize this into using the independence but whatever you do you always condition X so X is considered to be a in some sense a deterministic quantity You observe you don't know how X is generated we don't care about how X is
+
+64
+00:42:48,000 --> 00:43:49,000
+generated you just care about how Y is generated conditional you see X so um and part of the reason why you do this is that you only model y given X you need to model what's the distribution of X so there's actually no way you can do the does this maximum likelihood above in the in the in the in the discriminative sets because the only thing you model is why you can act that's the only quality that you have to parameterize form for so um so so you just go with whatever you have in some sense
+
+65
+00:43:19,000 --> 00:44:20,000
+um right and it turns out that these two are are indeed different you know there are some relationships and there are differences you know which we'll discuss uh uh after I introduce some more uh more examples I think any questions so far this is what we yeah exactly and and maybe you know I think you know um I think this is you know probably the best discuss you know after I give some examples of on the concrete examples but in some sense you can see the differences between these two kind of
+
+66
+00:43:52,000 --> 00:44:50,000
+algorithms and the differences between these two type of assumptions is that here you have more assumptions on the all the data right you you are making some assumptions on both X and Y and here you're only making assumptions on YG Max so so it's really about you know home like the differences will be about you know how many assumptions you impose on the on the structure of your data you know how much like in some sense like there is a whole universe right so you you cannot model everything right so so
+
+67
+00:44:20,000 --> 00:45:16,000
+like so you choose some part of the the qualities you can model and and the decision here is you model both X and Y and decision here is human model part of it and that will cause some differences in certain cases that's a great question so the question was that you know here for the genitive algorithms we have the generative learning algorithms we have assumptions on the features right would that be a problem if you generalize to you know other examples so it depends uh it depends on whether your assumptions are
+
+68
+00:45:02,000 --> 00:46:02,000
+correct or not in some sense right if your exact assumptions on the on the features is kind of gaussian then actually it would provide you more generalization generalization because your assumptions are correct and I need input structures and when your assumption is wrong then it would cause problems so um so actually this is um yeah and this is basically like the main differences right so you um for different algorithms you know sometimes you can have it like as I said you have a lot of variables in this
+
+69
+00:45:32,000 --> 00:46:29,000
+world right because can you probably can even pick some other you know like uh like so basically you have a you can try to Model A lot of mechanisms or you can try to only model a part of it and and what's the decision you know often it's a trade-off if you model too much then you are risking to to model them incorrectly right and if you model two less then you don't have enough um like you don't leverage enough prior knowledge in substance right like if for example if you really know this is a
+
+70
+00:46:01,000 --> 00:47:02,000
+gaussian you probably should not should leverage the prior knowledge um but but you may you may be wrong so it depends the cases yeah this is great questions um I know I'll discuss a little bit more about this more mathematical levels [Music] yeah so so I think the question is you know uh given to me and covariance you know like if you don't know anything else it's the ghost in the best is that question yes I think that's a that's a great question so um so typically you know you are
+
+71
+00:46:36,000 --> 00:47:30,000
+basically right if you don't know anything else then you probably should just model them like if you don't really know me me and covers but on the other hand you know um to be fair you know you know more than the me and the covers right so for example if you really want you can compute the the third order uh correlations between these data points between these coordinates right so in theory you can also because you have so many data if you have a lot of data you probably can model other higher uh
+
+72
+00:47:02,000 --> 00:47:54,000
+higher moments of the data I'm not sure you know the definition of mobile so you look at the higher correlations between the coordinates of the data if you have a lot of data um but gaussian is pretty reasonable assumption and it's still used very often um uh sometimes you people use transformations of gaussian so here we assume they are gaussian sometimes people use like you can transform the Gauss in certain ways but gulpture is pretty pretty reasonable assumption so how do I do the test when Y is
+
+73
+00:47:40,000 --> 00:48:46,000
+continuous is that question yeah so we'll uncover that but pretty much you follow the same methodology you're going to have a different prior or different distribution for white P of Y right so maybe you can model P of Y by say gaussian again you know if you want I'll even have my variables to describe the description the accuracy oh oh so so I guess the question so um in short you know why the why is this critical continuous in some sense is uh mostly decided by your data set right so
+
+74
+00:48:21,000 --> 00:49:14,000
+I think typically if your data set is really discrete right so if you really just have like benign cancer or not right you probably don't want to make it continuous for the same reason as you said you know why you want to make it more complicated right so you have more parameters to learn right but sometimes it's just like your your why is really continuous there's no way you can discretize them or you know meaningful way so um right and also to be fair the the parameters to model Y is often much
+
+75
+00:48:48,000 --> 00:49:47,000
+smaller you have a much smaller number of parameters to model y than the number of parameters to model X for example here if you come if you count so you only need one parameters model y right so even this is continuous you only need one real number to model y probably if you have say for example why is the gaussian description but it's one dimensional right so you only need one parameter but for X it's a high dimensional thing so you have to always use more parameters so so typically it's not a big issue
+
+76
+00:49:20,000 --> 00:50:18,000
+audio make a judgment of how many distributions yeah yeah I think that's a great question how how do you make this judgment how many kind of distributions right so the easiest answer is that you always use two as long as you have two labels uh if you just have two type of things you want to classify you just always have two different discussions two gaussians um of course you may want to go more advanced you know to say even for for the maybe for the benign Kaisers right it's not like really really like all the
+
+77
+00:50:05,000 --> 00:51:04,000
+deny countries are the same right maybe there's two sub populations right so so it does probably require a little bit domain knowledge or maybe a trials and hours you know you could try to generalize this okay so uh let me proceed with the okay so I discuss a lot of methodology so far so now the next goal is how do I maximize this how do I maximize the likelihood right so you need to you need to be able to do this you know in power quality right so to guide the parameters right so this is about computation
+
+78
+00:50:41,000 --> 00:51:33,000
+partly right so what we do is we you know one choice is that you just write down this function uh in your computer and you run some optimization algorithm but you want to do a little bit more than that in math because that will simplify your uh your implementation right so so we're going to simplify this formula so that we can and and actually we're going to do a lot of math so that you the you don't really need a laptop to your computer to compute the parameters to to run optimization
+
+79
+00:51:07,000 --> 00:52:30,000
+algorithm for this right so um so what we're going to do is that um so the first thing is that we know that if you do a Arc Max so we are we care about the arc Max right the the maximizer of this of DC so the the maximizer is the same if you transform your loss function with any continuous monotone function so even either log the maximizer will be the same and tip for the for the purpose of this course this course we Define this using a little L this is the law of likelihood okay while we are doing this no it
+
+80
+00:52:05,000 --> 00:53:35,000
+sounds like we just introduced something even more uh more symbols the reason is that this will make the product to a sub so log of this product log of a bunch of Paradox of range of terms will be equals to the the sum of the log of each of the terms so this will be sum of the log of these two terms and the log of the product these two terms will be the sum of the log of each of them so we log of P of x i given y i um plus the log of p y i given I guess I don't have to write P here for this purpose
+
+81
+00:53:02,000 --> 00:53:56,000
+right so everything becomes a sub and that's that's very important actually because even you do this numerically it's very important to take the log because all of these numbers you know if you do it empirical you see like there are either very small or very big just because you know we call that when you have gaussian distribution there's exponential here so it's kind of pretty easy to see the density function it's pretty easy to be either very big or very small they are not never on the the
+
+82
+00:53:29,000 --> 00:54:32,000
+best scale like you can imagine but if you take the log of it the scale will be much nicer so so the log of the density will be on like some reasonable kind of scaling so that you can numerically use uh and also it becomes a sub so you don't have to do the product so and then how do we proceed you know one option is that you again you can still do the numerical stuff where you can do optimization algorithm to to get the minimizer but here we can actually analytically compute the the maximizer
+
+83
+00:54:01,000 --> 00:55:20,000
+so so the maximizer here how do you compute it um what you do is you I'm going to continue here so um so you really so how do you find the maximizer so there's a small fact I guess probably you learn from the um the Calculus class so if Theta is a maximizer then that means that of some function f Theta I'm being abstract here um so then it means that the gradient of the function at Theta evaluate as Theta is equals to zero so if you are in the maximizer you have to satisfy the gradient zero and
+
+84
+00:54:43,000 --> 00:55:46,000
+actually in many cases this if after is convex then this is if and only if if it's not convex this is still um this is still a necessary condition so for us it's actually convex so it's a it's a necessary and sufficient condition um but for other cases this might be just only a unnecessary condition so because you have this then you can solve the the equation so you can try to solve the equation I'm going back to this is a small abstract fact now I'm going back to this case so basically you say
+
+85
+00:55:15,000 --> 00:56:33,000
+the gradient of the loss with respects to all the parameters should be zero right so like with back to three mu 1 mu 2 and uh and and sigma should all be zero so basically you just have to say by the gradients is zero and this really just means that the partial derivative with back to each of the parameter is zero so now you have four equations and you can try to find the solutions for these equations and and this is I think homework one Q 1 T so in that homework we're asking you to first of all you have to compute
+
+86
+00:56:09,000 --> 00:57:05,000
+what is each of these is right so you have to have an analytical formula for each of this right so what is the the derivative of L with respect to Phi you have to do some calculation to see what's the derivative you have to plug in all of our definition of this p is two P's and you get the the loss function as a function of v a new derived the derivative the derivative respect to Phi and then write out that this is zero and you solve the equations so that's homework q1d and this is a
+
+87
+00:56:37,000 --> 00:57:37,000
+little bit complicated to some extent you know but not it's still manageable and this is you know they are even more complicated things than this in machine learning this is still you know but but at the first time it would be a little bit complicated because all of this has a little bit kind of like complex formulas um right so and what I'm going to do next is that I'm going to tell you what's the solution of this directly so you know this answer of the homework question uh and I'm going to proceed I'm going to
+
+88
+00:57:07,000 --> 00:58:13,000
+interpret while the solution makes some sense you will see the solutions actually make a lot of sense intuitively um and and I'm going to proceed with that oh my god did I switch to that oh my God this is new zero this is thank you so yeah so what's the dimensions of this yeah that's that's a wonderful question so I think often this is a confusion that is pretty often like a um just because sometimes in math they have different things so in the in this class uh the derivative of with back to the
+
+89
+00:57:55,000 --> 00:59:17,000
+the parameter any parameter will have the same shape as the parameter so so this is a one-dimensional parameter so so that means that this is a scalar this derivative is scale and this is the D dimensional Vector mu zero so that means the derivative is Rd and this is in Rd by D ude so this is a zero ISO vector and this is a zero Matrix Okay cool so I need to erase something I guess okay so what other Solutions you know so the solutions are okay I'm going to first Define some notations so uh
+
+90
+00:59:15,000 --> 01:00:49,000
+select u0 to be all the examples that are positive these are the index for the policy of examples indices and wait my back this is U1 u0 is the indices of negative examples okay so under the mle solution the solution will be the following so Phi is equals to U1 over n where n is the total number of examples which is equals to u0 plus U1 so what is this this is really just the fraction of positive examples right so this is the fee you learn so Phi is supposed to be the probability of Y is one right that's your modeling
+
+91
+01:00:44,000 --> 01:02:08,000
+choice and it turns out that if you learn it from data it will be exactly the fraction of positive examples in the data so so this is the most likely fee that can join with your data which is exactly the same fraction as in empirical data um and and of course one minus V will be the fraction of negative examples in the data question okay how do I remember this I have to burn this in my head so one minus V is equals to this is the fraction of active examples yes one U sub 1 is it is the is a set
+
+92
+01:01:40,000 --> 01:02:55,000
+so this set contains all the indices such that y i is equals to what so this is the indices of positive examples Okay so so for example suppose you have here right so this will be the set you want this will be the set u0 and and how do you decide what is fee the maximum likelihood feed will be just you can't common examples in total one two three four five six and maybe 10 examples and you say four of them are positive so that's why fifth is going to be so in this case P will be 4 over the
+
+93
+01:02:23,000 --> 01:03:32,000
+total number of examples 10. and for some reason I'm going to write this p as the photos I'm going to write C also just to this is mostly just for mathematical cosmetically uh you want to make it look a little bit nicer in some sense or more consistent with the other equations I'm going to write next so you can also write this as the following let me explain this notation so this is so-called indicator function so indicator function I'm going to write that one of E I think I think the homework we
+
+94
+01:03:10,000 --> 01:04:28,000
+write it like this you know people different people have different type of brackets but it's the same as long as they defined so one e this is equals to um this is the so-called Indian function for the event e so it's equals to one if e happens and is equals to zero otherwise so let me check whether this um so in this case right so this indicator of y equals one just means that if Y is equal to 1 is equal to one this indicator of that is equal to one otherwise it's going to be equal to zero so so
+
+95
+01:03:51,000 --> 01:04:59,000
+basically this indicator is only one when the label is positive and I'm taking the sum over all examples so that's why I'm basically counting how many examples satisfy y i is equal to one so so that's why this whole thing is just equals to u u y it's probably useful to understand this notation because I'm going to have a little more conflict in formulas than this so this is a four marking subsystem this is just uh I guess on in my mind this is capital uh which is not the Greek lighter mu
+
+96
+01:04:33,000 --> 01:05:58,000
+um yeah I guess in the um yeah when you do it handwriting is not that obvious yeah but there are completely differences right this is a set another is a parameter no relationship at all um why do I started oh let's oh I see I see so that's a good question yeah thanks for us so the absolute value is um maybe I should Define this so this is the side so when you have a set I'm using this as the size of the cardinality of the set like how many items are in the set um this is the notation yeah yeah that's a that's a
+
+97
+01:05:32,000 --> 01:07:07,000
+good question maybe you should take a note on this I think last I was asking this last time as well Okay cool so I'm going to continue with the telling you the solution of this mle okay foreign this is the mle for the parameter mu mu zero this is equals to 1 over this is u0 the SEC the number of negative examples times the sum of all the excise in the set use mu u0 so so this is the sum over all the positive examples and I'm taking some of the the the input vectors the the feature vectors x i so
+
+98
+01:06:54,000 --> 01:08:05,000
+basically this is just the the average the empirical average of X I's you know of a negative axis right so I'm looking at all the negative examples I'm going to take the empirical average of the excise in it and that turns out to be the best estimate for the means of that class oh I see I see yeah that uh good question so it doesn't mean anything empirical average is the same average um yeah there is you know just just think of it as the average there's some reason why I use that just
+
+99
+01:07:47,000 --> 01:09:12,000
+because some other cases here sometimes don't worry about sorry um yeah okay so any other yeah so and and now I'm just gonna I'm just telling you the answer and but this sounds like very intuitive right so like what would you guess you know what's the the best what's the best meaning for this class probably you should just use the average of all the examples at least you know if you see it you know it sounds somewhat reasonable um and um you can guys you know just because these
+
+100
+01:08:37,000 --> 01:10:01,000
+are symmetric you know from the MU 1 is the same thing you're gonna have one over the size of the positive examples times x i the times the sum of the this right so this is the this is the average of positive access okay so and we're going to write this as so I'm going to use this indicator function to write them uh in a slightly different way so I'm continuing here so if you look at this formula you can write this as the u0 the size is equals to as we argued the indicator of y i
+
+101
+01:09:25,000 --> 01:10:30,000
+is equal to zero this is the number of examples where y i is equal to zero because Y is equal to zero means the indicator is equal to what right that's what indicator is saying right indicator is saying is if the indicator is y only if the event is happening so that's why this this is one when Y is zero so this this is why so that's why this denominator is the same as the size of the negative examples so and then the the numerator can be written as equal to zero so you first have this
+
+102
+01:10:04,000 --> 01:11:12,000
+indicator only selecting those examples that are negative and then you take multiply x i and for the second part for the MU 1 is the same you just replace Zero by one so you have and you have you select all the positive examples and you multiply x i so you know why I'm why I'm writing it like this you know one reason is that you know it looks you know a little bit kind of like more um systematic I'm not sure whether you agree with that maybe you don't um another thing is that you know
+
+103
+01:10:54,000 --> 01:11:56,000
+um I think you see this kind of formulas you know pretty often for other cases as well so so it's probably good to unify them in some months in some sense but you know but you don't have to remember any of this you know the I think this this way is the best way to remember them or and any kind of interpreter so you just treat this as a cosmetic changes some cosmetic changes of the former okay and next I'm going to have Sigma so the solution for the mle for Sigma is like this this may sound a little bit
+
+104
+01:11:50,000 --> 01:13:05,000
+complicated okay so let me try to so this is the what is this meal this meal is the meal we have completed above so you have to use the meal you completed about to compute Sigma so these are the means you complete above a mean y i could be mu 1 or mu zero depending on what what's what's y i um and when we do interpret this is that you just look at you can expand the sum into two cases one case is the Y is zero and the other case is y is one so when y i is zero so you have the so those are the Y those are the I's
+
+105
+01:12:39,000 --> 01:13:56,000
+that are in the set u zero and this is x i minus mu zero times x i minus mu zero transpose and then you have you look at the those cases where Y is equal to one and then this mu y i becomes mu 1 and you get this so this makes it a little bit easier to interpret because this if you compare this with the this is kind of the covers but the covariance evaluated on the empirical data so this is the sorry on the on the data set we have seen empirical is empirical is a word that's used to stress that you you
+
+106
+01:13:32,000 --> 01:14:50,000
+are seeing the data sample data so that's I kept using that but you we don't have to use that word so so this is the covariance covariance of excise for those excise in the set u0 for those negative examples so this is the covariance of negative examples and this is the covariance of the positive examples and and it turns out that the the average of the in this sense is is the is the best guys for Sigma it's the it's the sigma that gives you the maximum likelihood Okay so I've got all of this uh
+
+107
+01:14:23,000 --> 01:15:17,000
+parameters so far right so um and now you're going to ask to prove all of these are true and but suppose we already got all of these parameters we can complete them in near Miracle right by plugging this formula because you just plug in all the excise you have all of the data you plug in you get all of these parameters so you've got all the parameters so that's the so-called learning process you learn the parameters and now the next question is how do you make predictions on a new example right you get the parameters how
+
+108
+01:14:50,000 --> 01:15:52,000
+do you make predictions because so if you assume they are different I don't think the formula will be this I I and actually if they are different you can you don't even have a analytical form for the solution of the mle like like the just you cannot Solve IT analytically so here is kind of like for some reason because we are making all of this simplifying assumption you can solve the minimize the maximizer of the mle but it actually is not always the case you can write analytically and when
+
+109
+01:15:29,000 --> 01:16:59,000
+Sigma are different for the two subpopulation you don't have that analytical solution Okay so okay so now we're talking about prediction so let's get it if you want to open some water but you want to understand you know what what is the deny cancer or not right that's your final goal that's that's the final goal of the of the problem so and the way that we do it is that you say I'm gonna output the most likely why so I'm going to Output Arc Max the maximizer of P of Y given to X
+
+110
+01:16:37,000 --> 01:18:01,000
+and the parameter feed mu zero one Etc and note here that this are the solutions of the anole so these are not aperture parameters so I in some sense you can even say I'm obvious notation a little bit just for Simplicity so here this female one mu zero Sigma R those solutions that are computed from this farmers okay this is a matrix right this is a vector this is a vector new theories of vector mu zero is the mean of the gaussian is a d dimensional vector so did I say something here oh okay I
+
+111
+01:17:40,000 --> 01:19:07,000
+guess I erase it right so you assume y given x given y is from this you know from Y is maybe zero this is from discussion with mu zero and sigma so mu zero is a d dimensional Vector Sigma is a matrix no that's T C is the is a scalar is the probability of Y is equal to one and mu zero is the prop is the mean of the mu 0 is the mean of x given y zero and mu 1 is the mean of x given Y is one how to do this yep Okay cool so back to here so this is my methodology I'm going to take the mle so how do I
+
+112
+01:18:36,000 --> 01:19:33,000
+compute this so it turns out that this you know of course I have to use the base rule to get y gonna X because I only know x square and Y I only know why but I don't know what is YG Max so one thing is I have to use phase rule so let me do the base rule for you and it's actually simpler than you may think so because here you are maximizing over y right you are trying to Output which Y is more likely right well it's more likely to be denied cancer or not so basically this maximization problem just
+
+113
+01:19:05,000 --> 01:20:27,000
+have two choices we are just maximizing over two possible choices so you are just taking the arc Max of the two the two point is two scalars they are both probabilities and that's what so just cover these two scalars and which one is bigger and turns out that these two scalars their sum is one because given X in y can only be zero or one so right so maybe let's suppose just for for the sake of simplicity so suppose you call this a and call this B then a plus b is equals to y right and you care about which one is
+
+114
+01:20:02,000 --> 01:21:24,000
+bigger or the a is bigger or B is bigger so if you have a plus b is equals to one and you're taking Max of A and B then what does this really mean it really means that you are asking whether a is bigger than point five or smaller than 0.5 because you're going to choose a if a is bigger than 0.5 right because if 8 is 0 than 0.5 that means B is less than 0.5 so that's why you choose a and and you want to choose B maybe let's write this again sorry a if a is bigger than 0.5 because that
+
+115
+01:20:51,000 --> 01:22:06,000
+means B is less than 0.5 and it's going to be equal to speed if a is less than 0.5 because that also implies B is bigger than 0.5 so so basically the question is that you just care about whether a is bigger than 0.5 or not so going back to this zone I'm doing abstract thing right so if you're going back to this then it really just means that this Arc Max is equals to 1 Y is equals to 1 if the probability of Y is equal to 1 given X and the parameters is bigger than 0.5 sorry my there's a little bit
+
+116
+01:21:31,000 --> 01:22:52,000
+and limited space and if you zero if P of Y given Y is 1 given X the parameter is less than 0.5 so you know which also makes sense right because you know why oh in my back right so which this also makes sense because basically this is saying that if the probability of Y is one is larger then you you choose y you choose one otherwise you choose zero that's it right I'm just mathematically derived that for you um that's it so and if you look at this figure so what's the final decision what's the
+
+117
+01:22:35,000 --> 01:23:49,000
+final kind of like boundary between these two cases this line will be the family of X such that this P of y equals to Y given X is equal to exactly 0.5 so if you if you define this family of axis right this is a family of axis such that the probability y given X is equal to exactly 0.5 and this is called the decision boundary so and on one side of boundary Y is y is more likely on the other side of the boundary y 0 is more likely and the boundary you know you just do some arbitrary type of thing or you
+
+118
+01:23:24,000 --> 01:24:25,000
+just randomly output what you know the boundary wouldn't be very likely to show up it's very unlikely that your Pawn will be exactly the boundary so so it doesn't matter that much [Music] so maybe let me just uh maybe let me just uh quickly because we're gonna have two minutes left let me just quickly say what is this decision module is for the gaussian discriminate analysis right because here what I'm doing here is it's pretty General in sometimes you can see right I didn't really talk about what
+
+119
+01:24:00,000 --> 01:25:24,000
+exactly the parameters are and if you really want to know it know what this P of Y given X is but you have to plug in the parameters you have to use the modeling right so and for G for gaussian describing analysis if you plug in uh you plug in um so what you do is you're following so you do p of Y is equals to one game X this is the thing you really care about so you use base rule so you say that this is equal to P of x you know Y is one and here you only depend on mu one Sigma and you have P of Y is one given
+
+120
+01:24:52,000 --> 01:26:39,000
+and you divide this by P of X the probability of x this is the base rule that we kind of alluded to in the the beginning of the lecture so and then you do a lot of calculation which uh I think this is homework I do a lot of calculation and what you'll find out is that actually this has a relatively simple form so the form looks like 1 over 1 plus exponential minus Theta transpose X plus Theta 0 where Theta is a something of Rd so that zero is a scalar so they are functions or they depend on let me just simply say
+
+121
+01:25:51,000 --> 01:27:09,000
+these are Depends on V mu zero mu 1 and sigma so so basically eventually you get mu all of these parameters and then use this parameter to compute Theta instead of zero and then you get y g Max and that's your probability and then you're on the computer decision boundary let me also do that real quick sorry we're running a little bit late so then you get a decision boundary so so what's the decision boundary the decision boundary is when this is equals to 0.5 and when this is equal to 0.5 is when
+
+122
+01:26:45,000 --> 01:28:14,000
+this exponential is equals to one right then you have 1 over 2 is 0.5 right so when the exponential is equal to one this means Theta transpose X I think sorry let me see I think I need to have a parenthesis here but then we become some abstract here it doesn't really matter that much so um so it means this is equals to zero and and you'll see that you know P of Y is equals to 1 given X is larger than 0.5 is the same as Theta transpose X plus zero is larger than maybe you say larger than zero
+
+123
+01:27:37,000 --> 01:28:38,000
+so so basically you have a a linear function of X that's your decision boundary that's why I keep drawing a line here you know from here you know from the principle you never know why this is a lot right the principle says that maybe this is a some formula of X right that is let's separate this but but the the derivation tells us that at least for this case the decision boundary is a linear function of x they were doing protocol uh so I think I'm gonna have this yeah sorry this is a title here I should have
+
+124
+01:28:07,000 --> 01:28:46,000
+the parenthesis like a yeah I know the signs are not that important um I think yeah we are um maybe you can see with the best way you can come to me to ask the questions and I I can stay here is that the best way maybe yeah
+

@@ -1,0 +1,684 @@
+1
+00:00:06,000 --> 00:00:49,000
+So last time we were talking about generative models and we started off with some discussion of generative versus discriminative models and recall that these are basically both different flavors of probabilistic models. Um but it depends on what we're trying to predict, what we're conditioning on and really critically what we're normalizing over. So we talked about discriminative models where you're trying to predict the label Y conditioned on your data X, generative models where you're trying to
+
+2
+00:00:28,000 --> 00:01:17,000
+just learn a probability distribution over your data X and conditional generative models where you want to model the data X conditioned on some user input Y um or label Y. Um and recall that um these differ in that what you're trying to normalize over uh because probabilities distributions introduce this normalizing effect where all things that you're that we're all where different kinds of things need to compete for probability mass due to this normalization constraint of probability
+
+3
+00:00:52,000 --> 00:01:43,000
+distributions. Um and last time we also went through this taxonomy of different categories of generative models because it turns out this area of generative modeling has been something people have studied for a very long time come with a lot of different categories of methods to try to solve variance of these problems. So we went through this family tree of generative models um where we have exp where last time we talked about these explicit density models where the model outputs some measure some quantity that
+
+4
+00:01:17,000 --> 00:02:13,000
+you can that some quantity P of X um either either the exact predicted P of X in the case of tractable density models or some approximate version of P of X in the case of these approximate density models and then in the case of tract tractable density we saw auto reggressive as a category of model and we saw variational auto-enccoders as an example of something that gives you some approximate density. So recall that auto reggressive models, what we did is we took our our our image or more generally whatever kind of data
+
+5
+00:01:46,000 --> 00:02:42,000
+we're working with and we break it up into a sequence. Um and then for the case of image data, we typically treat this as a sequence of pixel values or even sub pixel values. Um and we usually want these to be discreet. So you treat those subpixel values as um 8 bit integers that can each take a value 0 to 255. you string this out into a long uh into a long sequence of integers and then model this in some using some discrete autogressive sequence model typically an RNN or a transformer. Then we also saw the variation
+
+6
+00:02:14,000 --> 00:03:09,000
+variational autoenccoders which were another uh um explicit density model but now they compute not the exact density but some approximation to the density in in in particular a lower bound to the density. Um so by to do this we train we jointly trained some uh encoder network which is going to input the data X and output a distribution over latent codes Z um and a decoder network which is going to input a latent code Z and output a predicted uh piece of data X and we were able to jointly train these
+
+7
+00:02:42,000 --> 00:03:35,000
+two networks the encoder and the decoder to maximize this variational uh to to max to to maximize this variational lower bound to our likelihood function. Um recall that likelihood, maximum likelihood is one of the key insights behind all generative modeling that we of that often our our objective function for training generative models is somehow to maximize the likelihood of the data that we observe that comes from um from our true data distribution. So today we're going to continue our discussion of generative models and
+
+8
+00:03:08,000 --> 00:03:59,000
+explore this other half of the family tree um these implicit density models. So in in implicit density models, we are no longer going to get access to some actual density value P of X, but these models will sort of implicitly model the probability distribution and even though we can't compute a density value P of X for any piece of data X, we will be able to sample from the underlying distribution that these models learn. Um so we'll be able to draw samples from the learned distribution even if we
+
+9
+00:03:33,000 --> 00:04:25,000
+can't output an actual density value. Um so the first such model that we'll explore are generative adversarial networks or um usually called GANs. And it's useful to contrast GANs with the variational autoenccoders and auto reggressive models that we've seen so far. So like we just said um auto reggressive models are are likelihood based method. Um their training objective is maximum likelihood. So you write down this parameterized function that is your P of X where X is a piece
+
+10
+00:03:59,000 --> 00:04:49,000
+of data and then you maximize this uh over the data that you observe trying to do maximum likelihood and variational autoenccoders sort of follow this similar idea where we can where we write down this um approximation to P of X and then maximize that approximation to P of X. Um and now very generative adversarial networks will do something a little bit different. They will give up on directly modeling that P of X as we just said. Um but even though they don't explicitly model the p of x or let us
+
+11
+00:04:25,000 --> 00:05:22,000
+get out those density values, they will give us some way to sample from the underlying distribution that the that the model is fitting. Um so the setup here is um that we'll start by having some finite samples of data x i which are assumes to be drawn from some true data distribution p data. Um and our goal is we want to be able to draw samples from p data. And recall p data is something like the true distribution of the universe. This is the distribution that the universe uses to give you samples of your data. And
+
+12
+00:04:54,000 --> 00:05:44,000
+this is likely a very complicated distribution. It involves physics. It involves history. It involves social political constraints maybe, right? There's a lot of complication that goes into all the stuff happening in the universe that gives rise to the data that you see. um and somehow we want to model that fit some approximate model that tries to match that true data distribution as well as possible and then allow us to draw new samples from our fitted distribution that look like the original data samples that we
+
+13
+00:05:19,000 --> 00:06:10,000
+observed. So the way that we're going to do this is um by introducing a latent variable Z. Um this looks kind of like the latent variable Z that we saw in um variational autoenccoders where it's going to give where the this latent variable Z is going to be distributed according to some known prior distribution P of Z that we will write down and control ourselves and usually this is going to be a unit gausian or or a uniform distribution but typically a unit gausian something very simple that we
+
+14
+00:05:44,000 --> 00:06:46,000
+know how to sample from we know the analytical properties of um and now the setup is that we're going to um imagine some data generating process that our network is going to model. So here um we're going to imagine that we sample a Z according to our known distribution P of Z um to get a sampled Z, pass that sampled Z through a generator network that G of Z um and then that X is going to be a sample from some generator distribution PG. Um and as we vary the parameters or the architecture or the
+
+15
+00:06:15,000 --> 00:07:07,000
+training of our generator network that is going to induce different kinds of distributions that we sample from in this PG distribution. So the whole goal in GAN training is to try to force this PG distribution which is induced by our generator network. We want that PG distribution to match the true P data distribution as close as possible. And because if they match then we could sample a Z pass it through our generator and now we have a Z now we have a sample of sampled piece of data that looks a
+
+16
+00:06:41,000 --> 00:07:43,000
+lot like our P data. So the the picture for this is something like the following. We'll imagine sampling Z from our PZ to get a a concrete latencer G and that will give us a generated image. So the generator network basically is trained to convert a sample from a known distribution Z into a sample of our data distribution. But now the question is how can we force these outputs? How can we force the induced generator distribution PG? How can we force this to match the data distribution P data? Um and the trick in
+
+17
+00:07:12,000 --> 00:08:03,000
+generative adversarial networks is that we're going to introduce another neural network to do that task for us. Right? In the previous versions of of gener of generative modeling um VAEs and autogressive models, we tried to write down some objective function that we could minimize that would force our fit distribution to match the data distribution. Here we're going to relinquish that control and basically have ask another neural network to solve that task for us. Um so in particular we're going to train another neural
+
+18
+00:07:38,000 --> 00:08:27,000
+network called the discriminator D. And this discriminator is going to be tasked with inputting a ner inputting an image, sometimes a real image, sometimes a fake image. And it's going to classify whether the real whether that image was fake or real. Um, and then the idea is that these two these two networks are going to fight. We're going to train the generator to try to fool the discriminator and we're going to train the discriminator as a classification model to try to correctly discriminate
+
+19
+00:08:03,000 --> 00:08:54,000
+or classify between real data and fake data. And the intuition is that as these two networks fight then ideally the discriminator will get better. It will get really good. The discriminator will get really good at at determining features of real data from fake data. And once the discriminator gets really good then in order to fool the discriminator into thinking that the generated samples are classified as real. The generator data will need to get closer and closer to producing samples that look like true data. Um so
+
+20
+00:08:29,000 --> 00:09:16,000
+that's the kind of intuition between generative adversarial networks. So question is does the generator network get feedback from the discriminator on whether it's classifying correctly? U yes and that's crucial for this whole process working and the type of feedback it gets is gradients right this this whole thing this composite system of the generator and the discriminator are just neural networks we know how to compute gradients through those and those communicate through that generated
+
+21
+00:08:52,000 --> 00:09:42,000
+image. So we're going to back propagate from the discriminator all the way through the generated image into the generator. So that's how the generator is going to learn from the discriminator. And then more concretely, we need to write down some actual equations, some actual math that we're going to use to concretize this intuition. So in particular, um we're going to jointly train the generator G and the and the discriminator D um with this miniax game. Um this equation looks maybe a
+
+22
+00:09:17,000 --> 00:10:11,000
+little bit daunting, so we'll walk through each of the terms one by one. So here we're going to color code this and say that the generator is going to be um in blue, the discriminator is going to be in red. Um and the discriminator is going to be a function um that inputs a piece of data x and outputs the probability that that data is real. So in particular d ofx equals 0 means that the discriminator has classified that piece of data x as fake. Um d of x= 1 means that the discriminator has classified that piece
+
+23
+00:09:44,000 --> 00:10:37,000
+of data as real. Um of course those are the extreme cases. is the discriminator in practice will output some probability that gives you a soft a soft version in between those two decisions. Now um and now imagine what happens if we fix the generator G and just imagine this problem from the perspective of the discriminator. So then from the perspective of the discriminator there's two terms here. One this says this first term says the discriminator wants d ofx= 1 for real data. Remember d ofx equals 1
+
+24
+00:10:11,000 --> 00:11:05,000
+means that the discriminator says that it's real. Um, and this this uh this expectation basically says we're going to draw data data samples X from the true P data distribution. We're going to pass those through the discriminator and then take a log because you know we almost always work in log space when working with probabilities. And remember log is a is a monotonic function. So um maximizing maximizing log of x is the same as maximizing x. So in this case um this is saying this this is saying that
+
+25
+00:10:37,000 --> 00:11:32,000
+the we want to maximize log of d ofx for real data which is equivalent to saying d ofx equals 1 for real data. Um now on the other side um this is saying that we're going to draw take an expectation by sampling prior's z uh sorry sampling latence z according to our known prior p of z. We're going to take those z's pass them through the generator um which should give us a generated data sample and then pass that generated data sample through the discriminator. Um and now the discriminator wants to classify
+
+26
+00:11:05,000 --> 00:12:00,000
+these as these are fake samples. So the discriminator wants to classify these as fake. So we need to somehow invert that that that that expression on the left. So here um we want d of xals 0 to be fake. So one way to say that is uh is to maximize log of 1 minus d of g of z. So this term on the right says the discriminator wants d ofx equals 0 for fake data. Um and the term on the left says discriminator wants d ofx= 1 for real data. Okay. So that's what the discriminator is trying to do. The
+
+27
+00:11:33,000 --> 00:12:23,000
+discriminator is trying to correctly just do this classification task between generated samples from between generated samples and real samples from our data set and try to classify them correctly as real or fake. Now look at this from the from the perspective of the generator. So imagine fixing the discriminator and looking at this setup only from the perspective of a generator uh with a fixed discriminator. Um now in this case this first term doesn't depend on the generator at all because this
+
+28
+00:11:58,000 --> 00:12:55,000
+first term was just about the getting the discriminator to correctly classify the real data samples. Um so this the generator only cares about this term on the right. Um and intuitively we want the generator to fool the discriminator into thinking that its samples are real. So that means that the the generator wants d ofx equals 1 for fake data. So the term is the same. Um we draw a sample z according to p of z. um pass it through the generator to get a generated sample. Pass it through the discriminator to get the discriminator's
+
+29
+00:12:26,000 --> 00:13:25,000
+predicted probability on that sample. Um and now the now recall the generator wants d ofx equals 1. So rather than maximizing this like we did from like the discriminator wanted to instead we're going to try to minimize this from for the for the for the from the perspective of the generator. And that gives us this uh this miniax game. So in particular we can abstract away all this math by writing it as uh some some scalar function V as a function of G and D. Um and then we say that the the discriminator wants to
+
+30
+00:12:56,000 --> 00:13:48,000
+maximize V. The generator wants to minimize V. Um and there's this they're going to fight against each other in that way. And then to optimize this we're going to basically run some gradient descent loop taking alternating steps trying to minimize and maximize this with respect to the parameters of the generator and discriminator. So um loop while true forever then update d acc according to take a gradient descent step um derivative of v with respect to d and then step plus that gradient
+
+31
+00:13:22,000 --> 00:14:16,000
+because remember discriminator is trying to maximize this. So we want to do gradient ascent to try to maximize this this uh this term. Um and then after we make an update on the discriminator weights then we'll make an update on the generator weights by taking derivative of that um of that uh of that v with respect to the generator weights g and now take a gradient descent step on v because the generator wants to minimize that objective. Um so that's basically our our training that's basically the
+
+32
+00:13:49,000 --> 00:14:43,000
+way that we train generative adversarial networks. Um, we've got this this thing V, which is the value of our miniax game. And we're going to take alternating gradient ascent and gradient descent weights on that objective V. Um, in order it like alternatively up alternatingly update the generator and discriminator. And one thing that's really important to realize when we're training generative adversarial networks is that this V is not a loss function. Um that means there is no like the the absolute value of V
+
+33
+00:14:16,000 --> 00:15:09,000
+basically does not tell us anything about how well the generator and discriminator are solving this problem or how well or or really the thing we care about is how well is that induced PG distribution matching the data distribution and just looking at the value of V doesn't really tell us anything about that right because the value of V sort of depends on how good the discriminator is right if the discriminator is really bad then it's really easy for the generator to fool this and get good get good numbers or if
+
+34
+00:14:42,000 --> 00:15:28,000
+the discriminator is really good then the generator has to be really good. So there can be sort of different settings of D and V D and G that will lead to the exact same value for V. Um and that means that generative adversarial networks are often really hard to train. Um and even hard to tell when they are doing a good job at training. Right? Normally when you train neural networks you have a loss. You try to minimize the loss with respect to the parameters of your network and you want to see that
+
+35
+00:15:05,000 --> 00:15:52,000
+loss go down over the course of training. But you don't have that with generative adversarial networks. You have the generator loss. you have the discriminator loss. You can try to plot them, but in general they're pretty they're pretty meaningless. So with generative adversarial networks, they're really hard to train. Um one I think one this objective is sort of fundamentally unstable. You're sort of trying to do jointly maximize and minimize the same quantity with respect to different parts
+
+36
+00:15:28,000 --> 00:16:15,000
+different sets of parameters of the network. So that's kind of inherently a difficult optimization problem. And then even worse, you don't have any value to look at to tell whether or not you're making progress towards a good solution. So generative adversarial networks um they're they're pretty effective but they're really hard to train and really hard to tune and really hard to make progress on. So um that's that's sort of the main takeaway for generative adversarial
+
+37
+00:15:52,000 --> 00:16:38,000
+networks. You know there is um one little trick that is kind of useful to think about for when training GANs is that um just to kind of imagine the training dynamics of these things. So at the very start of imagine at the very beginning of training your generator is randomly initialized your discriminator is randomly initialized. What's going to happen? Well, at the very start of training, then your generator is producing completely random noise. That completely random noise is going to look
+
+38
+00:16:15,000 --> 00:17:05,000
+very different from real images. So, at the very beginning of training, when the generator is terrible, then the discriminator has a very easy problem. So, typically within a couple iterations, um the discriminator can like really immediately pick up between real images and these totally garbage random fake images that the random that the random generator is giving you. So that means that at the very start of training um the generator is the discriminator is quickly going to learn to classify these real these um real and
+
+39
+00:16:40,000 --> 00:17:34,000
+fake pretty quickly with pretty high probability. Um so then it's interesting to plot what is d of g of z uh sorry what is the what is the what is what is this term um as a function of d of g of z right because that's basically the loss fun that's basically the loss function from the perspective of the generator. So then from the perspective of the generator, um we're we're we kind of at the beginning of training are somewhere all the way over here. So the discriminator is doing a really good job
+
+40
+00:17:07,000 --> 00:17:54,000
+at treating generated samples as fake, classifying them as fake at the beginning of training, which means that from the discriminator's perspective, it's trying to optimize a loss function that looks something like this. Um and if you'll notice something, this loss function is flat um or very close to flat at the place where the generator is trying to optim optimize its parameters. So this means that in like in practice when you use this naive objective for um training GANs then the generator has a
+
+41
+00:17:31,000 --> 00:18:19,000
+really hard time learning at the beginning of training. Oh good question is um how do you assemble the data set like how do we generate a photo of a unicorn if if nothing no unicorn exists. So so this um this P data that that's kind of your choice of P data right so whatever data set you happen to assemble from your training set that's you choosing what is the P data that you're trying to model. So in general, if you want to generate a sample of a thing that looks nothing like anything that
+
+42
+00:17:55,000 --> 00:18:43,000
+you've ever seen before, you're out of luck. It's not going to happen. Um, so the only way that you're generally going to draw samples is if you have something in your training data set that looks kind of like that. So these networks do like all generative models and all neural networks really do generalize a little bit, right? So then the hope is that you know maybe you've never seen a photorealistic image of a unicorn wearing a Santa Claus hat, but you've seen photorealistic images of horses.
+
+43
+00:18:19,000 --> 00:19:05,000
+You've seen photorealistic images of Santa Claus hats. You've seen drawings of unicorns. You've seen drawings of horses. And somehow you've got enough stuff, even if you've never seen the exact composition of attributes that you want to generate. Um you've seen enough stuff that's close enough to it that the model can generalize and give you something new. And that's always the hope here. What does this look like from the discriminator's perspective? So then like well then if I generated this image
+
+44
+00:18:42,000 --> 00:19:29,000
+of a photorealistic unicorn wearing a Santa Claus hat then maybe all the textures are really perfect like the lighting is perfect the shadows are perfect the leaves are perfect. So there's no real evidence in the data in that sample itself to say that this is obviously wrong. Um maybe if the discriminator was really really smart then the discriminator could somehow know that unicorns don't really exist and having a perfectly photorealistic image of them isn't likely to happen. But that's a like that's a pretty hard
+
+45
+00:19:05,000 --> 00:19:50,000
+semantic problem to solve. So in practice generator discriminators tend not to really be that smart. Yeah, good good question. The cost the idea is why don't we look at two curves? Why don't we look at one curve saying how good the discriminator is? Why don't we look at one curve saying how low good the generator is? Feel free to plot them. They tend to look really useless. Um and there's probably literally hundreds of research papers of people trying to solve this problem and figure out how do
+
+46
+00:19:28,000 --> 00:20:17,000
+we tweak the GAN objective? How do we not use a log? How do we use a a wazer sign something a something something? like put all kinds of crazy stuff into this to make those curves more interpretable. Hundreds of papers written about it like 5 years of of thousands of people's time I don't think anybody came up with a with a good solution. Um so still even after like hundreds thousands of papers training GANs that kind of they ended up a lot of people still end up using this vindilla formulation which tends not to give you
+
+47
+00:19:52,000 --> 00:20:40,000
+very interpretable curves even when you split it up that way. The question is, is it really is is what happens to the discriminator early in training really important? And the answer is no because this is unlike any other classification problem we've ever seen before because this is a non-stationary distribution, right? When you train an image classifier on imageet or cir or something like that, the data set is fixed and the and the model is just trying to classify that static data set. Well, but in the case of GAN training,
+
+48
+00:20:16,000 --> 00:21:01,000
+the data set that it's trying to fit is changing under it during the course of training because you know even at the beginning of training, maybe it's the the generated images look really bad. it's easy to solve the problem, but then the generator gets better and now the data set that it's that the discriminator is trying to discriminate changes under it during the course of training. So that means that it's a non-stationary problem and you know with very complicated learning dynamics.
+
+49
+00:20:38,000 --> 00:21:26,000
+>> Yeah, good question. Um can you does do these get caught in local minima? Are there way to kick them out of local lumina train for a while kick them out? I think again hundreds of papers, thousands of papers, lots of heristics, nothing really stuck correct. So you have to train the you have to train this end to end. So gradients from the discriminator always propagate into the generator. Um if you did like so in particular through this term on the right. So the the only way that you're ever getting gradients onto
+
+50
+00:21:03,000 --> 00:21:46,000
+the generator's parameters is actually through the discriminator. Right? There's I mean unless you have some regularizer in here, but there's no auxiliary term that's telling the generator what to do other than the gradients that gets through the discriminator. And that lead that's again leading to part of the the unstable learning problem. Correct? So the that that P data distribution that's going to stay fixed over the course of training. All right. So we said um you know there's this problem that the
+
+51
+00:21:25,000 --> 00:22:15,000
+generator gets low gradients at the course of training. There's a little hack here where rather than um minimize rather than trying to maximize log of 1 minus d of g of z, you can instead minimize minus log of d of g of z instead you can convince yourself offline that those are roughly equivalent. Um but the tlddr is then it gives you a better curve for the generator to get better gradients at the start of training. Um so that's really important. And whenever you're training GANs from scratch using this sort of uh
+
+52
+00:21:49,000 --> 00:22:40,000
+log objective, then this uh this trick to use the modified loss for the generator is really important in practice. So that means that there actually is a a one V that you're computing for the generator, one V that a different V that you're computing for the discriminator. Um and they aren't quite the same. Okay, there's another question of why might this be a good objective. Um and I used to have slides that walked through this proof um step by step, but I don't think we have time for that today. So
+
+53
+00:22:15,000 --> 00:23:11,000
+I'll just give you the TLDDR and uh we can refer you to something offline to check. Um but the the TLDDR is that this objective is good because you can write down this optimal discriminator, right? So you know this is a this is a nested optimization problem where there's an inner maximization over D and outer minimization over G. So if you do a little bit of math, you can actually solve this um in this inner maximization problem and write down what is the optimal gener what is the optimal
+
+54
+00:22:43,000 --> 00:23:31,000
+discriminator. This should actually be the op this is the optimal discriminator with respect to a particular generator G. Um and you can just write this down of course even though you can write it down. You can never compute it because it depends on P data. Um and you can never compute P data because if you had access to the P data density you'd be done. So you can write this down as an equation on a slide or on a piece of paper but you can never compute it. Um and then uh once you have this inner
+
+55
+00:23:07,000 --> 00:24:05,000
+objective once you have um sort of maximized this inner objective by writing down the optimal discriminator then you can show that the outer objective is minimized if and only if PG PG of X is equal to P data. So at least theoretically um kind of the the optimum state of both the discriminator and the generator actually occurs uniquely when PG is equal to P data. Um so that that kind of makes us feel good but there's a lot of caveats to that theoretical result. Um the one is that they both assume of infinite potential capacity
+
+56
+00:23:36,000 --> 00:24:28,000
+for G and D. Um that those those both assume that your generator and discriminator can in principle represent any function which of course they can't because they are neural networks of a fixed size and capacity. Um this also tells us absolutely nothing about whether or not we will converge to this solution. So even though there is this optimum point in this objective landscape um you know there this tells us absolutely nothing about whether we can ever reach there via gra v via this gradient descent gradient ascent um
+
+57
+00:24:02,000 --> 00:24:55,000
+especially with a finite number of data samples. So there's this weak there's this um sort of comforting theoretical results that there is some theoretical justification to GANs but in practice you know this doesn't really hold or give us very strong guarantees. Um, so these GANs, you know, in practice, the your your generator G and your discriminator D both are going to be parameterized as neural networks. Um, and they used to be CNN's. Uh, the GANs kind of fell out of favor before before
+
+58
+00:24:28,000 --> 00:25:18,000
+VITs became popular, but I'm sure they would work with VITs as well. Um, and the first GAN that really gave non-trivial results was called DC GAN that had this five layer comnet architecture which gave these pretty what were at the time pretty exciting samples. Um, and I mentioned DC GAN because the first author, Alec Radford at all, you know, for most people doing DC GAN would have been a highlight of their career. But for Alec Radford, it wasn't nearly enough for him because the next project he worked on right after DC
+
+59
+00:24:53,000 --> 00:25:47,000
+GAN, does anybody know >> GPT? >> GPT. Um, so Alec Radford, you know, DC GAN was kind of a lowlight in his career. He went on to do uh GPT1 and GPT2 um as well as some other amazing work at OpenAI. So I think there's this really cool connection between um you know people that were working on generative modeling of images actually jumped over to do generative modeling of discrete text data and did some of the really important work there. Um and one of the you know the only other GAN um paper that I'm going to
+
+60
+00:25:20,000 --> 00:26:09,000
+highlight is called style GAN. Um I'm not really going to walk you through the details of this one other than to kind of point you at it as like a good one to read if you want to know kind of the the best practices of GANs. They use a much more complicated architecture um but they get pretty good results in practice. And one really nice thing about GANs is that they actually tend to learn something smooth in the latent space. So what I mean that is that if we have two latent vectors Z0 and Z1 and we
+
+61
+00:25:44,000 --> 00:26:34,000
+interpolate between them that is you like draw a sample Z0 from your from your from your gausian you draw a sample Z1 from your Gausian then you interpolate some kind of curve between Z0 and Z1 then for every point along the curve we're going to generate a sample um using through our uh using our generator. Then if we do that, we tend to get smooth interpolations to this latent space, which is something really cool with GANs. And here's an example of this latent space interpolation from the
+
+62
+00:26:09,000 --> 00:27:06,000
+style GAN 3 paper. Um, so you can see that like these are all generated samples um by smoothly varying that latent Z and then passing it through the generator to generate these different samples. And you can see that these uh these animals sort of smoothly morph into each other. Um, so that means that the model has somehow uncovered some useful structure and stuffed it into the latent space. So that's uh that's pretty cool. So I I used to talk a lot more about generative adversarial networks. Um the the pros is
+
+63
+00:26:38,000 --> 00:27:27,000
+basically they have a really fairly simple formulation and if you tune them right like we saw with style GAN 3 then they can actually give you very nice results. Um very beautiful images, very high resolution. Uh very good stuff. Um but the cons like one like we talked about they're they're fairly unstable to train. You have no loss curve to look at. You have very unstable training. They tend to blow up at the drop of a hat. Um so you end up with like um mode coll what's called mode collapse. All of
+
+64
+00:27:02,000 --> 00:27:53,000
+a sudden you might get nans you might get ins your generator your your discriminator starts going crazy your generator starts producing complete random garbage all the time you have no loss curves to look at to tell to diagnose this they're kind of a mess. So even though that GANs can give you really nice results if you very very carefully tune them um and very very carefully control the normalization the sampling everything about them um they have been in practice they've been fairly hard to scale up to really big
+
+65
+00:27:27,000 --> 00:28:23,000
+models to really big data um so GANs were basically the go-to category of generative models from around 2016 to maybe around 2020 2021 something around there um and in that 5 years there were like literally thousands and thousands of papers um people both trying to use different GAN formulations, different loss functions, different mathematical formalisms as well as applying GANs to all kinds of different generative modeling tasks that you can imagine. So like this was basically the go-to generative modeling framework for about
+
+66
+00:27:55,000 --> 00:28:44,000
+five five or six years. Question is um would we just expect this? Would we just shouldn't we just expect these smooth latenc? Um I think not necessarily because one thing that can happen with GANs is the generator might just might just memorize a fixed number of data samples, right? So what if your generator ignores the latent Z and just memorizes 10 samples from the training data set somehow and then no matter what Z you give it, it always gives you one of those 10 samples from the training
+
+67
+00:28:20,000 --> 00:29:10,000
+data set and it never gives you anything else. Then in that case, the disc you're going to fool the discriminator because the generator is always giving you something which is maybe bitwise identical to one of your real samples. Um and then in that case the generator would have basically piled on sort of durac delta density like in the immediate vicinity of a couple finite samples. um but put no probability mass anywhere else. So that actually is kind of a legitimate solution for the generator. Um and that would definitely
+
+68
+00:28:45,000 --> 00:29:38,000
+not give you smooth latence at all. So that's just one example of how these things can collapse into unintuitive solutions that are not what you want. Oh, good question. Um what is the relationship between your training data set and your latence? Um so this is actually something very fundamental about GANs is a great question. So you you can map one way. So the generator gives you a mapping from latent space into data space maps from Z to an X. But with GANs, you in general have no way to map back from an X to a Z. Um, and
+
+69
+00:29:12,000 --> 00:30:01,000
+that's that's something very uh different between GANs and VAEs. So VAEs will learn an explicit mapping from X back to Z, but with GANs you have no such thing. Um, you can try to invert you can try to um compute an inverse um analytically numerically via gradient descent. There's papers that do that. Um, but there's actually like no explicitly enforced relationship between X and Z. Um instead the you can think of the discriminator as trying to just enforce a distributional alignment
+
+70
+00:29:36,000 --> 00:30:21,000
+between the distribution of all the outputs coming from the generator and the distribution of all the data samples without any kind of explicit supervision between them. Um of course like when it comes to GANs anything you probably think about there's probably at least like a dozen papers about so there's also a lot of papers about GAN variants that try to learn birectional mappings both ways but those never really took off. Oh good good question. What have we gained? So when we when we went to VAE,
+
+71
+00:29:58,000 --> 00:30:48,000
+we gained latent vectors, but we gave up density. And now with GANs, it seems like we gave up latent vectors that we couldn't control. What you gained was much better samples. Um so when it comes to VAE, like VAEs tend not to give you very good samples. Um VAEs are sort of characteristically always kind of blurry. They never really look good. Um VAEs on their own just never tend to give you very clean, crisp samples. But with GANs, um some of the as you saw with some of the examples, you can get
+
+72
+00:30:23,000 --> 00:31:13,000
+very crisp, very clean, very good samples. Um but what you lost was the ability it was like your sanity in trying to tune these systems. Yeah. At inference time you throw away the discriminator and just do the generator. So at inference you'll just draw a sample Z um draw a sample Z from the prior pass through the generator get your sample from your data. So it's very very efficient at inference time. All right. So I mentioned that GANs used to be the go-to um category of of generative modeling
+
+73
+00:30:49,000 --> 00:31:41,000
+for about five or six years. Um, so what displaced them? And what displaced them was a very different category of models called diffusion models. Now, um, I need to put some caveats here. Diffusion model literature is crazy, right? Like you read these papers, they go through like five pages of math before they tell you at all what's going on. And there's like three different mathematical formalisms that lead to diffusion models that are all very different mathematically. And there's very
+
+74
+00:31:15,000 --> 00:32:05,000
+different notation, very different terminology, very different mathematical formalisms between papers. So like this this is a sub area that's crazy. Um so I need to put a big caveat here that I'm not going to cover fully all the different variants of diffusion models with all of their proper mathematical formalism. Instead, what I'm going to try to do is give you an intuitive overview of diffusion models as well as an intuitive geometric understanding of the most common form of diffusion models
+
+75
+00:31:40,000 --> 00:32:31,000
+today which are called rectified flow models. Um, and you could really you could teach many many lectures about diffusion models and get into all the interesting mathematical nuance of all these flavors, but we just won't have time for that in in three in two-thirds of one lecture unfortunately. So, um, with that caveat aside, the intu the intuition behind diffusion models is actually kind of easy. So um you know like with all generative models we want to draw samples um and we we like kind
+
+76
+00:32:05,000 --> 00:32:57,000
+of like GANs we want to convert samples from a noise distribution um Z um into a data distribution PX. But the way that we're going to do that in diffusion models is totally different. Um GANs learn this deterministic mapping through the generator to map a Z directly to an X. With a diffusion model we're going to do something more implicit, more indirect. So what we're going to do um first off the first constraint in diffusion models is that the Z the the noise distribution the noise always has
+
+77
+00:32:31,000 --> 00:33:27,000
+to have to have the same shape as our data right so if you have an image that's like H byW3 then your noise distribution always has to be H byw3 as well they have to be exactly the same shape now what we're going to do is consider um v different versions of our data that are corrupted by increasing levels of noise so here if we have a data sample which is this picture of a cat then under the t equals Z then and then t is going to be our noise level um which is ranges from 0 to 1. So at t
+
+78
+00:32:59,000 --> 00:33:56,000
+equals 0 that means no noise that means a totally clean data sample. Um t equals.3 is a little bit of noise. We add some of our noise z into we mix some of our noise z into our data x. And if we go all the way to t= 1 we get full noise and those are going to be samples directly from our noise distribution. So somehow this ted parameter is going to interpolate smoothly between our data distribution and our noise distribution. Um and this is something and we can we and the and the the noise distribution
+
+79
+00:33:27,000 --> 00:34:16,000
+again is going to be gausian um almost always gausian something simple that we understand and can sample from. Um and now what we're going to do is train a neural network to do a little bit of incremental denoising. So the neural network is going to receive um some inter some some uh sample which is a piece of data which has been corrupted with some intermediate amount of noise. And now the neural network is going to be trained to try to clean it up a little bit, remove just a little bit of
+
+80
+00:33:51,000 --> 00:34:47,000
+the noise. Um, so the training objective here is going to be neural network inputs some an image of some amount with some amount of noise and it tries to remove some of the noise. Then at inference time, what we're going to do is do an iterative procedure where we first draw a noise sample directly from our noise distribution PZ and then iteratively apply the neural network to remove noise from that sample one at a time. So um you know the very first time we do this we're going to draw a complete sample
+
+81
+00:34:19,000 --> 00:35:10,000
+that's complete noise and then the very first application of the neural network the network will be trying to remove noise from full noise. So it'll basically be forced to hallucinate just a tiny whiff of data structure in that noise. And then once we get to some like slightly less noisy example, we're going to pass it back to the neural network and again ask it to remove just a little bit of noise from this now slightly um slightly dinoised slightly generated image and then it'll get a little bit
+
+82
+00:34:45,000 --> 00:35:38,000
+less noisy and it'll get a little bit less less noisy and it'll get a bit little bit less noisy. And eventually if we set up all of this stuff correctly, then we want to get to a situation where we can draw a complete noise sample and then ask the network to remove noise from that complete sample Z of complete random noise until eventually we we've removed all the noise and come up with a generated sample from the system. So that's kind of a weird setting. It's kind of a weird thing. Um but that's
+
+83
+00:35:11,000 --> 00:36:01,000
+kind of the intuition behind diffusion models is the number of steps of fixed hyperparameter. It depends. So on this slide, I've intentionally been I I was sort of forced to be very vague about all these things. Um what is the noise? What does it mean to corrupt the data with respect to the noise? What does it mean to remove a little bit of the noise? What does it mean to apply iteratively at inference? Because like I said, there's so many different formalisms of diffusion. There's a lot
+
+84
+00:35:36,000 --> 00:36:24,000
+of different variants about exactly what these mean in different situations. So this slide is intended to be a fairly highle overview of diffusion and then different specific implementations of diffusion models will have different concrete choices for what all these terms specifically mean. So um does this uh does this highle picture of diffusion kind of make sense? Okay. So then let's make this more concrete. So now we're going to now we're going to jump from you know general diffusion models to a
+
+85
+00:36:00,000 --> 00:36:48,000
+particular category of diffusion models called rectified flow models. Um some people may argue with me and say that rectified flow is not diffusion. They might be some people might say that they're different things. I don't really care. Um to me, rectified flow is a kind of diffusion model. Fight me. Um so with rectified flow, um the intuition is basically this. You know, we have this same thing. We have our P noise. We have our P data. And we're going to draw this geometrically because I think that's a
+
+86
+00:36:24,000 --> 00:37:06,000
+nice a nice way to gain intuition geometrically in two dimensions in particular because that's all that fits on the slide. But of course, these are going to be super super highdimensional images um and gausian um which is an easy way to get led astray, right? because you know that intuitions that hold in two and three dimensions go like totally out the window when you go to a lot of dimensions. Um it's really sad. It's it's sort of sad that we live in such a low dimensional universe because
+
+87
+00:36:45,000 --> 00:37:31,000
+our intuitions that we build in this universe just don't really transfer to like 100 dimensional spaces, thousand dimensional spaces. So always be aware but you know it is what it is. We're stuck with the universe we got. So you know the setup in rectified flow is that we've got you know our distribution P noise, our distribution P data. P noiseis is something simple that we understand, we can sample from, we can compute integrals of. It's a very friendly distribution. P data again is
+
+88
+00:37:08,000 --> 00:38:06,000
+something crazy. That's what the universe is using to give us images. Now, at every training iteration, um we're going to sample a Z from our prior distribution and sample an X from our data dist data distribution. um you know we can draw a sample e analytically because um pz is something simple that we control and drawing a sample from the beta distribution just means picking an example from your finite training set. Now what we're and you're also going to choose a a t to be uniform on 0 to 1.
+
+89
+00:37:36,000 --> 00:38:36,000
+Remember t is our noise level where t equals 0 means no noise t= 1 means all the noise. So now we're going to draw now we're going to draw a line that points from our data sample x directly to our noise sample z. Um, and this line, this vector pointing from X to Z is we're going to call it V. Um, this is this is going to be the velocity of a flow field. Um, and then in and then we set XT to be a point along this line, which is a linear interpolation between X and Z. So now we've got um we've got
+
+90
+00:38:06,000 --> 00:38:58,000
+our our noise sample Z, our data sample X, we've got the velocity vector between them V, and we've picked a noisy uh a noised version of our data XT. Um and this is what this is you know in the previous slide when we said um get noisy data. This is what that means in the case of rectified flow models. It's a linear interpolation between a data sample and a noise sample. And now the training objective is very very simple. So now we're going to train a neural network f theta. So that's f with
+
+91
+00:38:32,000 --> 00:39:24,000
+learnable parameters theta. Um that neural network is going to input the noisiest sample xt as well as the noise level t and it's going to try to predict the green vector v. So that's that's it. That's all we need to do in rectified flow. Um the code for this is very simple. Um you would be shocked like how how much obscurity there is when you read papers here and it boils down to this very simple code. Drives me crazy that this is not made more clear in in a lot of presentations of this. So then
+
+92
+00:38:58,000 --> 00:39:55,000
+the the training loop for rectified flow is extremely simple. Um you loop over your data set at every iteration. You get um Z which is g unit which is unit gausian of the same shape as X. You choose a noise level T which is uniform 0 to1. You compute XT which is a linear interpolation between X and Z. Um you give XT and T to your model and then your loss is just the mean squared error between um the this ground truth V and the model prediction. Um and that's it. That's your training objective for
+
+93
+00:39:26,000 --> 00:40:12,000
+rectified flow models. Um contrast this with GANs. Um when you train rectified flow models or really any kind of diffusion model, you have a loss that you can look at during training. When the loss goes down, the model is generally better. So like for those of us that went through half a decade of GAN madness, the first time you train a diffusion model and like there's a loss to look at, it's like, oh my god, this is an amazing thing. Um like how many hours have we spent looking at GAN plots
+
+94
+00:39:49,000 --> 00:40:38,000
+and they look like this and you have no idea. It's like reading tea leaves to tell whether or not the model is working well. You train a diffusion model, you get this beautiful smooth exponential loss curve and it just makes you so happy. Um so that's great. So then that's training for that's training for diffusion models. Now what do we do at inference? Right? Because you the you know gans are kind of easy at inference. GANs you just have to take a Z pass it through your generator you get a data
+
+95
+00:40:14,000 --> 00:41:08,000
+sample very straightforward. But now with a diffusion model or rectified flow model in this case the model output itself is like kind of useless. Like we get this XT we get a V. Like what are we going to do with this? Not super clear. So then at inference time um is where diffusion models get a little bit more complicated compared to uh compared to GANs. So um you know at inference we first will upfront choose a number of steps t um which is usually a fixed constant um and in the case of rectified flow models
+
+96
+00:40:40,000 --> 00:41:31,000
+t= 50 um is usually a good number to start with. Sometimes you can get down to t equals 30 and that works okay. Then what you're going to do is um sample an x directly from your noise distribution. This is going to be pure noise that's sampled from your known noise distribution. Then you're going to evaluate the then you're going to loop from t equals 1. you're going to march backwards to t equals z. This is your noise level. Um, and in this case, in this simple version, we're just sort of marching
+
+97
+00:41:05,000 --> 00:42:04,000
+linearly from full noise one back to noise zero, perfectly clean. Then at every iteration, we're going to take our our um our XT that was at first full noise, pass it to the network along with the current noise level, and get the network's predicted VT. And remember what this VT is supposed to be in the case of rectified flow. This V remember was supposed to point from a data sample all the way to a noise sample. So then it's kind of geometrically obvious what you should do in the case of rectified flow. You
+
+98
+00:41:35,000 --> 00:42:22,000
+should take a little step along that predicted V vector. So you but right because the problem is this rectified flow model it's not going to that that V is not going to point you all the way to a clean sample. Um it's just going to get you started. It's going to set you on a trajectory towards a clean sample. So we take a little step along that predicted V from the flow model to get a new X2 which is now a version of the data that has had a little bit of the noise removed from it by the model. And
+
+99
+00:41:58,000 --> 00:42:52,000
+now we iterate this. So once we have this X this X2/3 then we pass it back to the model and get another predicted V vector from the model. Um and remember the V is supposed to point from clean data all from a from a clean sample all the way to a noise sample. So then again we can take a gradient step take a little step along this predicted V to get another um X1/3. Repeat this thing again. Um re evaluate the model again to get another predicted V and then take a step in this case all the way to no to
+
+100
+00:42:25,000 --> 00:43:20,000
+to no noise all the way to the end of that vector uh to get our predicted X0 and then that is our sample from our diffusion model. So um you know the then the inference procedure you see here got a little bit more complicated compared to GANs. Um but what we gained here was um s sanity when you're training. You've regained that. Um and they tend to give you much better samples and they tend to scale really well to to large data sets and large models. And the code here is really simple, right? So we um we start
+
+101
+00:42:53,000 --> 00:43:46,000
+off by taking a random sample, make it be perfectly random, then march backwards for t from one back to zero. At every noise level, you get a predicted V from the model given your current sample as well as your T. Then you take what looks kind of like a gradient descent step on the model's predicted V and update the sample and just repeat this whole thing in a loop. So then you can see like these diffusion models aren't so scary after all. Um you can actually fit a complete implementation of training and sampling
+
+102
+00:43:19,000 --> 00:44:07,000
+from a rectified flow model in just a couple lines um on on one slide which I think is is very nice. Okay. So you might be ask so so this is this is pretty nice. I'm I'm pretty happy that we're able to get to a full right this and this will actually work right like if you if you take this code you plug it in like you plug it in a reasonable model architecture like this will actually this will actually work like this will actually convert to something kind of reasonable in a lot of cases you're kind of hitting on the core
+
+103
+00:43:43,000 --> 00:44:27,000
+problem in generative modeling that I've been thinking about a lot the last couple days while reviewing these slides right the core problem in generative modeling is somehow you have a prior distribution which is Z's that you know how to sample from you have a data distribution which is X's that you want to generate and kind of the core problem in generative modeling is figuring out how to associate Z's and X's. And all your different categories to generative modeling kind of do it in different
+
+104
+00:44:04,000 --> 00:44:54,000
+ways. Right? In a VAE, you say, I'm going to have the model predict a Z and then predict an X and then try to force that Z to be something I know how to sample from. Um, which doesn't super work that well. In a GAN, um, you're not supervising that relationship. Like the generator is kind of figuring out its own mapping from Z to X in a feed forward way through this distributional matching objective that the discriminator is giving it. um in diffusion it's kind of figuring out by
+
+105
+00:44:30,000 --> 00:45:24,000
+what what ends up and it ends up having to integrate these curves. Um and there's some there's a lot of different actually like several different mathematical formalisms as to why objectives that look like this end up matching probability distributions in a reasonable way. Um but again like the whole core problem is that we have no way ahead of time to get to pair up samples Z from our prior with samples X from our data. If we knew how to make that pairing and also knew how to sample from the prior like that would be that
+
+106
+00:44:57,000 --> 00:45:47,000
+you'd be done. And in some sense, all these different forms of generative modeling are different ways to square that circle and come up with a way to learn an association from Z to X even though we don't and and be able to sample from Z even though we don't have that association at training time. There's a lot of different interpretations of this that that can get very very heavy very quick. So I've tried to avoid them. Right? So um but we we said a couple lecture we said last lecture that um
+
+107
+00:45:22,000 --> 00:46:08,000
+unconditional generative modeling is kind of kind of pointless. So what we almost always care about is conditional generative modeling and that's easy to accommodate in in rectified flow. So we can do to do conditional rectified flow we kind of imagine that there's different subp parts of our data distribution. Here I'm saying it's categorical. Maybe our data is actually squares and triangles. Um, and then we have our our whole data distribution P data as well as our two sort of
+
+108
+00:45:44,000 --> 00:46:35,000
+subdistributions P data X given that Y is a square and P data P data X given that Y is the label Y is a triangle. So this is kind of the the picture you should have in mind when you think about conditional generative modeling. Then in the case of of rectified flow this is very easy to accommodate. So you just um sort of your data set now has pairs X and Y and your model now takes Y as an additional auxiliary input somehow. Um and then during sampling same thing you get your predicted V's uh according and
+
+109
+00:46:10,000 --> 00:46:57,000
+you you get your predicted V's you know the model takes as input this extra Y uh and you use that. So this all kind of goes through. Um the difference is that now Y is actually hopefully some conditional signal that the user can control. Maybe this is a text prompt. Maybe this is an input image. Maybe this is this is some kind of user input that you're expecting at inference time. Um which actually make these models controllable and useful in practice. Um, but then there's another really
+
+110
+00:46:33,000 --> 00:47:21,000
+interesting question is um, is there any knob you can tune to control how much the model pays attention to the conditioning signal, right? It turns out if you train these things naively, a lot of times they don't often follow the conditioning signal quite as much as you would like. Um, so there's a trick called classifier free guidance or CFG um, that changes this a little that changes our diffusion uh, training loop just a little bit. So, what we're going to do is we're still going to train this
+
+111
+00:46:57,000 --> 00:47:42,000
+conditional diffusion model that inputs your XT um inputs your Y, but we're going to every on every training on every training iteration, we're going to flip a coin. Um, and if that coin is heads, we're going to delete the conditioning information. So, we're going to set it equal to some kind of zero value or null value. Um, basically destroy the conditioning information 50% of the time. That could be a hyperparameter, but 50 is a pretty good one that most people use in practice.
+
+112
+00:47:20,000 --> 00:48:18,000
+So, we're going to flip a coin. If the coin is heads, delete the conditioning information. So that means that the model is conceptually now forced to learn two different kinds of velocity vectors. Right? Um right. So then the same the the model is sort of forced to learn two different kinds of velocity vectors. Right? So in the case where we pass it this uh this null value for y that is that that has destroyed the conditioning information then this is basically an unconditional generative model. Now um now that that
+
+113
+00:47:48,000 --> 00:48:45,000
+predicted velocity vector V is sort of has to point back towards the the meat of the whole data distribution P data. Um but when we pass a real conditioning uh input Y that's non-destroyed, non-null, non-zero um then we're getting sort of a conditional velocity vector that is pointing us back towards not the full data distribution but towards the conditional data distribution which is conditional on that conditioning signal that we cared about. And then the dumb trick is we're going to take a linear
+
+114
+00:48:17,000 --> 00:49:14,000
+combination of these two vectors to kind of push it more towards the uh more towards the conditional velocity vector. So in particular, we'll have a scalar hyperparameter w and take a linear combination 1 + w * v y minus w * v uh v null. So that's going to be a vector that now kind of points kind of points even more towards the towards the conditional distribution than it does the data distribution. Um and then the idea is that during sampling we're now going to um right then during sampling
+
+115
+00:48:46,000 --> 00:49:43,000
+we're now going to step according to this uh this this uh vcfg vector rather than the rather than the raw vectors predicted by the model and then setting w equals 1 um setting w equals z here will recover exactly the the the conditional one and you know the higher your w is then the more you're overemphasizing the conditioning signal. Um so this is this is and then this is pretty easy to implement right so uh then your inference code doesn't really change too much now you but now you
+
+116
+00:49:14,000 --> 00:50:01,000
+evaluate the model twice at every iteration to get your vy and your v 0 um and then you take this this linear combination and then step according to that and this is called classifier free because of a stupid reason there was an earlier paper called classifier guidance that I don't want to get into and then they remove the classifier and even though there was only like 9 months between those two papers and it's now been 4 years since the second one we're still stuck with the name classifier
+
+117
+00:49:37,000 --> 00:50:19,000
+free guidance. So it is what it is. Okay. So that's actually really important in practice for getting high quality outputs. Um and that's uh that's CFG. That's really important. That's used everywhere in diffusion models. Um it does double the cost of sampling though because now you need to hit the model twice on every iteration which is kind of a problem. Okay. Uh this there's this thing on optimal prediction. I think I'll skip that. That's not so interesting. Um I mean it is interesting
+
+118
+00:49:59,000 --> 00:50:57,000
+but we're running out of but but I'm worried about time. So um but one thing that we sometimes need to do is tweak this uh this uh this this this t distribution. So we saw in particular that we were sampling t according to to a uniform distribution in a raw in like a raw rectified flow model. Um and the thing about that is it kind of is going to put uniform emphasis on all noise levels. And intuitively when you're at full noise the problem is very easy right? When you're at when you're at
+
+119
+00:50:27,000 --> 00:51:19,000
+full noise the problem is very easy. then the model like the optimal prediction from the model is basically to point towards the mean of the data distribution. Um and similarly when you're at um zero noise then the optimal prediction is actually to point towards the mean of the noise distribution. So actually the model like the the the optimal prediction from the model at full noise and full data and no noise are actually very relatively easy problems. It just needs to learn the mean of those two distributions. Um but
+
+120
+00:50:54,000 --> 00:51:43,000
+when you when you're somewhere in the middle it's actually really really hard, right? because when you when you when you're somewhere in the middle and you sample that XT, there might have been multiple pairs X and Z that could have given rise to that same XT in the middle. Um, and then the network basically needs to solve this expectation problem and figure out what is that optimal direction to predict that kind of integrates over all possible X's and Z's that might intersect at this point XT. So somehow
+
+121
+00:51:19,000 --> 00:52:07,000
+those points in the middle are intuitively much harder for the network to solve. So um but when we sample uniformly from 0 to 1t then we're kind of putting equal importance on all levels of noise which doesn't really match this intuition. So in practice you'll often sample from different noise schedules. Um and one very popular one is this one called logic normal sampling which basically um looks kind of like a gausian puts relatively little weight on the zero and the one with a lot more
+
+122
+00:51:43,000 --> 00:52:27,000
+weight in the middle. Um another thing you'll see sometimes are these so-called shifted noise schedules that are asymmetric that shift more towards one direction or the other. um and those are important as we scale to high resolution data. The intuition being that when you have a very high resolution image then there can be very strong correlations across neighboring pixels. When you have a low resolution image then there then the correlations across neighboring pixels tend to be smaller. So depending
+
+123
+00:52:05,000 --> 00:52:53,000
+on how strong of correlations you have in your data, you actually may need different amounts of noise level to properly destroy information in a nice way. So um these things don't naively scale to different resolutions, right? All right. And that's actually a big problem with these diffusion models is that they are, you know, they're a beautiful formulation, but they don't but they're hard to get them to work naively on high resolution data. So, um, that leads to actually, you know, I said
+
+124
+00:52:29,000 --> 00:53:18,000
+diffusion models are the most popular form of generative modeling. That was a little bit of a lie because what's actually most popular are these so-called latent diffusion models, which is a variant that actually gets used everywhere. Um, so here it's going to be a multi-stage procedure. So, what we're going to do is first train an encoder network and a decoder network. The encoder network is going to map from our image into some latent space um which I've colored in purple and ideally that
+
+125
+00:52:53,000 --> 00:53:45,000
+that latent is going to spatially down sample the image by a factor of D um as well as uh convert from three channels up into C channels and a pretty common setting is to get 8 by8 spatial downsampling and to increase to 16 channels. That's kind of the one some of these most common encoder decoders. Um these encoder decoders tend to be CNN's with attention but um more some more recent papers have explored bits for these. Then what we do is we're going to train a diffusion model not on the raw
+
+126
+00:53:19,000 --> 00:54:09,000
+pixel space of our images but instead on the latent space which is discovered by this encoder decoder model. So then the training procedure kind of looks like a training for training the diffusion model. We're going to sample an image pass it through the encoder that we learned in the first stage to get a latent um and then add noise to the latent and train the diffusion model to dn noiseise the the noised latent. And really importantly, you freeze the encoder. So you do not prop you do not
+
+127
+00:53:44,000 --> 00:54:31,000
+propagate bit gradients back into the encoder. We're only using it to extract these latents and then training a diffusion model directly on the latent space which is learned by the encoder. Then at inference time once you're all done training then we'll sample a random latent pass it through the diffusion model many many times to remove all the noise to get a clean sample. But that clean sample is now a clean sample in latent space. So then we need to run the decoder to convert that clean latent
+
+128
+00:54:07,000 --> 00:55:03,000
+into a clean image. Um, and this is actually the most common form of most diffusion models these days. So, you might be asking, okay, we've knocked this diffusion model, um, this encoder decoder. How do we train an encoder decoder? Any ideas? Have we seen encoder decoders? How about a variational autoenccoder? Um, so in practice, whenever you're training these latent diffusion models, this encoder decoder tends to be a variational auto-enccoder. But we just said there was a big problem with
+
+129
+00:54:36,000 --> 00:55:24,000
+variational auto-enccoders is that they give you blurry outputs, right? And if this encoder decoder is going to give you blurry outputs, the quality of the reconstructions you get out of the decoder is going to bottleneck the quality of the generations you get out of the downstream diffusion model. So if your encoder decoder is giving you blurry, ugly reconstructions, that's not going to fly. That's not going to get us good clean samples. So anyone have an idea for cleaning up the sample quality
+
+130
+00:54:59,000 --> 00:55:57,000
+of a of a of a VAE? put something after the decoder in particular um we can make again make it again. So what we tend to do is actually um train this encoder that encodes from an image into latent space a decoder that goes from latent space back to image a discriminator that tries to tell the fake images from the re from the real images and then a diffusion model that uh generates these things in latent space. So this is basically why we have to walk through all of these different formulations of
+
+131
+00:55:29,000 --> 00:56:20,000
+diffusion models of generative models in order for you to understand the modern pipeline. Like basically the state-of-the-art in generative modeling is you know is it a VAE is it a GAN is it a diffusion it's all of them right? It's all of them. The modern the modern generative modeling pipeline involves training a VAE and a GAN and a diffusion model. I'm sorry it's a mess. Okay so then you might ask what what what do the neural networks actually look like under the hood here? So um thankfully there is
+
+132
+00:55:54,000 --> 00:56:39,000
+some sanity here the last couple of years. So relatively straight it turns out that relatively straightforward transformers actually can be applied to these diffusion models and they work really well. Um these are these are typically called diffusion transformers or DITS but basically these are just standard diffusion models uh standard transformer blocks that really don't really have much special sauce in them. Um there's a couple questions uh the the kind of main question you needed to
+
+133
+00:56:17,000 --> 00:57:02,000
+solve in the architectural side is how do you inject the conditioning information? Um, and in particular, the diffusion model now needs to take like three things as input. It needs to take your noisy image. It needs to take your time stamp t. It also needs to take your conditioning signal, which might be your, um, like your text or something like that. So, um, and then you have a couple different mechanisms for injecting that conditioning signal into your into your transformer blocks. Um, so the first is, um, to predict a scale
+
+134
+00:56:39,000 --> 00:57:24,000
+and shift, um, that are going to be used to like modulate some of the intermediate activations of your of your diffusion block. Um, and that's typically the way that we inject the time stamp information into diffusion models. Um, another thing you can do is transformers are just models of sequences. So you can jam everything into the sequence. Um, you can jam the time stamp into the sequence, you can jam your text into the sequence, you can jam whatever you want into the sequence and have the the have the transformer
+
+135
+00:57:02,000 --> 00:57:54,000
+just model that sequence of data altogether. Um, and you can do that either via cross attention or joint attention. And different models um sort of do both. And typically we're going to typically in modern diffusion DITS we inject the time stamp through this scale shift mechanism and you inject the the text or other conditioning signal through um sequence concatenation usually cross attention but sometimes joint attention as well. Um so then how can you actually apply this to different problems? So one task that people care
+
+136
+00:57:28,000 --> 00:58:08,000
+about a lot is the is the task of text to image generation. So here we're going to input a text prompt. This is one that I wrote yesterday. A professional documentary photograph of a monkey shaking hands with a tiger in front of the Eiffel Tower. monkey is wearing a hat made out of bananas. Tiger is standing on two legs and wearing a suit. Um, and this is a really this is a real sample. Like it's crazy that the stuff works now. Um, but I'm sure you've all seen these kind of things before. Um,
+
+137
+00:57:48,000 --> 00:58:33,000
+and the way that this works is you'll take your text prompt. Um, pass it through usually a pre-trained text encoder, right? So, actually I lied. Like there's actually more models you have to train in addition to an encoder and a decoder and a VAE and a discriminator. You also need to train a language model secretly to get these things to work. Um, so you'll actually typically pick up a pre-trained text encoder, usually T5, clip, something like that to give um, text embeddings and usually the text encoder will be
+
+138
+00:58:10,000 --> 00:58:57,000
+frozen. Then those text embeddings um, you pass your text embeddings together with your noisy latence into your diffusion transformer that also gets your diffusion time step. That's going to output clean latence and this thing will kind of go iteratively and that'll go through your your VAE decoder to give you your final image. And just to put some numbers on this to make it concrete, um, one pretty a pretty powerful open source model right now is called flux one dev. They use the T5 and
+
+139
+00:58:34,000 --> 00:59:29,000
+clip encoders. Their encoder uses 8x down sampling. They train a 12 billion parameter um, transformer model on this. And that transformer has an additional layer of downsampling on top of the VAE, which is kind of messy. So it ends up having a sequence length of 1024 image tokens. Another task that people care about a lot is text to video. So we can input a text prompt and then output the pixels of a video that follow that text prompt. And the pipeline basically looks kind of the same. So you're going to input a
+
+140
+00:59:02,000 --> 00:59:48,000
+text um through your pre-trained text encoder, get noisy latence. Importantly, the only difference is that your latents are now have an extra dimension to accommodate the time. So in addition to two spatial dimensions, HW, you'll also have a time dimension in your latent and that will give you clean latence. And then your decoder um this is typically going to be a spatial temporal auto-enccoder now. So it will downsample both spatially and temporally. Um, so then it will take your latence and then
+
+141
+00:59:24,000 --> 01:00:20,000
+upsample them into pixels which will give you a video. Um, and this is actually a this is actually a generated video from Meta's movie gen paper that came out uh in last year. Um, okay. And that's putting some that's putting some particular numbers on this thing. Um, and the key takeaway of these video generation models is that they get very expensive to train due to the sequence length, right? because if you want to generate high FPS, high resolution, high frame rate video, it just ends up with a lot of tokens. So,
+
+142
+00:59:53,000 --> 01:00:42,000
+we said that with um kind of a a fairly state-of-the-art um to text to image diffusion model, that transformer ended up working on a sequence of 1024 image tokens for this um for this texttovideo diffusion model. Even though the overall architecture looks pretty similar, the biggest difference is in the sequence length. So now rather now they actually need to process um 76,000 um video tokens to process this to create this high resolution video with a lot of frames. So that's where the expense
+
+143
+01:00:18,000 --> 01:01:15,000
+happens in these video diffusion models is actually processing these really long sequences. So um I I think basically the last year has pretty much been the era of video diffusion models. So um there was there it basically seems like every week almost for the past year there's been a new interesting video diffusion model coming out. Um, and these have been a mix of open source models, uh, models that have technical reports, um, so they they give you some details about the model architecture and the training. Um,
+
+144
+01:00:46,000 --> 01:01:33,000
+and you know, purely industrial models where they don't tell you anything, but they'll take your credit card number, let you generate samples from it. So, um, I I'm not going to go through all these in all of these all of these uh, one by one, but I just wanted to give the sense of like this has been a really hot topic the last like really the past 18 months. Um and in particular this uh there was this really influential blog post from OpenAI called Sora that came out in March 2024 which was not the
+
+145
+01:01:09,000 --> 01:01:54,000
+first um diffusion model on videos but it was the first one that gave really really really good results. Um and they kind of adopted this modern sort of diffusion transformer plus rectified flow. Um actually I don't know if they were using rectified flow in Sora. I don't know if they said um but they were they were one of the first to really scale up these diffusion transformers um and get this thing to work really well and then kind of that was the 4-minute mile sort of moment in video diffusion
+
+146
+01:01:32,000 --> 01:02:25,000
+models and then all the other big companies took notice of that and quickly tried to replicate Sora. So, I said it's it's felt like for the past year and a half that like almost every week there's been a brand new state-of-the-art video diffusion model. And today is no exception because an hour and a half uh at 11:00 a.m. this morning, Google announced Veo 3, which is almost certainly the best video diff which is almost certainly the best generative model of video out there right now. Um, I literally like read the
+
+147
+01:01:58,000 --> 01:02:58,000
+blog post while I was in the car on the way here, but it seems cool. Here are some samples from Veo3. So like these are actually generated videos from a text from a text prompt um in Google's new model. Kind of crazy. Also, this model joint also models sound jointly. So they can output like audio along with the video frames. This is another generated one. So you can kind of tell what you want to happen in text. It'll fly over here and like looks crazy. Okay. So I thought that's just fun to to
+
+148
+01:02:27,000 --> 01:03:23,000
+incorporate new stuff. Okay. So one big problem with um with diffusion is that during sampling it's really slow right we said that sampling was this iterative procedure and these models are can be really big these can be models with tens of billions of parameters potentially operating on sequence lengths of tens of thousands or or more so these things get really slow at inference time because even with rectified flow you need like you know tens tens of iterations of the model at inference time so the solution is a
+
+149
+01:02:56,000 --> 01:03:47,000
+category of algorithms called distillation which we don't have time to get into I just wanted to put a couple referenc here make you aware that this exists as a set of techniques. So distillation algorithms are basically ways that you can take a diffusion model that normally would take you know 30 50 100 iterations at inference time to get good samples and then modify the model in some way such that you can take many many fewer steps on inference and still get good samples. Um they tend to sacrifice sample quality. So the whole
+
+150
+01:03:21,000 --> 01:04:07,000
+trick in distillation methods is trying to maintain the sample quality as good as you can while still letting you take fewer samples at inference time. Um, and some distillation methods let you get all the way down to singlestep sampling, which is really cool, although they tend to take quite a hit on the on the on the um generation quality when you do that. So, that's kind of uh that's kind of, you know, I'm not going to go through these, but I just put some references here to different papers on distillation
+
+151
+01:03:44,000 --> 01:04:36,000
+if you want to take a look. Um, and this is a really active and evolving area of research. So, if you look at these references, these are um, you know, from 2024, from 2025. So, like these are stuff that people are working on right now is how do we get better distillation? And how do we get uh how do we get diffusion models to be more efficient at inverse time? So another thing so I I kind of mentioned that diffusion has this like black hole of math that you can get sucked into. Um and we intentionally sidestepped that by
+
+152
+01:04:10,000 --> 01:04:55,000
+just walking very intuitively through rectified flow models kind of giving you a geometric intuition for the problem without really diving through any math that proves anything. Um so I wanted to give you just a brief sense of like what some of these formalisms are. Um but we're not going to be able to go through them in detail. Um so here's kind of restating the rectified flow objective. We said that during training we're going to sample um our X's and our Z's according to our data distribution and
+
+153
+01:04:32,000 --> 01:05:26,000
+our noise distribution. We're going to sample T according to some distribution PT that we choose either um uniform logic normal or shifted something like that. And then we'll set XT equal to the linear interpolation between X and Z. We'll set a now now we've changed we've written this a little bit differently in in this slide. Now we're writing down a ground truth velocity VGT that we want the network to predict which is Z minus X. Um we compute a predicted V from the network by passing it our noisy XT and
+
+154
+01:04:58,000 --> 01:05:53,000
+RT then compute an L2 loss minimizing the V the VGT and the predicted V from the network. So most um when I said that there's a lot of different formalisms a lot of different flavors of diffusion um what a lot of these look to is sort of different functional hyperparameters in this general setup in this general setup. So in the in more generalized flavors of diffusion, usually you'll you'll you can you might vary what is this PT distribution. Usually you don't vary the noise distribution. This is
+
+155
+01:05:26,000 --> 01:06:17,000
+almost always gausian um at least for for continuous models. Um but what you will vary is like how do you compute that noisy XT and in general that will be some functional combination that will be some linear combination of X and Z. Um and the that the linear combination weights will in general be some function of T. But what exactly that function is kind of depends on the diffusion formulation. Then what also varies is what is that ground truth target that we ask the model to predict. It's always
+
+156
+01:05:52,000 --> 01:06:41,000
+going to be some linear combination of our data sample X and our and our um and our latent Z. Um and again the what are the linear combination weights might be functions of T in some formulations. So basically and then uh you know we're going to ask the model to we're going to give it that noisy XT and the T um get a predicted Y and then always compute an L2 loss between the two. I mean not always but usually. And then what varies is basically what are these different functional forms? What are these
+
+157
+01:06:17,000 --> 01:07:09,000
+different functions that we plot that we slot into these different these four different spots in this thing. So in the case of rectified flow it's fairly simple. Um a these all take these really simple forms and um ct and bdt are actually just constants. Um there's a kind of another another flavor of this called variance preserving um where a is where you kind of collapse these two into one scalar hyperparameter um called sigma of t. Um and now you have these linear linear combinations in this
+
+158
+01:06:43,000 --> 01:07:33,000
+particular way and you choose this because if X and Z are independent and have unit variance then your output also is guaranteed to have unit variance. So that kind of collapses these two functional hyperparameters into just one noise schedule and then you still need to choose that somehow. Um in combination with variance preserving there's also variance exploding is another one where you'll set a t equals 1 bt equal to again some sigma of t and you need to choose that somehow. Um there's a lot of different way a lot of
+
+159
+01:07:08,000 --> 01:07:53,000
+different targets that people will choose. Um sometimes they'll predict sometimes they'll ask the network to predict the clean data. Sometimes they'll ask the model to predict the noise that was added. Sometimes they'll ask the network to predict some linear combination of the two. Um and in the case of of rectified flow, you are just predicting the that velocity vector that points from a data directly to a noise. But in more generaliz in more in different flavors of diffusion, all of
+
+160
+01:07:30,000 --> 01:08:13,000
+these can kind of change. Um then you might be wondering you know how how you know choosing hyperparameters is bad enough. Now we need to choose hyperparameters which are themselves functions of t. Like this is crazy. Um you're never going to set these intuitively. So you'd have to be guided by some some kind of math. Um and there's basically three different mathematical formalisms that people um you that people think about when training diffusion models that again we will not walk through in practice. I
+
+161
+01:07:52,000 --> 01:08:37,000
+just want to get you the to know the existence of. Um the first is that diffusion is a latent variable model, right? that we're going to we have our clean data samples X0 but then associated to every clean data sample. There exists some sequence of corrupted or noisy samples like that that correspond to that clean sample and we can't observe them. We don't know what they are but we need to figure them out somehow. So that's a latent variable model that ends up looking a lot like a
+
+162
+01:08:14,000 --> 01:09:01,000
+variational autoenccoder. Remember in a variational autoenccoder we had a Z and an X. We didn't observe the Z. We wanted to train this thing somehow. Um then it turns out you can turn a very similar ma use a very similar mathematical trick um as we did in variational autoenccoders and maximize some variational lower bound of the likelihood of the data and that gives rise to this um latent variable model interpretation of diffusion. Another another a totally different interpretation of diffusion is that it
+
+163
+01:08:38,000 --> 01:09:38,000
+models something called the score function. Um so given a data given a data data given a distribution p data of x um there's this nice thing called the score function of the distribution which is the derivative with respect to x of the log of p data of x and intuitively this given a distribution the score function is a vector field that points towards areas of high of high probability density. So um you know for any point in the data space the score function is going to be a vector that points you towards areas of high data
+
+164
+01:09:08,000 --> 01:09:58,000
+density. And now another interpretation of diffusion is that diffusion is learning the score function of the data distribution and in fact learning a set of score functions corresponding to different levels of noise on the data distribution. So there's another interpretation of diffusion which is that it's trying to learn a family of score functions corresponding to a family of noised distributions that corrupt the true data distribution with increasing amounts of known noise. And that's a totally different mathematical
+
+165
+01:09:33,000 --> 01:10:21,000
+formalism that gives rise to very similar looking algorithm at the end. And then the third one that's come onto the scene a little bit more recently is this notion of diffusion as solving stochastic differential equations. And I got to admit like I don't fully understand this one myself. So don't ask me too many questions. Um but the idea is that you want to learn some you want to write down some differential equation that's going to write down you know some infantessimal way to transport samples
+
+166
+01:09:57,000 --> 01:10:45,000
+from a noise distribution into samples from a data distribution. And then it and then it inference. Then the neural network is basically learning some kind of numeric integrator, some numeric integrator to this stochastic differential equation that we can write down. Um, and this opens up a whole new way of thinking about it, right? Because from under the lens of stoastic differential equations, then we get access to whole different categories of functions to to to whole different categories of methods to sample from
+
+167
+01:10:21,000 --> 01:11:07,000
+these things at inference time, right? And from this perspective, the kind of like naive gradient descent type um type approach that we saw in rectified flow basically corresponds to a forward oiler type of integrator on top of a sta stocastic differential equation. And then under this interpretation, you can imagine doing all kinds of more complicated integrators to maybe do a better job at mar at marching along this score function. So again, like these are these are these are deep waters. Like
+
+168
+01:10:44,000 --> 01:11:31,000
+there's there's there's papers that go into great detail on all these things. Um, and a blog post that I really liked is this one by Sander Deman on perspectives on diffusion, who actually gave um eight different perspectives on different ways to think about or view diffusion models. So, this is an excellent post. I would highly recommend I would actually highly recommend everything he's written about diffusion models. All his blog posts are amazing. Um, autogressive models actually come
+
+169
+01:11:07,000 --> 01:11:59,000
+back. We can do the same thing in coder decoder um and put an autogressive model on there too. So the other the other you know just sneaking this in there at the end in addition to diffusion models the other you know modern recipe for generative modeling is to train an auto reggressive model on discrete latents that are computed by a discrete variational autoenccoder. So you know you know that's why we did the four generative models that we did right um GANs ves autogressive models diffusion
+
+170
+01:11:33,000 --> 01:12:18,000
+because it turns out they all get used in in in modern machine learning uh pipelines. So that's basically the summary of today. Uh today we did a whirlwind tour of two different categories of generative models. We talked about generative adversarial networks as well as diffusion models. And we saw kind of their their modern full pipeline instantiated in latent diffusion models which is kind of a nice way to wrap up this generative modeling section because all the generative models that we saw
+
+171
+01:11:56,000 --> 01:12:13,000
+basically come back and come together to form these big modern pipelines. So thanks and next time we'll talk about vision and language.
+

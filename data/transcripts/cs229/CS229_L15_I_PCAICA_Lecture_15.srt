@@ -1,0 +1,540 @@
+1
+00:00:05,000 --> 00:00:59,000
+so welcome to our continuing work on understanding unsupervised learning uh we're going through two kind of stalwart algorithms which are pretty fun today we're going to finish out PCA which is this old standby we use it for dimensionality reduction sometimes visualization it's kind of a core canonical unsupervised algorithm and we'll talk about that today and I'll try and refresh and be a little bit complete there because I know we got cut off kind of in the middle if we have time uh well then we're going
+
+2
+00:00:33,000 --> 00:01:21,000
+to go through ICA we will have time for ICA this is a fun problem this is this cocktail problem you'll implement it actually and it's a one of the ones that's kind of a highlight every year people talk about what are the favorite homework problems they did and the reason we're going to go through it is it's a place where you make a kind of a different assumption about how the noise works it turns out if you make the kind of traditional gaussian assumption here which we've been making kind of through
+
+3
+00:00:56,000 --> 00:01:47,000
+class it breaks and so it's just nice to to have an exposure like there's more interesting things to do and it's also kind of a fun problem if we finish those two and there's some chance we do but if we ask lots of questions that's actually even better I'll show you some stuff about weak supervision and I have some slides prepared for that which are not in the main deck but if we get to that I'll I'll post the slides week supervision the reason I would want to talk to you about it is it's a more
+
+4
+00:01:22,000 --> 00:02:16,000
+modern technique it's behind some products that you've actually used in the last while and it's kind of one of these things that looks like an em style model but you can solve it in a very direct way and since we're not having another exam in the course you won't be responsible for it it's a little bit more advanced and so I can talk to you about kind of how that works without hopefully freaking you out Okay cool so that's what I want to do today so let's talk about PCA
+
+5
+00:01:49,000 --> 00:02:38,000
+all right so PCA if you recall we were looking at these unstructured things I'm just going to run through some of where we were last time we're looking at the structure and our structure is a Subspace and it's a non-probabalistic method so the two things are we wanted some structure that we were looking for underneath the covers remember GMM and k-means were there's a clustering kind of structure here we want to look for a linear Subspace and we wanted the non-probialistic version of that we
+
+6
+00:02:14,000 --> 00:03:09,000
+looked at this kind of contrived example where we had pairs of Highway and City miles per gallon and we were plotting cars and we kind of intuitively would guess like you know their hybrids up here their SUVs down here and trucks maybe and economy cars in the middle and we wanted to understand what is a notion of good miles per gallon that took into account both Highway and City and this was a way of motivating effectively that what we wanted to do was to kind of draw a line along the direction that explained most of the
+
+7
+00:02:41,000 --> 00:03:36,000
+variance that was our intuition most of the ways that they varied inside the data set that was kind of that was descriptive so the way we did that is our first mathematical thing is that we centered the data recall we took the data we subtracted off the mean and literally last time I just copy pasted this data and centered it at approximately the center of of the data which is Mu and we transformed it and the reason we transformed it is we're using a linear mapping that's what we want to do and
+
+8
+00:03:09,000 --> 00:04:00,000
+linear spaces go through the origin so this just lets us use linear spaces and have one fewer degree of Freedom when we map them special understanding although you should think about it but it's really critical if you run these methods if they're Askew there will be no line through the organ origin that potentially goes through your data once we did this I want to remind you of some things that we're going to use from linear algebra we have this idea around we're going to prove formally what we
+
+9
+00:03:35,000 --> 00:04:26,000
+mean by the direction of maximal variation and we kind of thought that this line intuitively would be that variation that is when we projected things on the line either we had them maximally spread out that means we captured most of the variation that's that's actually what that means or we saw this dual thing in a second that the residuals the amount of error in our prediction on that line was small okay and we'll talk about that again in a second if you don't remember your linear
+
+10
+00:04:00,000 --> 00:04:57,000
+algebra remember that you can write once you have an orthogonal basis you can write any point in that space as a um in that orthogonal basis namely every one of the vectors that are orthogonal U1 U2 in this example and their distances along those lines we're going to recall the math that does that but that kind of gives you a new set of coordinates for your data if your data were a thousand dimensional it was given to you in a thousand Dimensions you could run PCA underneath it and find the
+
+11
+00:04:29,000 --> 00:05:23,000
+direction of maximal variation and maybe it's second and third components and then you could take that thousand dimensional coordinates which are a thousand numbers that you were given and compress it down to three and that's what we mean by dimensionality reduction what are the three best numbers if you like in some sense that represent your data set okay now just remember that fact that every Point can be written in the basis and really it's like the coordinates of like how far do I go along U1 then I'm going
+
+12
+00:04:56,000 --> 00:05:56,000
+to go along the U2 Direction and get to X1 this is Alpha One and this is Alpha two okay as we'll see below from last time now the convention is that U1 and U2 are unit vectors because we only care about their direction we don't care about their length or their magnitude and this is just what you do there and so here U1 was kind of how good is the miles per gallon and mu2 was the difference between their Highway and and City miles per gallon roughly those aren't formal statements that's just to give you an intuition of
+
+13
+00:05:26,000 --> 00:06:14,000
+what this basis looks like so you can kind of have an intuitive feel of what you're doing you want One Direction which is the principal component of variation and if you had a thousand different uh uh points you would then look at the other data sets and say what other direction is the second principle component third principle component and if you remember your linear algebra that is just how you write down a basis okay that's all I'm describing but we have to order those bases in some way we have to
+
+14
+00:05:50,000 --> 00:06:45,000
+figure out which components do we pick first and among all of them and that's what we're going to solve in PCA all right okay so this is all just saying X can be written in this form and we may hear compressed from Dimension two to Dimension One what that would mean was we would probably just keep the number alpha one that would just be we would treat X as its projection onto this line and just treat it as Alpha U1 okay and that's what we mean by explains more variation okay so when we we're going to find
+
+15
+00:06:18,000 --> 00:07:01,000
+these directions today with some caveats and we're going to think about thousands of Dimensions to tens of Dimension and this will be a dimensionality reduction because we're going to only keep those components so before I move on there's a lot of linear algebra in there ask me questions and I'm super happy to unpack this because we're going to assume this information so we try to that last time going forward but I'm super happy to answer questions and and derive whatever's here that's unclear and if
+
+16
+00:06:39,000 --> 00:07:36,000
+you have the question almost certainly somebody else does so please go ahead and ask please one of these Alpha which is basically the prohibitions are negative ah so they can be negative right so for example in this direction U1 is going this way if you were to have a negative it would mean that it was in the negative direction of that these are signed so they they can certainly be negative they're not positive scalars here that's why we worry about their squares for how much of the residual is because they can be
+
+17
+00:07:11,000 --> 00:08:01,000
+positive or negative coefficients just like you can have something that first component is positive or negative and the positive tells you to go this way and then negative tells you to go that way [Music] are based on we don't know yet right so what we're going to do is we're going to try and find so all we know at this point that we're trying to make sure that we get there is that we can take an X and we can write it down in a basis so X has its original thing that it's given to us
+
+18
+00:07:37,000 --> 00:08:31,000
+and RN some large space we can write it in new numbers alpha eyes for these uis and this is a different basis for the same underlying space and then what we're going to try and do is say how do we pick a good set of uis to represent this and what I'm trying to hint at is that we don't have to pick a complete space we don't have to pick n orthogonal basis vectors we're going to pick the top K in some sense and that top K is we hope captures the most variation and we're going to make that precise in the
+
+19
+00:08:04,000 --> 00:08:57,000
+next couple of uh you know write-ups awesome questions please any others wonderful point okay so that's exactly what I mean we're going to say how do we find those directions okay and last time we talked about this pre-processing we're going to assume this for the rest of time I would just say at some point reflect on this we have to Center the data that's because we're going to look through lines that go through the origin we want linear subspaces so that makes sense that we would want our data to kind of
+
+20
+00:08:40,000 --> 00:09:32,000
+have a chance for these lines to explain the maximal variation that's why we Center that's important we will also rescale the components so that they have about the same amount of space so imagine if one of your components was miles per gallon and another one was feet per gallon the feet per gallon because it was you know 5 000 times the numbers were five thousand times larger they would be at vastly different scales right and if you go through the calculations below because you're taking
+
+21
+00:09:06,000 --> 00:10:04,000
+squares and doing things because they're at different scales that kind of makes them you know unreasonably important right so one of the things that you'll typically do is then scale by the variance in each Direction and then allow them to kind of all be spread kind of about a gaussian because they're centered component wise and then divided by that variance that's just the other piece of pre-processing that that goes on okay all right so now we've done that we've we've done those pieces we need a
+
+22
+00:09:35,000 --> 00:10:35,000
+couple of bits of mathematics just you know to remind yourself of what it means to find these kind of components so here we have two components U1 and U2 and their unit vectors as we talked about before and they're orthogonal that means their dot product is equal to zero they're perpendicular to one another okay now what we want to find one of the things that we have to find are kind of a subroutine intellectually of what we have to do is to find the coordinate Alpha One on this line it makes sense
+
+23
+00:10:04,000 --> 00:11:04,000
+that it's the closest point actually on this line to X right that would be the point that we would project it on that's what projection means actually it's the closest point on the line in this sense okay and euclidean geometry so what does this line This is the set of all T times U1 so that's any scalar positive or negative as pointed out that scales this entire line and so basically our optimization problem to find this component Alpha One Is to find the T that gets me to this closest point now
+
+24
+00:10:35,000 --> 00:11:40,000
+geometrically it will hopefully be intuitive that that should be perpendicular right to this line this line here will be perpendicular and the reason is is the rest will be explained by U2 okay all right so let's find out how we find the closest point to the plane and I'm going to write it out now so how do we do that just remind ourselves so how do we do that so alpha 1 is going to be equal to the ardman this is just rewriting what I said overall Alpha such that we have here x minus Alpha U1 square the square
+
+25
+00:11:07,000 --> 00:12:03,000
+just makes our life a little bit easier kind of mathematically squares Norms of squares of norms are just easier to work with doesn't really make any difference in the underlying piece but this is just saying among all the oops among all the alphas let me get that among all the alphas which are running up and down this line I want the one that has the closest distance to X that's what I'm calling the projection okay so what does that equal well this is the same as doing the ARG man let me write it on the next line
+
+26
+00:11:35,000 --> 00:12:58,000
+actually the ardman and I'm just going to expand this Norm out so it's x squared plus Alpha Square U1 Square minus 2 Alpha x dot U1 okay and this is I'm just writing the dot product in a notation hopefully not too confusing this is just a DOT product okay just to make it clear without having little tiny dots to look at all right so a couple things right away this term is one because it's a unit Vector it's a unit vector and this term is irrelevant for Alpha Alpha's value here doesn't change the
+
+27
+00:12:23,000 --> 00:13:45,000
+value of x x is given so this is equivalent for us when we take the derivative oops we take the derivative with respect to Alpha of this expression this expression looks like to us Alpha Square minus 2 Alpha X U1 okay and when we take the derivative with respect to Alpha of this thing it's the derivative with respect to Alpha of this expression that equals 2 times Alpha which is from the first one minus X U1 okay now to set this equal to zero this is equal to zero this implies Alpha equals x dotted and E1
+
+28
+00:13:09,000 --> 00:14:36,000
+comma that's all that's saying all right so this is just saying something you may have forgotten from linear algebra or you're now remembering which is that the dot product of a unit Vector is actually a projection all right so far so good all right okay now one piece here is that we can generalize to higher dimensions to more components and it's worth actually thinking about what this looks like right so the point is when we when we write this down we're going to have here U1 to UK for some value of K this is
+
+29
+00:14:01,000 --> 00:15:29,000
+just for an exercise for arbitrary value of K element of Rd some X that's also living in Rd and then here we're going to calculate coordinates alpha 1 to Alpha D such that x minus sum k equals 1 to D uh Alpha k u k is smallest clear enough this is finding the closest point in the Subspace instead of a line we're finding the closest point in the Subspace hopefully clear and you remember this if not please ask a question super easy to explain all right so by the same basic reasoning you
+
+30
+00:14:48,000 --> 00:15:59,000
+compute the derivative you unpack it you have to use the fact that the uiks are orthogonal why when you expand the squares right you're going to get products of UK dot into UJ and those will cancel out and so you'll basically have just a bunch of Expressions that are that are present in which Alpha K is going to be x minus UK and this is only because they're orthogonal only because orthogonal UK or orthogonal okay and you can do that derivative very very quickly okay now this quantity here
+
+31
+00:15:33,000 --> 00:16:42,000
+is important that's a terrible highlight let's use this one this thing here is called the residual right all right this is the residual and what we care about when we're going to do PCA is we either want to we either want to find that we want to find a set of points a set of directions such that when we do this projection onto them the sum of all the residuals is minimized okay so this this tells us the residual for a given point and a given basis and now I have an optimization problem
+
+32
+00:16:16,000 --> 00:17:17,000
+right and I'll write it out formally in a second but intuitively you can think about what's going to happen is I'm going to pick you know K of these U's that are going to be orthogonal there are many of them that I could pick many orthogonal uh bases that I could pick I pick one of them then I project all of my data onto that set I measure how well I did by either how much I captured in the data set or by how much was missing which is the residual and this is the residual I then have that per point so I sum up
+
+33
+00:16:46,000 --> 00:17:57,000
+over all of those and this gives me a score of how good that basis was and among all the bases I want to pick the one that minimizes the residual or maximizes the projected Subspace so let me write some of that down and then you ask questions if you like so we can find PCA by two things by the way this is not this is a this seems like trivial uh potentially um that the maximizing the projected space or variance and the minimizing distance are the same it's actually not true in general for for other geometry so it's
+
+34
+00:17:24,000 --> 00:18:26,000
+actually quite a nice thing about euclidean space that doesn't matter to you but just kind of a comment it's residual all right so let's do this one this is the one we're going to do in class maximize the projected space so let's do it for one vector so now we want to pick among all the possible U's what's the debt what's the version uh what's the particular setting of you that explains the most about our data and so what that's going to be from our our previous discussion is this
+
+35
+00:17:58,000 --> 00:19:08,000
+Max U over Rd subject to U equals one this two Norm is equal to one over an average over all the points although of course such a constant doesn't really matter because we're maximizing but it's nice to have the right scale U dot x i Square okay so what we're saying here we pick a direction and this direction we want to get the largest dot product right how much this is the project this is X1 projected into this this is the alphas the sum of those Alpha squared I's we want to be as big as possible so we want
+
+36
+00:18:34,000 --> 00:19:53,000
+to pick the direction among all the directions so imagine in two direct and 2D you're just kind of spinning around and you're you're judging how great the Subspace is by maximizing how much is present okay we need a couple facts to solve this hopefully the the point is clear we need some facts to solve this okay so first fact we need we need to recall is let a be a symmetric and square Matrix kind of makes sense okay then it's a normal Matrix and in particular it can be written like this
+
+37
+00:19:24,000 --> 00:20:51,000
+you Lambda U transpose where u t equals I the basis is orthogonal and Lambda is diagonal okay not all matrices are diagonal not all matrices are orthogonally diagonal but if it's symmetric and square it's called normal then it has this and Lambda has has a nice interpretation Lambda I I the since it's a diagonal matrix equals Lambda I and we call these the eigenvalues Lambda 1 and they're real okay by convention so we order them this way just because it's nice to talk about them is Lambda 1 being the big one
+
+38
+00:20:15,000 --> 00:21:00,000
+Lambda n being the small one okay now if you don't remember your linear algebra maybe this doesn't seem mysterious to you but if you think about the like underlying model like there's no reason in general these things should even be real value they could be complex valued in general but if they're symmetric and it's nice then this happens they're real and they can order them which is really nice okay so we're going to use that fact and if that's confusing to you to remember what
+
+39
+00:20:38,000 --> 00:22:30,000
+happens when you diagnose over the complex plane don't worry about it at all just take this as a fact okay all right so these characters here as I mentioned these are the eigenvalues all right so recall if x equals sum k equals 1 to n Alpha k u k where U1 u n equals U we can write the following thing we can write alpha x ax sorry is equal to U Lambda U transpose X this is equal to U Lambda sum k equals 1 to n Alpha k e k oh sorry e k sorry let me write it like this uh I don't want to write it that way
+
+40
+00:21:44,000 --> 00:22:51,000
+yeah okay perfect yeah Alpha k e k what's going on here U transpose U is exactly the identity so all that's going on here is since it's what when I dot product UK into one of these which one survives exactly UK right if it's different if it's UJ that's different then they're going to contribute zero so this becomes Alpha K in the standard basis this is a standard basis that's confusing ask a question what's going on here again X is written in this form what happens when I
+
+41
+00:22:19,000 --> 00:23:43,000
+multiply U transpose by X it multiplies it by each of the uis only one of them survives for the kth term only the case one survives because otherwise they would be zero and so I get this then when I multiply it by the diagonal matrix I get U times sum k equals 1 to n Lambda K Alpha k e k and then I get back to sum k equals 1 to n i multiply by U again I get Lambda K Alpha k u k because again when I multiply e k the basis Vector right this is the vector where it only has a one in the kth position by U it selects out UK and
+
+42
+00:23:01,000 --> 00:24:10,000
+I get back and so what this means is this is a long-winded way of saying if I multiply a in this basis all it does is act by multiplying by the eigenvectors this is an eigen decomposition if you remember it that's all that's going on right please [Music] nice property that we can get all of these because once we have the use then you can you know user that is yeah yeah so I think the the we haven't gotten back to PCA yet we need one more fact hold on just one minute and we'll come back to that we're just recalling
+
+43
+00:23:43,000 --> 00:25:02,000
+like facts from your linear algebra class yeah but there's a great point you should be thinking exactly that right so let me just point out one fact here which is that if I take the max over all the unit vectors of X transpose X a it can also be written and this is the formula we've been we've been kind of hinting at as Alpha Square sum k equals 1 to n Alpha K Square Lambda k okay so now if you think about this how do you find the principal eigenvalue how do you find the largest way to
+
+44
+00:24:29,000 --> 00:25:36,000
+express this well since we only get to spend oops since we only get to spend our Alpha squared along the components and we only have a one unit to spend what maximizes this expression well we want to put as much value go ahead because when we multiply here by X Alpha times x is going to be equal to this expression and then when we dot X in again we get the alpha squares because they pair up to one another yeah apologies if I went too fast great question so we have the alpha squares times the Lambda case now the
+
+45
+00:25:07,000 --> 00:26:06,000
+Lambda case because they're let's imagine they're you know one to ten where would you put all your mass if you wanted to maximize this well on the largest one right so how do you maximize the amount of mass you put on the largest one you put in our in our notation Alpha One equals one because the rest are all then equal to zero this is going to be the largest one and that's the principal eigenvector imagine they're strictly different does that make sense please for many years
+
+46
+00:25:40,000 --> 00:26:50,000
+yeah we're here um yeah yeah so how does it then suddenly become this one is just the fact that it's diagonal so e k times a diagonal is just the case eigen unit Vector times that value and so that pulls it out pulls out Lambda K which is on the diagonal yeah and then when you have it when you have a unit Vector multiplied by a matrix it just selects out that column okay but is this clear if I want to maximize this I set Alpha One equal one right because we know Lambda 1. now what if Alpha One what if Lambda 1 equals
+
+47
+00:26:24,000 --> 00:27:23,000
+Lambda 2. that is there two eigenvalues that are hot that are that are that are present Lambda 1 equals Lambda 2. then it turns out there's an entire Subspace of solutions right I could pick any alpha 1 and Alpha 2 such that the squ that they're Square sum to one anywhere on that Circle and if Lambda one equal Lambda 2 equal Lambda 3 now I can pick anywhere in a Subspace of size three that's going to be important when we think about how well-defined PCA is because it's only well defined what the
+
+48
+00:26:55,000 --> 00:27:48,000
+principal component of variation is if Lambda 1 is strictly bigger than Lambda 2. right if there's no Gap then you can it doesn't the coordinates aren't well defined anymore I can pick anything I just described does that make sense all right please so alpha 1 is equal to one and the reason is so if this constraint this Norm constraint means that I have to pick among all the alpha such that they're Square sum to one so if among all the ones that square sum to one which one's going to give me the
+
+49
+00:27:27,000 --> 00:28:18,000
+biggest value intuitively I want to put all my mass on Lambda 1 because Lambda 1 is the biggest value right and so that setting I would set alpha 1 equal to 1 and all the alpha k equal to 0 for K greater than one that would be the value that I would pick there because that just that one's guaranteed it you know I can't really do better than that if I slide off even an Epsilon amount of mass well then it's going to a smaller eigenvalue and because I I lost that mass I would get you know Epsilon
+
+50
+00:27:52,000 --> 00:28:55,000
+Square times that okay you can also just compute the derivative using lagrangian if the intuitive thing doesn't make sense which we did two lectures ago cool all right so let's go back to PCA and say exactly where do we get this this UI the thing I wanted to point out that is here I'm going to come back to this point about what happens with Lambda 1 and Lambda 2 if you missed it don't worry I just care that you're aware that what we're doing in the maximization now back to PCA
+
+51
+00:28:25,000 --> 00:29:50,000
+okay so recall I'll just go up here sorry I'll copy because I'm extremely lazy where is our PCA where did we do this oh here I just want to like make sure you realize I'm not like doing something strange and changing the expression this is what we wanted to deal with well this expression here we can rewrite and we can rewrite it as x i transpose U transpose oh sorry X transpose U transpose x i sum I goes from 1 to n one to n okay let me drag that and give myself a little bit more space here so it's not crowding
+
+52
+00:29:08,000 --> 00:30:12,000
+you too much okay so this is equal these two expressions are equal I'm just expanding out the square but this is pretty nice because now I can pull out you oh sorry I wrote it backwards I don't want to do this let me write it the other way it'll just make my life easier in the next move you too I'm so sorry about that expose transpose you okay sorry that was that was foolish it's true but foolish okay so now I can pull out the use because they're on the outside this is U
+
+53
+00:29:42,000 --> 00:31:06,000
+transpose sum I equals 1 to n x i X I transpose U okay why is that because this is linear so I can pull this out of the sum and all of these things are are paired up this thing here is this is a quantity that you may remember previously this is the covariance of your data why is it the covariance because you subtracted off the mean this is the sample covariance and so here I can push the one by n inside let me do that too 1 by n and then it's really the sample covariance okay this thing here
+
+54
+00:30:37,000 --> 00:31:41,000
+so then what will you be if I want to maximize this U well it will be the Principal eigenvalue right this is an eigenvalue problem just as we went up here it's now of this form we can verify is it symmetric yeah it's a symmetric it's a sum of these are each are a sum of symmetric matrices so the covariance is symmetric it is actually really a covariance matrix it also happens to be positive semi-definite that means all the lambdas are non-negative so that's good news we didn't need that but that's nice to
+
+55
+00:31:15,000 --> 00:32:26,000
+have and now when we look at the U's as we go through there we have to pick a direction which direction do we pick well we're going to pick the direction that corresponds to Alpha One which is U1 right which is the basis when we do the decomposition here it's the principal eigenvector of this thing so the best you to pick is the principal eigenvector of the covariance right some of you are nodding some of you look like I said something horrible so please both ask questions this is a covariance we're going to sub
+
+56
+00:31:52,000 --> 00:33:10,000
+this covariance Matrix into the a awesome what happens if we want two components what do you think we pick anyone the first two that correspond to the largest two eigenvectors three the largest three if the first two are equal and you want One Direction Lambda one equals Lambda 2. now you got a problem because you have two potential representations for it but you can still pick a component of principal variation and that's the way that PCA is potentially undefined okay all right cool that's all it is so how do we
+
+57
+00:32:39,000 --> 00:34:03,000
+represent data with this just to make sure it's clear well we map x i I some let's say we picked D dimensions x i minus u j u j namely this is its coordinates in the top K eigenvalues that we picked on average this captures the most variance in our data and we just keep this is a scalar this is you know what we were calling Alpha J earlier we just keep these k scalars okay so this map what it does it takes in a thousand Dimensions let's say I started with a thousand dimensions then it's going to pick five
+
+58
+00:33:28,000 --> 00:34:20,000
+which five well they're going to be a blend of those they're not going to be any individual Dimension they're going to be this these eigenvectors of the underlying covariance they capture the most the reason we like them is they capture the most of our data they throw away the least amount of our data which is the other residual interpretation and this gives us a map that goes from you know R let's call it Big D down to R Little D okay and that's in what sense this is a dimensionality reduction and we can use
+
+59
+00:33:57,000 --> 00:35:08,000
+that for example to take our data and take it from 100 dimensions and project it onto two and visualize it draw it on a map um yeah awesome peace [Music] yeah great question so you want to know how do you pick K or D here Little D so let's hear in contrast for the last three uh lectures I've been telling you I have no idea how to pick K here I at least have an idea oh go ahead oh I'm just confused I think I confuse you with something so let me make sure this let me just call this K just for now to make this K is
+
+60
+00:34:43,000 --> 00:35:34,000
+less than what you're thinking of as D how about that that's a great point so it's decomposed into D dimensional vectors but it only now takes K coordinates to represent it so again going back to the two-dimensional picture we have a two-dimensional picture but we projected everything onto the line and so now we can represent things by just its distance on the line the alpha one so we've taken two scalars which were like it's X and Y coordinates and reduce it to just one which is the Alpha One
+
+61
+00:35:18,000 --> 00:36:29,000
+does that sound make sense awesome all right so let's see how we pick K here how do we pick k and this won't be super satisfying but you know whatever be fine okay so this actually does have some have some kind of trick so what does this actually mean so this is this is basically looking at the trace of a which is equal to this sum on the bottom Lambda I okay so if you know if you remember your linear algebra but basically what it's saying is what I want to know is how much of the space am I explaining so
+
+62
+00:36:03,000 --> 00:36:59,000
+imagine I have 100 dimensions intuitively if I get the top 10 of them the worst case is that they explain point one of my space meaning that my sum of those eigenvalues are about 0.1 and I'm throwing away roughly 90 of my data it's not what it means but just kind of think intuitively what this is saying is that traditionally people will pick K here so that they explain a lot of their data and so if your data does your data like you know as a Rough Guide if I pick 10 components of your data and
+
+63
+00:36:30,000 --> 00:37:22,000
+do PCA on it do I capture 90 95 then that means that was a good selection and you can now compare K's based on how their eigenvalues are ordered if it goes down to 10 to the minus 10 right your fifth component is 10 to the minus 10 you don't need it pick the fourth instead just pick bases of four so now it gives you a way to actually start to compare them and you can get error guarantees you may worry Computing these eigenvalues is super expensive because you have to compute like an SVD
+
+64
+00:36:57,000 --> 00:37:52,000
+on some Mega Matrix but you don't have to and the reason is this is a trace and if you remember your Trace equalities you can just sum the values on the diagonal to get the trace which is the sum of the eigenvalues please and that was like too large um and say that this quotient came out to be like very very high like 0.999 right would you saying that you're overfitting yeah it's exactly right it's like it's a finger overfitting you don't need to do it and so it's kind of like
+
+65
+00:37:24,000 --> 00:38:15,000
+if you're if you're keeping those extra pieces of information like intuitively you don't you want the smallest K that you have most of your data so you can tack on more but it's kind of like what's the additional value to do it traditionally you'll use K as I said PCA kind of is a visualization technique or like to get some rough sense of the data and so you try not to have K higher than two or three and it just provides a sanity check like if you run PCA and the first two components of your uh you know
+
+66
+00:37:50,000 --> 00:38:44,000
+your eigenvalues account for almost nothing in your data then it's not really clear what conclusions you can draw right the other place where it can cause you pain is the thing that I keep illustrating which is that if Lambda 1 and Lambda 2 are equal to each other which on real data is actually very unlikely but numerical issues could make them kind of come together then the coordinates could be pretty fragile right so I run PCA once and I get you know one comma two comma three as my you know sorry Alpha One Alpha 2 Alpha three
+
+67
+00:38:17,000 --> 00:39:05,000
+but then I run it the next time and because I chopped it three and the first four were equal some new coefficient comes in right so really like those are the instabilities that you worry about the most if like your lambdas are a bunch of lambdas are really really close to each other then your coordinates aren't really preserved and anything inside the Subspace goes so that's the other problem with PCA it really only makes sense when the spectrum is is separated and people don't usually check
+
+68
+00:38:41,000 --> 00:39:47,000
+that and as a result they uh lead to erroneous conclusions so you tack on too many you get there and then also you can have these issues about um you know non-fidelity in the representation those are the two main ones you got it perfectly okay awesome any other questions about PCA now you know it you love it so much all right great all right let's talk about ICA all right so ICA sounds very similar to PCA we only change one letter but it has nothing to do with it one has nothing to do with the other so that's refreshing
+
+69
+00:39:18,000 --> 00:40:26,000
+uh but they have um something about them that I really like so all right so first I'm going to tell you the high level story of ICA which is this cocktail party story high level story then some key facts these key facts are useful because you will run into them in your homework and I just want to highlight them and then we'll talk about the model and the model will be the least interesting part so here's how it works here's the high level story we have people and by the way I think
+
+70
+00:39:54,000 --> 00:40:48,000
+their homework is the world's most boring cocktail party I think they like count numbers to 10 or something so it's not like you're going to hear some salacious gossip you're just going to hear people counting to ten some TA from like five years ago all right so anyway so you have people here are two people they're happy those are people one and two we have microphones over here mic one mic two okay now here's our problem when the people speak they don't speak directly
+
+71
+00:40:22,000 --> 00:41:25,000
+into one microphone they're just ambient microphones and so what happens when this person you know compresses the sound waves is that boom it hits microphone one but also it hits microphone too similarly when person two speaks they speak in some way that same this is supposed to be the same wave by the way so like the wave didn't change based on them but it just took longer to get to the microphone we're not going to worry about length too much but the point is what microphone one and microphone two uh C
+
+72
+00:40:54,000 --> 00:41:44,000
+is a mixture of the sounds they don't just hear one person they hear two speakers simultaneously superimposed on one another and the goal is to take what we record at these microphones and recover kind of the time series of what they actually said and since if we had the wave that's just the air we could play it through a speaker and we would actually hear what person one and person two said and you'll be able to do this and it works which is kind of wild now I do want to emphasize having built things
+
+73
+00:41:19,000 --> 00:42:07,000
+that look sort of like this this is a naive way to look at the problem in the sense of like what you would build if you were doing this in industry but so what it gets you the core principles and you can look there's whole things about speaker identification and in fact like there are certain companies that when they ship their products they brag about how they can identify different speakers in the home so like as weird as this is like people ship products based on their ability to do this okay
+
+74
+00:41:43,000 --> 00:42:49,000
+all right please ask questions if the setup doesn't um make sense two we have data X and we'll see it for some time we're not going to assume things or make this simple the people aren't moving around in the room uh they're not changing just just to make our lives a little easier okay so we need to look at what does the actual data look like all right so as I mentioned oops speaker one is going to be kind of this time series that looks like this okay now we don't actually see the whole
+
+75
+00:42:17,000 --> 00:43:33,000
+continuous thing what we see is we see speaker one we don't even see this by the way this is what kind of we get samples at various regular intervals that's the way we conceptualize the problem this is like how audio processing works right um two at a time one so on let me just draw this and I'll talk and these should be evenly spaced if I could draw properly and had enough patience okay time one the point is is what you see is that you just get these measures of intensity so s t j is
+
+76
+00:42:55,000 --> 00:43:57,000
+speaker J intensity at time t okay now we want to recover this if we had this we were in good shape right if you think about how you actually record audio you know kind of high-end audio is usually recorded around 44 kilohertz right give or take you can probably understand people much lower kilohertz I don't know exactly where it breaks down um but my point is is like this is actually how digital recording works right you sample at a bunch of points you get the intensities and then you play it back through a speaker
+
+77
+00:43:26,000 --> 00:44:40,000
+okay all right and then there's speaker two which I'll also draw oops and then just so it's clear like we sample them at a bunch of points too maybe speaker two more loquacious I don't know S one two oops those look terrible I don't know why I'm gonna fix this but I am and these are sampled at the same time point so my drawing doesn't do is imperfect in many many ways uh two two s t two so on blah blah blah okay and these are going to be sampled at the same time points just to make our lives
+
+78
+00:44:07,000 --> 00:45:39,000
+easier okay all right so now we don't get to see this as I mentioned we don't see S1 and s2's Time series right we get to see the microphones only XT 1 and xt2 which are sampled at the microphones okay so far so good so we need a model of how we're going to do this and of course kind of our model from what we described above is going to look something like this the time that what we observe at microphone J at time t is a mixture of something from speaker one and something from speaker two
+
+79
+00:45:12,000 --> 00:46:41,000
+okay so microphone J just to make sure it's clear here Mike J sees a mixture and we're going to assume this mixture is fixed right just for the moment right if they're moving around the room that's not true any longer but we're going to assume it's fixed for the moment okay so I can write this compactly as X of T equals a of s of t all right now what do we know here this we observe this is the data both of these are latent we don't know the mixture we don't know the speaker intensities
+
+80
+00:46:10,000 --> 00:46:59,000
+okay for the moment I'm going to assume that the number of speakers and the number of microphones are the same you can imagine because there's a matrix here that you know if I have only one microphone this is going to be substantially harder actually impossible to to do the Reconstruction but I'm going to take advantage of the fact that I have different mixtures at these microphones okay so assume I have number of microphones the same as the number of speakers okay so is the setup the high level
+
+81
+00:46:35,000 --> 00:47:40,000
+story and setup clear intuitively what should happen right let me write some math sure it is a is actually the mixture so a right here this model says that what we see at time T it's from at microphone J is some fixed mixture of what speaker once at a time T and speaker two set at time T we're not modeling any delay or anything like that so they make their the sound they go ah and then it hits the microphone and then the you know the mixture of person one and person twos uh pressure hits the microphone at the same
+
+82
+00:47:07,000 --> 00:48:35,000
+time they don't they don't actually matter the physical units don't matter in any way but you can think about them as any unit of pressure that you want okay is a is unitless a is just a pure mixture you can multiply and add things because the s's are the same type cool all right so let's make this a little bit more mathematically precise so we're given X1 X n element of r d and D is the number of mics and speakers what we have to do is find S1 to SN that's also amount of Rd okay so
+
+83
+00:48:02,000 --> 00:49:27,000
+I'm preferring to have the notation over time we also are going to find although we really don't need it for the model this a that is d by D okay such that X of T equals a s of T now if we estimated a right there's a pretty easy way to find what we wanted if we knew a someone gave it to us this problem is Trivial just take the X's multiply by a inverse and you have yourself the S's right now the terminology is we call a the mixing Matrix for the reasons I just outline a the mixing Matrix and W equals a
+
+84
+00:48:48,000 --> 00:49:59,000
+inverse which will use the unmixing Matrix so why would I introduce and bother you with this it turns out that W is actually the right way to write a lot of the guarantees and you'll see why in a second okay so we're going to write this as right w is equal to W1 transpose to w d transpose and I'm just doing this so that I can write the following so that this is just one way of writing the inverse so that sjt equals W J times x t nothing happened here I'm just giving you notation of how I think
+
+85
+00:49:23,000 --> 00:50:25,000
+about the mixing and then this inverse is going to be important the inverse is kind of obviously important because we want it if we had the a we would multiply by its inverse on both sides and that would tell us the speaker that we were after right so w is what we need to multiply by okay now the things that I actually find interesting about this model so some caveats we talked about some of these a does not vary with time we're assuming that time if it did we have to use something more complicated
+
+86
+00:50:04,000 --> 00:51:05,000
+so we're not going to do that two this is more interesting to me there is inherent ambiguity in this model I like when there's inherent ambiguity when you can't tell two things apart because it forces you to understand what the model is doing so one thing we can't determine speaker one versus speaker two we have no idea who speaker one and who's speaker two in real life so it can we can only determine up to kind of how we permute their Time series okay so speaker idea is opaque to us
+
+87
+00:50:34,000 --> 00:51:24,000
+maybe one time we were on the algorithm are indistinguishable we don't know the labels okay of course we can tell that there's one person who's you know saying numbers in English and one who's saying numbers in French we just can't tell who's doing what in this model the other thing which is maybe a little bit more subtle is we can't determine absolute intensity and I'll just write the equation and it's because we're multiplying two things together so notice that if I take
+
+88
+00:51:09,000 --> 00:52:12,000
+any constant multiply it times a and then take that same constant and multiply it times s this is still equal to a of s of t so we can possibly only know that the person we can't tell how loud S1 and S2 are we can tell relatively how loud they are but the mixing Matrix we could multiply by a constant and it wouldn't you know wouldn't change anything right it was the scaling would go through and because we're multiplying them in our framework we can't determine this either now that has a surprising surprising
+
+89
+00:51:40,000 --> 00:53:11,000
+thing and this is why kind of I like to teach it intellectually oops surprising the speakers cannot be drawn from a gaussian distribution we're going to have to make some statistical assumption but they cannot be gaussian why suppose they were x i would then be a normal drawn with some mean from aat but then as we saw before if u t u equals I then a u generates the same data what does that mean s that any rotation of a generates the same data multiplied by U and the reason it happens is because the
+
+90
+00:52:37,000 --> 00:53:29,000
+data here are rotationally invariant because they're Co their their covariance Matrix is a times a transpose and that is not sensitive enough to tell about all these rotations the same reason we love gaussians because they were rotationally invariant means that that symmetry we can't recover anything in this problem and so that at that point you may think gosh there's no way we're going to be able to do this we have all these symmetries around the speaker and we can rotate the X the the intensities in any
+
+91
+00:53:03,000 --> 00:54:11,000
+way we want what are we going to be able to do and it turns out you can recover something here and weirdly enough as long as the uh distribution roughly speaking is not gaussian and is not rotationally invariant you can recover it and that's kind of remarkable and it's worth thinking about okay now the algorithm is going to be so trivial the algorithm is just going to be gradient descent and mle we're just going to set up a likelihood function and run everything that we've been running so far okay that's it
+
+92
+00:53:40,000 --> 00:54:49,000
+all right now we need one trick one half second you know two minute detour because this this causes problems every time people look at this it's just one little detour about how random variables behave under linear transformations under linear transform all right all right and this is just the reason I'm doing this is It's a key confusion if you remember your I don't know I'm not going to say what you should remember some calculus thing just basic you know change of variable formulas for
+
+93
+00:54:20,000 --> 00:55:42,000
+integrals this will make sense but we can draw it in pictures and you don't need to know that at all so here we go so just imagine I have something that's uniform on zero one okay and now I have a new variable U which is equal to 2 times s what is the PDF of U in terms of s now we're tempted to write P of U X over 2 equals P of s of x now let's take a look at the PDFs so here's the PDF of U it goes from 0 to 1 and what's its height well we integrate over the entire thing
+
+94
+00:55:20,000 --> 00:56:38,000
+it's one right this is our PDF of you sorry of s sorry PDF of s this is the uniform now for you what happens we go from zero here's one to two we know we have support from zero to two because it's a uniform distribution right you grab a point here you multiply it by two and it's going to sit somewhere in here oops go away right it's going to sit somewhere in here but what is its height it's got to be one half so this relationship is clear so PS of X is going to be equal to 1 if
+
+95
+00:56:09,000 --> 00:57:44,000
+x element of 0 1 it's 0 otherwise pu of of x is going to be equal to PS of X over 2 times one-half okay and that's just the normalizing constant and so this key issue here is this normalizing constant yep normalizing constant that's it so when we do this in higher dimensions we have p u of x and we want to map by some linear a oops so that is like a u for example right what happens right right oh sorry a s that's the way we're writing this because I want to keep the notation a s equals U
+
+96
+00:57:08,000 --> 00:58:17,000
+what happens in higher dimensions well we still have p u of X is equal to PS of a inverse X but we need a normalizing constant here and how does it take if you imagine I'm taking a box and I multiply it by a a matrix a what how does the volume change that's the determinant that's all a determinant does takes a box and the volume of it is going to be exactly proportional to the assigned the absolute value of the tournament this determinant is signed because it's a oriented measure
+
+97
+00:57:44,000 --> 00:58:52,000
+but that's what you get okay you can convince yourself in two Dimensions pretty easily in higher Dimensions it actually requires a little bit of work potentially to do it and this you probably learned as your change of integrals form change of volume integrals formula uh at some point times the determinant of w okay okay now the thing that I used here was the fact that one over the determinant of a is equal to the determinant of a inverse when I did that okay so the point is when you do change
+
+98
+00:58:18,000 --> 00:59:05,000
+of variables you have to take this determinant into account you probably did this with a Jacobian at some point in your life and if you didn't don't worry about it it's not that big a deal it just says if I take a box and I and I map it by a linear transformation what's the volume of the Box going back to this uniform case and then if you care about how you would probably prove this you just think about like integrals you break out into tiny little boxes that's it whatever space you're integrating so
+
+99
+00:58:41,000 --> 00:59:34,000
+this we did it for one box but you can do it for many okay so we're going to use this formula for the rest of our time please okay so yeah so the the idea here is that we have a probability distribution in one space now I want to probability distribution in my new space so I have from zero to two so I'm going to take the X and I'm going to divide it by 2 and whatever the height is over there I'm going to get it so if the height is one I get it the height is zero then that should be right as well but when I
+
+100
+00:59:21,000 --> 01:00:33,000
+do that the problem is is the probability distribution I had I'm using that value will be one right when I do that and I need to just multiply by some constant so I'm thinking here about the PDF for that random variable yeah so so basically you can ask you as a product it's a random variable and so a random variable is nothing more than like some function on the it's just an integral yeah awesome question all right so once we have this fact this problem is super easy ICA is mle why is that
+
+101
+01:00:01,000 --> 01:01:37,000
+P of s equals sum J equals 1 to D s of SJ okay this is where we use the sources are independent we have to assume this in the model and they have some distribution that's not gaussian but not gaussian this equals so then P of X is now equal to the probability J goes from 1 to D of p s w times x times the determinant of w but now this is something that we can compute this is written in terms of X and our Matrix a and we can just do gradient descent on it okay so how does that work here's the key
+
+102
+01:01:01,000 --> 01:02:47,000
+technical bit right we're going to set PS of x proportional to G Prime X 4 G of x equal to 1 plus e to the minus X inverse there's nothing really magical about this function except for it's not rotationally invariant and then we can solve the likelihood of w is sum from time goes from 1 to n um J goes from 1 to D log G Plus W J x t plus log determinant of w okay so maybe this looks pretty intimidating but what happened here this G is just some likelihood function I don't actually care what it is that's
+
+103
+01:02:06,000 --> 01:02:55,000
+the thing that's weird that's the thing I want you to confront it's not that it's like some specially chosen function when we would pick the gaussians we were picking it because of computational and kind of other reasons oh it only had two moments and we could compute everything we wanted this is basically saying honestly I can pick almost any G I want any likelihood function I want on the speakers as long as it's not rotationally as long as the the measure isn't rotationally invariant there will
+
+104
+01:02:30,000 --> 01:03:24,000
+be a unique solution if I look at enough data that's kind of fun that's kind of an interesting thing to think about you say what G do I pick well I'm going to pick this one because I know it's not rotationally invariant people pick other ones how do you pick a measure well you pick the problem the PDF proportional to something that looks like a CDF what does this function look like it's just a sigmoid function so I pick the probability distribution so it's kind of low to high it's not
+
+105
+01:02:57,000 --> 01:03:45,000
+rotationally invariant on each component and I'm done that's kind of wild okay I'm not super worried that like you grock absolutely everything here again these lectures are not supposed to walk you through line by line and read the book to you what it's supposed to do is give you a high level structure for how this algorithm is going to go and what are the key twists now the one thing that's that'll probably scare you is you're like well I don't know how to compute the gradient
+
+106
+01:03:21,000 --> 01:04:12,000
+of the log of a determinant and weirdly enough that actually has a form so that is actually a that's an object that you can compute and compute gradient descent on and so you just run gradient descent on W you have to do some derivatives in the old days I guess now you don't have to compute derivatives anymore you have Auto diff software for you which will kind of do it automatically like Pi torch will do this for you or jacks or something but maybe we make you do it by hand I don't know if we actually do that
+
+107
+01:03:47,000 --> 01:04:54,000
+but we do you can do it it's not bad you look it up or you drive it it's not super hard but it is weird that it works okay and miraculously I'm not going to have to convince you of this in class you run the thing and you will hear someone saying one two three four five some ta and it will work even though the what's at the microphones is a mix pretty wild all right all good oh by the way why so what is the log of the absolute value of the determinant right it's the determinant is the
+
+108
+01:04:20,000 --> 01:05:17,000
+product of all the eigenvalues right so if you take their absolute value and take their log it's going to be the absolute values of the sums of the eigenvalues now that looks a little trace-like so you can imagine why this is actually relatively easy to compute but your W small you can brute force it for these kind of things okay awesome any questions about this please this piece right here yeah so what we're doing is we have P of the speakers each one of them some probability distribution I'm being vague at this
+
+109
+01:04:59,000 --> 01:05:47,000
+point when I was writing it because I wanted to basically get to the point we can use any distribution that's the weird thing basically any distribution so long as it's not rotationally invariant so I don't know what PS is yet but just imagine it now I'm going to move it to a distribution from SJ to a distribution on X's so the speakers I can't observe I don't get to measure them but I do get to measure the X's now I only have one variable that controls everything that's w
+
+110
+01:05:23,000 --> 01:06:14,000
+now I can do gradient descent on W I didn't know how to do it on their product before I'm setting S and W as a product but because there's only one now I can run gradient descent on it and it happens to be kind of nicely concave and all the rest of the stuff I want [Music] exactly right and the thing and the thingard here that I want you to confront is and when the assignment is like if you use the standard distributions you don't get you don't get a unique answer and weirdly enough
+
+111
+01:05:51,000 --> 01:06:53,000
+almost any distribution you use will work we happen to pick this one but you could have picked something else and that's kind of wild so right that's a weird thing just can't just have to be able to distinguish it and what you think about there is the prior on the speaker doesn't matter too much they just can't mix in some awkward way you can't rotate the speakers intensities and have it make sense you have to be able to distinguish kind of up versus down fantastic other questions
+
+112
+01:06:24,000 --> 01:07:15,000
+all right so I'm going to spend please I want this Jeep yeah like how things exactly you can get like how do you get the deal this one is exactly proportional yeah you don't okay so I can take any function I want and normalize it as long as it has like some very it's smooth and other things and normalize it from like minus one to one or minus infinity to Infinity as long as it's integrable and make it into a probability distribution as long as it's positive right positive this function's
+
+113
+01:06:50,000 --> 01:07:34,000
+positive I want it to go kind of uh I wanted to go from low to high so it has that nice feature to it and I don't care about anything else but now that's a CDF right because now I have a function which the integral of which is you know zero the zero to one and then what I'm going to do is I'm going to take a differential and that's what gives me the PDF this is just probability Theory stuff but yeah and you're like the thing that should bother you and is bothering you is like why did you pick this function
+
+114
+01:07:13,000 --> 01:07:58,000
+and then I'm telling you that's disturbing go pick other functions still works but there's one function that if we use which we've been using the whole quarter all sudden everything breaks that's weird it just means that like not every prior matters sometimes priors get these like you know undefinability things and it's coming from this rotational invariance and that's weird it's going to bother you but then you run the code and you're like oh my god it works and you can play with it see
+
+115
+01:07:35,000 --> 01:08:30,000
+how close you can make it to rotation the invariant if you motivate or you just do the homework and turn it out either way but that's what's interesting right I'm going to lose our last little bit of time together to tell you something kind of different which was sometimes about weak supervision this would be less mathematical and potentially have more bizarre pictures we didn't get any activity on the thread I want to tell you about one Trend since this is our last lecture together
+
+116
+01:08:02,000 --> 01:08:54,000
+will take over and we'll see if we get through this all right okay so I want to tell you about weak supervision and I want to just motivate it for you in the last 20 minutes of why we care about it and mathematically the reason we care about it is it's an example the underlying model that I'll show you is an example of these em style models but we can solve it exactly in a lot of situations these are my slides and I have to give these quinoa to give a keynote this morning if you have two
+
+117
+01:08:31,000 --> 01:09:22,000
+more this week on random conferences they have lots of weird pictures on them just ignore them okay so the mo let me motivate for you why I care about weak supervision and then I'm going to skip over some stuff and then we'll try and get to the mathematics of the model okay so the reason we started thinking about weak supervision and others too this thing we call data Centric AI was that machine learning at least in a supervised setting has three pieces it has a model which you're learning a lot about in this course it
+
+118
+01:08:56,000 --> 01:09:50,000
+has training data which we've talked about a whole bunch it has Hardware and the thing is which is weird outside this class and for a variety of good reasons models have become Commodities so all of you in this room can go download you know Google Microsoft Stanford's latest models just the culture of AI is that we put everything online and there's been a ton of investment in in that so if you want a state-of-the-art natural language model you can download it like go to hugging face download it you want state of the
+
+119
+01:09:23,000 --> 01:10:16,000
+art Vision model there's a tutorial somewhere that will allow you to do it you can get it instantaneously and because of the cloud Hardware is a big problem it's not a big problem people can get access to it okay still interesting problem but it's there but training data is hard this was the original idea and the reason training date is hard is it's the way that you encode your problem about the world it's how you label it now when I tell you about uh you know supervised machine
+
+120
+01:09:49,000 --> 01:10:37,000
+learning the first day we have X and Y Pairs and I never tell you where they come from you have X and Y pairs they came from God herself they landed there and you're like well this is where machine learning stars but that's not at all how anything Works in machine learning it doesn't start then and it's not like hanging out with Beyonce it's like living in a sewer so if you want to do this stuff in Industry it is much more like hanging out in a dirty filthy sewer you have all
+
+121
+01:10:14,000 --> 01:11:03,000
+these data streams you don't know where the heck they came from they all have weird errors they all have weird correlations with one another and it's a huge mess and so we started to look at this problem a couple years ago with many other folks in the field and we just wanted to put mathematical and system structure around how to make this less awful okay that was the motivation right now I'm not going to bore you with the fact that like people actually do this and and all the rest it turns out
+
+122
+01:10:38,000 --> 01:11:28,000
+that like you know this is an interesting area but I'm just going to show you a toy example so here's a toy example and a little bit of light math okay so here's an example of something we may want to do and generate training data and there's a whole longer talk here of of how exactly this works let's say you want to do named entity recognition you want to label persons and hospitals in text okay you just want to know you have some mentions or these mentions of people or text Saint Francis
+
+123
+01:11:03,000 --> 01:11:55,000
+could be a person could be the hospital Bob Jones probably a person but I guess could be a hospital too okay so here's how these weak supervision Frameworks work they basically allow you to have these little voters that you write to reuse training data that you had before an existing classifier that's already voting person you just throw it in here's another kind of classification rule uppercase existing classifier says person you put that in and then Hospital well I have a dictionary of Hospital
+
+124
+01:11:29,000 --> 01:12:19,000
+names it's called distance supervision so this one votes hospital and the point is is each one of those noisy sources in the sewer is telling you something different and all you want to do is determine How likely is answer a versus answer B okay so this is how it works in a particular engine this is the first system that did it there's many others since then don't worry too much about that but what it did is it estimated this graphical model and I'll show you how it works in just
+
+125
+01:11:54,000 --> 01:12:48,000
+one second because it will look very familiar to you you take in all those sources and you try to estimate how accurate is every source and how correlated is every source with one another and then you make an estimate over all the labels for every point how probable How likely is it a person a hospital or whatever okay that's what you want to do so we model this as a generative process okay there's the graphical model there you've probably seen something like this and the instance here is we want to
+
+126
+01:12:20,000 --> 01:13:16,000
+learn the Y value that's there the label that's there without any hand label data so we want to look at the votes and somehow deduce the why okay there are reasons you want to do this that are Beyond this but we're not going to have any label data when we do it and we want to learn the correlations and the accuracies okay awesome so it's not at all obvious that you could do this the reason it works is because you can see these voters on many data sources millions of data points every point that
+
+127
+01:12:48,000 --> 01:13:43,000
+comes in every voter registers yes no or indifferent and you can look at their observe that they're overlapping judgments and estimate their accuracy and their correlation if you knew for example Source One was always right you just count how often every Source agreed with Source One and that would tell you the accuracy of source 2 and Source three okay but they could be correlated as we saw that first function and second function called each other they could be correlated in some way and you'll have to deduce that okay
+
+128
+01:13:15,000 --> 01:14:07,000
+all right so here's the way that you solve these underlying problems I'm just going to go through this very quickly because we don't have all the math but it basically looks like those covariance matrices that we saw from before the problem here is that we want what's in the red we want to know how often does Y which we don't see how often this thing let's make us make it zero or one so it's true we don't see how often Y is correlated with one source we only see how often the sources are correlated
+
+129
+01:13:41,000 --> 01:14:39,000
+with one another so set another way we can only observe what's in Sigma sub o we don't get to see how often the sources correlate with the ground truth okay now here's the thing that is pretty interesting it turns out that the inverse of this Matrix has a structure this is one of the most beautiful mathematical facts that comes from the graphical models course and I'll just state it here without proof it turns out that every time this graphical structure is missing an edge there's a zero in The covariance Matrix
+
+130
+01:14:10,000 --> 01:15:09,000
+okay this allows us to write this in terms of The observed values and the and some rank one parameters and these zi's basically say if they're one they have perfect accuracy and zero their total noise okay now why that's interesting is it lets us set up a bunch of these equations that basically say we know the left hand side is zero because let's imagine I know the structure I know how they're correlated you can solve for that if you want it and it turns out this will be kind of
+
+131
+01:14:40,000 --> 01:15:34,000
+weird stuff it turns out that actually here you can complete this as long as you have enough of these linear constraints now a couple of things here first Z and minus Z are solutions so this gives us back to those symmetry questions I wanted to highlight you can't tell if everybody's correlated with the ground truth or the exact opposite you have to make an assumption if you had a bunch of malicious labelers who were all telling you the exact wrong thing and correlated each other you would get fooled
+
+132
+01:15:07,000 --> 01:16:02,000
+so you have to make some assumption there the second thing is when zi is out equal to point is equal to zero that means it's a coin flip if I added a labeler that just flipped a coin this should give you no information and indeed it won't it will it will Zero out every constraint that it's in with sanity checks you can't kind of make your job easier by adding these labelers it turns out it won't bore you there's a great paper from version from like 2014 2015 that measures the notion of rank in
+
+133
+01:15:35,000 --> 01:16:23,000
+a continuous way it's called effective Rank and this tells you the right statistical scaling for this problem the closer those Z's get to zero when can you recover The Matrix super fun stuff it's a nice geometric piece okay so you heard all this stuff I just wanted to share with you it's stuff that I end up working on you probably think at this point like there's no way anyone would ever use these crazy covariance matrices but I just want to share one thing with you which is wild to me because my
+
+134
+01:15:59,000 --> 01:16:47,000
+students did this it's actually used in all these applications it's still in production all these years later and this is a way that people cope with the fact that they have lots of noisy training data and put them together so in search ads in Youtube Gmail and products from Apple and so this weird framework of how you program training data just something I wanted to share with you and the underlying model is like classical from what you've seen except for instead of solving these em
+
+135
+01:16:23,000 --> 01:17:03,000
+problems you solve these weird covariance Matrix inverse problems and you can solve them provably now turns out to be important for a variety of weird issues of like estimating Source quality you don't want to rely on Em which we talked about doesn't have a unique answer for this we can tell you exactly where the unique answer is thank you for your time and attention and thank you we'll see you on Wednesday
+

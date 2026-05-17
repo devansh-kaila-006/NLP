@@ -1,0 +1,616 @@
+1
+00:00:05,000 --> 00:00:53,000
+All right, welcome back everyone to lecture 8. Uh, today we're going to talk about attention and transformers. And I think this is a this is a really fun one. So, as a quick recap, last time we were talking about recurrent neural networks and recurrent neural networks were this new kind of neural network architecture meant for processing sequences. And in particular, we saw how neural networks by by processing sequences let us attack a whole new different kinds of problems than we than we could with convolutional networks uh
+
+2
+00:00:28,000 --> 00:01:17,000
+before. So in particular usually we had been thinking about these onetoone problems where you input one thing like an image and then output one thing like a classification for what's in that image. But once you have the ability to move beyond images and move towards sequences of data it let us tackle a lot of new kinds of problems like one to many problems image captioning maybe we want to input an image output a textual description of that image which is going to be a sequence of words. Um maybe many
+
+3
+00:00:53,000 --> 00:01:45,000
+to one where we do input a sequence of frames and output a classification for those frames. um and a bunch of other problems along this vein. Um so now we're seeing that moving be moving into these more um sophisticated neural network architectures um both is sort of more interesting architecturally but also lets us tackle new problems than we could with um with kind of more traditional feed forward neural networks. So today we're going to build on that and talk about two new things in today's lecture. Um the first thing is
+
+4
+00:01:19,000 --> 00:02:08,000
+going to be attention which is going to be a brand new neural network primitive that fundamentally operates on sets of vectors. And then the second thing we're going to talk about is the transformer. And the transformer is a different neural network architecture that has self attention at its core. Um, and this and the spoiler alert is that transformers are basically the architecture that we use for almost all problems in deep learning today. So any of the largest applications that you're
+
+5
+00:01:44,000 --> 00:02:37,000
+seeing out there in the wild today, whether it's classifying images, generating images, generating text, classifying text, working with audio, basically any kind of large neural network today, um that is large, state-of-the-art, trained in a lot of data, um deployed by a big company, almost all of them are going to be transformers today. Um so that's really exciting that we get to get you up to speed on the latest and greatest architectures that people are using now. Um, but even though transformers are
+
+6
+00:02:10,000 --> 00:02:56,000
+this sort of state-of-the-art architecture that everyone is using for everything today, they have kind of they have a relatively long history. Um, and they initially like it's kind of interesting watching these fields develop because looking back on it when the moment that Transformers came out, it feels like it ought to have been this big moment, this big thing when there was a big sea change, this new architecture, this new thing. But it actually didn't feel that way because even though there was one moment where
+
+7
+00:02:33,000 --> 00:03:22,000
+the transformer architecture was born, um these ideas around self attention, around using attention in various ways, those had actually been around in the field for several years at that time. And in particular, these ideas around attention, self attention, they actually developed out of recurrent neural networks. So we're going to start there to talk about and motivate these problems. So this is going to be a little bit mirroring the historical development of these ideas. So for that reason um we're actually
+
+8
+00:02:58,000 --> 00:03:45,000
+going to in order to introduce transformers we're actually going to roll back and recap a little bit about this idea of recurrent neural networks that we saw in the last lecture. So as a motivating problem um let's think about this sequence to sequence problem of translation. So we want to input one sequence which is going to be a sequence of words in English. Then we want to output another sequence which is going to be a sequence of words in a different language Italian. Right? And because you
+
+9
+00:03:21,000 --> 00:04:05,000
+and we can't make assumptions that there's any correspondence between those words. Right? The the number of words in the English sentence might be different from the number of words in the Italian sentence and the order of those words might be totally different. So this is a perfect application of the kind of sequence processing algorithms that we uh sequence processing architectures that we saw in recurrent neural networks. Um and indeed this idea of processing these uh sequencetosequence
+
+10
+00:03:43,000 --> 00:04:32,000
+problems with recurrent neural networks. This goes all the way back to 2014 um even even a bit earlier than that. But people had been processing sequences with recurrent neural networks for more than a decade more than a decade at this point. So the basic architecture for processing sequence sequence to sequence problems with recurrent neural networks is that typically you'll start with one encoder. Your encoder is a recurrent neural network. Um the recurrent neural network recall is this function that
+
+11
+00:04:07,000 --> 00:05:01,000
+gets applied recursively um on two inputs. One is your xt your input at the current time step and the other is your ht minus one which is your hidden state at the previous time step. and your recurrent neural network unit will then spit out a next hidden unit, a next hidden state at the next time step. And then we can apply that same recurrent neural network unit over in time um to process a sequence of a of potentially variable length. So in this case, we're using a recurrent neural network encoder
+
+12
+00:04:34,000 --> 00:05:26,000
+that inputs the input sequence in English. Um input sequence, you know, you you got to use relatively short sentences um to fit on slides and still have all the boxes show up. So we're using a kind of short, silly sentence, uh we see the sky. Um, and this, you know, each word in that sentence gets processed but via one tick of the recurrent neural network. And now, and then we're going to the idea of this encoder neural recurrent neural network is it wants to process all of the words in in the input sequence and somehow
+
+13
+00:05:00,000 --> 00:05:50,000
+summarize the content of that input sentence so that we can translate it into a different into our output target language. So the the the more the more concrete way that this happens is that after processing all the words in the input in the input sequence, we're going to summarize the the entire content of that input sequence into a single vector called the context vector. Um and there's a there's a couple different ways that people would typically do these in recurren recurrent neural
+
+14
+00:05:25,000 --> 00:06:12,000
+networks. I don't think the details are too interesting. So as a you can just think that that context vector is basically the last hidden state of the of the encoder recurrent neural network. Um and now the idea is that because you know this this these because of the recurrent structure of our recurrent neural networks the last hidden state sort of incorporates information of the entire input sequence. So we can think of that last hidden state as summarizing or encoding all of the information in
+
+15
+00:05:48,000 --> 00:06:37,000
+the entire input sequence. Um so then that that is one vector that is going to kind of summarize that entire input sequence to do whatever we want with it. Um and in this case what we want to do with it is translate that input sequence into an output sequence in a different language. So to do that we're going to use a second recurrent neural network called the decoder. Um which usually has the same architecture but potentially different a different weight matrix different set of learned parameters. Um
+
+16
+00:06:13,000 --> 00:07:07,000
+and this decoder GU is going to be a different recurrent neural network with different different learnable weights u but has the same basic idea. Um now this a recurrent neural network unit is going to take three inputs at every time step. It's going to take um yt minus one which is the token and the output sequence at the previous time step. It's going to take ST minus one, which is the previous hidden state in the output sequence, and C, which is that context vector summariz summarizing the entire input sequence.
+
+17
+00:06:40,000 --> 00:07:31,000
+Um, and then we kind of unroll that output sequence just as we saw in the last lecture and and produce words one at a time in the output sequence. And I don't speak Italian, so I'm not going to try to I'm not going to try to pronounce these, but um there's some Italian words on the screen that you can see. And I'm assuming that that indeed translates to we see the sky. Um hopefully that's correct, right? But the idea is we're going to like tick this recurrent neural network one tick at a time. It's going
+
+18
+00:07:06,000 --> 00:08:00,000
+to output words one at a time. And this is basically a summary of what we saw last lecture. So this should this should basically not be too surprising in light of the previous lecture. But there's a potential problem here, right? And that's the there's a communication bottleneck here between the input sequence and the output sequence, right? The only way in which the input sequence is communicating with the output sequence is via that context vector C. Um, and that C is going to be a fixed length vector, right? Because
+
+19
+00:07:33,000 --> 00:08:26,000
+the size of that vector is fixed when we set the size of our recurrent neural network. Um, and maybe that's fine, right? So C might be a fixed length vector of like 128 floats, 1024 floats, but the size of that input vector is not going to change as our input and output sequence sizes grow or shrink. And that's a potential problem, right? So if we're doing short sequences like we see the sky, maybe it seems pretty plausible that we can summarize everything we need to know about that sequence in that
+
+20
+00:07:59,000 --> 00:08:57,000
+fixed vector of 12 the 1024 floats. But what if we're not trying to translate four words? What if we're trying to translate a whole paragraph or a whole book or like an entire corpus of data? um then in that case we're going to run into a bottleneck where at some point as we scale that input sequence it's just not going to be sensible for to ask the network to summarize the entire input sequence into a into a single fixed length vector. So that's going to be a problem. So the solution here is actually let's
+
+21
+00:08:29,000 --> 00:09:21,000
+not bottleneck the network through a fixed through one fixed length vector. Instead let's change the architecture of our recurrent neural network. Intuitively, what we want to do is not force a bottleneck between a in a fixed length vector between the input and the output. Instead, as we process the output sequence, we're going to give the model the ability to look back at the input sequence. And now, every time it produces an output vector, we want to give the network the opportunity to look
+
+22
+00:08:55,000 --> 00:09:42,000
+back at the entire input sequence. And if we do this, there's going to be no bottleneck. It will scale to much longer sequences. And hopefully, the the model architecture will work much better. So that's the motivating idea that led to attention and transformers and all this great stuff that we see today. It all came like you know one way of telling the story is that it all came from trying to solve this bottleneck problem in recurrent neural networks. So let's see um how we can actually implement
+
+23
+00:09:18,000 --> 00:10:10,000
+this intuition and endow our recurrent neural network with the ability to look back at the input sequence on every time step. So here we're going to you know start with the same thing. Um our encoder neural network is going to remain the same. No changes there. we still need to set some initial hidden state for the output sequence. Um and so we need to set some initial um decoder state s0 in some way. But now once we have that decoder hidden state, what we're going to do is look back at the
+
+24
+00:09:44,000 --> 00:10:42,000
+input sequence. So the way that we're going to do that is by computing some alignment scores by comparing that that basically compute um a scalar value a scalar value for each step in the input sequence that says how much does that initial decoder state s0 how much does that decoder state match each token of the input sequence. So in this case there were four tokens in the input sequence. So we want to compute four alignment scores each of which is just a single number um that says how how what
+
+25
+00:10:13,000 --> 00:11:07,000
+is the similarity between the input to the the input sequence the token of the input sequence and this initial um this initial uh this initial decoder state as zero. Now there's a there's a lot of ways that we could implement alignment scores but um a simple way is just use a simple linear layer that we're calling f subat. And so that linear layer is going to input is going to concatenate the decoder hidden state s um with one of the encoder hidden states H concatenate those two into a vector and then um
+
+26
+00:10:40,000 --> 00:11:27,000
+apply a linear transform that squashes that down into a scaler. Um and that's just a linear operator that can be put into a computational graph and learned jointly via gradient descent just in the way that we learn all other parameters of a network. Um so now at this point we've got sort of this scalar alignment score um for each se for each step in the input sequence. And now we want to apply a softmax function. Right? These scaler alignment scores are totally unbounded. They're arbitrary val they're
+
+27
+00:11:04,000 --> 00:11:59,000
+arbitrary real values from minus infinity to infinity. We want to put some um some structure on this to prevent things from blowing up. So one way that we do this is apply a softmax function. So we've got four scalar values um telling us the alignment of that decoder hidden state which each with each of the encoder hidden states. Um now we apply a softmax over those four values to give us a distribution over those four over those four values. So remember the softmax function that we saw a few lectures ago is going to take
+
+28
+00:11:31,000 --> 00:12:26,000
+a vector of arbitrary scores and convert it into a probability distribution which means it'll have the property that each entry in the output softmax probabilities will be between 0 and one and they will sum to one. So we can think of so whenever we have whenever we run a vector through a softmax we can think of the thing we get out as a probability distribution rather a discrete probability distribution over those input scores. So in this case, so in this so at this point after we take those alignment scores and run them
+
+29
+00:11:58,000 --> 00:13:07,000
+through a softmax, what we what we've essentially done is predicted a distribution over the input tokens um given that decoder hidden state. So now what we want to do is take that distribution over over the input tokens and use them to compute a vector um summarizing the information in the encoder. So the way that we do that is we take our attention scores which recall are these uh these numbers a a11 a12 a13 a14 they're all between 0 and 1. They sum to one. We're going to take a linear combination now of the encoder
+
+30
+00:12:32,000 --> 00:13:30,000
+hidden states h1 h2 h3 h4. Um and take a linear combination of those encoder hidden states weighted by our attention scores. Um and this will give us a new a context vector that we're calling c1 here in purple. um which is going to summarize the information in the encoder sequence um in in some way that's modulated by that by those by those attention weights. Um and now at this point right so then this this C1 is basically some linear combination of the input encoder states H1 to H4 things
+
+31
+00:13:02,000 --> 00:14:02,000
+look basically the same as they did in the non-attention case. So we we have our context vector um we concatenate it with our in with our first token of the output sequence y0 pass that to our recurrent unit um to get both to get um to get our uh next hidden state of the decoder recurrent neural network as well as the first output token from the decoder recurrent neural network. Um so basically the structure of that decoder RNN did not really change. Um all we did is rather than set we've computed the
+
+32
+00:13:32,000 --> 00:14:38,000
+context vector in a different way using this attention linear combination mechanism. But now crucially um right so the intuition here is that this context vector basically attends or looks at different parts of the input sequence that is modulated by whatever the output RNN wants to look at at this moment in time. Um so for example you know part of the input you know as uh part of the input sequence has this token these these two words we see. So then in trying to produce that one word in Italian that corresponds to we see the
+
+33
+00:14:05,000 --> 00:15:03,000
+network probably wants to go back and look at those two words in the input sequence in order to know what output word to produce. So we might expect we we might want to have some we might expect that intuitively when trying to produce the word um vendo um then the network will want to look back at the words we see and put higher attention weights on those and it doesn't really care about the sky because those words are not necessary for producing that vendamo output. Um and that's the kind
+
+34
+00:14:34,000 --> 00:15:23,000
+of intuition we're giving the network the ability to look back at the relevant parts of the input sequence for the word that it's trying to predict at this moment in time. Um and the other thing to keep in mind is that this is all differentiable. Um we don't need to supervise the network. We don't need to tell it which words in the input sequence were required for each word in the output. Instead, this is just a big computational graph composed of differentiable operations. Um this all of this will can be learned
+
+35
+00:14:58,000 --> 00:15:45,000
+end to end via gradient descent. So at the end of the day, we're still going to have this, you know, cross entropy softmax loss where the network is trying to predict the tokens of the output sequence. And in the process of trying to predict the right tokens in the output sequence, it's going to learn for itself how to attend to different parts of the input sequence. So that's that's really critical, right? If we have to go in and supervise and tell the network the alignment between the two, it would
+
+36
+00:15:22,000 --> 00:16:08,000
+be very difficult to get training data for this kind of thing. The question is how do we initialize the decoder? Uh we're actually using the word you got to be careful we're using the word initialize a little bit overloaded here. So one question is the decoder is itself a neural network that has weights. When we start training that network we need to initialize those weights in some way. So then we will typically initialize the weights of the decoder randomly and then optimize them via gradient descent just
+
+37
+00:15:45,000 --> 00:16:39,000
+as we do with any other neural network weights. Um but there's a second notion of initialize which is that when the network is processing a sequence um whether whatever its current value of the weights are we need some way to set that initial hidden state at the time we start processing an output sequence. Um and in that case we need some rule or some some some way to set that initial hidden state of the decoder output sequence. Um there's a couple different mechanisms for this. Um sometimes you
+
+38
+00:16:12,000 --> 00:17:03,000
+might initialize it as the hidden the last hidden state of the encoder is one thing you'll sometimes do. You might have a linear transform that um projects has some learned projection from the last decoder state to the first from the last encoder state to the first decoder state. Um or sometimes will people even initialize the first hidden state of the decoder to be all zeros. Um any of those will work as long as you train the network to expect that kind of input. So the question is negations and exors
+
+39
+00:16:38,000 --> 00:17:30,000
+would this cause a problem? Maybe this is this is a this is a hard problem but then you need a lot of data a lot of flops to try to hope the network can disentangle this. Um but basically recurrent unit takes three things as input. It take in the decoder right it takes the previous hidden state the previous decoder hidden state it takes the current context vector and it takes the current um token in the output sequence and then from that we produce the next hidden state and then from the next hidden state then we go and predict
+
+40
+00:17:04,000 --> 00:17:54,000
+the output token. So that's actually the same setup as in the non-attention case. I guess there there's an implicit connection from there's a there's a connection from S0 to S1 that we're not drawing. So there there should have been another arrow from S0 to S1. I think I just dropped the S0 arrow. So sorry about that. Well, we're basically letting the network decide for itself to look back at any part of the in input sequence that it thinks might be relevant for the task at hand. Um so but
+
+41
+00:17:29,000 --> 00:18:17,000
+the reason why we think that this mechanism is plausible and might be helpful for the network is because we know that you know in a language task there often is some kind of correspondence between words in the output and words in the input and we want to let the network kind of look back and pick out which are the relevant bits of the input for producing this bit of the output. But again we're not directly supervising it. We're not telling it how to use these attention scores. But the intuition is that we
+
+42
+00:17:53,000 --> 00:18:40,000
+think that's a plausible thing that it might choose to do given this mechanism. Okay. So that's that's sort of like one tick of the output. Um, and now basically we do it again. We do this whole process again for every time we tick the decoder RNN, right? Remember the problem we were trying to solve is that previously the decoder was bottlenecking through a single vector. Um, now we're going to compute instead of bottlenecking through a single vector, we're going to repeat this whole
+
+43
+00:18:16,000 --> 00:19:17,000
+process again and compute a new context vector for the second time step of the decoder and go let it go back and look at the whole input sequence yet again. So now um basically given our S1 which is our computed first hit like hidden state in the decoder we're going to go back you take S1 go back and compute comparison and and use our attention uh mechanism to compute similarity scores between S1 and all of the hidden states in the encoder. Um that will compute our similarity scores using that exact same
+
+44
+00:18:46,000 --> 00:19:48,000
+fat that same linear projection that we used at the first time step. um compute these alignment scores again, cram them through softmax to get a a new distribution over the input sequence for the second decoder time step and now compute a new linear combination of the encoder hidden states now weighted by this new distribution that we computed at the second time step. Um and this sec this this will basically give us a new context vector um C2 that now is a different summarization of the input sequence that's now computed
+
+45
+00:19:17,000 --> 00:20:16,000
+as a new linear combination of the input encoder hidden states and then we then the whole thing kind of iterates right we have a new context vector we use that to run another tick of our decoder RNN unit that will now now does include that that mysterious missing arrow that wasn't there on the previous time step. So then given our new context vector, given the next token of the output sequence and given the S1 hidden state of the decoder, we compute a new decoder state S2 and then from that compute
+
+46
+00:19:46,000 --> 00:20:37,000
+another token of the output sequence. Um and again remember you know in this case it's producing ill which maybe is the according to the slide. I hope that's true. Um, and then you know in this case there's maybe a one to one correspondence between the word the the network is trying to produce for this sequence and one of the words in the output and one of the words in the input. So we might expect that the network should put relatively high attention weight on just one of the words in the input sequence and
+
+47
+00:20:12,000 --> 00:21:02,000
+relatively low attention weight on all the other words in the input sequence. But again, we don't supervise this. The network is deciding for itself how to make use of this mechanism all driven by gradient descent on our training task. Um, and this whole thing is going to we're just going to repeat that whole process for every tick of the decoder RNN. Um, so now this basically solves our problem right there. We are no longer bottlenecking the input sequence through a single fixed length vector. Instead,
+
+48
+00:20:37,000 --> 00:21:31,000
+we have this new mechanism where at every time step of the decoder, the network looks back at the entire input sequence, reummarizes the input sequence um for the to generate a new context vector on the fly for this one time step of the decoder and then uses that to produce the outputs. So this is a this is a pretty cool mechanism and this is called attention because the network is attending or looking at different parts of the input sequence um at every at every moment in its output. So we talked
+
+49
+00:21:04,000 --> 00:21:52,000
+about these attention weights and we said that they were driven that the network was learning for itself how to set these attention weights based on its training data based on its training task. Um and another really cool thing about attention is it also gives us a way to introspect and see what the network is looking at as it's trying to solve this problem. So we never told it how the what what what what what the what the alignment was between the input sequence and the output sequence. But by
+
+50
+00:21:28,000 --> 00:22:18,000
+looking at the attention weights that that the network predicts when trying to solve this task, we get a sense of what the network was looking at um while trying to solve the problem. So that gives us a way to interpret the processing of the neural network in some way. Um and so here's so one thing that we can do is then go and look at in the process of producing a particular of processing a particular sequence what were the attention weights that the network predicted when trying to do this
+
+51
+00:21:53,000 --> 00:22:55,000
+task and we can visualize these in a two-dimensional grid. So here we're looking at an example of English to French translation. Um and across the and across the the top we have our input sequence. The agreement on the European economic area was signed in August 1992. And then running down the rows is the output sequence which is in French which I will not attempt to pronounce. Um but you can see that like basically through this attention mechanism for every remember the way this attention mechanism worked is that each time the
+
+52
+00:22:24,000 --> 00:23:19,000
+network produced one of these words in the output sequence it predicted a probability distribution over the entire input sequence. So we visualized that in that first row. So if you look at the first row of this matrix, we're visualizing that predicted probability distribution over the entire input English sentence. And we see that when trying to predict that first um word the of the French sentence, then it puts a lot of probability mass on the English word 'the' and basically no probability
+
+53
+00:22:51,000 --> 00:23:43,000
+mass on any of the other words. Then when predicting the second word of the output sequence, remember it goes back and predicts a new distribution over the entire input sequence and that's going to be the second row in this matrix. So you can see that accord um I it puts a lot of probability mass on agreement and then no probability mass anywhere else. So then that gives us some sense that the network actually kind of did figure out the alignment between the input words and the output words when doing
+
+54
+00:23:17,000 --> 00:24:09,000
+this translation task. And there's some interesting patterns here that here that kind of pop up when we look when we see diagonal structures in this attention matrix. That means that there was a onetoone correspondence between words in order between the input sequence and the output sequence. So in particular we see that the agreement on the the first four words of the input sequence correspond to this diagonal structure um in the attention matrix. So that means that the network has decided for itself that
+
+55
+00:23:43,000 --> 00:24:40,000
+these first four words of the input sequence sort of align or match up or correspond to the first four words of the input sequence. And the same thing for the last um several words. So again, we see this diagonal structure at the end of the sequence, which means that August 1992 or in August 1992 um corresponds to these uh these last couple words in the French sequence. And again, there's this one:1 correspondence between words in the output and words in the input. But we see some other interesting stuff in the middle here. So
+
+56
+00:24:11,000 --> 00:25:01,000
+in the middle, um we see European economic area, but in the French, we see words that look kind of like those in a slightly different order. Good question. How does it figure out the grammar? That's the mystery of deep learning. But like basically we told the we didn't tell the network anything about grammar. We told the network we supervised it with a lot of input output pairs. We told it here's an input sequence in English. Here's an output sequence in French. Here's a mechanism for
+
+57
+00:24:36,000 --> 00:25:28,000
+processing this and learn via gradient descent to to like set the weights of this architecture in order to in order to produce this output from this input. Um we'd never told it anything about grammar. Um but it kind of because we as human designers have this intuition that maybe it makes sense that there ought to be some correspondence between some of the words. So we bake in a mechanism that we think as human designers might be helpful for solving this problem and the network figures out for itself in
+
+58
+00:25:02,000 --> 00:25:56,000
+the process of doing the endto-end task how to make use of that mechanism um to solve the problem we set for it. And it's pretty pretty amazing that it works. Um right but in this case you know it kind of figured out some of the grammar for itself. So it sees that you know we see this nondagonal sort of backward diagonal in the attention matrix here and that means that the network figured out for itself this um other this like different word order between words in English and words in French um or in the
+
+59
+00:25:29,000 --> 00:26:13,000
+middle you see there's a little there's a little like 2x2 grid um kind of here and that kind of corresponds to a situation where there might not have been a one to one correspondence between the English words and the French words. There might have been two French words that corresponded to two English words and they didn't perfectly disentangle perfectly. I mean the network just all figures out this for itself over the process of training um on a lot of data and putting a lot of compute through
+
+60
+00:25:51,000 --> 00:26:49,000
+this and that's pretty cool. Okay, so there's actually uh so that that's basic so and this actually was the initial usage of attention in machine learning. Um it actually came from this from these machine translation problems. Um so this was from a paper back in uh back in 2015 uh neural machine translation by joint by jointly alerting to align and translate. Um, and this paper actually just won the runner-up test of time award at iclair 2025. Uh, so that's pretty cool. A nice nice uh, you know, this has been a
+
+61
+00:26:20,000 --> 00:27:12,000
+really impactful paper over time. Um, but it turns out that there's actually a more general idea here and a more general operator hiding here. You know, we approach this problem from the perspective of trying to fix our recurrent neural networks. But it turns out the mechanism that we used to fix the recurrent neural networks actually is something general and interesting and really powerful in its own right. So now we want to try to pull that out, pull out this idea of attention and divorce
+
+62
+00:26:46,000 --> 00:27:36,000
+the idea of attention from the recurrent neural networks. And it turns out that attention will be a very useful and powerful computational primitive for neural networks in its own right. even even if then we can cut away the recurrent neural network part and just be left with attention as the core primitive in our architecture and that's kind of where we're what we're going towards. So now what we want to do is take this this idea of attention as we saw it in recurrent neural networks and
+
+63
+00:27:11,000 --> 00:28:03,000
+try to generalize it and try to carve out this independent operator that can be used on its own. So let's think about what this attention mechanism was doing. Basically what this attention mechanism did is there were a bunch of query vectors. These are Well, maybe maybe it makes sense to talk about these in the other order. So, there's data vectors which are like data that we want to summarize. These are the the the the encoder states of the encoder RNN. So, we have this input sequence and we've
+
+64
+00:27:38,000 --> 00:28:30,000
+summarized that into a sequence of vectors. Um, and the sequence of vectors is sort of data that we think is relevant for the problem that we're trying to solve. Um, and now in the process of trying to make use of that data, we want to produce a bunch of outputs. And for each output, we have a query vector. A query vector is a vector that we're trying to use to solve an out to to produce some piece of output. Um, and in this case, the query vectors are the hidden states of the decoder RNN.
+
+65
+00:28:03,000 --> 00:29:02,000
+Um, and we have this this property that for each query vector, we want to go back look at the data vectors and summarize the information in the data vectors into a context vector. Um, for each well, okay, from the purpose of from the purpose of attention, this gets a little bit weird. So the output of the attention operator are the context vectors that we just talked about for the RNN. So if we're talk if we're thinking about just what does that attention operator do? The output of the attention operator were the context
+
+66
+00:28:32,000 --> 00:29:22,000
+vectors that we feed into the RNN. So then what is the attention operator doing? The attention operator is taking a query vector going back to the input data vectors summarizing the data vectors in some new way to produce an output vector. Um and that's what the attention operator is doing. Is that does that is that does that kind of make sense as a generalization of this attention mechanism that we just saw? >> Yeah. Yeah. I I'll repeat it again because it's it's tricky. There's a lot
+
+67
+00:28:58,000 --> 00:29:44,000
+of stuff flying around here. A lot of boxes and we're changing the words that we're using to define the the define the boxes. So I get it. There's a lot happening. Um so what the attention operator is doing is there's a bunch of data vectors which are the encoder hidden states. Um then for then we have a bunch of query vectors which are the p the things we're trying to produce output for. Now, in the process of processing a query vector, we're going to go back to the data vectors,
+
+68
+00:29:20,000 --> 00:30:12,000
+summarize the data vectors in a new custom way for each query vector, and that will produce um an output vector, which is the context to be fed into the next tick of the RNN. Right? So, our query vectors are these guys in green. For each query vector, we go back to the data vectors, summarize the data vectors, and then produce a new output vector, which is one of the contexts that we then feed into the the rest of the network. So um you know this is kind of tricky because we're trying to like
+
+69
+00:29:46,000 --> 00:30:40,000
+go into this architecture and like cut carefully cut out the attention part and cut it out from the RNN. Um so then we're going to try to like walk through this again from the perspective of just the attention operator. So from the perspective of just the attention operator we're going to start with just one query vector at first um which is you know one of the one of the states in our RNN. We also have a bunch of data vectors which are the encoder hidden states in the RNN. Now the computation
+
+70
+00:30:13,000 --> 00:31:03,000
+that we want to perform is first compute similarities between that query vector and all of the data vectors. This is the exact same thing that we just saw just sort of written in a different way. So we use this fat function to compute these similarity scores um from our to to to compute similarities between each data vector and our one query vector. Then once we have those similarities, we're going to squash them through through a softmax to get attention weights. And this will be a distribution
+
+71
+00:30:38,000 --> 00:31:34,000
+over the data vectors that has been computed on the fly for this one query vector. Then we want to do is produce an output vector. And out this output vector is a linear combination of our data vectors where those linear combination weights are the attention scores that we just computed. So this is the output of the attention layer. And then in the context of the larger RNN that we saw, the output of the attention layer or the attention operator will become an input to the next tick of the decoder RNN. But
+
+72
+00:31:06,000 --> 00:31:53,000
+we're trying to deprecate the RNN. So we don't want to talk about that. We just want to talk about the attention and focus on the computation happening inside the attention layer. So like so this is basically the operator that we saw in the RNN, right? We had this one like we we did this process over and over again of taking a query vector using it to compute similarity scores getting attention weights getting an output vector. Then we got a new query vector. Where did that query vector come
+
+73
+00:31:30,000 --> 00:32:18,000
+from? Attention operator doesn't care. Get a new query vector. Go back summarize the data vectors get a new output vector. Um and that's that's the core of the attention operator. So now let's try to generalize this and make it a even more powerful computational primitive. Yeah. So in principle this um this fat doesn't have to be it could be any function. It could be any function of two vectors that outputs a scaler um in principle but in practice we're actually going to make it simpler in in
+
+74
+00:31:54,000 --> 00:32:48,000
+a couple slides. But in principle yeah you could just slot in any any function that you wanted there. Okay. So the first generalization that we're going to do is actually um the opposite of what you just suggested and make that similarity function simpler. So we said in principle it can be any function that takes two vectors and gives a similarity score. What's the simplest possible function that inputs two vectors and gives us a scalar similarity score? It's a dot product. So we want to try to make things uh simpler
+
+75
+00:32:21,000 --> 00:33:16,000
+and also generalize at the same time. And it turns out that a dot productduct is is good enough of a similarity score to be used for this purpose. So the first thing we're going to do is um actually just only use dot products to compute similarity. Um but it turns out there's a slight problem with dotproducts. So and this one's kind of subtle because there's a weird interaction between the dot product and the softmax. Um and that has to do with what happens when the when the dimension of those vectors scales up
+
+76
+00:32:48,000 --> 00:33:43,000
+or down. Right? So if you have a like the motivating example is that if you scale the dimension of that vector, say we had a constant vector of all ones of like dimension 10 versus a constant vector of all ones of dimension 100, then as we go to the to the higher dimensional vector, then when we compute the sum inside that softmax, then we're going to be dividing by a larger number. So we'll end up with more squashed probability scores as we go to higher dimensional vectors. Um that can lead to
+
+77
+00:33:16,000 --> 00:34:06,000
+vanishing gradients as we just saw in the previous lecture. and prevent learning of this whole thing. So as kind of a slight hack to prevent that um and make this architecture more generally more generalizably scalable up and down to different dimension vectors um what we're going to do is actually not use the pure dot productduct but scale the dotproduct down by the square root of the dimension of those vectors that we're looking at. Um and this is just a way to prevent vanishing gradients and
+
+78
+00:33:41,000 --> 00:34:28,000
+give nicer gradient flow through the softmax for a wider range of dimensions of vectors. Um, and this turns out to be very important because as we make these networks bigger and bigger and bigger over time, we want to get higher dimensional vectors because that gives us more compute, more capacity. So we always want to think about how our architectures will scale as we make the parts of those architectures get bigger and bigger and bigger. So this um this this scale dotproduct is actually really
+
+79
+00:34:05,000 --> 00:34:57,000
+important for preventing vanishing gradients here. Yeah. Question was we're limited to data and query vectors of the same size, but we'll actually fix that. So uh our first generalization was to use actually scaled dotproduct similarity as our as our similarity measure. Um so now you know if we go back and look at the shapes of these things we have one query vector of dimension dq. We have data vectors of dimension nx by dq as well because it's a dot productduct they need to match. Um
+
+80
+00:34:30,000 --> 00:35:19,000
+but there's actually a next generaliz generalization that we're going to do is have multiple query vectors right like maybe we don't want to process just one query vector at a time. We want to have the ability to process a whole set of query vectors all at once. Um, and this kind of happens in the RNN. You know, we did end up with a bunch of query vectors. Um, and it's useful for the attention operator to be able to process not one query vector at a time, but basically process a set of query vectors
+
+81
+00:34:55,000 --> 00:35:54,000
+all in parallel and perform the exact same computation in parallel for a whole set of query vectors. So in this case, we've now generalized it to have n. So q is now a matrix of shape nq by dq. So we have n q query vectors. Each of those query vectors has dimension dq. We have our data vectors is a matrix of size nx by dq. And now uh this now the the computation changes a little bit because now want when we compute these alignment scores when we when we compute these similarities basically we want to
+
+82
+00:35:24,000 --> 00:36:20,000
+compute all pairs of similarities between all of the input data vectors and all of the input query vectors. And that sim and each one of those similarities is a dotproduct. So well scaled dotproduct. So what's a very efficient and easy and natural way for us to compute dotproducts between two sets of input vectors? That turns out exactly to be a matrix multiply, right? Cuz remember when you do a matrix multiply, each entry in the output matrix is the inner product of one of the columns of one of your matrices and
+
+83
+00:35:52,000 --> 00:36:44,000
+the rows of your other matrix. And that's what uh so then each entry in the output of a matrix multiply is exactly the dotproduct between the rows and the columns in the output. So this by computing a matrix multiply between our um query vectors Q and our data vectors X and you need to get a transpose in there to make the rows and columns match up in the right way. Um this basically gives us you know lets us compute all the scale all the similarities between all the data vectors and all the query
+
+84
+00:36:18,000 --> 00:37:08,000
+vectors um all in one simple matrix multiply. Um now we still need to compute these attention weights. Remember the attention weights we want to compute for each query vector we want to compute a distribution over the data vectors. Well, we already have these. Now, our similarity scores are not just a single vector of scores. They're now a matrix of scores giving all the similarities. But we still want to compute a distribution over the data vectors for each query vector independently. So, now
+
+85
+00:36:43,000 --> 00:37:40,000
+we need to comput the softmax over just one of the axes of that um of that matrix of similarity scores. So, this is basically the exact same computation that we just saw. We're just doing it in parallel for a set of query vectors all at once. Um now, we need to compute the output vectors. And remember the output vectors were going to be a um weighted combination of the in of the data vectors where those weights are the values in the softmax. And it turns out that this is also something that matrix
+
+86
+00:37:12,000 --> 00:38:06,000
+multiply does. Um another way to think about matrix multiply is that when you take a matrix multiply of two matrices, a different way to view a matrix multiply is that it takes a linear combination of oh man, am I going to get the rows and the columns in the right way? But I think you get the the linear combination of the columns of one of your input matrices um weighted by the values in the other input matrix. So this is another interpretation of matrix multiplication. So then if you kind of work through the indices and draw some
+
+87
+00:37:39,000 --> 00:38:35,000
+little pictures for yourself to to prove to yourself what's going on. It also turns out that you know in order to compute me now what we want to do is compute many linear combinations of the data vectors where each linear combination will be given by the probabilities in one of the rows of the attention matrix. Um so we can compute all of these all at once with another matrix multiply between um the attention matrix A and the data vectors X. And again you need to get the transposes in the right order to make this work out.
+
+88
+00:38:07,000 --> 00:39:02,000
+But basically, this is the exact same operation that we just saw, but we're now doing it for a set of query vectors all at once. And it turns out that we can do it all at once with just a couple matrix multiplies. There's a next way that we'll generalize this is notice that in this equation, the the data vectors X are actually entering in two different places in this computation. Um the first place that we're using the data vectors X is to compute similarities with the query vectors in
+
+89
+00:38:34,000 --> 00:39:24,000
+this uh similarities computation. So in that in that notion what we're trying to do is say oh for hey data vector how much do you line up with each query vector as measured by an inner product but then we're also using the data vectors again to compute the output vectors. So we're we're re we're the output vectors are now a linear combination of the data vectors weighted by our attention weights. Um and it maybe seems a little bit weird to reuse the data vectors in those two different
+
+90
+00:38:59,000 --> 00:40:02,000
+contexts. So now what we want to do is um separate those two usages of the data vectors um and let the network sort of figure out for itself two different ways to use the data vectors in those two contexts. So to do that we'll introduce this idea of keys and queries. So now what we're going to do is you know we had a set of data vectors but what we're going to do is for each data vector we're going to project each data vector into two vectors. One is a key vector one is a value vector. Um, and the idea of the
+
+91
+00:39:31,000 --> 00:40:24,000
+key vectors are the key vectors are going to be compared with the query vectors to compute the alignment scores and the value vectors are what we're going to compute linear combinations of in order to compute the output from the layer. Um, and this also by so then the way that we implement this is we add two learnable weight matrices, the key matrix and the value matrix which are going to be um linear projections that project the input that project the data vectors into key vectors and value
+
+92
+00:39:57,000 --> 00:40:55,000
+vectors. So now the data vectors are we have remember we have n data vectors each of dimension dx. So now the key matrix projects is a is a linear transformation that projects from dx into dq right because we know that we're going to compare the key vectors with the query vectors. So they need to have the same dimension as the query vectors. Um so that will project each so then applying matrix multiply of k= x wk will project each data vector into a key vector of dimension dq. Then we'll
+
+93
+00:40:26,000 --> 00:41:23,000
+separately have another weight matrix that projects from dx to dv which is the dimension of the value vectors which in principle could be different than the query vector dimension. Um and then we'll separately project each each data vector into a value vector again with a matrix multiply operator here. Um and the intuition here is that it's kind of like in a search engine like you want to separate what you're looking for from the answer you want in response to that query, right? So like you go to Google
+
+94
+00:40:55,000 --> 00:41:41,000
+or these days chatgpt and you type in like what is the best school in the world that's your query and then the value you get that's the that's the query that needs to be combined with the keys in the back end but then the value the data you want to get back from that query is actually different from the query you typed in right so we want to separate this idea of like you put your query in what is the best school in the world that query needs to go match on all the different strings in the on the
+
+95
+00:41:18,000 --> 00:42:08,000
+internet and then the value you want to get back from that query is Stanford which is a different value come which is a different value which is different from the query that you put in. So that's kind of the intuition another intuition between separating the keys and the queries and the values in this way. The query is what I'm looking for. The key is you know in the back end we have some record of all the data back there in the data vectors but um when we query we want to match up against part
+
+96
+00:41:43,000 --> 00:42:32,000
+of the potentially just part of the data vector and then the thing we want to get back from the data vector is the value. So we're separating the usage of the data vectors into those two different notions of keys and values. Then we can visualize this in a different way. So now we're we're we're finally throwing away the RNN and we're looking at attention just as an operator on its own. So we can step through this operation again. We've got our query vectors coming in. We've got our data
+
+97
+00:42:07,000 --> 00:43:07,000
+vectors coming in. Now what we're going to do is from the data vectors, we're going to project each data vector into a key and a value. Um then we're going to compare each key with each query to get our um similarity scores. Right? So this is a similarity. This is a matrix of scalers giving the similarities between each key and each query. Then once we have this matrix of similarity scores, we want to compute um a distribution over each qu a distribution over the data vectors for each query. So that
+
+98
+00:42:37,000 --> 00:43:39,000
+means we need to run softmax over this uh matrix of alignment scores um or we compute the softmax over each row. Then what we do is we want to take rewe the value vectors by the attention scores in the softmax. Oh actually no sorry we want each we want a each column to be we want each column to be a distribution. uh right because each we want for each query a distribution over the keys which means we want softmax over the columns right because we want it to be aligned to the columns. So then what we do is
+
+99
+00:43:08,000 --> 00:43:57,000
+you know we've got this query one we've prod we've predicted this distribution over all of the keys um from this computation. Then we're going to take a linear combination of the values weighted by these attention weights and comput a linear combination of the value vectors to produce our first output vector y1. And then the same thing happens over here. Our second query got compared with all the keys. We computed a distribution over those alignment scores to get a distribution over the
+
+100
+00:43:33,000 --> 00:44:27,000
+keys for the second query which then get linearly combine. Then we use those to linear linearly combine the values to produce our output vector. So now this is now the attention operator sort of standing on its own um divorced from the recurrent neural network. The question is how do you divide the data vector into keys and values? The beautiful part is we don't have to say we don't have to say how just as we just give the neural network the capacity to split it by by to split it by itself by giving it this
+
+101
+00:44:00,000 --> 00:44:46,000
+mechanism to project separately into keys and values but just but we're not going to tell it how to do it. Um these are just going to be the the key matrix and the value matrix are just going to be learnable parameters of the model that will be learned via gradient descent along with everything else. So just as we did not tell it how to align the English and the French sentences all of that was sort of learned via gradient descent. the model will learn for itself how to separately project into keys and
+
+102
+00:44:23,000 --> 00:45:04,000
+values in a way that's sensible for the problem for that's helpful for the problem it's trying to solve. So that the keys and values you might think of it as some kind of filter right so the data vector might have a lot of stuff in there but for the task at hand we might want to filter the data vector in various ways and only try to match our queries against part of it and we only care about retrieving information of a different part of it. So you could think of those as yeah filtering you know the
+
+103
+00:44:44,000 --> 00:45:36,000
+information in the data vector in two different ways. Okay, so this is this is basically our attention operator. And now like there's no RNN here. This is just a neural network layer that you could have standing on its own, right? It receives two inputs, the query vectors and the data vectors. It has two weights of learnable parameters which are the key matrix and the value matrix. Um it inputs two two sets two sequences of vectors, outputs a sequence of vectors. So this is a neural network layer in its
+
+104
+00:45:10,000 --> 00:46:02,000
+own right that you could start to plug into your neural network architectures in various places. This is sometimes called a cross attention layer because it has two sets of inputs coming in, right? The idea is we have both data vectors and query vectors. They're potentially coming from two different sources. Um, and this is sometimes useful, right? So that I have a set of queries. For each query, I want to go and summarize information from my data which is potentially different or a different number or totally different
+
+105
+00:45:36,000 --> 00:46:29,000
+from my query vectors. Um, so this is this is sometimes called a cross attention layer because we're crossending between two different sets of things. Um, but there's another version of this that happens maybe even more commonly is a self attention layer. So here what we're going to do is we only have one set of things. We only have one sequence of inputs. We we have one set of vectors, one sequence of vectors that we're processing. Um, and then so now we we no longer have this separation
+
+106
+00:46:02,000 --> 00:46:54,000
+between data vectors and query vectors. We just have one set of input vectors that we would like to process. So in a self attention layer um we're going to have one we're going to have a set of input vectors and we're going to produce a set of output vectors. So we want to input a set of vectors X output a set of vectors Y that are the same number as the input vectors. But now the mechanism of this is basically the same attention mechanism that we just saw. Um but now rather than projecting but we then we're
+
+107
+00:46:29,000 --> 00:47:20,000
+still going to use this notion of filtering but now rather than projecting our data vectors into keys and queries as we previously did. Now, what we're going to do is take each one of our input vectors and project it to three different things. Um, from each of our input vectors, we're going to project it to a query, to a key, and to a value. Um, and so the the the equations change just a little bit. Um, and but the picture over here doesn't actually change very much for each of our input
+
+108
+00:46:54,000 --> 00:47:47,000
+vectors. We separately project it to a query, to a key, and to a value. Um, and now we have, you know, the exact same computation. Now we've got queries, we've got keys, we've got values. From the perspective of everything happening up here, it's all the same. It just h it just so happened that we computed the keys and the queries and the values all from different linear projections of those same input vectors, but all the computation otherwise shared. Yeah. Question is how do you where what are D
+
+109
+00:47:21,000 --> 00:48:05,000
+in and D out? How are they sized? Um so these are going to be architectural hyperparameters of the layer, right? Like just when we have a learnable linear layer in a model, a linear layer basically projects from a Din to a D out. Those are going to be architectural hyperparameters of the layer. Um same thing with a self attention layer. The D in and the D out are going to be architectural hyperparameters of the layer. Um and in principle they could be different, right? There's enough there's
+
+110
+00:47:43,000 --> 00:48:34,000
+enough flexibility in this architecture so that in principle D in D in and D out could be different. Although I don't think I've almost ever seen that. In practice they're like almost always the same. So I've been like a little bit extra general in the notation here. Okay. So I I don't know that we necessarily need to walk through this. Oh actually there is one important thing. Right. So I said that um we are separately projecting the inputs into queries, keys and values. Um so that
+
+111
+00:48:08,000 --> 00:49:01,000
+happens via three matrix multiplies with our three learnable weight matrices. Now we have three learnable weight matrices. One for keys, one for values, one for queries. Um and we separately project the the input vectors X into keys, queries and values. Um but in practice um we can actually typically compute just one matrix multiply all at once for those because it's typically more efficient on hardware to do fewer large matrix multiplies than it is to do more smaller matrix multiplies. So a pretty
+
+112
+00:48:34,000 --> 00:49:26,000
+common trick in practice is to fuse is to sort of concatenate these three matri matrices along the dimensions and compute all of these keys queries and values for all the input vectors all at once with one big matrix multiply. If you've read transformers before, they sometimes separate between encoder and decoder transformers or encoder decoder attention. So in that case like this does this is this would be the decoder only attention. Um if you've read transformer papers before um and which
+
+113
+00:49:00,000 --> 00:49:49,000
+corresponds to the decoder of the RNN initial example at beginning of class um but like this mechanism is actually just the most gen is like the most commonly used flavor of attention nowadays is this sort of so-called decoder only attention. So we are we are quite divorcing ourselves away from the RNN now. Right? So this flavor of it doesn't really make sense to be used in the RNN that we saw at the beginning of class. Right? So we basically been like doing a little bit of a slight of hand
+
+114
+00:49:25,000 --> 00:50:15,000
+here where we introduced this architecture for the purpose of RNN in this very concrete case of machine translation sequence to sequence. But we've now generalized it to become a totally different operator that can be used all on its own. And in this particular generalization into self attention, it actually no longer can be used in that decoder in the RNN. Um but it's a very useful primitive that gets used in a lot of other places. It turns out the question is what's the benefit or difference between the self attention
+
+115
+00:49:50,000 --> 00:50:35,000
+versus the cross attention. Um they would get used in different contexts. So in a in some situations you naturally have two dis different kinds of data that you want to compare which we saw for example in the machine translation setting we have an input sentence we have an output sentence. We believe that there there's some natural structure in the problem that there's two different sets of things that we want to compare. Um that also might happen in say image captioning right say we have an input
+
+116
+00:50:12,000 --> 00:50:57,000
+image we want to produce an output sentence there's two different kinds of things we want to compare pieces of the image and tokens in the words that we're generating so for some problems there's just this natural structure where you have two different kinds of things floating around but for other problems there aren't two kinds of things there's just one thing um so say you're doing image classification then there's only an image we just want to process the image so in that case we just want to
+
+117
+00:50:35,000 --> 00:51:23,000
+compare parts of the image with itself and that's where you use a self attention layer So they just get used in different for different kinds of problems. Um but we want to but crucially we want to reuse basically the same machinery and the same uh computational primitives to you to be used in those different kinds of problems and that's very that's really beneficial. There's a couple interesting things about attention that I want to get through. So one is like let's consider what happens if you
+
+118
+00:50:58,000 --> 00:51:43,000
+permit permute the inputs right we had a set of input vectors. What happens if you shuffle them and process them in a different order? Now actually a lot of interesting stuff happens. So the keys, the queries, and the values will all end up the same, right? Because they are computed as linear projections of the input. So we'll end up getting the same keys, queries, and values. They'll just be in a different order, shuffled in the same way that the inputs were. Um, and now because our similarity scores were
+
+119
+00:51:21,000 --> 00:52:09,000
+just dotproducts, we'll also end up with the same similarity scores, just again kind of shuffled in accordance with the way we shuffled input. Um, same thing with the softmax. Softmax doesn't actually care about the order of its inputs. So it's the softmax is now operating on the same vector, but shuffled. So um each column of our attention weights will end up the same as they did before just shuffled. And then same thing with linear combinations. So our output val our outputs y will actually still be the
+
+120
+00:51:45,000 --> 00:52:37,000
+same outputs as we said before. They'll just all be shuffled. So that that means that there's a really interesting structure here um called permutation equariance. Remember we saw we we saw this a couple lectures ago with with um with with convolution. Now we see a different equariance property of these uh self attention layers which is that if we shuffle the inputs then the outputs we get the same outputs just shuffled in the same way that the inputs were shuffled. And this kind of means in
+
+121
+00:52:11,000 --> 00:52:59,000
+this case that self attention doesn't actually care about the order of the inputs. If we change the order of the inputs we'll get the same outputs just shuffled in the same way. That the computation of the layer does not depend on the order in which we present the inputs. So that means that we can think of self attention actually not as operating on sequences of vectors. They happen to be packed into into an ordered sequence of a matrix. But we really think of it instead as operating on an
+
+122
+00:52:35,000 --> 00:53:24,000
+unordered set of vectors because the the the the the outputs that we get don't actually depend on what order we've packed those vectors into our input matrix. So we really think about this as a kind of different neural network primitive that fundamentally operates on sets of vectors rather than sequences of vectors. But this is sometimes a problem. Sometimes it is useful to tell the neural network what the order of the se what the order of the entries is. So as a quick fix to that, we'll sometimes
+
+123
+00:53:00,000 --> 00:53:47,000
+concatenate an additional piece of data onto each of the input vectors called a positional embedding. That is basically some some piece of data that tells the neural network this one's at index one, this one's at index two, this one's at index 3, blah blah blah blah blah. And there's a bunch of different mechanisms for that. The question is, is it going to train to the same result? Um the training, I'm not really talking about the training here. I'm talking about if you fix the weight matrices and just
+
+124
+00:53:23,000 --> 00:54:11,000
+consider the computation of the layer then if I were to shuffle the inputs then I receive the same outputs but they'll be shuffled in the same way that the inputs were shuffled. So like the the the the question of what vectors do I compute at the output does not depend on the on the on the vectors on the order of the vectors in the input but the order of the vectors I get from the output does depend on the order that they were presented in the input. So there's another couple tricks we can do
+
+125
+00:53:48,000 --> 00:54:36,000
+with self attention, but I'll go through these a little bit faster. Um, so sometimes, you know, in in a full self attention layer, we allowed every piece of the input to look at every other piece of the input. But for some problems, we might want to impose some structure on this computation and say that certain pieces of the input are only allowed to look at certain other pieces of the input rather than looking at rather than everything being allowed to look at everything. And we can implement this via a notion called
+
+126
+00:54:12,000 --> 00:54:56,000
+masked self attention. So what we're going to do is after we compute these um these alignment scores E, we're going to go in and override the alignment scores with negative infinities in places where we want to block the attention. Um and now if you have a negative infinity in your alignment scores, then after you do a softmax, it's going to end up as a zero if you walk through the softmax computation. Um so that means that if there's a zero if there's whenever there's a negative infinity in the
+
+127
+00:54:34,000 --> 00:55:25,000
+alignment scores we end up with a zero in the softmax in in the scores after the softmax which means that that output y will not depend on the value vector computed at that index. So this is a mechanism to let us control which inputs are allowed to interact with each other in the process of the computation. Um and we might want to do this now for language modeling right because now we've generalized this operator to the point where we don't need an RNN at all. We can just use this in the for the same
+
+128
+00:54:59,000 --> 00:55:51,000
+problem that we used to use an RNN for. So now we can use it to process sequence of words like attention is very and then output is very cool. So then in this case we're doing the same language modeling task that we saw last lecture with RNN's but we can now do just do it natively with this self attention block. But in this case we want to make the first output is only depend on the first word. The second output vary only allowed to look depend on the first two words. We don't want to let that let the
+
+129
+00:55:25,000 --> 00:56:15,000
+network look ahead in the sequence and cheat. So here is where we would use masking. Um another thing that we'll sometimes do with self attention is called multi-headed self attention where you run n copies like h separate independent copies of self attention in parallel. Why do you want to do this? Because it's more computation, it's more flops, it's more parameters. Deep learning we always want more and bigger. Um and this is another way that you can make this network that make this this layer more
+
+130
+00:55:50,000 --> 00:56:46,000
+and bigger and more powerful. So what we're going to do is take our inputs X, route them to H independent copies of separate self attention layers. Those will each produce their own outputs Y which will then stack up um along the output and then fuse the and then have another linear projection at the output to kind of fuse the output data from each of the independent self attention layers. Um and now in this case uh this is called multi-headed self attention. Um and this is basically the format that
+
+131
+00:56:18,000 --> 00:57:13,000
+we always see in practice. So this is like whenever you see self- attention used these days, it's almost always this multi-headed self- attention version. Um, and in practice, um, it turns out that you can compute this all with matrix multiplies as well. So you don't have to like run a for loop. Um, you can compute each of these H copies of self attention all in parallel if you're clever and use batched matrix multiplies all in the right places. Um, so in in in fact this whole self attention operator
+
+132
+00:56:46,000 --> 00:57:39,000
+seems like a lot of stuff going on, but it's really basically just four matrix multiplies. We have one matrix multiply where we take our inputs and project them to queries, keys, and values. Um, we have another matrix multiply where we compute Qase similarity. For each Q, we compute the similarity against all the all the K's. And that's one big batched matrix multiply. Now in the multi-headed case um we have another one called V-weing where we want to take linear combinations of all the values weighted
+
+133
+00:57:12,000 --> 00:58:00,000
+by the softmax entries and that can be done in another big batched matrix multiply and then finally we have an output projection to mix information across our different self our different heads of our self attention. So even though there's a lot of equations there's a lot of vectors flying around this whole self attention operator is basically just four big batched matrix multiplies. Um, and that's great because matrix multipliers are a really scalable, powerful primitive that we can
+
+134
+00:57:36,000 --> 00:58:27,000
+distribute, we can optimize um, and we can make this thing highly parallel, highly parallel, highly scalable, highly uh, highly efficient. Yeah. Question is that the x1, x2, x3, they're exactly the same. Um, but just but um, yeah, but we're just going to like have separate cop like basically separate copies of the self attention layer. They're all they will all be random. They all have different weights critically and those weights will be initialized randomly different at initialization. So they
+
+135
+00:58:02,000 --> 00:58:45,000
+will end up learning to process them in slightly different ways. So this is just a way to give extra capacity to the layer. Oh yeah, the only thing different between the different heads is the weights. So we'll the architecture is exactly the same. The computation is exactly the same, but they'll have different weights and those weights will be diff will be initialized to different things at initialization. Um but other than that it's all exactly the same. Okay, there's some stuff there that we
+
+136
+00:58:23,000 --> 00:59:08,000
+can skip. But now basically we've gotten to one really interesting place where we have basically three different ways to process sequences that we've seen in this class. The first is recurrent neural networks. We saw that recurrent neural networks basically operate on 1D ordered sequences. Um and they're they're really cool. They're really powerful. People like them for a long time, but they're fundamentally not very parallelizable because of this concurrent structure where each hidden
+
+137
+00:58:46,000 --> 00:59:37,000
+state depends on the previous hidden state. Then they're just a fundamentally sequential algorithm. there's no way to parallelize this across the sequence. Um, and that makes them very difficult to scale, very difficult to make very big. Um, another primitive that we've seen is convolution. And convolution basically operates on multi-dimensional grids. Um, we've seen it in two-dimensional grids in the case of images. You can also run them on 1D grids, 3D grids, 4D grids. And convolution basically is something that
+
+138
+00:59:11,000 --> 01:00:08,000
+mixes information locally in n-dimensional grids. Um, this is great. is very parallelizable because by this notion of sliding a kernel around a grid, each position that we might want to place the kernel can in principle be computed in parallel. So this is a very parallelizable primitive. Um but um it has a hard time building up large receptive fields. If we want to if we want to summarize an entire very long input sequence or an entire very large image with convolution, we either need to have very large convolutional kernels
+
+139
+00:59:40,000 --> 01:00:35,000
+or stack up many many many convolutional layers. So that still introduces some fundamental sequentiality in the way that we need to process large pieces of data. And now self attention basically is a separate kind of primitive that operates on sets of vectors. Um it sort of naturally generalizes to long sequences. There are no bottlenecks in the way that there are in in in recurrent neural networks. There's also no necessity of stacking up many many layers of them to pro to to let all the vectors look at each other. In one layer
+
+140
+01:00:07,000 --> 01:01:05,000
+of self attention, every vector looks at every other vector. So with just one layer you can summarize you can do a lot of computation um and it's also highly paralyzable as we saw the whole operation is just four big matrix multiplies and matrix multiplies are a great primitive that we can distribute we can run on GPUs we can run in very scalable distributed ways um the only downside of attention is that it's expensive it ends up having n squ compute for a sequence of length n um and n squ or later n o n memory for a
+
+141
+01:00:36,000 --> 01:01:32,000
+sequence of of of length n and if your n ends up being like 100,000 million 10 million n squared becomes very expensive but you can solve that by buying more GPUs. Um so that's that's basically the solution that people have have come up with here. So basically attention has become this super awesome primitive that is super powerful for processing very arbitrary pieces of data and you might be wondering which of these you should use. Attention attention is all you need. It turns out that of the three you
+
+142
+01:01:04,000 --> 01:01:59,000
+can get a long way using only attention. Yeah the question is is paralyzable. What's the advantage of that? Um the advantage of that is that in the history of computing um it it get it gets hard to make processors faster, right? We've sort of run up against this limit as a fundamental limit in hardware that it's become very difficult to make individual processes faster. But what we can do very easily is get a lot of processors, right? So we so the way that we've able to marshall more computation over the
+
+143
+01:01:31,000 --> 01:02:21,000
+last two decades is finding algorithms that do not require running on one really fast processor. But instead if we can have an algorithm that can make use of 10 processors or a 100 processors or a thousand processors or a million processors. I want to blanket the entire Stanford campus with processors and have all of them working together in concert to process this big thing. If we can find algorithms that do that, that's how we can scale up and get really big powerful computations. Um, so the
+
+144
+01:01:56,000 --> 01:02:48,000
+benefit of parallelizability is that if you have algorithms that can trivially make use of more and more and more processors in parallel, then we can scale up those algorithms without having to wait for individual processors to become faster, which they may never will. Yeah. Is there a trade-off with the n squ? I I think the n squed is actually a good thing. Um, so it it see it seems bad. You're taught in computer science that higher parameters inside that n that that those is bad. But in the case of neural networks for compute
+
+145
+01:02:23,000 --> 01:03:13,000
+it could actually be a good thing because more compute means the network is doing more computation. It has more ability to think more ability to process. So actually the more compute the network does on the input sequence actually maybe the better answer it could get it could arrive to. So it means that you know it's more expensive but that's not necessarily a bad thing. So basically the transformer is now a neural network architecture that puts self attention at the core of everything. So our input is going to be
+
+146
+01:02:47,000 --> 01:03:37,000
+a set of vectors X. Um then we're going to run all those vectors through self attention. Um which is as we just said this amazing primitive that lets all the vectors talk to each other. Um after that we'll wrap that self attention in a residual connection for all the same reasons that we wanted to use residual connections in ResNets just a couple lectures ago. Um then we will take the output of that residual connection pass it through a layer normalization because as we saw in ResNets and in CNN's adding
+
+147
+01:03:12,000 --> 01:04:02,000
+normalization inside your architectures makes them train more stably. Um then um but then now there's something interesting because the self attention basically what it does is compares all the vectors with each other. Um and that's a very useful primitive that's a very powerful thing to do. But we also want to give this network the ability to perform processing on vectors independently one one by one. So then there's a second primitive inside the transformer which is the multi-layer
+
+148
+01:03:37,000 --> 01:04:31,000
+perceptron MLP or also called FFN. But basically this is a little two-layer neural network that operates independent that is run independently on each one of our vectors inside. So then this kind of works in concert with the self attention where self attention lets all the vectors talk to each other and compare with each other and the FFN or MLP um lets us perform computation on each vector independently. Um we'll also wrap the MLP in a residual connection put a layer normalization and put a box around the whole thing and
+
+149
+01:04:04,000 --> 01:04:59,000
+call it a neural network block. So this is our um transformer block and a transformer is just a sequence of transformer blocks. Um and these things have gotten much much bigger over time. Um the architectures haven't changed too much since 2017 when this is introduced. Um the original transformer was something like 12 blocks, 200 million parameters. And now we're people are training transformers with up with hundreds of blocks and trillions of parameters. So this same architecture has scaled across many orders of
+
+150
+01:04:32,000 --> 01:05:30,000
+magnitude in compute and size and parameters over the past eight years. Um they can be used both for language modeling as we sort of already seen. Um they also can be used for for for for images. And here the application is fairly straightforward. Given an image we basically divide the image up into patches project each of those patches separately into a vector. Those vectors then get passed as inputs to our transformer. um and then the output gives us one output from the transformer for every patch in the input. Now if you
+
+151
+01:05:01,000 --> 01:05:55,000
+want to do something like a classification score uh do a classification problem then you do a pooling operation on all the vectors coming out of the transformer and have a linear layer that predicts your class scores. So that's then this same architecture of a transformer can be applied both to a language and to images and to a lot of other things as well. Um, I mentioned there have been a couple minor tweaks to transformers since they were first introduced, but we're running out of time, so I'll just leave those as
+
+152
+01:05:27,000 --> 01:06:19,000
+extra reading. So, kind of the summary of where we get to at the end of this lecture is basically two things that I promised at the beginning. One is that we introduced attention, which is this new primitive that lets us operate on sets of vectors. It's highly paralyzable. It's basically just a couple matrix multiplies. So, it's highly scalable, highly paralyzable, highly flexible. It can be applied in a lot of different situations. Um and the transformer which is now a neural network architecture that uses self
+
+153
+01:05:53,000 --> 01:06:43,000
+attention as its main computational primitive. Um and the transformer is basically the neural network architecture that every every application in deep learning is using these days. So that's super powerful, super interesting, super exciting. Um they've been transformers have been with us for like 8 years now and I don't see them really dying anytime soon. So that's that's pretty pretty exciting. So that's that's basically it for today's lecture. Um and then next time we'll
+
+154
+01:06:18,000 --> 01:06:36,000
+come back and talk about some new tasks uh detection, segmentation, visualization and see how we can use these architectures to do new cool things.
+

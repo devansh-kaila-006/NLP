@@ -1,0 +1,592 @@
+1
+00:00:05,000 --> 00:00:59,000
+all right uh let's get started so today we're finishing our first kind of piece of the tour of the very basics of supervised uh learning we're going to talk about these family of models that's called the exponential family of models and why we care about these models as we talked about is they're going to allow us to generalize basically the kinds of models that we were using before to a wider range of error modes okay of different kinds of errors and they'll also come back and play a starring role
+
+2
+00:00:32,000 --> 00:01:23,000
+when we start to tackle unsupervised learning where we don't have access to a Target variable and the underlying mechanics that we'll use here will set us up quite nicely for that just in terms of pacing in terms of the course what happens is I go away for a little while telling you is going to come in and talk to you about a bunch of different things kernels svms and deep learning and then I'll come back to teach you a little bit about the unsupervised learning piece which is again like a you know two-week block
+
+3
+00:00:58,000 --> 00:01:48,000
+where we kind of see you know kind of from first principles how those things work and that area I have to say just as a plug for what's coming um that that area is something that's been really exciting kind of thrilling over the last couple of years how much we can learn without label data or with really weak sources of data that's been like a revolution in machine learning so hopefully I can share some of that excitement with you okay uh the threat is up the lecture threat is up on Ed if
+
+4
+00:01:23,000 --> 00:02:09,000
+you want to ask questions as usual and everything's online um before the lecture I didn't put out a template today because I'm going to handwrite almost everything so all right so what are we doing today we're going to learn about these exponential family models and they're basically going to be what you already know with slightly fancier notation basically we've been ramping up the fancier notation each time and generalizing as appropriate how we want to go through them
+
+5
+00:01:46,000 --> 00:02:40,000
+we'll go do the definition and the motivation and the definition at first will look like at simultaneously like a little bit weird and like kind of like oh that doesn't really mean anything it doesn't have any content and then it will also look to you like it's impossible to satisfy and that's kind of true right so these are fairly interesting objects we're going to be looking at but they have a very nice kind of canonical form we'll then do a bunch of examples a couple of different examples and the
+
+6
+00:02:13,000 --> 00:03:00,000
+notes Here the master notes here are really good I would definitely recommend going through them the type notes just so you work through a couple of details this is something that like you're going to get like a high level piece of how we go through it just do the calculations once and you will be convinced of like all the different claims that are in the lecture if you try to reason about them without doing the calculations it just makes your life more difficult than it needs to be so just just go through it
+
+7
+00:02:37,000 --> 00:03:23,000
+once it shouldn't take uh take too long but I'll give you kind of a high level tour today so we'll do that definition of motivation we'll do a couple of examples and then last time we were talking about uh this question of how do we deal with multiple classes right last time we were talking about binary classes yes or no now if we want to have multiple classes out there you want to know if there's a dog or a pig or a horse or whatever in there this is called multi-class classification and
+
+8
+00:03:01,000 --> 00:03:47,000
+we'll talk a little bit about our friends softmax what you'll really get out of this is that it will look kind of to you in the end like oh okay that seems pretty reasonable but you'll learn about some encoding that is fairly widespread called the one hot encoding which you would need practically if you were going to actually use any of these kind of things I believe also your homework is out but I don't don't quote me on that I think it's out now and I saw there were some questions I had a
+
+9
+00:03:23,000 --> 00:04:32,000
+class about that any other questions before we get started oh please oh yeah I'm the wrong person but you're free to ask like just tell you like I don't know oh yeah yeah so we are blessed at Stanford with many great things we have wonderful weather we have like incredible faculty we have the best students on the planet um and we're also going to create course support until I have no idea all right so let's see what's next Okay so the exponential family now I want to be clear like I have mixed feelings about
+
+10
+00:04:03,000 --> 00:04:58,000
+how I present this because on one hand I want to convey to you like The Unbelievable historical significance of this and why you should know this uh kind of by rights of machine learning on the other side like there's an argument to be made that a lot of modern machine learning is not going to use this this formulation in this framework but if you start to read papers it's canonical enough that it will come up in various different places okay so I don't want you thinking like oh this is all you can
+
+11
+00:04:31,000 --> 00:05:21,000
+do when you model machine learning this is like where the field is stopped it's important historically it is very nice to understand it has a bunch of properties we care about but it's it's not the state of the art right it's not what we it's not what I go home and you know use exponential family models it's weird that I go home and use any of these things but but and I do um but it's not this one okay all right so what we want to do uh is we want to have the following idea
+
+12
+00:04:56,000 --> 00:06:04,000
+here is that and this is why it was it's so beautiful and and will come back as a form that we want to think about if P has a special form which I'll show below special form then some questions come for free some uh you know inference learning come for free now what do I mean by for free I mean what you already know automatically applies to them okay and when we start to worry about more complicated models this will form like a subroutine that we'll use again and again like oh if we can reduce it to
+
+13
+00:05:33,000 --> 00:06:33,000
+that form then we're in we're in good shape that'll be the way we get to things like unsupervised learning all right now the form looks like this okay now one thing I should I should highlight as I go through this so this is the data which you know you already know this character so data labels this thing is called the natural parameters okay and I'll Define the form in a second the reason I want to highlight that is one place where you're likely to get kind of tripped up when we
+
+14
+00:06:05,000 --> 00:06:52,000
+go through this is that there are kind of three sets of parameters and I'll come back to that later so if you're confused there'll be natural parameters canonical parameters whatever doesn't matter you'll see them all written down at one point and that will kind of explain the mappings between them but there are many different names for parameters in this lecture and and that's like the essence to understand it and the reason that's important is the natural parameters if you like are so we
+
+15
+00:06:28,000 --> 00:07:41,000
+can write this form this functional form P of Y exponential this is where it gets the exponential name T of Y minus a of okay so I'm going to unpack this for a second okay now this form says basically my probability distribution factors if you like or can be written in this form not every probability distribution can okay the way you show that a probability distribution can be written in this form is you write it in this form okay there's no secret shortcut here right you have to be able to express it as
+
+16
+00:07:05,000 --> 00:08:00,000
+some linear thing in the parameter so this is the parameters here these natural parameters times some T of Y I'll unpack that in one second what T of Y is minus this thing which is the partition function okay so that's what it says it says that your your function right there are many functions that are in the world that could be probability densities this one has this technical form okay we'll unpack this this shouldn't be like obvious that these things are important or exist so T of Y
+
+17
+00:07:32,000 --> 00:08:39,000
+is called the sufficient statistics efficient statistics now in this course primarily we'll use T of y equal to y we won't kind of massage the data but you can kind of think about t of Y as capturing everything that's relevant to your data right these are the things that you're modeling that are in your data and so in this example like we're keeping everything T of Y being equal to y means just it's y itself okay now another thing people get confused about this is necessarily the same dimension
+
+18
+00:08:08,000 --> 00:08:59,000
+foreign right why is that well we take their dot product okay this is a DOT product here you can think about this I'll write it above just so you clear also you could write it like this if that's more clear to you it's an inner product between the two okay so to take the inner product and for it to be meaningful those have to be vectors of exactly the same Dimension okay so you have if you want to have so many parameters you have to have so many sufficient statistics right okay so far so good
+
+19
+00:08:38,000 --> 00:09:45,000
+B of Y is called the base measure it's not the most critical element here but you need it okay the ex the intellectual content of that is that b depends on y but it does not depend on not depend on beta okay so it says basically if you like what's going on here is this term has all the interactions with Y this term has some interactions with ETA and the only way that ETA and and t y interact is through this term okay it's really a statement about how they interact these functions are pretty
+
+20
+00:09:15,000 --> 00:10:18,000
+powerful right those are just arbitrary functions but when they interact they interact in a linear way sometimes these are generalized linear models okay all right keep staring at it this character A is often called The Log partition function now this is a weird comment that I'm going to make okay and it does not depend on well it's friend it doesn't depend on y just as I just said does not depend on why okay now this thing is picked effectively as a way of normalizing the distribution
+
+21
+00:09:54,000 --> 00:10:48,000
+so it's a probability so it sums to one when I integrate it or I sum up over the discrete values all the Y's it's going to sum to one so that may make you think that a in some way is like not the star of the show you know it's just this thing that kind of like adds up everything but actually this log partition function contains almost all the information it turns out of the function and that's a weird thing but it's true okay so talk about that so this contains a and then you have this
+
+22
+00:10:21,000 --> 00:11:55,000
+linear interaction term where the statistics interact with the data okay now just to make sure it's clear Y A and B are scalars scalar functions so a of ETA B of Y are scalars okay just to make sure the types are clear and these two characters have the same dimension okay so far so good all right so let's highlight where everyone where all these characters are so you just see them visually same and wise okay so far so good all right now here's the crazy thing many of the distributions that you've
+
+23
+00:11:13,000 --> 00:12:03,000
+encountered in your life I don't know how often you encounter distributions but if you encounter them at a relative frequency a lot of them are of this form and that was a huge win for statistics because they said all the stuff we're doing on distributions a lot of it can be mapped into this what looks like as I said a trivial statement and the same time seems also impossible that it would be there so let's look at some examples and see how we map into this form probably you're thinking about you are
+
+24
+00:11:38,000 --> 00:12:32,000
+going through some distributions in your head if you look at them and you're like I'm not sure that it is of that form so let's look at the simplest version of that and see that actually yep these things are of the form so let's look at some examples okay before doing that example I just want to are there any questions about about the content of this and I'm happy to defer so please feel free to ask a question and I can tell you to defer if there's something else clear enough please
+
+25
+00:12:09,000 --> 00:12:54,000
+don't worry about X they'll come back in a minute yeah yeah wonderful wonderful Point yeah there's no X here there's just a y which is your data there's no x's and features and they're going to make it they're going to make a an appearance uh later they will be one of these parameters it's not given it's remember it's our semicolon those are the parameters remember there's a bar which says given which is condition and there's a semicolon which
+
+26
+00:12:41,000 --> 00:13:45,000
+says these are parameters yeah see there's these Ada are the parameters of the model right and and they're going to sweep up all that nasty notation that I talked about last time wonderful questions please why does that mean Q5 is also a Spirit uh and some of the examples that we'll see you later yes yeah it doesn't need to be yeah just for just to make my life a little bit simpler in this in this class it's not a requirement of the model yeah awesome wonderful questions okay this is a requirement just so we're
+
+27
+00:13:19,000 --> 00:14:18,000
+clear these have to have the same dimensions otherwise it doesn't make sense I'm not saying something deep I'm just saying like otherwise it will your brain should segful like what am I taking a thing and multiplying it by okay right because this has this entire expression has to be a scalar for it to make sense okay great so let's take a look at an example so probably the first example that you should think about I would guess are bernoullis right Bernoulli random variables so what are these so we're going to have
+
+28
+00:13:48,000 --> 00:14:58,000
+some Phi probability of an event right I guess the most common thing people use is like flipping a biased coin right for some probability that it's had some probability that's tail something like this so here when we've seen this before Phi it had this form remember this form that we used maybe this looks a little bit familiar one minus y okay so the probability of Y uh you know for one is Phi and when Y is one um this term when Y is zero it's this term okay just a compact way to write it P
+
+29
+00:14:24,000 --> 00:15:38,000
+and 1 minus p is all I'm writing here if you think about kind of a heads Tails distribution all right so this is not obviously of the form let's go get the form let's go get our friend from up above how are we going to put it in this form okay and I'll draw a box around it all right now when we do this we are like well we got to get an X somewhere right I mean that seems pretty natural so we're gonna we're gonna put an X in there and we're gonna X above y log Phi plus 1 minus y
+
+30
+00:15:07,000 --> 00:16:25,000
+log 1 minus 5. okay so far so good we're making a little bit of progress well the problem we have right now is the Y's are interacting in two places right so what do we have to do well we have to bring all the Y's together because the Y's and the fives the parameters like they're not eight is yet well we'll give ourselves some freedom but intuitively like the parameter should all be looped all be somewhere together okay so what is that going to be 5 1 minus 5 plus log 1 by 5. now we seem to be in kind of the
+
+31
+00:15:46,000 --> 00:16:42,000
+right situation because we have this character here which kind of looks like the interaction terms right Y and the and model parameters are interacting and we have something here that's isolated that's just a function of the model parameters okay now it's going to turn out that Phi is not going to be equal to Eta right because this thing here is not of the right functional form so we got to figure that out so what's our what's our best guess for what this ETA will be well why not what it looks
+
+32
+00:16:13,000 --> 00:17:22,000
+like 1 minus 5. okay so we want to set to to show that it's of the right form we want us we postulate that this thing is actually equal to Eta okay now that means this thing here has to be some function of ETA right now that seems at one hand kind of obvious right because it only depends on Phi and that's a local transformation for Phi but we're going to solve for it explicitly if that kind of hand waving implicit function theorem kind of argument bothers you okay right so here our goal is we're going to take
+
+33
+00:16:48,000 --> 00:18:15,000
+Ty as again getting equal to y we take ETA that way and we want to understand what is the value of a and what we claim it is right a of ETA or of Nu is we claim that that's going to be minus log of 1 by 5. all right let's let's check that claim right that shouldn't be hard and so why does that work well copy this guy so this goes to well I just take e of both sides 1 by 5 then I move this thing across right so that I can I can do whatever I like 1 minus 5. equals Phi then I want to make sure I get all the
+
+34
+00:17:36,000 --> 00:19:09,000
+files on one side so I get 5 or 5 times e ETA plus one and I'm off to the races right so now I have 5 is equal to 1 plus e to the minus ETA over one okay now this means by the way that log of 1 minus Phi well that's going to be equal to oh sorry did I screw that up let's make sure I didn't screw that up I'm just going to redo this piece just to make sure because I didn't do it in my notes um so it's going to be oh no it's one I'm right e to the FI okay so now I take 1
+
+35
+00:18:25,000 --> 00:19:37,000
+minus this right so that's going to be equal log of this is a lot of arithmetic to do in one Peak setting but this is going to be log of uh 1 plus e to the ETA okay so far so good so why does that satisfy me because that's a function of ETA right now as I said it's kind of straightforward from here because these things are just functions of each other but this is technically what we needed to do to show that these things are actually equal and in fact we're in good shape now okay so what am I saying I'm saying like
+
+36
+00:19:03,000 --> 00:19:58,000
+this seems trivial on one hand because you're like wow I could just put in whatever I want but you can't put in whatever you want you have to first separate out the interaction between Y and the firm and the form and then you have to be able to pull out the term that depends only on on new here the parameters does that make sense let's see another example please [Music] right I mean a is a function yeah right that's just a function of a just this happens to be a different one okay
+
+37
+00:19:36,000 --> 00:20:24,000
+now here's what's weird okay I don't know if I should really mention this but you should look this thing actually remember I told you all the action was in there you can kind of look at this encoding this is the log partition function so a log is what we expected this one plus e n thing well if you think about like the different weights on the spaces this is actually encoding the fact that there's like a positive and a negative State and try and think about why that might actually be the
+
+38
+00:20:00,000 --> 00:20:54,000
+case in fact if we start to compute the derivative of this thing it's actually the expected value of y that turns out not to be an accident okay all right okay before we get into that let's go down one more okay so what did I hope that you got it from this it's a tedious thing to walk through you can should walk through these on your own there are three examples you should also walk through the logistic kinds of examples and the others basically the whole thing is I want to make it super clear what the statement
+
+39
+00:20:28,000 --> 00:21:23,000
+means I don't expect anything here to be mind-blowing I don't think like our use of fractions is gonna you know change your lives I'm just saying that like this is the content of the statement clear right you give me a probability distribution in one form I'm going to translate it into a different problem into a same functional form such that it has you know satisfies these conditions and then in that case this Ada is now the this Ada is now What's called the natural parameters
+
+40
+00:20:55,000 --> 00:21:45,000
+okay and you're typically not given the function in the natural parameters right and you're going to be responsible on homework and in other places to do this and the reason why is if you can do this mapping then a bunch of stuff gets easy inference gets easy learning gets easy because now it turns out that you can show and we'll talk about in a second you can do gradient descent on these parameters and it's going to be concave and that's wild that you can solve all these models the same way okay
+
+41
+00:21:21,000 --> 00:22:06,000
+so I just want to make sure that the functional form is clear and the reason we're doing it is because it's going to simplify some stuff please yeah awesome so could you use the T function to massage in the form now in this class if you find yourself doing that too aggressively you've probably done something wrong just as like a heads up because we don't we don't use it too much but yeah you could do that in t if t or like expressed in some way and you were only modeling a piece of it
+
+42
+00:21:47,000 --> 00:22:39,000
+uh as a result of this and saying the probability distribution didn't depend on one part like T was a projection you could do that too but this is pretty hard to get around so I think you're thinking in exactly the right way kind of like how do I get around and break this and basically what it's saying is your interactions are arbitrary and why arbitrary arbitrary and new and the interactions between them occur in the X right and that are linear and once they have this linear interaction term
+
+43
+00:22:13,000 --> 00:23:05,000
+whatever the function T is those sufficient statistics that's what you're modeling up to and some folks asked and I answer some Advanced questions on the on Ed which none of you are responsible to know about deriving things like uh why is logistic regression calibrated in certain ways in data those features those sufficient statistics are what feed into those arguments so up to these sufficient statistics this is how well you do so when you play the game of massaging it you're either throwing away information
+
+44
+00:22:39,000 --> 00:23:24,000
+uh or you're not in which case you know that's what we're doing here yeah so it's a modeling choice you could do it nothing that presents you but it means something about what you're doing underneath the covers okay this is awesome so so now you learn something which again hopefully seems sort of trivial you're like oh I can take some I can take that distribution of like heads and tails and put it into this weird functional form and that would be interesting because one thing
+
+45
+00:23:02,000 --> 00:23:54,000
+you should test your understanding of is can you now given a bunch of samples from heads and tails like estimate the underlying parameters right Computing derivatives here seems a little bit nasty right these are like fives and y's that are up in things it's like it looks like a weird function once I put it in this form all of a sudden like it's nice and convex and life is good but I have to look at estimating this parameter not the original one is that making sense please ask me a question if not
+
+46
+00:23:30,000 --> 00:24:48,000
+all right we'll see one more example and we'll come back to it this is the only important thing that from from what we need to do now let's look at the gaussian example two we'll only do these two examples okay this is the gaussian with fixed variants this one's really good because remember what the probability of Y is going to look like sorry one over two pi X and there is a negative y minus mu Square over two Sigma Square okay let's make Sigma Square equal to one actually make my life a little easier
+
+47
+00:24:20,000 --> 00:25:22,000
+okay just for no reason okay now how do we get that in our favorite form so let me go copy our favorite form seems to be pretty close right I mean we're in pretty good shape what do we need to do well we have to factor it in some way so this constant we can absorb anywhere we don't care about that we have to somehow pull this thing apart okay so how are we going to do that so we're going to put the 1 over 2 pi square root 2 pi here and then we're going to pull out the E minus y squared over 2. okay so I'm just
+
+48
+00:24:54,000 --> 00:26:12,000
+going to factor this right this is going to be minus y squared plus u squared minus 2 mu y over one half that's what this term is going to be right let's just straight multiplication so I factor out the e y squared what does that leave me with leaves me with X of this character mu y minus one half mu squared oops minus one half mu squared okay so what are our natural parameters well ETO is Mu which is why I accidentally wrote it right at the beginning which would have been a little bit weird to do
+
+49
+00:25:33,000 --> 00:26:49,000
+T of Y and a of n equals one half ETA Square oop mu squared okay wow no yeah okay right so because this is Mu now again notice I differentiate this thing what's the expected value of this of this character well it's mu right but when I differentiate a y I get exactly back mu which is kind of interesting this is Trivial here in the last example it was non-trivial it was like a weird function that I differentiated and I got back the actual probability distribution right which is kind of bizarre that I
+
+50
+00:26:13,000 --> 00:27:13,000
+would get that back okay by the way if that's not clear differentiate dysfunction with respect to Ada and then see what you get okay does that make sense okay so just make sure we're verifying everything Yep this looks right uh this is my B term oh sorry this is my B term I'll highlight in different colors this is b y this thing is the part log partition function okay and what I'm just trying to highlight is like this thing contains like a lot of information about the distribution in both of the examples
+
+51
+00:26:45,000 --> 00:27:37,000
+we've seen please no it's a wonderful question so right now we're worried about the case where Y is going to be a scalar which makes our lives a little bit easier and so we're going to look at that but you just have to have that the t y and n and ETA actually resolve to a scalar that they're the same type so if you have if your y has multiple dimensions then you need more natural parameters that's actually pretty important because um that that's why they're and why we
+
+52
+00:27:17,000 --> 00:28:12,000
+call them natural like it's like your problem has you know Dimension D then you need deep free parameters [Music] foreign there is not no you could the thing is I wanted to have Sigma squared be um fixed like I didn't want it to change per data point that was important and so it was easier to just write one there if you put if you put Sigma squared in here and it was just a constant then you would just push it into the appropriate spots and be done they would just fold into this if Sigma squared were
+
+53
+00:27:45,000 --> 00:28:28,000
+something that we're changing per data point right like we were trying to estimate for every data point not only it's mean but it's possible variance like I give you a temperature reading and I say like from all the data I've seen I think it's 30 degrees but I know that I haven't seen enough data so I'm like plus or minus two degrees if I've seen tons of data and I'm very confident I'll say plus or minus 0.1 degrees right that is an estimation where Sigma is
+
+54
+00:28:06,000 --> 00:29:02,000
+part of the model and then you would have another free parameter for it great question and try and write that out I don't know if that example is written out in the notes if you get stuck or whatever please send me a note I'll write it up for you on it does that make sense that capture your question awesome okay yeah awesome so two questions on the on the live thread um the examples to go through on your own are the ones in the hand and the typed written notes which contain these in one more but just go through them on
+
+55
+00:28:35,000 --> 00:29:16,000
+your own like I'll just wax pull whatever one minute if you haven't studied for a mathematically minded course the way that I always do it did it I still actually read textbooks and course notes and everything else is I read them I watch the lecture or whatever it is then I try and remember those key spots and I try to derive them myself it's the fastest way to figure out what didn't stick so if you're like oh I can write the derivative in two minutes and you walk away well okay you
+
+56
+00:28:56,000 --> 00:29:44,000
+know everything for the lecture if you get stuck it's a really good signal that you don't do it if you don't do it and then that builds over time something that you thought was trivial and you didn't actually put the time into will end up biting you right just lesson that I learned from too many years at the University why is the derivative equal to the expected value I'm not going to prove that I will just assert it here I just want to show that oops sorry I just want you to observe that in both cases
+
+57
+00:29:20,000 --> 00:30:21,000
+it's true it's a wonderful question okay it just takes a little bit of arithmetic to show it's a wonderful question yeah yeah okay so I'm just gonna I'm gonna put those assertions in here now so why do we care about this form first is what we said inference is easy okay the expected value of y given ETA is the partial derivative with respect to the Natural parameters of a of n okay I would encourage you to compute this on all the examples okay you don't want it proving the
+
+58
+00:30:13,000 --> 00:31:15,000
+general thing just takes a little bit of extra thing but on all the examples so far you've seen it's clearly true and then why that's true in general is because it's the log of the sum of all the possible outcomes proving it for continuous stuff takes a little bit more effort okay so don't don't worry about it okay but we've seen this as true okay and this this pattern holds the variance is also the second derivative of n okay now this pattern you may think holds like oh the third power is good no
+
+59
+00:30:46,000 --> 00:31:40,000
+it doesn't work that way okay just these first two that's the only ones that matter okay these are the only ones that work okay so why is this so interesting to me one because once you take your distribution whatever the crazy distribution is however wild it is and distributions can get pretty insane there's you know uncountably many of them you put them into this form you basically have a mechanical procedure to do inference and to do uh you know variance estimation inference more important to us but that
+
+60
+00:31:12,000 --> 00:32:24,000
+also means that you can do learning right and in fact learning is well defined okay in particular this function is going to be concave in data okay well let me write it this way the mle remember we did the maximum likelihood estimator for all those things previously is concave okay please that helps yeah so that is definitely a piece of it you have to do one extra step but you're exactly on the right thing that's exactly how you can go and prove it just compute it directly right and see that it's positive the second
+
+61
+00:32:00,000 --> 00:32:57,000
+derivative is positive everywhere then it's um then it's comebacks but yeah so you have to there's a negative in front but that's a monster wonderful yeah exactly right that's that's if you remember last time the way we framed all of our estimation problems was take the log likelihood that was there L of theta and then use gradient descent on that and this is basically saying that the resulting formulation if I use the natural parameters is always guaranteed to be concave
+
+62
+00:32:29,000 --> 00:33:16,000
+please yeah so the thing is you can compute this directly by looking at exactly when you compute the derivative and and pull it out the way that you do it I'm not going to prove it in class but I'll just tell you like it's not a mysterious statement what you do is you look at all of the for the discrete case you look at the fact that it's a log partition means it's the sum over all the possible worlds meaning all the possible ways that y could be assigned right so there's going to be a term in there for
+
+63
+00:32:57,000 --> 00:34:02,000
+each one of them because it sums over all of them that's what it does so maybe this is getting way too abstract and mysterious maybe this is better to prove so if I look here look at this this part of the distribution this may not sum to one right if I just started to do it so like if I took and summed over y oops if I sum y of this expression let's call this g y it may not equal 1. it's not guaranteed to be equal to one okay because it's just some collection of values and some other stuff this thing
+
+64
+00:33:31,000 --> 00:34:34,000
+uh is the the function this ETA here makes sure that it's equal to one so it's the scalar as we were talking about before that make sure whatever this sums to it's going to divide over it so it's sometimes written as 1 over Z the part the part partition function however that means that the way you get it one derivation of it is you sum over all the different values so it is like the sum of everything over one is actually what so this character has to be equal to this right because it has to cancel out it
+
+65
+00:34:05,000 --> 00:34:57,000
+has to be actually equal to 1 when I compute it and that means that it's basically of the form a sum over all the possible values of Y and so if you compute the derivative inside when you take the log of that each one of the Y's is going to come down next to exactly this functional form all right so if if that's too mysterious I didn't want to prove it because it gets like strange but I'm happy to write out the proof it's super super straightforward okay awesome so all I care about this
+
+66
+00:34:33,000 --> 00:35:13,000
+the thing that I'm trying to get across because I'm trying to give you a guided tour I don't want to get to I want to do enough details that you see all the pieces so you can go back and understand how they work but I don't want to get bogged down in things that I don't think are like super critical for you to understand um and also I don't want to do things that I think you should do on your own because doing them mechanically will teach you better than me like inscrutably writing for the hundredth
+
+67
+00:34:53,000 --> 00:35:47,000
+time how to prove this um but if I'm wrong and you want to watch me incredibly right I can I don't know you can log into a twitch stream or something um awesome all right all good okay so clear enough like why we did this so barring these assertions if you get your probability distribution into this form then all of a sudden you get inference and learning and a bunch of other stuff for free however one of the things is as was correctly pointed out there was a little bit of a bait and switch here we started
+
+68
+00:35:20,000 --> 00:36:15,000
+last time to think about various different models and how we put those models inside so where did the data in X go and that's what we actually need to figure out here okay all right so let's talk about generalized linear models foreign that I really want you to get across is these are all design assumptions okay so these are all design choices that you can actually make in your model and we'll get to them and and talk about what you want to do okay and you can also think about them as assumptions
+
+69
+00:36:00,000 --> 00:37:01,000
+all right so first what we're going to say is we're going to claim that the distribution of our label given X for some parameters Theta follows an exponential family okay now I claim without much justification here that this is an important family now you can say it's an important family because as we'll talk about many different data types like fall into this that you've seen so if you look at binary things you want to do y as binary well that's Bernoulli right so we looked at that
+
+70
+00:36:31,000 --> 00:37:26,000
+classification if you want to have real valued wise well we have a couple of them that we could use but we saw gaussians okay if you want to do counts like you're actually counting like uh you know how many people walk by a particular uh thing or how many packets arrive at a server or something like that then that's a different distribution it's called poisson okay if it's oh you want all the whole real line right you don't want you want real positive line well there's two different
+
+71
+00:36:58,000 --> 00:38:00,000
+fancy distributions there called gamma right you don't need to know these per se but what I'm trying to explain to you kind of proof by writing a lot and gesturing wildly is that these oh sorry exponential laplacian's also in this uh if you want distributions just one more then this is called the duration distribution so what am I trying to get across here these are probably most of the distributions you've heard of there are more that I'm not writing down but they all fall into this exponential family
+
+72
+00:37:28,000 --> 00:38:15,000
+now one hypothesis is that we figured out this technology and that's why we described distributions this way but that's actually not true we went the other way around we were doing things ad hoc for each one of them and this tied them up and put them nicely together okay so you pick your error mode and the way you pick the error mode is it has to have the right type if you're observing binary data you want to use a Bernoulli right or something that has a binary type if you're observing real data you
+
+73
+00:37:52,000 --> 00:39:07,000
+want to use a gaussian counts plus on so on okay so there's a data type mapping here right the second thing that you have is that your natural parameters and this is where they come back in are going to be of this following form with Theta element of r d plus one and X also element of r d plus one okay so here we're going to make the assumption that after subject to noise our model varies linearly with some underlying features okay now you're going to see later there's actually a more powerful assumption than
+
+74
+00:38:31,000 --> 00:39:17,000
+you realize if you take your model to be very very large and have a huge number of features almost everything becomes linear in that space High dimensional geometry is very very weird so it's not like if you think in low Dimensions you're like oh there's only so many lines I can draw I can't separate out my data if you take your data and you know put it up into a huge dimensional space odds are it will be linearly separable there'll be a line through it we'll come back to that okay so this is just the
+
+75
+00:38:54,000 --> 00:40:11,000
+thing there and then three once you've made that assumption your inference is super easy right a test time you output e of Y given X and Theta okay I said another way h of state of x equals T of Y given X okay so hopefully this makes sense okay so I'll walk through exactly what's going to happen in one second just to make sure it's it's clear but this means that we're doing this prediction and one thing that we sneaked past you was that when we went to logistic regression all
+
+76
+00:39:43,000 --> 00:40:29,000
+of a sudden we started with these hypothesis where instead of returning like yes or no we just returned a probability distribution over it okay and that was a that was a change right when we're doing regression we returned to just a value here we're just returning actually like your probability that you think y has a particular value that's what you do for inference that's how inference is defined okay so let me make sure this is super clear how this works your data comes in as X
+
+77
+00:40:05,000 --> 00:41:23,000
+it then goes into your linear model you compute Phi transpose x with your parameters this is your box you get out Ada right Theta T becomes ETA and the parameter you have before you feed that to your exponential model X model does whatever it does there's B's and T's and whatever in there but now you know your value for Ada or new whatever you want I'm using both and then if you want to train you do Max over five of log p y x Phi if you want to do inference you do ey X5 okay this is learning
+
+78
+00:40:52,000 --> 00:41:43,000
+this is inference okay so all you pick here is you pick your your data you pick the features and then you run this procedure and everything's kind of you know automated for you in the sense that like um yeah in the sense that you now know a general recipe to do maximum likelihood estimation and do inference it's not obvious how to do that by the way there are scenarios where we don't know how to do maximum likelihood estimation so right now like your universe is like oh everything you've shown me you've done
+
+79
+00:41:18,000 --> 00:42:29,000
+maximum likelihood estimation it's been really easy I'm like yeah that's fair but there's a big world out there of stuff that is hard to cram into this and so what this says is if you can put it into this form maximum likelihood estimation and inference becomes super super easy okay and learning here has a nice form data J looks like this and you can directly check this plus alpha y i minus H Theta of x i x j i so why is that the case well we saw that it was the case in all the other models
+
+80
+00:41:57,000 --> 00:42:40,000
+you just have to go through and compute the derivative and convince yourself but now that it's in this form just Computing the derivatives with respect to Theta as you go through here because it occurs only in this Theta TX we'll get that out so one of the reasons I was delaying proving it in the special cases is because you have to do all of these transformations to put it into the right the right nice form and then when I compute the derivative my life gets really really easy if you compute it in
+
+81
+00:42:19,000 --> 00:43:25,000
+the natural parameters it looks weird but if I mean if you computed in the original parameters it looks weird but if you compute it this way life is pretty good okay and this by the way here is always this thing right always hypothesis okay so far so good please yeah so let's actually it's a great question let me do one more example and then hopefully that will become clear about how they relate um I wanna yeah so let me just run through logistic regression then I think that'll probably maybe answer that question
+
+82
+00:43:08,000 --> 00:44:27,000
+um so it'll show exactly how they fit together terminology okay so there's the model parameter this is Phi there's the natural parameter which in a linear model we always substitute a generalized linear model we always substitute this was the Ada before and then there's the canonical parameters parameters okay so these were like five for Bernoulli okay uh or mu and sigma Square for gaussians okay and this G here we're going to call the canonical response G inverse so G is called a canonical response
+
+83
+00:44:00,000 --> 00:44:45,000
+okay so why do I do this I want to make sure it's really clear what all the pieces are and what's going on here there's some model parameters that's the thing that we're going to solve with respect to that's the thing that we're going to do gradient descent on that's the thing that we're going to do the H data over with respect to Theta is then dotted into the model or the data that's what this x is this is data right here that becomes the natural parameter which
+
+84
+00:44:26,000 --> 00:45:14,000
+then goes to the which the exponential model now tells you how to operate on okay and then I can do everything I want on the natural parameter that's what tells me the distribution and so in the case we're doing logistic regression which we'll talk about in one second you have a linear thing and then your errors are of the form I make an error you know that I sometimes switch to class if you like I get the wrong answer with some some uh probability and then there's this link which are these canonical
+
+85
+00:44:50,000 --> 00:45:35,000
+parameters and this is the content of what we're talking about here is you write them down in these canonical parameters and then they have people write them down in whatever messy form we found them and I'm asserting that a lot of them can be put into that nice exponential form through what's called this canonical response function or its link function and that allows us to treat them in the same way so this is super important because when you encounter one of these distributions you
+
+86
+00:45:12,000 --> 00:46:35,000
+probably encounter it in this form you have to put it into this form and then that lets you do everything that we just talked about in one clean way learning becomes this nice simple rule inference becomes this nice simple rule okay awesome all right okay so let's look at logistic regression just so it's super clear what that means all right so H Theta of x well we said it's the expected value of y given X and some parameters Theta okay this Theta right so we have right so there's uh theta equals one
+
+87
+00:45:57,000 --> 00:47:00,000
+plus one Theta minus n and then the model one over one plus Theta oops e to the minus Theta TX okay so this piece here Theta was our was our or sorry Theta should be driven sorry this was our model parameter this was after we transformed to the Natural parameters that's this character and this is what we wrote down last time so when we went to do logistic regression remember we had a loss function that looked like this this was our sigmoid or logistic function and then what I'm saying is is that we right
+
+88
+00:46:32,000 --> 00:47:23,000
+now to get the derivatives and do everything else which I skated on last time I now no longer have to skate on because I just made it more abstract I transform it into this parameter space and I'm good okay so in one hand as I said it's totally trivial I'm just doing a transformation of how I represent the numbers but it also seems weird that I can do this and I'm inserting that in these cases I can and that's what allows us to go and treat all those different distributions in some way so if I give you some
+
+89
+00:46:58,000 --> 00:47:46,000
+features you dot forward you learn a model and then you have an error like I'm looking at counts I'm observing them counts have a very different distribution than the errors I would expect on zero one things or the errors I would expect on a linear regression I just plug that model in that natural Model N and outfall is a pretty reasonable class of machine learning models okay and you may say the thing that people usually react to is they say something like well what if I want to do something
+
+90
+00:47:21,000 --> 00:48:11,000
+that's more complicated than linear but linear is pretty powerful I can take my features and square them I can multiply them together it's still linear right I can take my feature five could be the you know product of the preceding seven and so this turns out to be a wildly popular class of machine learning models in fact our entire books that are written about generalized linear models there's a citation to McCullough which is the standard reference I'm not sure I advise necessarily reading it but it's
+
+91
+00:47:46,000 --> 00:48:42,000
+uh the standard reference not because it's not a great book just like you know it's long okay please do you think that there will be more improvements in the theory of machine learning such that quadratic and other models are more applicable in these folks right now when you're extremely powerful we're going to make a lot of sense yeah I am I I really feel like I should buy you something so that's a great question so there's a lot of folks that have done through the years but as we'll talk
+
+92
+00:48:16,000 --> 00:49:02,000
+about when you get to kernels things like polynomial kernels and exponential kernels and those are very powerful ways to model the world what I was kind of hinting at before is the linear model has this sneaky out in the back which is you get to pick the features so if you know up front that like you want it that the squares of the temperatures are more indicative than the you know the raw values you can just put that into your model and and learn more and more features and so it's not a question of
+
+93
+00:48:39,000 --> 00:49:28,000
+like you know eventually we're going to get powerful and use those features we can use them today the crazy thing is we can reduce a lot of the things you would naturally do to this model and you'll see eventually you know someone was asking about these infinite dimensional feature models those are what kernels are you can reduce those to linear in an infinite dimension space so it's wildly like uh you know important there to do this the other bit which is also you know my personal opinion on these things
+
+94
+00:49:03,000 --> 00:49:56,000
+one of the things that has really bitten me again and again is that simple stupid things work extraordinarily well with a given enough data and in fact the trend has been larger and larger amounts of data for the last 40 years and every time we think it's going to run out of gas and get fancy a bunch of fancy people academics start writing papers about clever ways to do X Y or Z and usually they get smoked by more data and linear stuff and there's a great paper about this that I can post of like
+
+95
+00:49:29,000 --> 00:50:16,000
+different eras of machine learning when this happened and like the thing that's remarkable about modern machine learning to me is not how sophisticated it is but how we basically do the same thing and just pour in mountains of data like right now there's a particular model that's very hot in five years will it be hot I don't know right maybe five years ago it wasn't I guess five years ago was kind of hot but you know and then a new one will come but the pattern of like we just dump in all this information and
+
+96
+00:49:53,000 --> 00:50:39,000
+just optimize the crap out of these parameters like that works really well so the Sim so the thing I'm trying to get across there is as you said is like the future of machine learning seems to me to be more tied with like under understanding relatively simple applications when we have huge amounts of data underneath the covers um yeah but I'm a zealot there I taught the large language model course with Tatsu last quarter so I'm a Believer you can think it's nonsense it's a personal
+
+97
+00:50:15,000 --> 00:51:14,000
+opinion but wonderful question yeah awesome others all right so again you know same thing I'll do gaussian just just to stall to make sure this is clear because I hope you know if I'm very optimistic I'm here like oh this is obvious uh there's there's no content here I understand it perfectly if we are in that Universe like I will be extremely happy if you're like baffled please ask me a question um this is the same this is a gaussian how do I do prediction well when I have
+
+98
+00:50:49,000 --> 00:51:47,000
+something I pick the mean value that I would have that's exactly the same piece that's here how do I do the estimation well that's exactly Theta TX that's what we were doing before when we fit a line okay same thing so all that's all I'm saying is what we've done so far in the first K lectures we've now compressed to basically one equation one schema of this thing we now know how to do inference and we know how to do learning and maybe it's tough to appreciate in the sense that
+
+99
+00:51:22,000 --> 00:52:19,000
+you're like well I didn't encounter a thousand models before but now all these different models can be shoehorned into this and that's quite powerful and we'll use that quite a bit later when we do you know much more uh kind of advanced stuff right awesome if there are no questions I'm going to move on to multi-class all right so the last thing I want to describe here which is important for you and I think you have to use in your homework is uh how we deal with multi-class classification and I should say
+
+100
+00:51:51,000 --> 00:52:54,000
+the trend has been in machine learning not only these big models that I was just excited and ranting about which you can you know take or leave but is that you train models on a variety of tasks more broad than even a variety of classes you train them to do many things at once in fact weirdly as I may have told you the the thing that we seem to be doing as a field right now is training a model to do something task a and then using it for task B and weirdly that makes the model more robust so the typical task
+
+101
+00:52:23,000 --> 00:53:17,000
+that we do there by the way is predicting the next word which is a really seems like a really basic task you look at a sentence and you produce of all you view the words as individually it's just oversimplified but how it works every token is a class right so is the word cat dog whatever you just take a vocabulary of 50 000 words let's say and then you predict which one do you think is likely to be in the next space so I read the first part of the sentence and I predict this turns the entire web into a training
+
+102
+00:52:49,000 --> 00:53:49,000
+Corpus right because now any piece of text I can evaluate in a multi-class way we train it just to do that and weird Behavior emerges like it can write pieces of code for you it can answer questions in narrative form and only when we train it on lots and lots and lots of data and it's a little bit spooky so anyway so this is what multi-class is for and this is this is actually you know something that we use every day [Music] um awesome wonderful question what is the disconnect between the power of linear
+
+103
+00:53:21,000 --> 00:54:08,000
+models and the need for non-linear components in a neural net wonderful question so right now what we've done is we've said and the exchange was wonderful hey what about more powerful feature representations what neural Nets basically are and why they're so amazing is and they take your data if you like and they pick out what those features are what those X's should be from the underlying data and then usually on the end you just have a linear model that's you know there's little tweaks and
+
+104
+00:53:45,000 --> 00:54:49,000
+variations but that's pretty much what you have so the question of where does The X come from you give me an image of a cat how do I get good features about images that's what the neural net is actually solving and that's where we need non-linearity but it comes in at that piece not at the prediction piece great questions all right so here we're going to look at discrete values if you're familiar with distributions up to some fixed k so we have uh cat you know dog car I don't know whatever else oh I wanted
+
+105
+00:54:18,000 --> 00:55:12,000
+one other one oh bus okay so here K is 4. all right so I want to predict among that set it's kind of weird I promise you that you're only going to see a cat a dog a car a bus you could ask well what if I show it a horse it's not it doesn't have to predict You can predict whatever it wants in that situation right but um for this case imagine that I'm just distinguishing among those four classes or the crazy example I gave you where your classes are every word and say the English language
+
+106
+00:54:46,000 --> 00:56:09,000
+okay all right how do you encode this it's encoded as a one-hotvector it's called a one-hot vector right and the distribution the error distribution is the thing that we just talked about to the k okay so uh such that you know sum y equals one okay equals one okay so there's a vector that's in zero one but it's precisely one thing is is uh lit up so for example you could have you know the cat one is one zero zero zero this could be cat zero one zero zero this could represent
+
+107
+00:55:32,000 --> 00:56:37,000
+dog you get the pattern zero zero one zero this could represent car and so on okay so those vectors basically these one hot vectors they seem pretty wasteful but you don't have to store all the zeros it's not as bad as it looks um but like this is how you intuitively think mathematically think about how the data looks okay clear enough so we've reduced our problem from uh you know dealing with these categorical labels to dealing with vectors now let's try to classify them all right so let's draw a quick picture
+
+108
+00:56:07,000 --> 00:57:25,000
+okay oops so let's imagine our data looks like this so there are some class ones which I guess are cats here there are some buses here which are fours there are some dogs here I'm just drawing all nice and clustered of course your native never really looks like this but that's okay all right so what do I what do I want in this situation okay I want lines so this is you know this is corresponding to one class you know as I said this is the cat class this is the dog class so on so how does multi-dimensional how does
+
+109
+00:56:53,000 --> 00:58:08,000
+this uh how does this multi-class thing work that's too close the colors don't really matter but I've started so now I'm going to finish all right car bus okay so what do I want here what I need to do is I want to pick because we're looking at linear separators for this I kind of want to look at you know what I'll do is I'll pick a line that for example separates the cats from everything else okay so this will be something this will be you know Theta 1. X is equal to zero so this is the line
+
+110
+00:57:30,000 --> 00:58:31,000
+I'm drawing here so I want to pick Theta right so that on one side are the cats and then the other side is everything else does that intuitively make sense right for Theta 2 for Theta 4 what would I like to do well I'd also like to pick something where you know here oops Theta 4 dot x equals zero so I like it so that again the buses are on one side and everything else is there now if you look at this geometrically it becomes pretty clear by the way like there's lots of choices right I could have
+
+111
+00:58:01,000 --> 00:58:52,000
+picked here I could have picked there right what we will try and prefer sometimes called Max margin we actually prefer that it's kind of as far away from the two data points as possible it's like as close to in the middle as possible you can verify that actually makes sense and um you can verify that that's actually what we'll you'll hope will happen I get something like this all right this is X3 so in this case by the way which is really nice everything is nice and linear separable
+
+112
+00:58:28,000 --> 00:59:40,000
+right this side has the dogs on it this side has the cars on it and so on okay so there's one line that explains uh you know that kind of can separate each one of them now the question is how do you pick right so the way you do it right is when you get a point you're going to compute its value against each one of them Theta 1 Theta 2 Theta three I'm just going to draw the first ones first three yeah data four whatever okay and these are going to give me some values okay and the values are going to
+
+113
+00:59:07,000 --> 00:59:56,000
+be basically you can think about as like you know kind of how close are they to the various lines it's a DOT product I'm just saying like this is the line where on this side Theta is going to be yeah so for this side Theta is going to be positive and on this side it's going to be negative all over here right and so I'm just drawing like the deciding line so as you're more cat-like you're getting a higher score from this you're getting something that's like you know a
+
+114
+00:59:35,000 --> 01:00:40,000
+larger score Azure here you're getting a negative cat score okay right so the point is each one of these things because of that is going to give you great question is going to give you some score so maybe it's a cat so it looks like you know this thing 0.1 and everybody else is like yeah I'm not really sure maybe I'm I'm kind of like borderline about all the other classes this is what you would hope would happen okay each model gives me a score and then okay so what happens yeah yeah great question so right now
+
+115
+01:00:10,000 --> 01:00:55,000
+remember like you give me a horse and you put the horse in a center who knows right who knows what I'll get I will be able to run this procedure and it will be confused so one of the things that happens in neural Nets by the way is that they're in large scale models is when you're really high dimensional right and you have a bunch of uh a bunch of these lines and other things there will be Pockets that are actually nowhere close to anything but now look it's totally well defined this character
+
+116
+01:00:32,000 --> 01:01:14,000
+here has a normal this way this one will get a negative it will get a negative score from everybody right now you can look and say if it gets a negative score from every single thing maybe I should be suspicious of it but that's not in general something that will happen it one of these unfortunately will be higher than the others like if it's here it may be closer to cat and so it says oh it's a a cat that was near the border or something like that and it will pick but let's get to the procedure first before
+
+117
+01:00:53,000 --> 01:02:11,000
+talking about the exceptions okay so we have all of these then what happens we exponentiate them right 0.7 minus 0.5 0.1 so on and then this actually leads to probabilities right actually let's make this really negative because like minus 10. either minus 10. then these things are approximately like you know uh 2.1 whatever so on I get the values out and then I normalize them by summing all of them so I sum all these together so I sum all these characters sum Theta I dot X and that gives me some value Z and I divide this
+
+118
+01:01:35,000 --> 01:03:14,000
+number by Z divide this number by Z and that's going to give me a number between 0 and 1. because I sum them up and they're all positive so 0.5 0.17 so on 2.5 up okay the point is is I compute this exponential I sum oops it should be e of this thing and then that is my normalizing term I sum it up so let me write it in a cleaner form it's a falling thing so the probability of Y equals to X a probability of y equal to k is given X and Theta has the falling form it's X of Theta K dot X over some K sum J all
+
+119
+01:02:25,000 --> 01:03:27,000
+right X Theta J dot X okay J goes from 1 to K okay I just described the procedure in elaborate detail here but this is basically what's going on okay this is exactly what's going on it's not basically please [Music] okay so two things one is this makes sure that everything is so exactly as we were talking about before these are each think about these as each like a logistic regression model so in the logistic regression model you take this and get the natural parameter then you exponentiate it
+
+120
+01:03:01,000 --> 01:03:44,000
+if you had an offset like if you had some function there you would still need just as we did in the exponential model you need to sum to make it a probability distribution so that's where the Z comes up so the x is because we're doing these General linear models and that gives us the nice kind of functional form that we wanted underneath the covers that we've been using in all our predictive problems for in the class or not think about logistic regression binary or not and then we have many different scores
+
+121
+01:03:22,000 --> 01:04:10,000
+and then the procedure is just to normalize them okay and this kind of makes sense right it's like this is saying like how strong a classification I am right if these cats like if there's a cat way over here maybe this is a super cat like the clearest picture of a cat you've ever seen in that case like it should get a really high score and you should be really confident in it that's the intuition now is that always true no certainly not a picture of a horse could show up over here
+
+122
+01:03:46,000 --> 01:04:49,000
+we hope it doesn't but mechanically is this clear what happens right yeah so exactly so this is basically a compact form of what we'd call One Versus All which is like okay how confident is my cat detector how confident is my dog detector how confident is my whatever this is car detector I don't know what that is does that make sense and so you just bake off their relative strengths that's how you do multi-class classification at once all right so how do you train this well what you're given
+
+123
+01:04:37,000 --> 01:05:39,000
+is you're given something that looks like this say one two three put four in there you're told it's a cat you have probability one here and you have zero everywhere else this is what you're actually given that's what the label looks like okay your probability your P hat your estimate will not look like that it will actually look like oh I'm pretty confident it's a cat but I have little pieces at each one of the others one two three four okay maybe some spike okay this is at inference time
+
+124
+01:05:16,000 --> 01:06:03,000
+what I'm trying to get across is when you actually look at these things they will give you Pro small probabilities that it's everywhere because it's doing this normalization okay now one thing that people do by the way is something they call label smoothing they take this and they push a small amount of mass everywhere else right so you take the one and you kind of say like I'm going to put a small tiny amount of mass everywhere else and that's basically to account for the fact
+
+125
+01:05:43,000 --> 01:06:26,000
+that your labels are often wrong right you're you contain you know even very popular well-studied benchmarks will have you know three percent of their labels be wrong or something so you can imagine how you would kind of smooth and and why that would be bad when you're training a system if you're like it's definitely not a cat you're like no no there's a small possibility it's a cat I should admit that possibility that's a very different statement if you imagine those two
+
+126
+01:06:09,000 --> 01:07:37,000
+okay awesome so what happens here well the great thing is is like this follows exactly what we've been doing the whole time so we we now introduce the this is also sometimes a cross entropy term right which is equal to this guy but this follows basically our basic recipe which is I said Pui uh equals K Times log P hat uh of Y this equals minus log pyi okay so this is the ground truth label okay so this is in case we don't do smoothing basically our loss to minimize the cross entropy is the same as
+
+127
+01:06:59,000 --> 01:08:19,000
+minimizing the log of our expected probability and that thing has a very fancy name that's a logit and that's the you'll see these negative log likelihood things all over machine learning packages that's what they're doing okay and this equals just so we're super clear it equals minus log of x Theta I dot X over sum X Theta J dot x j goes from 1 to K okay and this is what we minimize that's it and so how do you solve this model just run gradient descent all right that's it
+
+128
+01:07:50,000 --> 01:08:41,000
+right any questions about this um what part of that is to launch it again oh the logit is a log probability great question so this is the this is the terminology for a log probability so this thing comes up the reason I call that is you'll probably encounter that term I just wanted you to be familiar with it and you don't usually predict you don't actually write out the probability functions you don't take the X you actually just take the log of those probabilities and that's what you
+
+129
+01:08:20,000 --> 01:09:09,000
+actually minimize and so you you will use them and they're in log scale so you'll often see like machine learning codes spit out these like you know negative seven negative four or three point two one that's what they that's what they are they're logits you'll see that term logic everywhere yes please uh because the otherwise it would be a maximization yeah it's just to make the function sign so that we have a minimization wonderful question yeah please remember your
+
+130
+01:08:48,000 --> 01:09:48,000
+minimizing yeah what it doesn't look like it has any dependence oh awesome question what a wonderful question yeah it's hidden right here this Theta I this I is the ground truth I right that's what this is this statement is this is the ground no it's just like you picked out that one and then you get a your your loss function kind of like perfectly encodes it if you put in the label smoothing then in fact it's not just one Theta I that's there they each get a weighting associated with them as well but here
+
+131
+01:09:18,000 --> 01:10:10,000
+that was the trick this Yi is the same as the actual ground wonderful wonderful question yeah great question yeah yeah so so here it's the Theta X and then I'm I'm taking exponential but you would also have like an X point over X spin yeah but here for this model I don't do that so if so what you're saying is an alternate model where you take all the logistic regressions and you just say like what's the probability of each one and then you compare them and I'm saying no you do it
+
+132
+01:09:55,000 --> 01:10:45,000
+in terms of the logits here and this is how you bake them off all at the same time the difference between them is not super critical but this is the one we use but it's a great point that they're different so I did kind of by sleight of hand here I said oh this is like you're doing a logistic regression but this again is like saying so if you think about logistic regression as there's a yes class and a no class in the yes class I have the weight is X above Theta T the X this is each thing that this is
+
+133
+01:10:21,000 --> 01:11:07,000
+the weight of every one of those possible worlds and then I'm summing over all of them and so that's why this is consistent with logistic regression imagine a null world that occurred here that said it's either the class one or it's none of the classes and so it's feature I'm just going to default to one because I don't care it could be any scalar the knife gets you exactly back to logistic regression does that make the connection clear yeah so they really are the same I just derived them in a
+
+134
+01:10:44,000 --> 01:11:36,000
+slightly different way wonderful question please um yeah so uh if you've seen so this is a new function I guess for us potentially we have seen it because of the discussion we just had and another guys it actually is the binary cross entropy is the logistic function and so this is a generalization of that and if you've ever seen entropy or cross entropy which I think you know it doesn't matter if you've seen or not this is it right it's just a functional form that we care about it's a kind of a
+
+135
+01:11:20,000 --> 01:12:20,000
+distance between probability distributions I care whatever reason I say this is not because I think there's something mystical here so if you haven't seen entry before I guess this would be mysterious and potentially even if you have seen entropy before because entropy is a mysterious thing um but this is the loss function that you use and it it's the reason you use it is because it generalizes in the way we just talked about I don't think you need to know any of that so please X and Y right
+
+136
+01:11:50,000 --> 01:12:35,000
+there's no Y in this diagram but yeah uh so this here x is a two-dimensional Vector this is a little bit of a weird plot right X is cat as a two-dimensional Vector because I only have two Dimensions to draw on and so I put them there and that's why this picture looks a little bit different than maybe you're thinking about it as like a function or a curve or something but that's that's the difference higher Dimensions but it's exactly right so in higher Dimensions what you would
+
+137
+01:12:16,000 --> 01:13:09,000
+expect is rather than lines which are one-dimensional you'd expect you know D minus one dimensional big planes that were separating everything out hyperplanes and then they would be live on one side or the other and you would care about the distance effectively there and so I'm drawing like the Contour representation of the function right yeah awesome question and then there's no the Y's are encoded as we were just discussing by which index I use right foreign oh awesome question yeah so we'll talk
+
+138
+01:12:46,000 --> 01:13:39,000
+about PCA when I come back to join you and why we use that PCA is a method so the two things PCA fix for you is if you have X's that have different scales or have different meanings like you know if all your temperatures are between 80 and 82 degrees but they're really significant PCA is a way of centering and whitening your data meaning like subtracting off the mean and standardizing and normalizing that and so that's a technique that is very very commonly used in statistical analysis
+
+139
+01:13:13,000 --> 01:14:01,000
+and so we'll talk about that and how to provably find that and what does justifications for here when you're doing things like image analysis actually the the methods have been more toward raw features and raw pixels over the last couple of years where you the things that we're all excited about is to try and have no hand coding in the pipeline you can talk philosophically about why we're obsessed with this but basically the newest models just take the image raw and they try to have as
+
+140
+01:13:37,000 --> 01:14:26,000
+minimal what we call they call it inductive bias but I won't Define that term but as minimal kind of information about the model to learn from them so one weird fact that got me very excited a year or two ago was that we have one model for text and we were using that same model and getting nearly state-of-the-art accuracy on text and images and audio in a bunch of different places and that is the thing that's really interesting and it starts from the raw pixels and it learns The Edge detectors and all the stuff we used to
+
+141
+01:14:01,000 --> 01:14:49,000
+do by hand so that's been the trend here we'll talk a little bit about more about featureprep because that stuff doesn't always work and when it breaks you want to kind of have a library to fall back on wonderful question but that'll be in like I guess week five four five oh my God what a great question yeah what if you can't draw this pretty picture it doesn't make sense yeah that's possible so what if your features are bad right what if it turns out that like your features about cats were like
+
+142
+01:14:29,000 --> 01:15:21,000
+they sleep on couches you're like well dog sometimes sleeps on couches then you couldn't possibly separate the dogs and the cats it's a stupid example but like your features could be could be so weak that they're not able to actually separate your class uh imagine putting a lot more features in and that's why these models that have bigger and bigger Dimensions come in to separate automatically all the different classes but now your real question is like okay well okay there's a fix but I
+
+143
+01:14:56,000 --> 01:15:48,000
+have my features and I train what happens you just make misclassifications and that's actually the default you have a small number of features and then you fit those features and you know you do the best you can so like if a cat jumped over here there's a cat that was here you just misclassified and you'd get it wrong right you go from here over to here and then you'd be toast so that does happen quite a bit sometimes due to label error and sometimes like there's a subfield of
+
+144
+01:15:22,000 --> 01:16:12,000
+machine learning um that is kind of obsessed with this and my students write papers in it there's a great Benchmark called Wilds from Percy and Chelsea and a couple other folks on the faculty that have these places where machine learning picks out the wrong feature systematically like you take a bird that normally is on water and you photograph it with a land background and the Machine learning model is like oh that's a land burn not a water bird there's a lot of that going on so that that
+
+145
+01:15:47,000 --> 01:16:39,000
+absolute 100 happens wonderful question any other questions all right so just to recap what do we do today we went through this exponential family of models and now we've hopefully tied in a bow the fact that we like had this method to our Madness about doing binary and then real value uh we you know we went real valued in binary because we had seen fitting lines we did classification and we tied them all up in these exponential family models we talked about why inference and learning were you know basically the the
+
+146
+01:16:18,000 --> 01:17:03,000
+same in these models that let us generalize to a whole host of them this is the Workhorse of supervised machine learning but the questions that you're asking now are exactly the right questions where do these features come from what if the features don't fit the data how do I get more expressive things you're going to see things about kernels and sem and neural Nets in the next couple of lectures and that will tell you how do you pick your features and how do you get to these more expressive
+
+147
+01:16:40,000 --> 01:17:29,000
+models and that will form the bulk of supervised machine learning then the next section will come to unsupervised and we'll forget the whys and figure out what structure can we get there and that's when we'll get into questions like PCA we'll get into these questions about what are called exponential family models or em models where you have a supervised predictor and an unsupervised thing and this allows you to do some pretty wild stuff like you know fit data from the from quasars and stuff and
+
+148
+01:17:05,000 --> 01:17:34,000
+we'll we'll walk through all that stuff and the fact that we'll also have a thing on self-supervision which is a new lecture uh just this time I guess my student gave it last year but thank you thanks so much for your time attention have a wonderful rest of your week
+

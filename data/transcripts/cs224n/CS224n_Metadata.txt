@@ -1,0 +1,96 @@
+Stanford CS224n: Natural Language Processing with Deep Learning
+========================================================================
+
+Course Information:
+- Course: Stanford CS224n NLP with Deep Learning
+- Institution: Stanford University
+- Instructors: Chris Manning, Shikhar Murty, and guest lecturers
+- Playlist URL: https://www.youtube.com/playlist?list=PLoROMvodv4rOaMFbaqxPDoLWjDaRAdP9D
+- Total Lectures: 20 (Spring 2024: 16 lectures + 2023: 4 special lectures)
+- Total Tutorials: 3 (Python, PyTorch, Hugging Face)
+- Total Duration: ~30.6 hours
+
+Spring 2024 Lectures (16):
+--------------------------
+01. Intro and Word Vectors
+02. Word Vectors and Language Models
+03. Backpropagation, Neural Networks
+04. Dependency Parsing
+05. Recurrent Neural Networks
+06. Sequence to Sequence Models
+07. Attention, Final Projects and LLM Intro
+08. Self-Attention and Transformers (from 2023)
+09. Pretraining (from 2023)
+10. Post-training by Archit Sharma
+11. Benchmarking by Yann Dubois
+12. Efficient Training by Shikhar Murty
+13. Brain-Computer Interfaces by Chaofei Fan
+14. Reasoning and Agents by Shikhar Murty
+15. After DPO by Nathan Lambert
+16. ConvNets and TreeRNNs
+17. Natural Language Generation (from 2023)
+18. NLP, Linguistics, Philosophy
+19. Multimodal Deep Learning by Douwe Kiela (from 2023)
+20. Model Interpretability & Editing by Been Kim (from 2023)
+
+Tutorials (3):
+-----------
+T01. Python Tutorial by Manasi Sharma
+T02. PyTorch Tutorial by Drew Kaul
+T03. Hugging Face Tutorial by Eric Frankel
+
+Topics Covered:
+--------------
+- Word Vectors and Embeddings
+- Neural Networks for NLP
+- Backpropagation and Training
+- Dependency Parsing
+- Recurrent Neural Networks (RNNs)
+- Sequence to Sequence Models
+- Attention Mechanisms
+- Transformers Architecture
+- Self-Attention and Pretraining
+- Post-training and Fine-tuning
+- Natural Language Generation
+- Benchmarking NLP Systems
+- Efficient Training Methods
+- Brain-Computer Interfaces
+- Reasoning and AI Agents
+- Reinforcement Learning (DPO)
+- Convolutional Networks for NLP
+- Tree-based Neural Networks
+- Multimodal Deep Learning
+- Model Interpretability
+- Python, PyTorch, and Hugging Face Tools
+
+File Naming Convention:
+----------------------
+CS224n_LXX_T_Topic.srt  (Lectures)
+CS224n_TXY_T_Topic.srt  (Tutorials)
+
+Where:
+- XX: Lecture number (01-20)
+- XY: Tutorial number (01-03)
+- T: Type indicator (I = Lecture/Tutorial)
+- Topic: Brief description of lecture content
+
+Transcripts Source:
+------------------
+NoteGPT (30-second interval transcripts with timestamps)
+
+Course Structure:
+----------------
+- Spring 2024: Latest lectures with current research
+- 2023: Specialized topics and guest lectures
+- Tutorials: Practical tools and frameworks
+
+Processing Status:
+-----------------
+[ ] Upload transcripts (completed)
+[ ] Rename transcripts (completed)
+[ ] Process video chunks
+[ ] Generate embeddings
+[ ] Create FAISS index
+[ ] Test multi-modal queries
+
+Last Updated: 2026-05-17

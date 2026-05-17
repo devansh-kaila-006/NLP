@@ -1,0 +1,504 @@
+1
+00:00:05,000 --> 00:01:13,000
+hey everyone uh I guess let's get started um so today we're going to talk about a kernel method so I'm going to Define what it is so in some sense this is a general technique uh for dealing with non-linear averity in your data so um um oh we're going to see more other General techniques like new light works but this is one of the techniques that we will deal with nonlinearity before deep learning took off and we'll introduce these techniques mostly in the setting of super asserting
+
+2
+00:00:40,000 --> 00:01:52,000
+in the kind of the discriminative algorithm type of settings so um but this kind of techniques can also applies to Enterprise Learning or other settings um just with similar type of ideas okay so I guess so let me start by um I guess start with a random example so suppose you have some data I guess I'm thinking about surprise learning just a simple kind of like regression settings right so you have some acts and you have some Y and you have some data something like this I'm destroying something
+
+3
+00:01:16,000 --> 00:02:17,000
+I'm making up some data and in the first two weeks I think Chris talked about you know you fake a linear regression right so that's that means that you have to you're filter some linear model on top of this so but you can see that you know I'm I designed this data such that you know a linear model is probably not correct right so apparently in this data you know you may want to use some something like maybe a cubic polynomial and if you have done the homework um I think there's one homework question
+
+4
+00:01:47,000 --> 00:02:44,000
+which actually also talks about you know how do you deal with this kind of situation where your data is not linear in X right so you shouldn't you assume a linear model in X the homework is still this Wednesday right yeah so it's one of the last homework questions but you don't have to know the exactly the homework questions I'm going to actually um um basically kind of review the homework questions to some extent so how do you deal with this kind of case right so um so a simple way to do it is the
+
+5
+00:02:16,000 --> 00:03:42,000
+following so you say I'm going to have a Q back polynomial to fade this data so basically I'm going to assume that um model is something like H state of X is a function of X parameters by Theta so it's something like theta 3 times x cubed plus Theta Square Times x squared sorry see there's two times x square plus Theta 1 x 1 plus Theta zero so here my Axis uh is a real number just for the sake of Simplicity um so I have this uh um non-linear model and um sorry any questions okay so uh you fit this right so how do
+
+6
+00:03:02,000 --> 00:04:05,000
+you deal with this so one thing to realize is that either you have such a model that is non-linear in x but actually this is linear in Theta right it's a linear function of theta it's a nonlinear function of x so but actually when you really do linear regression it really doesn't matter whether it's linear X or not what really matters whether you are linear in your parameter because you are optimizing over the parameter space so in other words more especially so what you can do is that you can turn
+
+7
+00:03:38,000 --> 00:05:12,000
+this into a linear a standard linear regression Problem by doing a simple change so you can say that I'm going to Define this function Phi of x um to be this function that Maps a to this vector so this function maybe you should record five of maybe let's just call it Phi Phi is a function in maths R to r four and then you can rewrite this non-linear model non-linear X um to be something more like a linear model like this is almost exactly the same as um the linear model we have talked about
+
+8
+00:04:24,000 --> 00:06:02,000
+right so this is a vector say the ones something like this times 1 x x square X cubed which you can write this as Theta transpose times Phi of x so in some sense after you do this simple rewriting right now H Theta X linear in Theta I still linear in Theta and also is linear in the coordinate of Phi of x so this is how you make everything linear and then you can in some sense invoke um the linear regression algorithm that you have used what does that mean that means that you basically can just view this as your new input so
+
+9
+00:05:16,000 --> 00:06:38,000
+before your input was X right now input becomes higher dimensional before input was one dimensional X right and now input becomes uh field facts which is a four-dimensional vector um and and that's it so in other words suppose before we have a data set which is X1 y1 up to x n y n where X is a scalar the input is scalar y i is always a scalar I say and now in some sense you just turn this into you can turn this into a new data set and this little set is going to be the input will be Phi of x i
+
+10
+00:06:09,000 --> 00:07:29,000
+and the label or the output is the same of course your input dimensionality becomes formal instead of one but we have we are able to deal with high dimensional input for leading regression right so so basically you know you can just know um view this as you're new inputs or sometimes people call it features I guess probably you know we have talked about this like features sometimes is a is a word that is has multiple similar meanings in machine learning so um so so in many cases features just means
+
+11
+00:06:56,000 --> 00:08:05,000
+inputs um but I'll clarify you know in earlier uh situations sometimes features means slightly different things um but sometimes you can just say this this is a new input this is a new output the new out to be the same and you just work on linear regression on a new data set and that's how you learn a cubic function for this data set right by turning it by kind of reducing it to a linear regression problem and I think this is a piece that one I think it's Q4 but maybe we change the order
+
+12
+00:07:32,000 --> 00:08:40,000
+um of this of the questions a little bit um right any questions so far um [Music] uh how do I know this is better than that what yeah this transformation uh then no transformation okay so yeah so I guess it's just uh you know you you know of course eventually you have to validate your method and see how it works but the intuition so here I'm not saying it's better I'm just saying that if you believe that you should use a cubic function this is how you implement it right so whether you
+
+13
+00:08:23,000 --> 00:09:21,000
+believe that you should use the cubic functions of a linear function that depends on the property for data maybe you should experiment with it you should probably look at data to see whether it is a linear function there are other ways to decide you know which model we want to use I think actually in two or three lectures uh later we're going to talk about how do you pick different models okay so yeah so exactly I think so this is a way to implement a cubic function uh at least for one dimension
+
+14
+00:08:53,000 --> 00:09:55,000
+okay and and what you um gonna do is the following so um so how how do you proceed right so like you basically just uh you know repeat what we have knew about we have no about like a linear regression you just write down an algorithm uh on this data set right and and implemented linear regression algorithm on this data set I'm going to um repeat the procedures but this is basically just exactly you just invoke what we have learned uh from the first two weeks but I'm going to repeat it because uh this part I'm going to use it
+
+15
+00:09:24,000 --> 00:10:54,000
+we use it again to demonstrate uh something else to demonstrate a kernel trick so um so how do we really do this so if you do linear regression on this new data set so I guess let's say we use green reset okay so let's use green descent and so on the loss function something like that's right you compare your label with um uh with um you know suppose you have fun you compare a label with uh the model which is V of x i and square right recall that you know if you do the standard linear regression what will
+
+16
+00:10:27,000 --> 00:11:52,000
+happen is that um for the standard case then this will be x i and this will be x i in the most standard case and what I'm doing here is just replacing that x i by Phi of x i and then if you work within yourself what's the formula the formula would be something like you have to have a loop right so and each time you are updating your Theta um by theta plus some learning rate times the gradient and the gradient if you compute it it will be something like y I minus Theta transpose Phi of x i
+
+17
+00:11:14,000 --> 00:12:17,000
+times V of XL and for the standard case then this two two things will just be both x i if you look up the lecture notes there will be dispose of both x i and now they becomes this Transformer transformed version of this I guess so the quest teaching this location like this is supposed to be that you update your status by Theta process that's the notation makes sense okay sounds good so you know it's in some sense just a short hand you know you know if you really want to be very kind of like if you really read a
+
+18
+00:11:50,000 --> 00:12:54,000
+mathematical paper maybe they will call Theta t plus one is equal to Theta t plus this I'm saying that in a standard case this will be x i in the in the in the first two weeks now I just replace it yeah all right okay so um and there's some small differences which is that you know if in the standard case so now what's the dimension of theta the dimension of theta is not the same as the dimension of the X right so suppose you say X is of Dimension Rd um maybe I should use black color just
+
+19
+00:12:30,000 --> 00:13:39,000
+to be more consistent so and po Fox is a function that Maps Rd to some other dimension it doesn't have to be exactly the same Dimension right before we map from one dimension to four dimension but you can from any Dimension to other dimension so let's call this Dimension P so p is the dimension of the so-called new feature the in the new inputs so and that means that your Theta also has to be in the same space as V because your Theta will be a linear combination of the transform inputs so Theta is also
+
+20
+00:13:06,000 --> 00:14:25,000
+living in this space so so so basically we are updating um in this P dimensional space instead of X dimensional space and and let me also just briefly talk about the terminology so I guess so I think this is often called a feature map so and and this V of x maybe I think I should call this like something like this maybe the right notation should be this so fees as a function it maps from RD to RP and P of X I think people often call this at least in this context called these features and if you look at you know this kind of
+
+21
+00:13:55,000 --> 00:14:52,000
+like papers or kind of research in this context often people call X the attributes just to distinguish it from the features um you know the terminology doesn't really matter that much like in most of cases you can infer the term terms if you really know what they uh they mean so um but I'm just uh giving you some kind of context when if you read the paper which says that access the attributes and fear facts the features they know what they mean but sometimes other papers would call it differently maybe some people
+
+22
+00:14:25,000 --> 00:15:31,000
+would call Access raw features and call these features you know they are there are multiple ways to name them which is a little bit unfortunate um okay um anyway so but feature map I think people always call this feature map maybe sometimes people call this feature extractor um um but they all mean the same thing and I guess maybe let's just so my extrapolation from reading all of these papers I realized that features you know even though sometimes they mean different things often at least from my
+
+23
+00:14:58,000 --> 00:16:05,000
+statistical learning inference of this world I think this word seems to mean it always means that something that you use a linear function on top of these things so basically if you're there's a linear thing on top of something and then that something will be called features like uh um you know just uh so so basically like uh it often refers to those variables in which you have a linear you have a your model is linear okay so are we done right so um this sounds great right so everything is so
+
+24
+00:15:32,000 --> 00:16:35,000
+clear and simple nothing seems to be complicated you just replace x i by feel flexor so um so but we are not done so why because you know in some cases this is great right so um like for example example of the homework question if you look at it but we basically ask you exactly Implement something like this I think we ask you to implement a different algorithm we didn't ask you to implement the green infant we ask you to implement the uh the you use the the exact solver use the the um the inverse of the the time some
+
+25
+00:16:03,000 --> 00:17:00,000
+Matrix some Greenies kind of things so um but you know but the same thing right you just apply your existing algorithm on this new data set um but but this is not done because you know because of efficiency issue but I have I think I saw a question yeah why is it why is it hot here I think this is the so that's the gradient doesn't have like a it doesn't really matter right but but if you have a half then you always agree in front of the green there's no two it's just convention
+
+26
+00:16:32,000 --> 00:17:40,000
+I think if you I think if you read the the the the first two weeks also we have a half right typically there's a half um um okay so um all right so okay so while we are not done the reason is that sometimes there's an efficiency issue uh with this with this kind of approach and the reason is that this feature map can be very high dimensional so P can be very large in some cases for example suppose you know in this case p is four right so it's which sounds kind of pretty fun but what if
+
+27
+00:17:08,000 --> 00:18:26,000
+your ax is High dimensional right so here x is one dimensional and p uh the features are p is four dimensional but what if you say I'm going to have a x 1 up to XD right I have D coordinates in my raw data and now if I want to create something like this um that have all the the common the cubic monomials of the of the coordinates then what you have to do is that you're gonna have something like Phi of X needs to be something like a gigantic Vector where maybe you have one here you have X1 X2 all the degree
+
+28
+00:17:47,000 --> 00:19:02,000
+uh one um monomials of the coordinates and then you have the degree two I think x minus two maybe you should start with X Y Square x one times X1 X1 X2 up to X by x d now X2 X1 so and so forth maybe maybe x 2 x 1 can be omitted because there is a repetition but it doesn't really change the point um so you're gonna have need to have a very long Vector that lists all the possible combinations the products of these coordinates right so you're going to have like maybe X1 Cube up to eventually x d cubed
+
+29
+00:18:28,000 --> 00:19:46,000
+something like this so and only when you have this then you can claim all the degree three polynomials can be written as a linear function of this of these features right so and so so and and then what is p what was the dimensionality of this new features so if you contact right so there is so I'm going to do some rough content so this one there's one one and for this kind of like degree one thing you have D of this right and for the grade two thing I guess uh so you're gonna have degree two thing
+
+30
+00:19:07,000 --> 00:20:26,000
+maybe so there are d square of this let's say we ignore the reputations you know the reputations only change the constant factor which doesn't really change the point um so you have d square and then for degree three thing you you can start from X1 X1 cubed 2x D Cube and with all the combinations you're gonna have D cube of this terms I guess this is a little bit okay okay so right so then this means that um so even though you know of course every so every the good thing is every degree three polynomial
+
+31
+00:19:49,000 --> 00:21:14,000
+can be written as you know can be written as some but the bad news is that V of x is in this RP where p is something like the D Cube um you know technically B P I see in this case you know if if I do this p is equals to 1 plus this plus d square plus d Cube um the dominating term is D Cube and this is very high dimensional uh Vector so if you think about this uh for example let's say maybe you suppose this is just a back of envelope calculation suppose these 10 to the three say a thousands then P will be
+
+32
+00:20:46,000 --> 00:22:14,000
+a billion so and and why this is a problem this is a problem because if you run algorithm this algorithm then how many iterations how many uh how much computation you have to pay here so if we look at this so I guess if you count how how much competition we have to pay this product requires of P computation right all p in the so you are taking the product of two inner paradoxical two uh to two vectors to P dimensional vectors you have to pay P numerical like operations right P multiplications and
+
+33
+00:21:32,000 --> 00:22:29,000
+you also have to sum the sum also has P operations so it's all of P operations for this in the product and a name it becomes scalar and you you take the difference between this and this that's fine and then you multiply by this which also uh this is scalar times this which still takes all P operations so evaluating this whole thing takes off P operations that's still kind of okay but you have to have take this out and there's a multiplicative Factor because you have to wait you know
+
+34
+00:22:00,000 --> 00:23:19,000
+repeatedly so totally evaluating this the whole thing takes off NP um like multiplications or or additions so so you have to take all of n times V time so basically the runtime depends a lot on P it's linear in p and if p is something like 10 to the nine then your run time will be 10 to the nine um times the number of samples you know which is often prohibitive so this is very very slow on on empirically if you do let's just implement this and when D is a solid any questions so far okay so the main goal of this lecture is
+
+35
+00:22:48,000 --> 00:24:05,000
+to find out a way to speed up this algorithm that's called the that's the kernel trick what's the kernel tricks about it's about to how to uh implement this non-linear model um using this idea better but but implementing it in a way such that you can be computationally efficient so so the final algorithm will be equivalent to this algorithm but it will just be faster and actually much much faster focus on that like whatever alternative he is going to stay as the same um the second the we are gonna we are going
+
+36
+00:23:30,000 --> 00:24:36,000
+to try to implement this algorithm in some other ways but but UCP will you know I'm not sure whether I will say yes to like you know we will do something with fee yeah foreign so the the whole point of the the rest of the lecture is to have a faster algorithm and you know maybe just a a side of philosophical remark I think machine learning is really a lot of about machine learning is about computational efficiency even though these days sometimes you know like you can use gpus right so but uh but I think at the heart
+
+37
+00:24:08,000 --> 00:25:09,000
+you know at least a good fraction of machine learning is about computational efficiency because many of these kind of statistical questions in some sense you can say they are studied well in some sense like in in statistics and and I at least immersion learning I think at least comparably comparatively I think we focus a little more on computational part but the first competition is only one part right so like you also have to care about statistical perspective um but I'm just saying that computation
+
+38
+00:24:38,000 --> 00:25:39,000
+is important you know it's not just a merely uh or a separate thing that you you can you can resort to an oracle so in many things you have to really think about computation because otherwise you cannot Implement your algorithm you cannot run your algorithm on a large their side then you wouldn't see a good result um and and this is one way to speed up things um and we're gonna see other uh ways okay so um okay so how do we speed up this so here is a key observation to speed up this so
+
+39
+00:25:15,000 --> 00:26:56,000
+so the observation is that um the Theta can always be represented as you know you may found this a little kind of like a surprising at the first start but I'm going to um explain so this Vector Theta can always be represented as a linear combination of the features for some scalar where this beta I is the the scalars for the for the uh linear combination so for some later one up to Beta n and each of these beta is in r uh and okay I guess there's a condition here so if Theta 0 is 0. so I guess I'm going to change just uh
+
+40
+00:26:18,000 --> 00:27:18,000
+for the sake of Simplicity I'm just going to decide my initialization for this algorithm is that Theta is equal to zero it's initialized to zero so then I'm not going to have this condition so I'm going to claim my algorithm I'm going to say that my algorithm to start with Theta is zero you know initialization probably doesn't matter that much right so because either way you're going to update a lot of times right so um so if you start with zero then in this algorithm no matter what time
+
+41
+00:26:47,000 --> 00:28:01,000
+stata can always be represented as a linear combination of our features so and why this is you know useful what will be this useful you will see but roughly speaking the reason why this is useful is because Theta is a p dimensional vector right and I'm in a regime where p is probably maybe just uh I'm thinking of so I'm in a regime where regime uh is that P is larger than n so let's say p is really really big extremely big right even bigger than n so so Theta is a p dimensional Vector
+
+42
+00:27:24,000 --> 00:28:25,000
+which is extremely big but now you represent this vector by the scalars and you have unscalers so so in some sense you have you reduce the degree of freedom in your application at least right so before we have to represent store P numbers but now you only have to store in numbers if this claim is true so so in some sense you will see that you know I'll tell you more about details in some sense you'll see that the way we speed up this is that we never store Theta explicitly we all we always store the the representations of
+
+43
+00:27:55,000 --> 00:29:02,000
+data right the beta ice is my surrogate for for phosphate and that's enough for many of my computation like is isn't the sum their escape this is a scalar but this is a vector right this is a pdmi stone vector so this is scalar so so but you but you don't have to store this because these are already there in some sense these are not changing even right so only the beta will be changing where beta is a surrogate Force Theta in some sense so so um so you don't have to store how data
+
+44
+00:28:34,000 --> 00:29:43,000
+changes and that implicitly tells you how stata will change over time we'll see exactly how this works um right so but maybe before going to that let me just uh um show you why this this is true why why this is true the reason is actually relatively simple um if you look at this so the reason is that pretty much you know in short in a nutshell the reason is that every time you update you always update Theta bioscaler this is this whole thing is a scale this parenthesis is a scalar whatever scalar
+
+45
+00:29:10,000 --> 00:30:19,000
+it is you always update about scalar times this vector v of x i so basically every time you update your update is of this kind of form it's a linear combination field of exercise so that's why you keep being keep having it for um if you want to prove that you know um you know more formally I think the kind of the statement you have to do the induction so let me also try to do that so by induction so first of all you check at iteration zero so at uh iteration zero so indeed our Theta is equal to zero
+
+46
+00:29:47,000 --> 00:30:55,000
+that's my choice of initialization and this is indeed equals to a sum of linear combinations of the the feature vectors right because I just have to choose my Beta I to be zero exactly right um that's easy and maybe I can also just uh to build up intuition let's also look at iteration one even though I don't think this step is necessary if you really care about the formal proof this is just for intuition and iteration one then what you do you you update Theta to be equals to the over Theta which is year zero
+
+47
+00:30:23,000 --> 00:31:48,000
+plus um this gradient which is Alpha times uh I from 1 to n y i minus Theta transpose Phi of x i feel facts I and this thing you know um is a scalar actually is equal to Y because Theta is zero right Theta was zero in the previous division so this will be just y i times V of x i right Theta was zero and you plug in 0 here you get this so this is indeed a linear combination of the feature vectors right so this is a vector this is a scalar and so Alpha times y I will be my Beta I in this round right so so this thing plus this thing
+
+48
+00:31:15,000 --> 00:32:28,000
+together will be my maybe I'll just write Alpha here so if I write Alpha here then this whole thing will be my Beta I add iteration one okay and you know for the future steps you know I wouldn't I wouldn't be able to explicitly write beta I that carefully but I'm going to use the induction right so so suppose I'd iteration t I already know that Theta is equals to something like sum of beta I Phi of x i I'm already this is my inductive hypothesis and then a next iteration
+
+49
+00:32:02,000 --> 00:33:03,000
+you can see that Theta is updated to b equals to theta plus Alpha okay I'm just going to copy this formula again actually if you just I just want to prove the induction I don't even have to plug in what Theta is because if I just care about induction right so I know this is a linear combination field of x i and this is a complete the combination field of x i then the sum of them will be linear combination of V of x i but I'm going to do a little bit more detail steps because these steps
+
+50
+00:32:42,000 --> 00:34:08,000
+will be useful for me as well uh so I'm just going to plug in everything so I'm going to plug I'm going to replace Theta by my inductive hypothesis and then I'm going to replace this data by my inductive hypothesis as well so I'm going to have Alpha times okay what is this so Theta is equals to uh let me see one moment there's something okay I guess let me maybe let me just skip this okay so and this is equals to just the sum of faded eye plus Alpha y i minus Theta transpose Phi of x i
+
+51
+00:33:54,000 --> 00:35:16,000
+I didn't do anything really complicated it's just a super simple uh manipulation right I just and now this whole thing is a scalar whatever scalar it is this will be my new beta I right in the next step any questions [Music] yeah this doesn't work for randomization and but you don't need to use but actually in a position zero is actually probably the best um maybe maybe there's some reason for this but maybe let's discuss that uh offline so initialization um it does matter a little bit but but
+
+52
+00:34:45,000 --> 00:35:55,000
+let's say is we just take initialization fees zero Okay so okay so now let's proceed with my plan my plan was that I'm going to replace so so so so far I just don't want to prove the claim right the claim is that I can always represent say that by Beta and now I'm going to just only mention beta so so basically my plan is that I was just only gonna maintain beta but not say so so that means that I'm going to start from so so P parameters before it was P Paris and now it becomes
+
+53
+00:35:26,000 --> 00:36:27,000
+n parameters and if p is very large then this this means some saving so so that means that I have to understand how the beta is changing right so I have told you that beta exists right so when beta is equal to this but I want to have an update of data that only so here right now beta depends on Theta so you found to compute beta the new beta I have to know the old Theta which is uh which kind of defeats the purpose right so if you have to know what's the existing Theta then um then you have to compute it right so
+
+54
+00:35:58,000 --> 00:37:25,000
+then um you raise the P time so what I'm going to do is I'm going to find out how does beta depend on beta itself without going through a site so that's uh what I'm gonna do so where should I Maybe yeah I'll write down the left hand side I guess maybe I'll just write somewhere here so that there's some locality uh maybe I can erase this so so this is the update for beta I so how do I update beta I so beta I is supposed to be equals to Beta I plus Alpha times this way times this so this is my
+
+55
+00:36:57,000 --> 00:38:12,000
+rule for my starting point I know that beta is equals to Alpha times y i minus Theta transpose Phi of x I but this rule is not great because it does have sailor here so I have to maintain Theta I'm going to get rid of data by plugging the definition of theta in terms of beta so this is equals to Beta I plus Alpha times y i minus what's the definition of theta so if you the sorry what's the representation of theta so Theta is equals to this right this is the relationship between Theta and the beta
+
+56
+00:37:41,000 --> 00:39:41,000
+this is a j because I'm having some inside and this transpose times Phi of x i and parenthesis okay so um and then I'm going to continue so reorganize this a little bit so I'm going to get beta I Plus Alpha times y i minus I'm going to um put this inside so sum over J from 1 to n beta J Phi of x j times Phi of x i this means in your product right so a transpose B I guess this is just a inner product with speed that's what I'm using so and this is I and this is J okay so have I done okay so what I have
+
+57
+00:39:10,000 --> 00:40:11,000
+achieved I got rid of theta so now it's a it's of the rule from beta to Beta itself right so if you know the old beta you can compute new bit that's what this is saying but did I really save any time not yet right because if you want to compute the new beta from the old beta you still have to do this in the product this inner product between two P dimensional vectors still takes P time and you still have the sum Over N indices right so still of MP time so I haven't really saved much just because
+
+58
+00:39:40,000 --> 00:40:58,000
+the fees still shows up here however here is the Magic The Magic is that somehow you can compute so so this still takes off this is still of MP time right and this is uh so far not really much saving there are two things we can notice to to make it faster so one thing is that this inner product um can be Pro can be pre-processed okay so you don't have to compute every time right because this is just something that doesn't really change over time in your in your algorithm but over time I
+
+59
+00:40:31,000 --> 00:41:38,000
+mean in in the as your algorithm is running right this quantity is not changing at all right so for every IJ right the beta will be changing right so but this wouldn't wouldn't be changing so and another more important thing is that so so this means that you can do it once and you don't have to complete it every time so at least you only have to do it once in the very beginning and another thing is that oftentimes this inner product actually can be computed faster than you thought right the trivial way to implement this
+
+60
+00:41:07,000 --> 00:42:34,000
+is that you just compute this Vector this vector and you take inner product but actually you can do some math to speed up this in many cases um so this can be computed without even evaluating fee explicitly evaluate each of these factors you are the waste p time but sometimes you can do some math to not even evaluate the fee that's what I'm going to show on next any questions basically we are representing something in the space of RP in terms of linear combinations of vectors in order so
+
+61
+00:42:21,000 --> 00:43:23,000
+actually uh last number of factors than the dimensional space itself so does it make it all over approximation of the initial results where is it precise um it's still precise because so far you see that I have never done any approximation right but your question your question definitely makes sense it's a very logistical question right so why you can somehow magically save money degree of Freedom right I think the reason is that um this might be a little bit big at this level but the reason is that even you
+
+62
+00:42:52,000 --> 00:43:56,000
+had this P dimensional uh degree of Freedom key degree freedom in a third time when your data is not as large as P you cannot use all of them you could it's not it's not like you you are not fundamentally using all the dimensionality so or all the degree of freedom in the face in some sense like the if you have any samples the maximum amount of degree frame you can have is and that's why you can save even without any approximation right so here it's really to see a real implementation of
+
+63
+00:43:24,000 --> 00:44:22,000
+the same algorithm we didn't lose any it's not like you're doing any approximation um I think no I think you have to utilize with beta0 be all of this only works with easier initialization so so state has to be tries to be zero and beta also has to be initialized to be zero just because that's the correspondence at the beginning right so then this wouldn't help you ice probably would hurt you yeah we will discuss a little but at the end like when this will be useful I think this
+
+64
+00:44:19,000 --> 00:45:30,000
+will be useful only when p is really really big yeah but sometimes p is really a bit like like in the case um yes yes so so like um so okay so if your question is like what happens with my Beta Is Random I think in most of the cases maybe in all cases I don't know in most of cases I think you probably would get the same answer eventually like when you run this algorithm in a data space but the correspondence is only zero so there's another reason why like okay so so maybe maybe here is the exact
+
+65
+00:45:09,000 --> 00:45:59,000
+answer to this so suppose you only care about what happens with beta is run initialized to be random then I think it still can work and it can actually still give the same solution in most of cases is basically zero initialized initialize to be zero but that's that's a different reason um that's a there's a different reason for this to be true because just because you're doing some complex compensation eventually you always converge to the same solution probably that's what you
+
+66
+00:45:35,000 --> 00:46:39,000
+are only um kind of you you mean as well but this correspondence between sailor and beta you know on this level it only works for beta is zero that makes sense um okay any other questions [Music] we still have to calculate like we're pre-processing it we're actually a single combination right right how is that speeding anything else right so so so so that that means you only have to do any Square pairs right you know it doesn't you know how does that so that still is a lot of time I agree but the the difference is
+
+67
+00:46:18,000 --> 00:47:18,000
+that if you do it on the Fly then you have to do this all IG pair for every iteration so I'm saying that comparatively this is faster I'm not saying absolutely is very fast so so suppose you do this inner product every time then you still have to do it for every inj because here you have a j here you have some over J and also you have to update for every eye so so you basically have to do all of these pairs for every iteration so I'm saying that at least you can save that at least you don't
+
+68
+00:46:48,000 --> 00:47:45,000
+have to do it for every it will be higher than the number how many iterations will we end up having um the number of iterations I think that's a little bit tricky like but but let's say you know let's say you have two iterations right so before you have t times this number right and now you just save that t oh right that that's the only thing okay the the biggest saving is probably come from coming from here which I'm gonna show right now like like a each of these inner products actually cheaper much
+
+69
+00:47:22,000 --> 00:48:23,000
+cheaper than than than we typically think okay so why that's the case so um of course this is not like a this is not a universal statement right it's not like forever fee you can do this but for many of the the fees that we designed or that that makes sense that intuitively makes sense then you can speed up and actually later on this becomes a principle you only design free such that this is fast you don't you don't care about any other fees um but you know but let me say Let me
+
+70
+00:47:53,000 --> 00:49:02,000
+let me not get into there let me just talk about this particular what right so for this fee I'm going to show you why this can be fast and and the reason is very simple it's just that you can do some math to to make your own formula easier so so for the fee that I Define here so fee of x times Phi of Z uh this what is this I'm taking I'm abstracting a little bit I have x and z just the two two things right you can think of this as x i this as x j um I'm just using more abstract notation
+
+71
+00:48:27,000 --> 00:50:05,000
+so this is just the inner product two vectors you know one vector is one um X1 up to x d x y Square so and so forth you know and the other one is a column Vector which is one Z One Z two up to z d and Z1 Square so and so forth right something like this so and you just take the anchovies product and take the sum right so this times this will be one this bunch of things times these bunch of things will be sum of x i z i i from 1 to D okay so now let's do the degree two parts right the degree two monomials so this
+
+72
+00:49:16,000 --> 00:50:24,000
+will be so what are this coin this these quantities right here the degree two things so they're all of the form x i and x j right and here you have this bunch of these they're all of the form z i z J right and you take the corresponding Paradox and take the sum so basically what happens is that you Loop over all the possible choices of I and J and you take x i x j times z i z J and then you do the you do it for the degree three part which is the same so you Loop over so all the degree three
+
+73
+00:49:51,000 --> 00:51:09,000
+parts there of the form x i x j x k and on the other side you have the form z i z j z k and you take the sum over all possible combinations of i j k so this is from 1 which is from 1 to B okay so and now let's simplify this and so you can simplify this by So This One X this one we don't simplify this is already pretty simple um you can notice no otherwise you can simplify x times Z but this doesn't really change anything it's still the same computation but then for the second term what we can do is that we can we
+
+74
+00:50:38,000 --> 00:51:57,000
+have a two sub right we can factorize the two sum so you can write this as you first take the sum over I you look at all the terms that depends on I that's a z x i and z i and then you also have the part that depends on J so j z J so in some sense I'm just using uh I've checked speaking I'm using the fact that you know if you have sum of UI times WJ where I is from 1 to D J is from 1 to D then this is equals to sum of UI times sum of w j right so that's just the formula I'm
+
+75
+00:51:26,000 --> 00:52:46,000
+using an UI corresponds to x i z i and u w j corresponds to x j that's how I use this abstract formula so um okay and then I can do the same thing for the third one which will be equals to again you factorize based on i j k you collect all the terms that depends on I which is x i z i and you collect all the terms it depends on J which is x j z J and you collect all the terms it depends on K which is uh x k c k so okay what's good about this the good what's good about this is that you know
+
+76
+00:52:14,000 --> 00:53:28,000
+you can see this one and this one are actually the same thing you use you are just changing the the way you index the terms but but anyway you are you are taking a loop some over all the terms right doesn't matter what indices you use and and the same for all of this all of these are all the same all of these are equals to X transpose X in the product we see so you find essentially what you get is that um essentially it's like a you know what you got is just a x inner particle Z Plus X inner product with z
+
+77
+00:52:51,000 --> 00:54:08,000
+square plus X in the Paradox with z cubed and why this is helping you in computation the reason is that now it takes of D time to compute X commas inner product with Z right that's that's of D time but now P right this is just the your your raw feature like your input dimension and then after you get this you can take the power the second power this one is a scalar right after you get X in the power C you just take a scalar Square you get this and you take a scalar Cube you get this right so so the whole runtime is really
+
+78
+00:53:32,000 --> 00:54:58,000
+just X the time for doing this Plus I think four or plus some constant because you just take the power and you take the cell so so the total runtime is total time is also of d like a look or I'm ignoring the constant you know I'm assuming D is big any questions so I guess like if we choose a fee smartly and appropriately then we will we might not even need to compute the whole do we we might not even need to put our data set right right so here you don't need right so here you don't have to
+
+79
+00:54:22,000 --> 00:55:31,000
+implicitly save fee because okay so exactly that's a good question so basically what so what happens right now so basically you compute this quantity but you don't have to know what fears you just complete this quantity using the using the circuit and you compute them you compute all of this in advance and then you run this algorithm so let me write down this more formally so formally what you do is you let me also introduce some notation to kind of abstractify this because it will be also useful
+
+80
+00:55:09,000 --> 00:56:38,000
+um especially if you read other papers and the related works so um there is a notation people call this Define the so-called kernel function is defined to be this precise at this quantity we care about the inner product between features this is called kernel function so this kernel function as the definition shows is something like that takes in two vectors and output a single scalar and and the algorithm is just that um so if you use the kernel method basically we have show you the steps but now I'm going to group everything
+
+81
+00:56:00,000 --> 00:57:39,000
+together so basically the final algorithm is the following um maybe here so what you do is you say you first compute you're pretty precise all of the inner product so you you compute K of x i x j recall that this is defined to be the inner Paradox of these two things so you compute this for all I and J from one to n okay um and then you say you have a loop so I guess you start with say beta0 and so beta beta is a vector in RN so beta is the collection of beta 1 after beta n and you start so you
+
+82
+00:57:12,000 --> 00:58:46,000
+start with better zero and then you do a loop and this Loop will just be something like uh for every I from 1 to n I'm going to use this update rule for beta so what does that mean that means that I'm going to update beta I to be with I plus Alpha times y i minus sum of beta J sum of beta J times this inner product by this inner product which is something I've computed and I denoted that by K of x i and x j right so that's my algorithm and and now we can take another kind of like accounting to see what's the run
+
+83
+00:58:15,000 --> 00:59:52,000
+time for this particular polynomial feature so the runtime is let's see okay so I guess you know you probably can also got a runtime so to compute this we are using the formula like this right to combination part that we're using this formula so for every pair you need all of the type so this is O of t for IJ so of N squared D in total hmm [Applause] right and here my runtime would be um let me see [Applause] I guess I would I don't have it on my nose somehow I don't know why anyway but I can do it on the fly so you
+
+84
+00:59:14,000 --> 01:00:41,000
+already know this number so basically you need to pay n times to a time of end time to compute this sum and you also have to update uh each of the this and each of the I right so for every eye you have to pay and time so totally this is all of n Square time and square time per iteration so the catch is that there's no P involved anymore whatsoever so you just only have n and D um and if your n is small enough then in some case you know as if n Square for example is less than NP then you are
+
+85
+01:00:02,000 --> 01:01:07,000
+winning right recall that before when we run this every iteration we have to take n times P duration and now every iteration we have to take an Square iteration so if n is less than P then you are winning and in many cases n is much smaller than P just because P could be a D to the three right that's just a lot of it so [Applause] um at least I'm not saying this is universally better when I'm actually I'm only discussed you know when this chronometer is better especially as you can see it's better when p is very big
+
+86
+01:00:35,000 --> 01:01:45,000
+and small right but in those cases you do save a lot of time can you do update one day at each time so I think that's that would that would be called uh coordinate within this is right because each of the beta I should be considered as a as a coordinate of your parameter but that's just terminology I think if you update each of them one by one um You probably have to use smaller Alpha but in theory you should it should still work if you small enough Alpha but I don't think you would gain much by
+
+87
+01:01:17,000 --> 01:02:33,000
+doing maybe you can gain a little bit but but it wouldn't be a fundamental difference you know maybe it will be faster a little bit any other questions or what I'm adding squared or per iteration how many tuitions I need that's a little bit hard to decide because it depends on the problem and um but so so that's why we only compare per iterations so far run time on my part if each calculation C runtime like the total is over and b square or N squared B plus o of N squared D times
+
+88
+01:02:16,000 --> 01:03:27,000
+I think I think I see what it means so so if you really care about the total the final final run time I think you would call it something like and Square D plus of you know and squared times T where T is the number of iterations but what is T you know the reason why I don't discuss like that is because t uh is a little bit tricky like it's a little bit uh problem more problem dependent um so so so that's why and um yeah but it was a good guess for tea it really depends on the problem
+
+89
+01:02:51,000 --> 01:03:51,000
+sometimes it's pretty small sometimes it's it could be a little bit larger um so so suppose you ignore the the pre-processing time then you can compare roughly speaking and compare the per iteration runtime so maybe maybe the first implicitly right so there's no way to exactly compare everything exactly so um unless you you have more specifications of the problem but roughly speaking though I think the idea is that here there's no P showing up so so so so it has to be better in some
+
+90
+01:03:21,000 --> 01:04:37,000
+sense it's it's kind of pretty easy to be better than so for example p is really really large I suppose p is like 10 billion right so whatever you do here you probably it's going to be better than something that has p in it yeah so um what so I think and and this observation that you only have to compute the inner product of this of the features um it sometimes has more profound kind of implementation Implement uh implication on the the thing is that you know when we realized that this inner
+
+91
+01:04:04,000 --> 01:05:11,000
+Paradise the only thing you care about then you start to wonder what do you really have to think about what it feels so maybe you just have to start with the kernel and then as the field so basically so here is the um a change of mind side you know that researchers have kind of in some sense done in for this kernel method so so so we started with the fee and we defined a kernel but you can also start with the kernel so you say I'm going to define a function like this and then as long as there exists a fee then you
+
+92
+01:04:37,000 --> 01:05:43,000
+are done because you don't have to know what fee is right so you don't have to know the kernel is the inner part of something but you but you really have to care about those fees and the way it's not implemented it's not used at all in your algorithm right so so roughly speaking I think one way to deal with do this is you just Define K and you get you just forget about V and different points um [Music] P dimensional space this p is greater than M so isn't that this will be over
+
+93
+01:05:13,000 --> 01:06:21,000
+50 in this case so yeah yeah yeah I think that's uh that's a great question um you don't necessarily have to overfit but this is um um the short answer is that you don't have to you don't necessarily have to overfit um because uh okay I guess you know I'm I'm using languages that we haven't discussed in this course like you like the norm of your solution may not be that big like even though the parameter of parameters is a lot but you can have a small Norm solution and that still can help you
+
+94
+01:05:48,000 --> 01:06:47,000
+generalize but this is something that uh I don't think we're gonna discuss in very much detail in this course even though we're going to touch on this a little bit but not much okay so so basically let me just say you know let me continue with the the this change of mindset uh in some sense so what what people do um is that you just forgot about a fee and you just don't only work with the kernel because the all the algorithms you know you don't have to even know what fee is so
+
+95
+01:06:25,000 --> 01:07:26,000
+so basically you know one thing at least that is tempted to do is that you can use the Define okay and then you just run this algorithm because after you define okay you can run this algorithm right but of course you know you cannot just use a arbitrary hey because if you use the arbor trick hey then your algorithm doesn't have interpretation you don't know what you are really doing it's just the algorithm right so what you really want is that you want okay that satisfies this for some fee but you don't have to know
+
+96
+01:06:55,000 --> 01:08:18,000
+what exactly fee is so so basically I think so that means that you have to understand in what cases you can Define of K and that algorithm still makes sense so so basically people call this if K is a valid kernel foreign if if um there exists of a function fee such that K of X comma Z is equals to the inner product so so basically you can just design any function K as long as you guarantee that the existence of Phi as I always guaranteed that this is a very kernel then you can try to run that algorithm
+
+97
+01:07:43,000 --> 01:08:52,000
+and you know your algorithm is really just doing a linear linear model on top of the the feature fee but you don't have to know what V is once we get these final because we'll apply them to feed that free version of the data and then we'll get the thetas and formulas that's a fantastic question that's that's great so yeah I think I I think I missed this small part I forgot okay my back so but yeah but I also you know um like yeah this is exactly you know what let me talk about
+
+98
+01:08:20,000 --> 01:09:39,000
+this so the test time you also don't need the fee that's the thing so so the test time by test time you mean I mean if you if you give me a new data point x right so give a new data point x so the question is how do you compute how to compute this thing and the question was that you know it sounds like you have to have to compute feed in the Theta right um from beta and then you you compute this but actually you don't have to because you can just plug in the formula so Theta transpose field of X you use
+
+99
+01:09:02,000 --> 01:10:28,000
+the representation as much as possible and and use math so so you try to replace Theta by this linear combination by the I times Phi of x i so I suppose Fairfax and now it will regroup you found that this is still about inner Paradox of two six so this becomes sum of beta I times the kernel function applied on x i and X so if your kernel function is evaluated very fast then you don't have to know what Phi is okay that's a quick question thanks for reminding me right so if you know okay you can do the training you can do the
+
+100
+01:09:46,000 --> 01:10:55,000
+test um and the only thing you have to guarantee is that this K is a valid kernel so that you are doing something sensible um by doing something sensible it means that if you know it's a valid kernel you know that you are doing linear regression with the fee as the feature so in some sense like a there is a if you design a good fee a good feature is kind of almost the same as designing a good k because I know you don't know what fee is good right or not right so probably you should just go directly designing K
+
+101
+01:10:28,000 --> 01:11:33,000
+and advanced K is a very kernel you just run it and see whether it's good or not [Applause] what is x i is samples or like training samples this is the treatment samples yes that's a great question so X eyes are still the chaining samples and an X is a test example so it's interesting that in the test time you still have to look at the training example to do this to do this test it's not like you have you just have to remember right right so so like in a typical case you just have to store Theta and then
+
+102
+01:11:18,000 --> 01:12:20,000
+you don't you can forget about the tuning site but now you cannot forget to change that so and I guess I have like 15 minutes so I'll briefly discuss you know when do you know this is a valid kernel because this is so you need to have a way to you know if you want to use this kind of like equivalence and just forget about hey you have to have some way to tell whether your kernel is valid right in some sense so um and there are some mathematical characterization of when the kernel is valid this is uh um
+
+103
+01:11:56,000 --> 01:13:40,000
+um uh let me write down the theorem see which sport did I which one should I erase maybe this one okay foreign there's a necessary and sufficient condition um so [Applause] so necessary condition so so if K is valid this implies that okay maybe let's let me let me first Define some notation so in the in the literature people also have you can Define the following suppose you have X1 after accent these are undated ones Define the so-called we still use the same thing in the same notation I don't know why people do this
+
+104
+01:13:16,000 --> 01:14:30,000
+but so now this is with the abuse of notation you define a matrix K I call it kernel Matrix and this Matrix is a unbatant dimensional Matrix where k i j is equals to this K is the kernel function applied on this the parents of data I know this is a little confusing I don't know why people keep doing this like this is a on the left hand side this is a matrix you define a matrix based on the function the kernel function so every kernel function you can use that to Define Matrix and this Matrix is basically the
+
+105
+01:14:00,000 --> 01:15:16,000
+evaluation of this kernel function on particular data points um you know if I think probably you know we should just call this came another thing like I'm whatever you call it by so it's just there are two different things but people keep to seems to use the same notation for the fault um and um what you know is that so maybe I'll just uh probably talk about the the full condition given that we don't have a lot of time so unnecessary and sufficient condition is that if the k so K is a
+
+106
+01:14:40,000 --> 01:16:07,000
+is a valid kernel function so that means I'm talking about a function but now the Matrix foreign this is equivalent to for every X1 an accent if you choose any examples then the kernel Matrix K this is a matrix that's defined like this is PSD is positive sum definite um one side of this claim is pretty easy to show because from the value kernel to this I think it's really pretty much just a simple calculation so you just plug in the definition that K is the inner product of two feature functions
+
+107
+01:15:41,000 --> 01:16:48,000
+feature vectors and then you can pretty much verify this current this Matrix PST the reverse direction is a little bit kind of tricky and and also my statement of theorem I think I'm missing some regulatory condition if you if you really care about the exact math but but this is like up to a small manner regulatory condition you have to say this K is boundator like a continuous kind of things um right so basically after you have this theorem then the workflow is that [Applause] so in some sense kind of the workflow
+
+108
+01:16:38,000 --> 01:17:56,000
+is kind of like you first design okay a kernel function right there's a kernel function okay and then you verify K is valid and how do you verify maybe you can use the theorem above but that doesn't really mean that it's easy because you still have to use this theorem in some way try to prove that the kernel makes with PSD but there are some ways to verify this or you verify by either by using a serum or just by constructing all by constructing the explicit Feature Feature map that make a valid so you do something
+
+109
+01:17:36,000 --> 01:19:09,000
+like this and then you just run your algorithm run on you run this algorithm that we defined somewhere I guess here um with k and and they are so but here we are using so how do we get this algorithm we are using the regression loss right we are using the square loss and linear model right but you can also kind of like use other uh starting point for example suppose you start with logistic regression with the feature and then you can do the same kind of like operations like we have done and then arrive at a different
+
+110
+01:18:25,000 --> 01:20:06,000
+algorithm in the kernel space so in some sense this is called kernel trick so basically a kernel trick or sometimes if you call this kind of kernelite kernelized it means that you turn an algorithm so you turn an algorithm uh uh into into this algorithm like algorithm about Phi Phi X into a algorithm uh about okay this kernel function so so you may start with logistic regression with VX as the feature and then you can do you know I'm not I didn't tell you how to do it but you can do the same type of kind of
+
+111
+01:19:16,000 --> 01:20:17,000
+derivations as we have done today to get another algorithm um that only uses K and the algorithm would look something like this but not exactly the same a little bit different and and if you can do this then you you say but not all the algorithms can be turned it can be can be can be done in this way like a like a not all the algorithms is a mean about this so-called kernel trick so some algorithms is possible some algorithms not possible um I think in the homework we have this perception algorithm for homework too
+
+112
+01:19:46,000 --> 01:20:49,000
+um which can be turned uh into into kernel uh kernel can be kernelized uh I guess I'm already kernelized um or you can apply the kernel trick and now just the question I think you can apply chronologic um but some of the other algorithms if you use L1 organization if you have heard of it we have I know we haven't talked about L1 organization but some of the other algorithms cannot be colonized just because your algorithm so okay and also maybe one thing why in what case you can kernelize this so like a kind of
+
+113
+01:20:18,000 --> 01:21:16,000
+the key is that everything can be written like the only way you use the features are about the person of product between two data points the features that do two data points if your algorithm somehow can be turned into a way such that the only thing you care about is this then you can kernelize it because just replace this by the kernel but if your algorithm cannot be written in a way such that the entire algorithm only cares about this inner product then you wouldn't be able to chronologize
+
+114
+01:20:49,000 --> 01:22:10,000
+um right okay and then let me also briefly say a few words about some of the other kernels right so only show you one kernel on some of the other kernels include um they are actually not that many you know sometimes um they are not the many general ones but sometimes for like the particular applications you can design particular kernels that looks um that they are useful for you so um so some of the kernels are something like for example uh we have defined this you know k x z which is something like
+
+115
+01:21:30,000 --> 01:23:04,000
+you can for example this is a something that is very similar to what we have so KX is equals to X in the product we see plus C to the power k so for any choice of c and k uh this is a kernel um and actually you can write this as something like um for case two I guess I actually know so far okay it's two actually I even know what's the feature the feature is something like this C square root 2C X1 square root 2 c x two so and so forth and X1 square up to XD Square you don't have to know exactly
+
+116
+01:22:18,000 --> 01:23:19,000
+what is this like I don't even remember but but but for this case you know for case two you can write the explicitly what the the features are and for other case you can also write explicitly what what they are um but you don't have to carry that much about it right you only have to know the existence of it and then we run it you just use this kernel and another kernel is called gaussian kernel which is something like exponential minus x minus Z Square over to Sigma Square here this is two
+
+117
+01:22:52,000 --> 01:24:03,000
+norms so and this one you can also write it as an inner product between C of X and Phi of C but this fee will be much more complicated actually you can construct oh sorry yeah you can construct a expensive fee such that this is true but this construction will be very complicated and also another thing is that this has to so fee has to be infinite dimension so sometimes you can fee has to be even infinite dimensional vectors you know I I know we we didn't talk about what exactly the infinite dimensional Vector
+
+118
+01:23:33,000 --> 01:24:34,000
+really mean but but that's kind of the idea so you have to really use a lot of Dimensions um to um to to express this kernel but you don't really have to know what what's the what are exactly the fees are because when you run the algorithm you just don't care about this right so so in some sense this so this is the way that we can deal with info and dimensional features so so if your features that it's not a problem like as long as your inner product between two features can be computed
+
+119
+01:24:04,000 --> 01:25:10,000
+efficiently then the dimensionality of the features just don't matter like uh it can be very large or it could be like infinite it doesn't really matter foreign people think of this you know features as a similarity metric where you can think of this this function as a way to measure x and z um of course you know that's just the in some sense that's the in interpretation or intuition um so um when x and z are similar I think at least in this case you know when accessory are similar you
+
+120
+01:24:46,000 --> 01:25:49,000
+look at a larger number so that's why you can think of as a similarity Magic um all right so maybe a final comment is that you know how do you think about this kernel trick in the modern by more than I mean like in the last five years or last 10 years so you can see that like the runtime here right so they always depends on N Square actually it's always N squared so so you save a lot uh in terms of the P the dep dependency you just even get rid of the P dependency completely but you what you lose is that
+
+121
+01:25:21,000 --> 01:26:29,000
+you get N squared instead of n recall that before when you have um like the vanilla way to implement it you get n times P the p is there but earn the power of only is only what right so but now the the power on N is two so which means that you know if your own is very large then this n square is actually a bad thing right and square is much worse than n so you lose a lot in terms of the dependency on n and this is probably one of the reasons why kernel method is not um used a lot you know these states you
+
+122
+01:25:55,000 --> 01:26:43,000
+know just you know that's that's one reason I don't think it's a fundamental reason is I don't think it's the the most important reason but it's a it's a it's a it's a it's a it's one of the reasons so the reason is that in these states you know your data set is at least in some applications and it could be like a million and when you have a million square that's like 10 that's like a a trillion right so that's just prohibitive so um so that's the the
+
+123
+01:26:19,000 --> 01:27:28,000
+problem but of course there are also also other ways to speed up this a little bit like if you really uh care about the runtime so that's the second reason why the kernel method is not used as often as before is that um all of this requires a design you have to design your K or fee right so whatever you do is it's really a hot so-called handcrafted feature right you do Define a function fee yourself um you know you can you can choose them but it is it's by human design I already designed okay so when you do
+
+124
+01:26:53,000 --> 01:28:02,000
+um at least one way to interpret uh what new right work will do is that um we I know we didn't discuss new artworks but I assume some of you know a little bit but um generally you know on High level um at least one way to interpret why the right work is better is is is that you can say new network is actually in some sense learning this function fee so so as you will see I think when you have new artworks in some sense you can view this as a model as something like Theta transpose fee of X but this Phi of x is parametrized
+
+125
+01:27:29,000 --> 01:28:25,000
+by maybe let's call them some parameter w so so you can view the video networks like this so it's a still a linear function on top of some feature but this feature itself is learnable based on the data so so you have a learnable feature instead of like handcrafted feature and that's one you know one of the many intuitions why new artworks can can do better and and but we do see this very often so these days we have a lot of this kind of Feature Feature extractors that are learned by
+
+126
+01:27:58,000 --> 01:28:38,000
+data um and more and more more of this and and if you use them then you just um um like it's much much better than just a random uh much much better than the kind of those polynomial features we designed um on like in this lecture um okay I guess that's all I want to say for today um thanks
+

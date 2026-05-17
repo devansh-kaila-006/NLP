@@ -8,7 +8,14 @@ import os
 from typing import List, Dict, Any
 from dotenv import load_dotenv
 
-import google.generativeai as genai
+try:
+    from google import genai
+    from google.genai import types
+    USE_NEW_API = True
+except ImportError:
+    import google.generativeai as genai
+    from google.generativeai import types
+    USE_NEW_API = False
 
 from src.utils.logger import LoggerMixin
 from src.utils.helpers import Timer
@@ -31,22 +38,28 @@ class GeminiGenerator(LoggerMixin):
         load_dotenv()
 
         self.config = config or LLM_CONFIG
-        self.model_name = self.config.get("model", "models/gemini-2.0-flash")
+        self.model_name = self.config.get("model", "gemini-2.0-flash")
         self.api_key = os.getenv("GOOGLE_API_KEY")
         self.temperature = self.config.get("temperature", 0.3)
         self.timeout = self.config.get("timeout", 30)
+        self.use_new_api = USE_NEW_API
 
         # Check API key
         if not self.api_key or self.api_key == "your-api-key-here":
             raise ValueError("GOOGLE_API_KEY not set. Please set in .env file")
 
-        # Strip 'models/' prefix if present (GenerativeModel expects model name only)
+        # Strip 'models/' prefix if present
         if self.model_name.startswith("models/"):
             self.model_name = self.model_name.replace("models/", "")
 
         # Initialize Gemini
-        genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel(self.model_name)
+        if self.use_new_api:
+            self.client = genai.Client(api_key=self.api_key)
+            self.logger.info(f"Using new google.genai package with model: {self.model_name}")
+        else:
+            genai.configure(api_key=self.api_key)
+            self.model = genai.GenerativeModel(self.model_name)
+            self.logger.warning(f"Using deprecated google.generativeai package. Install google-genai for better performance.")
 
     def build_prompt(
         self,
@@ -107,7 +120,7 @@ Answer:"""
     def generate_answer(
         self,
         prompt: str,
-        max_retries: int = 3
+        max_retries: int = 2
     ) -> str:
         """
         Generate answer from prompt
@@ -119,38 +132,56 @@ Answer:"""
         Returns:
             Generated answer text
         """
-        self.logger.info(f"Generating answer (model: {self.model_name})")
+        self.logger.info(f"Generating answer (model: {self.model_name}, new_api: {self.use_new_api})")
 
         for attempt in range(max_retries):
             try:
-                response = self.model.generate_content(
-                    prompt,
-                    generation_config=genai.types.GenerationConfig(
-                        temperature=self.temperature,
-                        candidate_count=1,
-                        max_output_tokens=self.config.get("max_output_tokens", 1024)
+                if self.use_new_api:
+                    # Use new google.genai package (faster, more reliable)
+                    response = self.client.models.generate_content(
+                        model=self.model_name,
+                        contents=prompt,
+                        config=types.GenerateContentConfig(
+                            temperature=self.temperature,
+                            max_output_tokens=self.config.get("max_output_tokens", 1024)
+                        )
                     )
-                )
 
-                if response and response.text:
-                    return response.text.strip()
+                    if response and hasattr(response, 'text') and response.text:
+                        return response.text.strip()
+                    else:
+                        self.logger.warning("Empty response from Gemini")
+                        return "I apologize, but I couldn't generate a response. Please try again."
                 else:
-                    self.logger.warning("Empty response from Gemini")
-                    return "I apologize, but I couldn't generate a response. Please try again."
+                    # Use deprecated google.generativeai package
+                    response = self.model.generate_content(
+                        prompt,
+                        generation_config=genai.types.GenerationConfig(
+                            temperature=self.temperature,
+                            candidate_count=1,
+                            max_output_tokens=self.config.get("max_output_tokens", 1024)
+                        )
+                    )
+
+                    if response and response.text:
+                        return response.text.strip()
+                    else:
+                        self.logger.warning("Empty response from Gemini")
+                        return "I apologize, but I couldn't generate a response. Please try again."
 
             except Exception as e:
                 error_str = str(e).lower()
 
-                # Handle rate limiting
-                if "rate limit" in error_str or "quota" in error_str:
+                # Handle rate limiting and server overload (503)
+                if any(keyword in error_str for keyword in ["rate limit", "quota", "503", "unavailable", "overload"]):
                     if attempt < max_retries - 1:
-                        wait_time = 2 ** attempt  # Exponential backoff
-                        self.logger.warning(f"Rate limit hit. Waiting {wait_time}s before retry {attempt + 1}/{max_retries}")
+                        wait_time = 3 + (attempt * 2)  # 3s, 5s (reduced from exponential)
+                        self.logger.warning(f"Server overloaded/rate-limited. Waiting {wait_time}s before retry {attempt + 1}/{max_retries}")
                         time.sleep(wait_time)
                         continue
                     else:
-                        self.logger.error("Rate limit exceeded after all retries")
-                        return "I apologize, but I'm currently rate-limited. Please try again in a few minutes."
+                        self.logger.error("Server unavailable after all retries")
+                        return "I apologize, but the service is currently overloaded. Please try again in a minute."
 
                 # Handle other errors
                 self.logger.error(f"Error generating response: {e}")

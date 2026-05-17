@@ -1,0 +1,524 @@
+1
+00:00:05,000 --> 00:01:18,000
+So, I guess uh last time we talked about um Gaussian discriminant analysis. I'll have a very brief review and um and talk about some of the remaining points that I didn't get time to mention last time. And then I'm going to move on to another case uh about spam filtering where uh we're going to have uh discrete X instead of continuous X. So, last time we talked about Gaussian discriminant analysis and the general idea is that you first model P of X given Y and P of Y. And what we do is that we say P of
+
+2
+00:00:41,000 --> 00:01:55,000
+X given Y is a Gaussian for Y is 1 or Y is 0. Okay, I guess I need to remember write bigger. So, X given Y is equals to 0 is from some Gaussian distribution with mu 0 and covariance sigma. And X given Y is 1 is from some Gaussian distribution mu 1 and sigma. And recall that we have this uh um illustrative situations where you have some examples like this. These are positive examples, these are negative examples. And you kind of believe that each of this subpopulation come from a Gaussian distribution with different means but
+
+3
+00:01:19,000 --> 00:02:33,000
+with the same covariance. So, that's the methodology we have. Um that's the starting point we have last time. And then what we do is that we say uh after you have this uh probabilistic model with uh also we have this uh P of Y is 1 is equals to phi. After you have the probabilistic model, then you can uh learn the probabilistic model from data by MLE. So, so we learn by maximize we take the arc max uh over our parameters phi, mu 0, mu 1, and sigma. And we take the arc the arc max of the
+
+4
+00:01:56,000 --> 00:03:11,000
+the log likelihood. You know, it's the same as the the likelihood, you know, log max arc max of the log likelihood is the same as the uh max of the likelihood, so I'm just writing the log likelihood which is the log of the probability um of X I given Y I plus the sum of the log of the probability Y under I guess you know, technically under this parameter phi, mu 1, mu 2, sigma. And I guess that I don't have to write phi here just because it doesn't depend on phi. Okay, so that's the the methodology and
+
+5
+00:02:41,000 --> 00:03:47,000
+then uh we skipped a lot of steps because these are homework questions um and and we told uh and I told you that the solution of this MLE problem you can analytically solve it in this case because this objective function is nice enough. It's a it's kind of like a quadratic function, so you can solve the uh the maximization problem analytically and you get um some uh formula for uh these quantities, right? So, the formula for phi was something like um something of this form. Of this indicator function
+
+6
+00:03:15,000 --> 00:04:32,000
+um which is here basically the numerator here is the number of positive examples and divided by the total number of examples. And we also have formulas for mu 1 and mu 2. So, mu 1 was something like the average of X I in the positive um group. In the in the positive examples. So, you take the average, you divide by the total number of positive examples. And you can also have mu 0 and also sigma. So, each of these has a formula which is a formula or that depends on uh the data. So, this is how you learn the
+
+7
+00:03:56,000 --> 00:05:08,000
+parameters uh from uh from the data. And then we talked about uh given these parameters, how do you do the test? Uh how do you do the the inference or how do you do the um the prediction, right? Like uh when you get when you are we already learned these parameters, now you are given an example X, how do you predict Y using the parameters and given X? Right? So, and we said that the you're trying to compute the arc max over the two choice of uh Y's and you want to look at which choice of Y give you the largest
+
+8
+00:04:34,000 --> 00:05:42,000
+probability given X and given the parameter. And these parameters are the the the solutions you have computed from these formulas. Right? So, you compute which one Oh, sorry. My bad. This is Y. You compute which one has the largest probability. And also we discussed that, you know, to know this, actually you just have to, you know, in some sense you you have a decision So, uh the decision boundary between the two choices is those cases where is this uh those X's where that is where these two
+
+9
+00:05:16,000 --> 00:06:33,000
+probabilities uh are exactly the same. So, where the P of Y is 1 given X is equals to P of Y 0 given X is equals to a half. Right? This is the decision boundary and we have computed the decision boundary which turns out to be something like a linear function. So, decision boundary turns out that this P of Y is equal to 1 given X, this is equals to um This is equals to something like uh um I guess maybe I'll just uh directly write out the decision boundary. We found out that the decision boundary
+
+10
+00:05:58,000 --> 00:07:10,000
+is the set of X such that uh theta transpose X plus theta 0 is equals to 0. Where theta and theta 0 are functions of the parameters that you have learned. There are some like um specific formulas uh um that um um to describe this theta and theta 0 which are the homework questions. But theta and theta 0 are some functions of phi, mu 0, mu 1, and sigma. So, that's why when you really make the prediction, what you do is you say you find out this decision boundary. This is the family of X such that theta
+
+11
+00:06:34,000 --> 00:07:34,000
+transpose X plus theta 0 is equals to 0. And then if this quantity is bigger than 0, then you'd say it's positive. And if this quantity is less than 0, you say it's negative. This is a very quick, you know, 5-minutes review of the last lecture. Very very quick. Any questions? What would be the decision boundary or actually would there be a decision boundary if we have multiple labels? Yeah, there will be a decision boundary for multiple labels. So, um and um you you basically just compute the decision
+
+12
+00:07:08,000 --> 00:08:00,000
+boundary using this methodology. You're going to get a So, how about if all of us do the procedure? The procedure? Like if one versus all kind of decision boundary or what kind of what would be the decision boundary? For multiple labels? Yes. I think if you have the same covariance, the decision boundary is still uh linear. Um but if you have different models, you may have different type of decision boundary. So, would it still be equal to a half if we use the same covariance? Yeah, it wouldn't be a half because, you know,
+
+13
+00:07:34,000 --> 00:08:30,000
+you're going to have multiple choices Y's here, right? So, so your decision boundary will be the like uh I think I think it's going going to be more complicated. So, you have to really decide, you know, when suppose this is like 0 1 2 3 or 4, right? So, then you really have to just really literally solve this, right? You have to know when is the case what is the region such that the maximizer of this is equals to say label 2. So, that's that's going to be something that is described by some linear region,
+
+14
+00:08:02,000 --> 00:09:04,000
+some kind of linear boundaries. But it's going to be more complicated. Yeah, that's a good question. Any questions? And then our boundary be quadratic? Um for uh you know, it could be depending on what probabilistic model you define. Right? So, I think if sigma are all the same, the capital sigma all the same, I think it is going to be linear. And if you have different sigma, even you have two classes but the sigma 1 and sigma 2, then I'm I know it's uh as a fact it's a it's quadratic.
+
+15
+00:08:35,000 --> 00:09:36,000
+I saw some other questions as well. Any questions are welcome. Okay. Okay, so this is just give you a a quick overview a quick review of what we have we we did last time. Um and and you will see that the our new when we discuss the new problem, we are going to have um similar methodology. You define a probabilistic model, you solve the MLE, you get some formula, and then like you get some parameters and then you use those parameters to predict what's the most likely Y's. Okay, so but before going to that, I'm
+
+16
+00:09:08,000 --> 00:09:58,000
+going to discuss one important thing which, you know, many people actually asked in the last lecture in at the end of the last lecture. They are great questions. So, the the question I'm going to discuss next is that, you know, why this is different from what what we have seen in the first 2 weeks, right? So, at the end of the day you have a decision boundary which is linear, right? So, basically at least superficially, it sounds like you are using a linear model to decide you you are going to use this linear
+
+17
+00:09:33,000 --> 00:10:33,000
+function to decide whether it's positive or negative, right? You compare this with 0 and if it's positive if larger than 0 it's positive, otherwise it's uh negative. And this is the same as the the logistic regression that Chris talked about in the first 2 weeks. So, why these are why this is different uh from from the uh the so-called discriminative methods that Chris talked about? So, I think um here is uh the the way I think about this. So, um, So, so if you have GDA on the left, and
+
+18
+00:10:08,000 --> 00:11:26,000
+suppose you have like a logistic regression on the right, Mhm. So, first of all, in terms of the assumption, they are different. So, for GDA, I guess I wrote assumption there, so you maybe I will just write here again. So, this is Gaussian, and this is also Gaussian. Something like this. And you also have Y, which is from Bernoulli. And when you do logistic regression, then you just uh, literally say that uh, P of Y is equals to 1 given X. You you your probabilistic model assumes that this has the form
+
+19
+00:10:57,000 --> 00:11:56,000
+uh, 1 over 1 plus E to the minus theta transpose X. And and recall that here, when you write this, implicitly we are saying that X 0 is 1, right? That's Chris' assumption, like in the first 2 weeks. But suppose you don't even have that assumption, you're going to have another Suppose X doesn't contain X 0, then you need to have another set of 0, something like this. Right? If you contain the X 0, then you are going to have a clean form. But they are the same, you know, if suppose I say for today, let's say X,
+
+20
+00:11:30,000 --> 00:12:43,000
+uh, you drop that convention, so X doesn't contain X 0, then you would you're going to write it like this, right? And this exactly match the form here. So, so basically, you can see that one thing is that for GDA, you assume this bunch of things, and you and you found out that it implies that Y given X has this form. Right? Recall that maybe I didn't write this, but like this is equals to 1 over 1 plus E to the minus theta transpose X plus theta 0. Right? So, let's say mhm, how do I do write this? So,
+
+21
+00:12:05,000 --> 00:13:13,000
+P of Y is equals to 1 given X. Right? So, this is a This is a conclusion that we got from the probabilistic modeling, right? We from our mathematical derivation. Right? We conclude that Y given X should have this form. And in logistic regression, you just directly assume it. So, in in in GDA, that's a conclusion, in some sense. Right? And and I guess, you know, we have to stress this many times. So, here you you you model the joint probability distribution, because given you if you know X given Y, and you know Y, then you
+
+22
+00:12:44,000 --> 00:13:54,000
+also have the density of X {comma} Y. Right? But here, you only always have Y given X, but you never have anything about X. You only have the conditional probability. So, in some sense, the kind of like a the the main difference between these two is that on the left-hand side, you have more assumptions. So, I think this is the key. You have stronger assumptions on the left-hand side than on the right-hand side. And and in some sense, the kind of the general um, uh, the general kind of like a phenomenon, or the general principle
+
+23
+00:13:20,000 --> 00:14:25,000
+about, you know, how do you model what what part of the world you want to model in your machine learning algorithm, right? So, do you want to model both, or you want to model only Y given X, right? So, how do you decide when what how much you want to model the world? So, the the the kind of the pros and cons of the the the kind of the trade-off is that if you have more assumptions, then typically, if if this is also correct assumption, if your assumption is correct, then uh, this pretty much implies you have
+
+24
+00:13:54,000 --> 00:14:47,000
+better performance. Of course, this is a not mathematical statement, but I think it's kind of reasonably intuitive, because if you have more assumption, it means that you you are using your prior knowledge about the world, right? So, here you are using your prior knowledge that X given Y is Gaussian. And if you use that prior knowledge, typically, if you use it correctly, then you should have better performance. Like a like a, you know, if I tell you everything, then of course, you have better performance. Right? If I
+
+25
+00:14:23,000 --> 00:15:19,000
+tell you a little more, I Suppose I tell you everything about mu and sigma, then of course, your performance is the best. Right? If you tell you a little more about X, then you should always have a little better performance. So, but the problem is with this is that the So, this is the the good thing about more assumptions, but the risk is that you may have wrong assumptions, right? You you might have make wrong or approximate or kind of like not exactly correct assumptions, right? Right? So, if you make wrong
+
+26
+00:14:58,000 --> 00:15:59,000
+assumptions, then may in in most of the cases, probably GDA will will be worse off. For example, what if the data are not really Gaussian, right? So, what if this doesn't look Gaussian at all, and you still make assumption that they are Gaussian, then you you you're going to have like a um, um, worse worse performance. So, and um, another thing I want to stress is that even though superficially you see the form here is the same, right? So, theta transpose So, when you make the GDA assumptions,
+
+27
+00:15:28,000 --> 00:16:21,000
+you get this uh, Y given X of this form, but suppose you go through this left-hand side and get this, and you numerically compute the so theta, say theta and theta 0, it wouldn't it wouldn't be the same theta and theta 0 um, as you what you computed from logistic regression. So, you're going to get a different set of like a theta and theta 0. So, that's why it make a difference. So, so this theta and theta 0 from logistic regression is how do you get it? You just directly fit your linear model
+
+28
+00:15:55,000 --> 00:16:49,000
+using logistic regression. That's how you got theta and theta 0. But if you go from here to here, then you're going to first learn the mu, the sigma, uh, the mu 1, mu 2, mu 0, mu 1, sigma, and then you compute theta using mu 0, mu 1, sigma. So, so that will result in a different set of theta and theta 0. That's why it does make a difference. Um, and whether it's better or not, I think, as I said, basically depends on whether assumptions are are correct or how correct your assumptions are. You
+
+29
+00:16:22,000 --> 00:17:17,000
+probably you never have can have like exactly correct assumption, but maybe your assumption your assumption is approximate correct, then you should do GDA. If your assumption is completely wrong, then you probably should do logistic regression. Any questions so far? Oh, on this final note, I'll leave it because you weren't seeing that. You said that like you would have a like we we have a different theta in both the cases, so how would you say that would be different again? Like is it because the
+
+30
+00:16:51,000 --> 00:17:46,000
+theta is being computed in that equation up there up there? Are they like I guess that's the formula that you need to be able to derive at the end of the day, after training all the parameters, right? Or are we not training on those parameters? Right. When you do GDA, you are not training on theta directly. You are training the mu and mu mu's and sigmas directly, and using those formulas, and then you compute theta as a function of mu and sigma. Right? So, so it's definitely a different process, right? You you are
+
+31
+00:17:19,000 --> 00:18:18,000
+not getting the theta and theta 0 in these two cases using the same process, right? So, in one process, it's kind of circuitous, right? You first have to compute mu, and then say theta. And the other case, you just directly fit this using a numerical algorithm, like a gradient descent. Right. A follow-up to that, like is it possible that you can get a different equation for the P of Y given X? I mean, if we have, let's say, different assumptions. Yeah, definitely. You you you may have if you change your assumption, you may
+
+32
+00:17:49,000 --> 00:18:41,000
+have a different equation for P of Y given X. And and there's actually an interesting point I'm going to mention maybe maybe after I I answer. Are there any other questions? Okay, so then there's actually another interesting point I'm going to mention next is that even you change the Actually, it's possible you change the assumption, you still have the same formula on the right-hand side. So, so you can have both. You can Like if you change the assumption, maybe you still have the same formula, maybe you
+
+33
+00:18:15,000 --> 00:19:13,000
+still have a different formula. So, so this is a concrete case, which I think the I think the what I said is actually even more surprising, right? So, you change the assumption on the left-hand side, you still have the same Y given X on the right-hand side. At least the same form. So, so this is a example. So, I guess here I'm I'm looking at uh, I think one-dimensional. So, suppose X is one-dimensional. Just uh, you know, it's not very important like uh, exactly. So, so suppose you do X given Y is 1 is from
+
+34
+00:18:45,000 --> 00:20:10,000
+the so-called Poisson distribution. Um, Poisson Wait, how do I Wait, Poisson distribution? Sorry. Uh, and and then you do this. I I might spell misspell this this word, sorry. Um, but you do this. So, you change it's no longer Gaussian. It's it's some other distribution. And um, oh, I guess X is is in because this is a Poisson distribution, so it has to be integer. Something like an integer. Um, and and then you still have Y is P of Y is 1 is equals to phi. Right? So, you change your assumption.
+
+35
+00:19:34,000 --> 00:20:40,000
+And then this actually still implies that P of Y given X has this form 1 plus E to the minus theta transpose X plus theta 0. So, still the form looks similar. Of course, you know, if you really numerically compute this, it would would be a different theta and theta zero because theta and theta zero here I'm just writing them as a as a generic variable, right? But actually they they are they are they are they have meanings, right? Theta is a function of lambda one and lambda zero. And theta zero is also a function of
+
+36
+00:20:09,000 --> 00:21:11,000
+lambda one and lambda zero. So, the form is still the same. Um, but you could have like um numerically if you if you use this model in terms of instead of the GDA, you're going to get different theta and theta zero. So, so a linear form doesn't necessarily mean everything, right? Uh, it also you know, it also depends on how you learn this linear function. So, you can actually here we have already three ways to learn it, right? We can use this this model, we can use the GDA, we can use the logistic regression. They will
+
+37
+00:20:40,000 --> 00:21:35,000
+all give you different theta and theta zero as a as a final result. And which one will be better, I think you know, if you compare GDA with this Poisson version of the the the standard learning algorithm, then I guess the answer would be that you know probably it depends most on whether which assumption is more correct more likely to be correct. Of course, there's also some type thing here because here you your thing is like but suppose you have a different model which also deal with like R
+
+38
+00:21:08,000 --> 00:21:56,000
+like a you know, if you basically I'm saying that when you compare it, okay, forget about this axis in anything. Suppose you don't care about that differences, then which model will work better probably depends on whether your assumption is correct or not. Uh, which assumption is more likely to be correct. And and the when you compare the generative learning algorithm with the discriminant one, I think it's the same thing, right? So, if your generative assumption is is likely to be correct,
+
+39
+00:21:32,000 --> 00:22:48,000
+then you should gain something from it. Otherwise, maybe you should just use logistic regression. I think in some sense like in these days, you know, if you look at um um and also another thing is that um okay, so um so and and also um maybe a little more general discussion is that um in some sense your model has two sources of like a so in some sense they are like in some sense you have two sources of knowledge. The the model learns from two things in some sense. So, one thing is that your assumption.
+
+40
+00:22:16,000 --> 00:23:13,000
+And the other thing is you have data. Right? So, the assumptions means like how do I probabilistically model all of these quantities and data is really just what you see. Right? So, if you have more data of course, it's good, right? If you have more assumption, if the assumption is correct, then that's good. Um, but on the other hand, suppose if for example you have already a lot of data then you have less need to use prior knowledge because your data already are very telling, right? So, like it the
+
+41
+00:22:45,000 --> 00:23:36,000
+data is kind of sufficient for you to to kind of like a extract whatever information you want. Then you don't really need to use prior knowledge because if you use prior knowledge, you always have a risk to use it wrongly, right? So, so basically in some sense I think the modern uh trend is that you know, like a we're going to talk about neural networks and deep learning. Um, so the like in a in a in two lectures, the modern trend is that now we're in this setting that we have more and more data for many
+
+42
+00:23:11,000 --> 00:24:05,000
+applications. And and and then that's why the modern techniques, you know, like deep learning neural networks those techniques, you know, use fewer and fewer assumptions about our data. So, just because you know, it's not really worth it, right? So, like I have to think about how do I model my images, right? Suppose you apply this to images, right? You have to have a model for X for the final image. You know, does it really worth the the effort to do that, you know, probably not, you know, of
+
+43
+00:23:38,000 --> 00:24:30,000
+course, it depends on the cases, but if you just want a first cut result, you don't have to model your X because modeling your X is very difficult, you know, it's very challenging and you may make mistakes. So, so you probably should just directly go for the more kind of like a discriminative analysis type of approach, right? So, you just directly model Y given X if X is a image. Right? But in the in the in some other applications, for example, if you think about medical applications, right? Or or
+
+44
+00:24:04,000 --> 00:25:05,000
+or some of the other applications of machine learning where you don't have enough data, in those cases I think still you have to kind of use as much prior knowledge as possible. Um, and actually many times people even do even much more complicated modeling of your X, right? So, maybe you can use some other more advanced ways to model your X because you know how does each coordinate of X what each coordinate of X means and you know what's their relationship and you put all of this prior knowledge into your modeling for X
+
+45
+00:24:34,000 --> 00:25:28,000
+and then you get finally some Y given X using this machinery and then you predict. And that's that's more likely to work. So, yeah, I guess that's the that's And another thing is that if you use more assumptions, then you are specializing to your application. Right? That's another reason probably why in the modern time like a people some somehow don't do this kind of a use this prior knowledge that often because I I guess probably heard of neural networks and one of the kind of
+
+46
+00:25:02,000 --> 00:25:55,000
+magic about it is that it works for many many cases without much customization. Right? If you use prior assumptions, you'll use more assumptions, you you you are the you are you have to kind of like a use different assumptions for different application because for different applications their data probably have different structures. You so, you have to do it one by one. And that's actually what people do um a lot of times, right? So, they they look at their domain, their questions and and and study the the structure. Um,
+
+47
+00:25:28,000 --> 00:26:21,000
+um but these days you know, like as you see like a when you people use neural networks because you have enough data and you just drop assumptions and you make a model kind of very general, not very not specialized at all and then you just apply it to everything just without thinking much about what the data look like. So, uh yeah, so I guess that's a you know, you we're going to talk more about neural networks, but this is the a preview of kind of connections to what we're going to talk about next.
+
+48
+00:25:54,000 --> 00:26:50,000
+Um, and another kind of like a big picture is that you know, one of the reason as I said, you know, in some sense I I was saying that you know, this kind of GDA analysis is not used that often. Um, you know, at least not used as often as before, right? Before you have to use these kind of things and now you can at least you have the choice to uh to try something like neural networks and and because you have more data. So, um but still I think if you are able to model the X, you know, in many cases you
+
+49
+00:26:22,000 --> 00:27:17,000
+can do better. So, and also in some cases you just don't have Y. So, even even for example, when you have images, right? So, sometimes you don't have Y at all. You just only have X. And in those cases you just really have to model X because that's the only place where you can get information from it. And another possibility another case is is um uh we're going to talk about languages, right? You like especially like uh this lecture I'm going to talk about language as well, but you know, later we
+
+50
+00:26:50,000 --> 00:27:42,000
+we're also going to talk about languages, you know, solving language problems with neural networks. And there, you know, you you're just getting a kind of a um like a a lot of like text from the from the internet, right? And there's no labels. There's no way nobody's tell you like which like which web page is is about which, right? So, you just have like raw text. You don't only have X. And in those cases you really have to model X. There's no way you can get around this.
+
+51
+00:27:15,000 --> 00:28:26,000
+So, so so so still like modeling X is is very important. It's just like um for example, it's less important for certain kind of applications because we have more data. Any questions? Okay, cool. So, I guess now I'm going to move on to um the next uh uh the next uh question. So, um I think the the question is the the so-called spam uh classification. So, we are trying to understand whether a piece of text is a spam email or not, right? So, like you have a email spam filter and then you want to know whether
+
+52
+00:27:58,000 --> 00:29:07,000
+your email is a a spam or not. And we're still going to do generative learning algorithm. Uh and and we we're going to have discrete X. So, this is another example how you do this generative learning algorithm. You model X given Y and you execute this like a pipeline in some sense and and and learn something out of it. Okay. So, so the first thing, so uh I'm going to you know, get into a little more details with you know, how do we really approach this question? So, the first thing you probably have to
+
+53
+00:28:40,000 --> 00:29:49,000
+what Okay. You have one quick question like is GDA and like this spam filtering now is that only kind of generative learning algorithms or there are more? Yeah, there are many many uh yeah. These are just examples. Um Right. So, I guess um so, the first question to first question we have to deal to approach this is that how do you represent a text, right? The texts are symbols, right? Like a b c d, right? So, um you need to make it numerical at least to to to to make the the computer recognize them.
+
+54
+00:29:15,000 --> 00:30:22,000
+Right? So, to in some in some naive way at least, right? So, so the question first question is how do you change the text to some, you know, X. Maybe you call this feature, right? This is a um you can call this feature vector or or or representation or something like that. So, you want to change this to X in some dimension D. And then you model X. So, so the first question is how do you represent text? So, there are many ways to represent text. So, um so, the way I'm going to tell you is a very naive way. This is like a um
+
+55
+00:29:49,000 --> 00:30:52,000
+probably I shouldn't say naive way, but this is like a very simple way. Like a And these days we're going to have like a you know if you really deal with the text you are going to use some more advanced deep learning based approach, which we're going to cover a little bit in the in probably in three or five weeks. So um So this way So here the way that we do it is very simple. So what you do is that um Maybe I should have some So what you do is you say you have a you first look at the vocabulary.
+
+56
+00:30:28,000 --> 00:31:40,000
+Suppose you have a vocabulary of maybe 10k words. So and suppose you say you list all of these words in your in a sequence based on alphabetical order. I guess if if you open up a dictionary the first letter the first word is probably always A. I think the second you know I'll come to um some dictionary the second word is this word aardvark. I think it's a kind of animal. um And the the third one is aardwolf. I think it's another kind of animal. um something like this. And then you list all the words you know and maybe at
+
+57
+00:31:06,000 --> 00:32:13,000
+some point you're going to have a the word book and eventually the last word I think in many of the dictionaries is this this thing I don't even know how to I don't even remember how to pronounce it. I think I used to know when I the first time I teach this lecture and then I forgot after a few years. Um anyway, so you listed all of this and and then you say that um um you have suppose you have a a piece of text, right? So maybe say suppose you have a a sentence or maybe an email. Suppose this email
+
+58
+00:31:39,000 --> 00:32:50,000
+just has one sentence. uh something like I buy a book. So you want to turn this into a vector and how do you turn it into a vector? So the way that we do it here is that you turn it into a vector that is of dimension um this X is of dimension D. Where let's say D is the size of the vocabulary. D is equals to the number of words. So and then on this vector that represent this um piece of uh this sentence is going to be a zero one vector. So X is actually you know it's really from zero one to
+
+59
+00:32:19,000 --> 00:33:27,000
+the power D. There are only two choices. And every entry so you have so many entries. And what you do is you say if this word shows up in that sentence then you have entry one uh in this entry. So the word A shows up in the sentence then you have one here. And aardvark doesn't show up in that sentence I have zero. And then at some point you have this corresponding entry book. Book shows up in the sentence I have one here. And maybe somewhere I think there's a word probably I here in the list and
+
+60
+00:32:53,000 --> 00:34:09,000
+then that uh one would also have a one. That that that word also corresponds to one. And for the all the other entries that all the other words that don't that don't show up uh in the sentence you just fill in zero for the corresponding entries. So and you call this X your representation or your feature vector uh for uh for for for this email for this sentence. So basically technically I'm just going to say that X I is equals to one if and only if uh the ith word occurs in the email.
+
+61
+00:33:52,000 --> 00:34:53,000
+So there are actually many other ways to encode even before you know using deep learning techniques. Um but this is probably one of the simplest one. And you can see that this this representation of the sentence is in some sense like a super um I guess like simplistic because for example you don't care about the orders of the word, right? Suppose you have another sentence I a book buy, right? That sentence still has the same representation. Just exactly the same. And it doesn't care about the the
+
+62
+00:34:23,000 --> 00:35:25,000
+frequency of the word. For example suppose I have a sentence I buy a book and I a kind of pencil then of course the the representation would change, but this two word A and A here you know will be counted you will still have a vector called one here just because the word A shows up in this sentence, but you don't care about how many times the word A shows up in the sentence. So so you don't care about the frequency of the words in the sentence. You just care about whether each word shows up.
+
+63
+00:34:54,000 --> 00:36:01,000
+So um and and you do there are many other probably issues with this like a uh what else? um Yeah, I guess probably these two are the most important thing. You don't have the order and you don't have you don't care about the frequency. Um but that's what what I'm going to deal with because this is easy and you can um somewhat kind of like do all of the math uh with this kind of model. Okay. So now what's the next question? The next question is that we need to build a generative model for X given Y.
+
+64
+00:35:27,000 --> 00:36:48,000
+And we need to have a model for Y and then we do MLE and we solve the parameter so and so forth. So So basically I think I can just erase this and now I'm going to redefine these three things. Right? So that's what I'm going to do. Okay. So let's take a and how do you proceed? So now because this X now is a binary vector it's only taking zero and one. So we need a distribution that can generate binary vectors. Right? So you cannot use Gaussian here. Um and uh the kind of the techniques that we
+
+65
+00:36:17,000 --> 00:37:39,000
+are using here is the so-called naive Bayes. So what does this mean is that um this means that you just assume X one up to XD are maybe I'll erase this you know. are independent conditioned on uh Y. So given Y you just independently draw X one up to XD. Of course this is not realistic, right? This is definitely not exact you know. How realistic it is I think that's subjective, but at least this is not exactly how people generate emails, right? You are not saying that I'm going to generate spam filter. I
+
+66
+00:37:11,000 --> 00:38:17,000
+first decide I'm going to generate generate a a spamming email and the first thing I decide is I decide Y and then after I decide Y I just generate words randomly like a like right? That's probably not what how how people write spam emails, right? So and also that's not how people write the the the usual like a good emails. So but it turns out that many many many cases these kind of assumptions are pretty um already pretty good. So in the homework actually um actually we haven't decided whether we
+
+67
+00:37:44,000 --> 00:38:39,000
+are going to include that homework question, but at least you know there are there are cases where um um you can see this kind of things can be very effective, right? Actually if you just really use this model even you make this kind of kind of crazy assumption and and you learn some parameter and and use this model to classify spams. I think you're going to you're going to get more than 90% accuracy. Maybe these days you know as of like a 2020 12 maybe it's not that effective because all
+
+68
+00:38:12,000 --> 00:39:07,000
+the the spammers they are they are adversarial, right? So they know what your prediction algorithm is they can change their algorithm to kind of fool you, but but at least this is a reasonable one if you go back 10 years ago for sure. Like um So um so so it's kind of interesting, right? So even you make you know obviously kind of not exactly the right assumption, but sometimes you can still because the assumption probably somewhat correct you know to some extent you can still get a useful kind of
+
+69
+00:38:39,000 --> 00:39:41,000
+outcome from it. And and for our purpose I think here um I guess you know to some extent I'm not really that um I don't care that much about assumptions. I I think it's more like I'm trying to demonstrate the the methodology. Um like the how how do you like I just want to give a new example where you execute this probabilistic model this flow this this pipeline, right? Um and and and show how how to solve them. Right. So the question is how how does the text the length of the text matter,
+
+70
+00:39:18,000 --> 00:40:20,000
+right? So here in So one interesting about this is that in this representation the length of the text doesn't really matter. You can encode any length into a vector of dimension D. Which is you know you can say this is a good thing or bad thing you know. But but so so basically you can encode any length any sentence or any documents into a single vector. And how do you choose how do you decide which what is the window size? You know, here I don't think it matters that much. Maybe you just take entire email.
+
+71
+00:39:50,000 --> 00:40:58,000
+Um yeah. Oh, of course, you know, if you change the the the the I think I think you should you should just like include the entire email because that's the the the unit you are working with, right? Like for every email you are classifying whether it's a spam or not. You are not classifying whether a sentence is a spam or not. So, that's why you treat a email as a single example. If X1 through XT are independent conditional Y, does that mean that like if one like one X appears, that tells us
+
+72
+00:40:28,000 --> 00:41:39,000
+nothing about whether another X is likely to appear, or does it mean that all X's are equally likely to appear like when Y is zero? Um I think it's it's more about the it's more the first uh case. So, so because like certainly not all the words are equally likely to appear. Right? So, I So, basically I'm assuming that given Y, given you have decided that which whether this is a spam email or not, um every word, you know, is is uh is they are they are independent with each other. But but
+
+73
+00:41:04,000 --> 00:42:20,000
+they have they may have different kind of probability. Okay. So, I guess let me proceed. So, So, what does this really mean? Okay, now I'm going to do some math, right? So, to kind of uh expand this and parameterize it. So, this really means that you have this P of X1 given XT given Y, you write this as P of X1 given Y times P of XT given Y. And now I I can I just need to parameterize each of these probability distribution by some parameter. So, and if you think about this, what is this uh this is this is really just a
+
+74
+00:41:51,000 --> 00:43:07,000
+distribution of a newly distribution because X I can only have two choice, zero or one. So, basically you just have to describe this probability by two numbers, right? I'm I'm actually by one number, right? So, So, basically what you do is that you parameterize parameters of the model is you have phi um say J. So, there's some index, which I'm going to explain in a moment. You say this is XJ is equals to one given Y is equals to one. So, basically for Y is equal to one, you you're asking you
+
+75
+00:42:32,000 --> 00:43:38,000
+know, what's the probability of XJ is one? Right? And and you you denote that probability as this. And then what once you have this, you know the probability of XJ is equals to zero given Y is one is going to be one minus phi J given Y is one. And this uh this um this thing is just a notation. It's not like a um it's equally the same if I write J {comma} one. Uh I I just like I write the subscript because it's a little bit more intuitive, but but I just I just need the index in some
+
+76
+00:43:05,000 --> 00:44:27,000
+sense. Does it make sense? So, basically for every J, I'm going to have a parameter. For every J and and one, I'm going to have a parameter that's called phi, and this parameter is in 0 1. Right? So, and and this parameter describes this distribution. And for Y is zero, I'm also going to have a parameter. So, so I'm going to write this as J given Y is zero. So, this is the parameter for the distribution of XJ given Y is zero. Yes, it's between zero and one. Uh this is between this is this is uh the
+
+77
+00:43:58,000 --> 00:45:20,000
+bracket the hard bracket. Okay. So, so basically I'm saying that if I this with this parameter and this parameter, I can describe all the all of this I can I can write out all of these numbers because uh I I describe all the quantities, right? Because for example, what is P of XJ given XJ zero given Y zero? This is going to be equals to one minus phi J Y is zero. Okay. So, and then I also have need to have a a like something for this to parameterize the distribution of Y. We call that we call this phi before, right? In in the
+
+78
+00:44:56,000 --> 00:46:02,000
+in the GDA case. And now just for the for the sake of like a distinguishing it from the other phi's, I'm going to call it phi Y. But this is the this serves as the same role as phi uh in before in the GDA case. Any questions? So, and then how do I proceed? I'm going to write the likelihood and then maximize the likelihood. All right, so the the likelihood it likelihood is the probability of seeing a data given your parameters, right? So, likelihood is a function of the parameters. And you and this is the probability of
+
+79
+00:46:03,000 --> 00:47:26,000
+the data given the parameters. So, what are the parameters? The parameters are phi Y is one of the parameters. And also all of these phi's, phi J given Y zero and phi J given Y is one. So, basically I have phi one given Y zero up to phi D given Y zero. And then phi one given Y is one up to phi D Y is one. Right? These are all your parameters. So, and my likelihood, you know, here there are two um uh ways I can expand this. So, the first thing is that because by definition the likelihood is the
+
+80
+00:46:44,000 --> 00:47:52,000
+product of the likelihood of each of the example because you are all your examples are independent. This is not the naive base yet. This is the examples are independent. So, you can just write this as probability of XI YI given all the parameters. And here, if you are careful, then you know okay, so so basically all the par- I guess all the parameters I'm going to write uh I think in the my notes the notation is this. So, but I think this really just means this is just a convenience notation that
+
+81
+00:47:22,000 --> 00:48:50,000
+denotes all of the parameters. This is the same as the this. Um okay, and then you first you so so so so far is the same as the GDA. And then you can also do the chain rule to make this XI given YI conditional on the parameters. Uh given the parameters and then times P of YI I um given the parameters. So, when when I use dot dot dots, I just mean all the parameters. Of course, sometimes you can drop some parameters because they are not they don't matter. Um and then I'm going to again factorize in the dimension of X,
+
+82
+00:48:07,000 --> 00:49:16,000
+right? Now I'm going to use my G like in this naive base assumption, right? Which is the factorization across the coordinates of X. Right? We call that this is X sub I is the coordinate of X. The superscript I is the I's example. So, what I'm going to do is that I'm going to use that assumption for each of the examples. So, what I'm going to get is uh I from one to N. I'm going to put this in front just to make it simp- make it easier. Um and if I'm careful, I I I only have to
+
+83
+00:48:48,000 --> 00:50:08,000
+write phi Y here because the distribution of Y only depends on phi Y. And then I'm going to factorize this thing across the coordinates. So, I'm going to have a product um across the coordinates. I have D coordinates, and then I have P of X sub J I. This is the J's coordinate of the I's example given the label for that I's example and all the parameters phi J Y. Phi J Y just means I guess maybe I will just uh So, phi J Y, this just means a shorthand for this family of parameters.
+
+84
+00:49:32,000 --> 00:50:50,000
+Doesn't make sense. Maybe I will just Sorry, this is a little bad notation. Um So, fee j y just uh means a short hand for this collection of parameters. Okay. So, So, you mean here? Yeah. Um Yeah, that's right. So, right, if you only look at Yeah, this j and this j, yes, you only care about the you just care about the j and the this the fixed j and the the y 0 and y 1. That's it. Right, so so so we have two times that we factorize this probability. So, so the first time is here. So, here I'm using the fact that all the
+
+85
+00:50:52,000 --> 00:51:52,000
+all the examples are independently sampled. So, that's why I I I say the joint probability is the over all examples is uh is the product of the probabilities of each of the example. And now for every example, um of course, I first do the chain rule to get the x given y, right? And then I factorize this one into this product again. And this is the level of the naive Bayes. This is using naive Bayes. Okay, cool. So, and then so, I guess you can expect, you know, what we're going to do. We're
+
+86
+00:51:28,000 --> 00:52:58,000
+going to maximize this. And we know that if you are maximize this, it's the same as maximize Suppose let's call this L, right? So, maximize L, this is the same as argmax of log L. And log L is going to be a sum of the log of this probability. So, log L will be a sum. You turn all of these to sum and you have the log in in front of the terms, right? So, you have log p y i given p y plus Here we have a double sum, sum over i from 1 to n, sum over j from 1 to d, and the log of this. Yeah. And then you analytically plug in all of
+
+87
+00:52:31,000 --> 00:53:53,000
+this, right? So, for example, for this one, you can you know what is this, right? This is equals to What is this? This is equals to p y if y i is 1. If this is equals to 1 minus p y if y is equals to 0. Right, so and for each of this, you can write them as a formula of of the data and the and and the parameters. And then you do the maximum likelihood. So, the maximum likelihood uh I guess I'll also just tell you the solution. Um So, if you write look at the gradient of L is zero. Right, this is the is a sufficient is a
+
+88
+00:53:27,000 --> 00:54:50,000
+necessary condition for for your you are being um uh for you to be a maximizer. I guess technically I should write nabla y And you compute this gradient and you solve this equation. This is a family of equations. And then this solving it gives um some formulas for the parameters uh you are recovering. So, the So, the the final solution will look like this. p y is equals to um Right? This is pretty intuitive. This is the fraction of positive examples. Actually, it's the same formula as we have seen for the GDA.
+
+89
+00:54:24,000 --> 00:55:51,000
+And then p j y is 1, this is the probability to see x j is 1 given y is 1. It turns out that this is uh also something simple. So, you look at Maybe let me write down the formula and then interpret it. So, what is of occurrences of i-th word, right? It's only one when the i-th word the the i-th example contains the j-th word, right? So, the j-th word, right, this is x j i is 1 means that the j-th word shows up in the i-th example. In And And you also require that the i-th example is positive example. So,
+
+90
+00:55:45,000 --> 00:56:44,000
+basically the the sum is the total number of occurrences of j-th word in positive examples. And this is the number of positive examples. So, you can see that it's you know, even though we have done a lot of like calculation and modeling, at the end of the day, the the formula is pretty intuitive. You are in some sense just counting It's kind of like something about counting, right? You're doing some statistics. Right, you're counting how many times the j-th word shows up in positive examples and you divide that by
+
+91
+00:56:22,000 --> 00:57:20,000
+how many total positive examples there are. Right, so for example, suppose like uh the word book shows up in 10 positive examples and there are there are like a a million positive examples, that means this is 5 over a million. Which kind of means that book doesn't seem to have much correlation with positive examples. If it is this number is small, right? If this number is small, it means that it's unlikely to see the j-th word given positive example. So, when it's unlikely, you know,
+
+92
+00:56:51,000 --> 00:58:07,000
+it's unlikely because partly because the in the data they don't show up. So, Okay, and and for the negative examples, it's the same. So, you just uh write um it's kind of symmetric. So, p of j given y 0 is equals to um something like I guess you can guess what the what it is, right? Basically, you just the change every the value of y to to zero. Okay, any questions? Okay. So, um Okay, so basically we are done with this. Um at least uh we are almost done. There's one small thing that we have to address. But in
+
+93
+00:57:56,000 --> 00:59:10,000
+terms of the estimate parameter, we are done. So, and we got the parameter and at the prediction time, as before, right? So, when you do the prediction, as as usual, you want to compute p of y is 1 given x. Right? And if this number is larger than 0.5, then you say this is positive example. If this number is less than 0.5, you say this is a negative example. So, we have to compute this. And how do we compute this? You know, this is again as in our general methodology, use the Bayes rule and divide by p of x.
+
+94
+00:58:47,000 --> 00:59:46,000
+So, this is still the same. But there's one small caveat here, which is that what if you have a zero divide by zero in situation? So, before when you have Gaussian, the density, you know, no matter what you do, the density is always non-zero at every places. Even though sometimes it could be very small, the density could be very small, but still your p x in all of these quantities are like all positive and strictly positive. At least you're going to get a ratio here. But here, there might be some cases
+
+95
+00:59:17,000 --> 01:00:41,000
+where your p of x is just literally zero. And why that can happen, I guess maybe let me just give you a example. So, So, you may think that some example just never shows up because because of some um I guess let me show the example cases. Right, so suppose maybe I say suppose So suppose um maybe the word aardvark never appears in in training set. And then we claim that this would mean that this would mean that P if you have a but your test example contain contain it. So let's say test example let's call it
+
+96
+01:00:15,000 --> 01:01:44,000
+X contains it. And then I'm going to claim that P of X will be considered as zero. Um, why? I guess let's um somewhat similar this algorithm and see what the fee will we're going to compute from this. So aardvark aardvark is the second word. Right, so you are so J is two. So um and you know X 2 J X 2 I is zero for every I. This is a mathematical translation of aardvark never shows up in the training set. For every example, the second word never shows up. That's why the X 2 I is zero.
+
+97
+01:01:09,000 --> 01:02:12,000
+And when the X 2 I is zero and you plug in it into this formula that tries to estimate this parameter, suppose let's try to estimate the parameter fee 2 Y is one. Right, this parameter intuitively means that how likely the second word will show up in a positive example. And recall that you know this formula is really about you know the total number of occurrences that aardvark shows up and divided by total number of positive examples. So this will be zero because no no occurrences of the second word
+
+98
+01:01:41,000 --> 01:02:48,000
+divided by the total number of positive examples. And this will be zero. That's still fine. Um uh so far it's not a problem. So zero divided by a positive number, that's fine. And if fee 2 Y is zero is the same. It's zero over a total number of negative examples. This is also zero. So so basically according to your uh estimate MLE estimate this this word aardvark just cannot show up at all. Right, which makes sense because it it didn't show up it didn't show up in the training set. You know, you you just in
+
+99
+01:02:21,000 --> 01:03:36,000
+your estimate you also say it shouldn't show up at all in this under this uh this set of parameters. So but that's that's a problem because now if you compute P of X for example X that does contain the the second word then you're going to have write this as P of X. So how do you compute this? You use the the total law of probability. You say this is equals to the case when Y is one plus the case when Y is zero. And of course this is a positive number, this is a positive number, that's fine.
+
+100
+01:02:59,000 --> 01:04:26,000
+But this one is equals to Maybe I'll just this one is equals to the using naive base this is equals to X J given Y is one. And you have some uh product over J from J to D. Right. And now I know that my X 2 is one because this word does show up in this email and that means that P you're going to have P of X 2 equals to one given Y is one as the second term in this product. Right. So you're going to have this term shows up in this product. And but this one is equals to fee 2 Y is one which is equals to zero.
+
+101
+01:03:45,000 --> 01:04:52,000
+So just because of the second word you know according to your model it's not supposed to show up but it does show up. That means that this example just does have zero probability in your probabilistic model. So that's why this is zero. And for the same reason so this one is going to be equals to Y zero. And also you have this term P of X 2 equals to one given Y is zero. And recall that under your probabilistic model you learned you just think this word cannot show up at all. Right, the chance is zero. So that's why the chance
+
+102
+01:04:22,000 --> 01:05:27,000
+to see this word shows up is zero. So this is zero. So that's why this is also zero. So because of these zero terms it eventually I guess if you because there's a zero here there's a zero here so you get zero just eventually. So basically you conclude that this example just sup- isn't supposed to show up. Like this example has zero probability under this probabilistic model that you you learned. So and then that's a problem because now this P of X is a zero this is zero. So you have something divided by zero.
+
+103
+01:04:55,000 --> 01:05:58,000
+Actually this is also zero if you think about it because this is just the one term the the numerator is just one term in the decomposition of PX. And the numerator is just this term. And uh PX is the sum of the two terms. So both of these uh the the numerator and the denominator they are both zero. And you have the zero divided by zero situation. And now and what do you do? So this is uh this is a issue. And this is a reasonably realistic issue because uh sometimes you just see a new word in your test example, right? You haven't
+
+104
+01:05:29,000 --> 01:06:35,000
+seen this word at all in the training set. So uh the way we deal with this is so-called uh Laplacian smoothing. In some sense this is a way to introduce a little bit prior so that uh you don't 100% trust your training set. So so basically what we are seeing here is that you trust your training set just 100% like religiously in some sense. Like a like a like uh you uh you haven't seen any word the other the word aardvark in the training set. You just and because of that you trust it you just say this word just shouldn't
+
+105
+01:06:01,000 --> 01:07:13,000
+show up at all. That's why if you see this if this word is in this X, right? So then the probability of X is to zero. So so what we are going to do is we're going to say just you know maybe we shouldn't trust the data exactly. We we're going to allow it to allow any new word to show up a little bit with some small chance. And and this is in some sense this is a local adjustment um um by using some prior knowledge which is called Laplace Laplace smoothing. So I guess uh just to the best way to describe this method is
+
+106
+01:06:52,000 --> 01:08:02,000
+start with something abstract. Um for the moment let's forget about that for the moment and just think about the abstract question. Suppose you have um so a simple simple example. Maybe you can call this example or abstraction in some sense. So suppose you think about you know your estimate um um the bias of a the bias of a coin. I suppose you have a coin this coin is biased it's not 50/50. Um so how do you know the the bias of the coin? Or or in mathematical language it really means that you have a random
+
+107
+01:07:30,000 --> 01:08:24,000
+variable Z which is from Bernoulli. Um where is where with the parameter fee and this fee is something unknown, right? It's not the half and you want to know what the fee is. And you want to know it by looking at some data, right? So you draw a few copies of from this distribution and you want to know what's the um uh what's the what what's fee? You want to estimate fee by um by using the data. And you want to solve this problem, right? This is still a probabilistic model. We can still do the same thing
+
+108
+01:08:03,000 --> 01:09:14,000
+where you can uh write out the probabilistic you can write out the MLE and you can write out the you can maximize the MLE. Right, so let's uh maybe let's try to do this. Just uh so suppose you have like maybe N trials and let's call this you know Z1 Z2 and ZN and each of these is either one or zero, something like this. Right, uh maybe I guess in my notes it's called tail and heads. So I'll just call it tail and heads. Something like this. So and you want to estimate what fee is.
+
+109
+01:08:42,000 --> 01:09:53,000
+And if you follow our general principle, right? We will try to write out the likelihood. Then the likelihood What is the likelihood? So the likelihood of fee, right? Of the parameter fee. Um is the chance to see this data set given the parameter fee. So what's the chance to see this data set? The chance to see the first one is 1 minus fee. Right, the chance to see the second one is is one um I guess tail means I think I need to define tail means what? Tail means zero let's say. And heads means one.
+
+110
+01:09:23,000 --> 01:10:18,000
+Right, so so the chance to and you have uh the the the the probability to see one is fee and the probability to see zero is one minus fee. So that's why the probability of to see the first example is one minus fee and then you time one minus fee for the second example and you might have a bunch and then you multiply fee at the end. Right, this is the likelihood. And and if you organize this, right, you count how many one minus fee there are, how many fees there are, this will be one minus fee
+
+111
+01:09:50,000 --> 01:11:19,000
+to the power of the number of uh tails and times fee to the power of heads. Actually, if you really look at this example, you will see that the formulas are very very similar. Actually, this example is a a toy case for that in some sense. Um Okay, so you got this. And then you can um take the argmax of this log likelihood. You you take the argmax of the log likelihood. So the argmax uh maybe let's call this L of fee. So the argmax of log of L fee if you solve it you are going to get the following. So it's going to be the
+
+112
+01:10:39,000 --> 01:12:03,000
+number of heads over the number of heads plus the number of tails. Which also makes sense because, you know, this is basically empirical frequency of seeing a head. Uh the by empirical I just mean like a the the the frequency of that you see the heads in the in the training set. Right? And that's your most likely estimate um for uh for fee. Okay? So and Right. So Okay, so far everything seems to make sense, right? So but now I'm let's consider a somewhat um kind of extreme case. So what if you see
+
+113
+01:11:32,000 --> 01:12:37,000
+all the examples you see are tails, right? And you don't have a lot of like a Suppose you just have three draws. Z1 Z2 and Z3 and they are all tail. So according to this formula, you are going to get uh the fee, the best estimate for fee is zero over zero plus three, which is equals to zero. But do you should you really trust this, right? Should should you really trust that this this coin just never give you a head? Right, what does this mean? This means that this coin just never give you a
+
+114
+01:12:09,000 --> 01:13:03,000
+head at all, forever. Right? Should you really trust that? Um you know, this is a little bit subjective, right? You may you know, if you are really really trust the data, you probably can say yes. But you know, maybe you have some prior knowledge that most of the coins are not that crazy, right? So like you probably should at least just have some chance to see the head, right? With some chance. So um so in some sense you can say so basically on the flip side you can say, okay, maybe this is just some
+
+115
+01:12:37,000 --> 01:13:33,000
+coincidence, right? It just happens that you see three tails. Even this fee is a half, right? Seeing this example seeing this cases is the the probability to see this case is is at least one over eight, right? It's something like one over eight. So so maybe it's just coincidence of the data set. So maybe you shouldn't trust the data set that much. Um so the so-called Laplace smoothing is is a way to in some sense incorporate a prior so that you you say the my coin shouldn't be extreme, shouldn't be too extreme like
+
+116
+01:13:05,000 --> 01:14:16,000
+this. So so basically if the Laplace smoothing refers to the following estimator So this if you use Laplace smoothing, you are going to have a different formula. Your fee will be equals to the number of heads plus one over the number of heads plus the number of tails plus two. So um this formula, you know you know, I didn't tell you any like a mathematical justification. Actually, if you really look in the literature, there are mathematical justifications. So far I'm just telling the formula.
+
+117
+01:13:42,000 --> 01:14:43,000
+But it would solve this problem, right? Like at least to some extent because if for this particular case you are going to get one on on the numerator and four um the denominator. So instead of getting zero, you are getting one over four. So still you you say, okay, the the chance to see the head is pretty small, right? It's it's smaller than the chance to see the tail. But you don't have a very extreme estimate. So and and you can see that this Laplace smoothing is mostly useful when you have
+
+118
+01:14:13,000 --> 01:15:28,000
+not enough data. Right? If you have a lot of data, then this Laplace Laplace smoothing is not doing much. Right? Maybe let me give you a kind of a example. For example, suppose you have a big data where the number of heads, let's say I guess I'm making up this, right? So 100 and number of tails is 60. So if you use the standard approach, right? If you use the the the standard approach or maybe I shouldn't call like the the vanilla approach, then this is like a the fee would be equals to 60 over 60 plus
+
+119
+01:14:50,000 --> 01:16:14,000
+uh 100. Right, this is uh what is this? This is like a I don't know what this is. It's like this. Something like this. And then um if you use the Laplace smoothing then this fee will be 60 plus one over 60 plus 100 plus two which will be um 61 over 162. This is 60 over 160. very similar. Just because the one just because the one whatever you change here, one and two, right? It doesn't really matter that much because the the dominating term is the six and 100. So so in some sense you you achieve
+
+120
+01:15:36,000 --> 01:16:37,000
+like you choose you achieve a kind of right balance, right? If you have enough data, then your prior or or like your Laplace smoothing is not doing much. It doesn't really change much. You trust your data. And if you don't have enough data, then Laplace smoothing would um would try to make it not too extreme. Would try to make your estimate not too extreme. Okay. So now let's go back to our problem. So let me see where is the best way to write this. Hm. Oh, I think I erased the Oh, I erased the formula, but I I will
+
+121
+01:16:29,000 --> 01:17:44,000
+write it again. So going back to our spam filtering thing, I guess actually there is a there is a there's one thing that is left here. This is our estimate. Right? And our other estimate was something like fee j y is one is equals to Am I writing the superscript correctly? I think this is I. My bad. Right, so if you apply this to uh our case so you can recall that, you know, in this case it's kind of like you are saying that um the numerator is the number of times this word shows up uh in the in the
+
+122
+01:17:42,000 --> 01:18:44,000
+positive example. And and uh and the um the denominator is like the total number of positive examples, right? So in some sense the analogy is that this denominator is very similar to the number of heads and tails. Because because the head means that this word shows up. The tail means this word doesn't show up. So and and and here the the the denominator is like the total number of times the total number of examples positive examples. Um and here the the the the numerator is the kind of like the heads.
+
+123
+01:18:13,000 --> 01:19:09,000
+Right? So basically heads means that the word show up in positive in a positive example. And tail means that the word doesn't show up in a in a positive example. So that's why this is like heads, number of heads, and this is like number of heads and plus number of tails. And if you use a Laplace smoothing, then um you are going to add one to the denominator and you add to the numerator and you add two to the denominator. So that's the that's the Laplace smoothing. And and the same thing for
+
+124
+01:18:42,000 --> 01:20:12,000
+the other formula, so you are going to get add one and add two here. So that's the uh Laplace smoothing. And why this solves our problem? It solves our problem because now we just never found we just never estimate any parameter fee to be exactly uh zero, right? So recall that uh when we have this uh um ad bug issue right? So the issue was that this two parameters for the ad bug was exactly zero. Um yeah, let me ask. So we do the same thing with our speed in 3.9 or one of them Yeah, that's a fantastic question. So,
+
+125
+01:19:32,000 --> 01:20:30,000
+the question was that whether you want to do the same Laplace smoothing for the fee Y. Like fee Y was the the single scalar to describe the probability of Y. Um uh to describe the uh the probability of each of the class. Right. So, and you are right. So, suppose one class just never shows up, right? And you still only have like negative class or positive class, then you probably should use Laplace smoothing for that. But, I think this is a a little bit less uh important because, you know, in most of the data
+
+126
+01:20:01,000 --> 01:20:55,000
+set you have to see positive examples and negative examples. You you have to see a reasonable number of them, maybe 50 of positive, 50 of negative. And then Laplace smoothing wouldn't really matter that much. You can still use it, but it wouldn't matter that much. Okay. So, going back to this So, So, recall that our problem was that when you have the you when you have the same parameters, you get this zero, right? You you you thought that otherwise it shouldn't show up at all, but you get this very extreme estimate.
+
+127
+01:20:30,000 --> 01:21:31,000
+And now, when you add this one and two here, uh um So, you what you're going to happen is that instead of having zero over the number of positive examples, you get zero plus one over this plus two. Yeah, I don't have a different color, sorry. So, I have to just modify. Um um I I don't I don't just only have black pens. Um but, so you get this. And then this will be at least no longer So, this will be still a pretty small number, right? This is one over the number of positive example
+
+128
+01:21:02,000 --> 01:22:16,000
+plus two. So, but at least this is bigger than zero. So, and the same thing for this, right? So, you're going to get plus one over and this plus two, and this is bigger than zero. So, if both of these are bigger than zero, then when you evaluate this formula, you are not going to evaluate to zero. So, your P of X will be some positive number. So, then you can get uh uh a a number of the P of Y given X. And maybe just a a very small extension given I have 2 minutes. So, 12 minutes. So, if you have more than two classes,
+
+129
+01:21:50,000 --> 01:23:18,000
+you can um this is just a for your interest. Um so, suppose you have like a uh maybe a dice, something like that, right? Instead of like a coin. So, suppose you have Z, which is from something like 0 1 up to K minus 1. So, you have K choices, then uh the Laplace the general Laplace smoothing would be something like if you don't do Laplace smoothing, what you're going to have is that the prob the chance you estimate this to be something like the number of times Z I is equals to J over the total number of examples. So,
+
+130
+01:22:34,000 --> 01:23:39,000
+you count how many examples kind of end up to the choice J, and you divide by the total number of examples. And if you use Laplace smoothing, you're going to add one to the top, and you add K uh to the bottom, where K is the number of choices. So, so this is just a a small extension of Laplace smoothing. You know, I don't think this course will use it again, but just for for your interest. Um Okay, cool. I guess that's pretty much all for today. Any questions? Okay, great. Yeah, in the next lecture,
+
+131
+01:23:13,000 --> 01:23:25,000
+I guess we are going to talk about kernel method, and then we're going to talk about deep learning. Thanks.
+

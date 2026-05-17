@@ -1,0 +1,508 @@
+1
+00:00:05,000 --> 00:01:07,000
+today we're going to talk about self suppress learning this is a lecture that um that doesn't have a lot of math but it's going to be all about very recent works like probably like in the last three or four years at the most so and these are kind of like a pretty interesting kind of intriguing kind of like Concepts you know but nothing very complicated everything is kind of simple um so so basically I think you know about probably like 2013 2014 I think you know deep learning new networks you know this
+
+2
+00:00:35,000 --> 00:01:36,000
+kind of ideas start to take off and and we have this kind of kind of like a revolution of AI in some sense like we have a lot of amazing results in the last about 10 years right after deep learning took off um but in the last two or three years I think we see kind of like an emergent new paradigm of AI which you know she's still based on deep learning new artworks but I think kind of like in some sense um the kind of the paradigm shift a little bit towards this kind of like large-scale unsurprised learning or
+
+3
+00:01:06,000 --> 00:01:55,000
+self-spice learning so that's that's kind of like what we're going to talk about today so I guess uh um uh last few lectures I think Chris talk about Express learning so those are mostly ideas you know like more classical ideas like that was you know developed like before deep learning took off and today I think we're going to talk about the kind of new type of five spice learning you know which is not that different from the old ones but uh you know with new artworks and with some you know more
+
+4
+00:01:30,000 --> 00:02:34,000
+uh kind of like a um some kind of like technical differences and and also like some differences in the conceptual way so um so I think um in some sense this is called like a like a actually we also write a white paper about this uh like a bunch of extend for people like actually there are 100 people more than 100 people on the paper so um mostly stand for researchers stand for faculty and students so rather right direct um we wrote a white paper on this we call it Foundation model um so in some sense it's just a name so
+
+5
+00:02:02,000 --> 00:02:57,000
+um um it's a name for kind of this large set of ideas that involves kind of like pre-training online surprise data and then kind of like use it for a bunch of Downstream tasks I'm not sure whether you know any of these passwords but that's what I'm I'm here for so I'm going to Define some of these words and and tell you what's kind of the pipeline and the Paradigm is so basically um uh kind of like the the main thing uh for deep learning is that you know we use like a new networks to face you know
+
+6
+00:02:30,000 --> 00:03:28,000
+larger data than we used to do before like 10 years like 15 years ago and and typically at the beginning when you use deep learning you use it for uh surprise learning right you have a lot of data uh maybe a million data image night and you have labels for them and then you pick right work to predict the label and it turns out that even audio network is pretty big um as until data is also somewhat big you know like you can see good results and sometimes you can even make it work on small data so but all of this requires you know
+
+7
+00:02:59,000 --> 00:03:54,000
+some amount of label data right so um and then um recently people figure out you know maybe we should use unlabeled data as well right so when you use unlabeled data then you have you know much more like for example for tax data I think there's this data set which has like 40 trillion uh words in it um so um but if you have label data sets then you probably have a million labeled documents you know and also label has has specific meanings you know maybe you need multiple labels for a documents
+
+8
+00:03:26,000 --> 00:04:27,000
+very many times so in many cases so if you if you say I can tune with unlabeled data then you certainly have availability of a lot more data so I think that's kind of like a uh uh the kind of the main kind of the driving force so now we are training on unsurprised um uh like on unlabeled data so and this kind of fight so and how do you tune with unsurprised unlabeled data I think often um people have you know different words for for the same kind of concept I think one of the way to call it is
+
+9
+00:03:56,000 --> 00:05:07,000
+because self-surprise learning so you supervise and as you'll see you're going to supervise your model with um yourself your like the input itself so so you don't have to use any label and sometimes you know um as I said you know in a white paper we call this family of models called Foundation model um Foundation it's kind of like uh I will explain this word a little more um and some other bars words include pre-training I'll explain on them as well and adaptation so I guess I will just
+
+10
+00:04:40,000 --> 00:05:49,000
+um start by explaining pre-training so in some sense the way that people do this right now is the following so you have this so-called pre-training stage where you um pre-tune description oh so large scale and here large scale really means very very large scale and label data set it's not always the case that you have to use unlabeled data set we'll see actually in some cases you can use the label data set for pre-tuning but you really have to make a large scale um and an unlabel is that is kind of
+
+11
+00:05:22,000 --> 00:06:44,000
+more common than uh the label data set and also you push a large model a very large model and then this the second step is that you somehow adapt this so adapt this preachment model to some Downstream tasks actually often you can download adapt to my adoption tasks not only one um so but the adaptation to 90 task is the same as adapting to one you just do it one by one so you adapt to some Downstream tasks um tasks and these Downstream tasks are often labeled data set so and for Downstream tasks you know you have
+
+12
+00:06:19,000 --> 00:07:21,000
+different settings you know describe you know in more detail but generally you have you know a few examples you know in a downstream task uh for example you know um one example could be that you preach on unlabeled text right that you can download from internet right so you could have like a chilling words you know like documents uh like a lot of documents with your children words download from data from internet and you preaching your model on this unlabel data set uh how do you personally I'm
+
+13
+00:06:50,000 --> 00:07:45,000
+going to tell you and then after you get this model this model is preachment you know with no labels so you don't really it doesn't really solve any particular task and then you say I'm going to have a downstream task about tax maybe I care about sentiment analysis meaning you care about whether this sentiment a document or sentence is positive or not right maybe for Amazon review where you care about whether the reviews is positive or not and then you say I'm going to have um you know a small number of examples
+
+14
+00:07:17,000 --> 00:08:15,000
+for sentiment analysis where I have I have a small number of examples with documents and label the positive or negative label pair right so maybe like a you know a hundred or a thousand kind of like pairs of documents and label and then that's called Downstream task and then you want to adapt your prediction model which is very general with generic um to the specific task using some additional kind of like tuning so so that's the uh the general idea and sometimes you know the down of course
+
+15
+00:07:46,000 --> 00:08:40,000
+you know kind of the distinction between these two steps is that this time you you may still involve some training some kind of tuning in this adaptation step because you're going to see the new examples on a downstream task the sentiment analysis does right and then uh you have to kind of do something you know with those examples so there is a there's possible a training of transition step in the adaptation uh step as well but uh the difference here is that this step often involves very
+
+16
+00:08:13,000 --> 00:09:12,000
+large scale data and this kind of generic it's not like about task specific uh learning so here is really about task itself and also often times you have much fewer data points uh than the approach winning step you know sometimes you have a thousand sometimes you have ten thousands but generally not by not a lot sometimes you can even work with you know even zero uh examples in adaptation step you can sometimes still adapt to the task so so kind of the intuition is that the future new step is about you know
+
+17
+00:08:42,000 --> 00:09:36,000
+learning the generic structure or the kind of like the intrinsic structure of for example texts right or the for example if you do it for image you are learning the intrinsic kind of like structure of the images maybe the kind of the the intrinsic features about images and then the adaptation step is more about the task itself right so um for images you can care about the many different tasks you know maybe you care about recognition maybe you care about you know classification or maybe you care about in a different kind of
+
+18
+00:09:09,000 --> 00:10:10,000
+like labels right so so you can have labels of different granularities you know a bunch of different tasks right so this step is more about tasks um so um so that's the kind of like the the general kind of like intuition right you approaching a lot of data so that's uh give you the intrinsic structure or the best intrinsic representations uh for this kind of data and that representations are useful for Downstream tasks so that so that you don't have to use like a a lot of examples in Downstream tasks right
+
+19
+00:09:40,000 --> 00:10:40,000
+because you already learn some interesting weapon stations that helps you uh for the downstream task um right so so basically you know the kind of the one implication here is that you know you expect that this is uh this this pipeline is going to do better for than just preaching just training your your model only on the downstream data set so that's that's the the basic goal right you have the Baseline is that the trivial baselines that you you just directly tune your model on the task
+
+20
+00:10:11,000 --> 00:11:12,000
+Downstream task um but generally you don't have enough data for that but if you do this kind of like transfer um it's transferring from the unlabeled data set to this one then you may do better and and we call this kind of like preaching model also Foundation model so here I call it pushpin model right so you can call also called Foundation model and a reason for the word foundation I think the kind of like the implication is that this uh this person model is kind of like a um a general model that you know general
+
+21
+00:10:43,000 --> 00:11:44,000
+purpose model that can do a lot of different things um and that's kind of the foundation and this is the adaptation that's a good question but I'll talk about this yeah okay any questions uh so far so I'm going to tell you okay so this is general idea I'm going to tell you some kind of like uh I'm gonna you know start with some simple notations and and tell you how do people generally do this and you're more kind of mathematical way Okay so so pretty training so [Applause]
+
+22
+00:11:28,000 --> 00:12:39,000
+um so I guess so let's say you have some data something like X1 up to accent so you have ended up points and and could be very big and there is no label here so this is unsurprised you know pertaining of course sometimes you can still have labels in it but let's say we focus on a case where you have uh no labels and you have a model so let's specify the input and output of the model so typical you can think of this as you know the model let's say is called V of theta and sometimes you feel
+
+23
+00:12:06,000 --> 00:13:34,000
+this as a feature extractor a feature map um but it's a learned feature map so this is something that maps apps to V of theta if Theta of X and let's say visit of X is some vector so and I guess you can as we have kind of seen this kind of like we have this kind of feature map often you call this representation features you know there are many many names for it reference then quotation slash features sometimes people also called embeddings especially if you talk to more mathematical people because in my field
+
+24
+00:12:51,000 --> 00:13:54,000
+this word embedding is used on in a similar context um so so this is a representation of the of the raw that you have right so the raw data could be text could be image and this is a vector so this is something we are familiar with right so in both you know new artworks we have like we have used the last but one layer as the open station in a feature lecture uh this is the the feature map although like in a feature in the kernels or in the kernel lecture we this is the feature map but in a kernel lecture this
+
+25
+00:13:22,000 --> 00:14:24,000
+feature map is given uh and designed but um later when we do the new artworks this is the Learned feature map and here we are still learning a feature map and we are still learning a feature map feature extractor whatever you call this so and then but you but here you learn this you know without um labels so you say you have some protein loss maybe some protein loss there are many forms of positioning laws as well here I'm just only giving one form something like probably nothing maybe some some laws
+
+26
+00:13:54,000 --> 00:15:00,000
+no um like a sum of laws on single example right so you can Define I'm going to define the laws for different cases um sometimes these laws can also depend on multiple examples sometimes they can depend on labels but something like this you have operation loss okay and then what you do is you just optimize this loss this IOP um and let's say obtain some say the heart so so and I'm gonna call this my protein model or maybe that's called we can call it Foundation model or something like that
+
+27
+00:14:39,000 --> 00:15:39,000
+okay so it's nothing fancy so far yet I haven't told you what the protein loss is um there are many many different ways of ways of doing pre-training I'm going to tell you a few ways but so far it's just you have some Define some loss function but the loss only depends on the unlabeled data and then you minimize the loss and you get some um some model okay so and then I'm going to do the adaptation step which I'm going to be a little bit more concrete because it's a little bit
+
+28
+00:15:10,000 --> 00:16:17,000
+easier um so in adaptation is that let's first clarify what kind of data you have right before talking about how do you do it so what data do you have so you can also it's a down it's a it's a label data set it's a label prediction task the downstream tasks even though I think you know if you look at enough papers there are many other papers talking about different type type of tasks but here let's say we have some labeled um on some prediction tasks and we have some label data set so let's say we have
+
+29
+00:15:45,000 --> 00:17:19,000
+a few examples you know let's call it X task one why task one so and so forth text task and T y task s and this is the number of you know down Downstream examples which is you know presumably much smaller than um like I'm going to use NT the num as the number of Downstream so um on this one you know this is is supposed to be much smaller than the number of unlabeled examples in a perching step so and they are actually a few different settings you know so one setting is that when NT is zero
+
+30
+00:16:48,000 --> 00:17:52,000
+so this is called zero shot learning so when T is zero it just means you don't have anything you don't have the data set so it's called zero shot learning we will see how do you do it you know sometimes you can still do zero like you can still do the task without even knowing anything about a task um so and when NT is relatively small I think uh this is called Fuel shots and what do I mean by small I think in the literature maybe five is typically considered as small 5 10 20. um but
+
+31
+00:17:28,000 --> 00:18:23,000
+maybe not more than 50. if you have more than 50 examples I think of course there's no nobody really defined what what exactly means but I think if it's more than 50 examples um per class in the downstream task I don't think you you would call it few shots so mostly like 10. so um but of course you know there are cases where you can have more examples maybe like I think I've seen cases where you have like 10 000 examples or maybe even a hundred thousands in some extreme cases so
+
+32
+00:17:55,000 --> 00:18:58,000
+um but the the end there typically could be like a billion or even a trillion sometimes 100 billion so okay so how do okay so this is the setup you know I'm giving this information and then how do I uh do it so a high level the first thing I'm gonna do is I'm going to first Define how do I even uh how do I adapt right so I'm giving this model still your heart so what's the what's the model to predict a label I need to have a model that protects the label so here the Taylor hat
+
+33
+00:18:27,000 --> 00:19:44,000
+predicts a feature Vector but not the label so so the first thing is that I'm going to um typically I'm going to have a some kind of like or maybe like me this one one way to do this so This which is called linear um Pro often people also cause linear hats like a um something like this so the kind of like the the idea is you know you are you probably should be familiar with this um it's just like you take this feature fee say the height X and then you apply a linear classifier on top of it you say I'm going to take
+
+34
+00:19:08,000 --> 00:20:07,000
+an inner Paradox of this feature with some linear class for doubling and W transpose X is my prediction model for the downstream task um let's say suppose you have a regression model then you just want this number this to be some real number and if you have classification then this is supposed to predict the probability of the label one of the label so so it's just almost the same as what we do in what works right you just you have some feature and you apply some linear height on this feature
+
+35
+00:19:37,000 --> 00:20:58,000
+so so and then so it will do linear probe what you do is that this is the we have defined a prediction model and then you can Define how to you can say how do I learn this W right so here no no that say the Hat here is fixed so I'm only learning W when I'm doing a linear probe so how do you learn W you just say I'm gonna just tune w um with some loss function with some um loss function on the on the downstream examples so basically I just do something like maybe one over NT and minimize over w
+
+36
+00:20:19,000 --> 00:21:21,000
+and I have a loss function which is the sum over the loss on the downstream tasks assuming you have Downstream tasks right if you assume you have Downstream examples if you don't have Downstream examples you have to this doesn't apply anymore I'll tell you how to do it we don't have Downstream examples um but suppose you have Downstream examples then you just minimize the loss something like the loss that's called L task and this loss function is something that compares the label
+
+37
+00:20:52,000 --> 00:21:59,000
+and your prediction of your model the prediction of your model is something like this right this task for example could be just you know L2 loss you know mean Square loss sorry this this loss could be just the mean Square loss or could be some kind of cross entropy loss or some other loss that you care about and so when you do linear so-called linear probe it means that you only optimize W so you're only optimizing W which is the vector of Dimension at right so and is W is in all right so you're just
+
+38
+00:21:38,000 --> 00:22:43,000
+optimizing this m-dimensional Vector to make it to make your model um fit on to the downstream task um and this is the so-called adaptations that basically the W is the thing that you want to use to adapt your model to a new task any questions so where the label come from you have seen you have a label data somebody gave you right so you collect the data set I as as the same as what we did before but the difference is that you don't you may not have to collect as many as before I I like if you just uh turn on this data
+
+39
+00:22:22,000 --> 00:23:31,000
+set just from scratch then you may need more than what you do here okay okay um so I think um so I guess maybe the questions what what plans for learning you know come into play here so I think you can in some sense call this also transfer learning so transfer learning used to be the transport in this word you know occurs you know like a um like this this uh this term this term was used way before people have done any of the pro training so like uh so like now like I think the like transferred on your
+
+40
+00:23:09,000 --> 00:24:19,000
+probably like people started like in early 2000s or already even maybe before that so and then at that time transfer learning means what it means that you know if I use protein language it means that you preaching with a label data set and then you do some adaptation so so so basically transfer learning means this you know in the new language so um but now these days when we preaching we push on unlabel data set um and another maybe another thing is that um it used to be the case that um like the like when transferring the the the
+
+41
+00:23:44,000 --> 00:24:41,000
+First Data that you turn on is also is classification task which is kind of like similar so the the final task you care about so but here um in some sense the reason why people introduce new terms for this is that when you preach when this task could be could be nothing like um the downstream tasks I I haven't told you what exactly the task is but as but at least you can imagine there's not a lot of similarity because here we don't even have labels right it has to be something different
+
+42
+00:24:15,000 --> 00:25:30,000
+um yeah but but I think you can still say this is transparent it's not like you know there's no precise puncture between this oh okay so let me introduce another way to do um um adaptation so another very common way to do adaptation uh is that a so-called fine-tuning and it's also pretty easy to understand so basically your model is the same um but you just your model your prediction is some W transpose fee fatal effects so here I write Theta but don't say the hatch to indicate that I'm allowed to
+
+43
+00:24:56,000 --> 00:26:09,000
+change this data so here Theta doesn't have to be exactly the preaching model anymore it could be something um that you can change so then what you do is you say I'm gonna optimize both W and Theta um on the downstream tasks but if I just say this then this just sounds like the standard surprise learning right there's nothing different from Super restaurant you are just treating some new network right that blue transpose V of say X on the downstream task the difference from that is that you optimize but you also
+
+44
+00:25:39,000 --> 00:26:52,000
+initialize with initialization that Theta is initialized to be Theta hat because I say the heart is the prison model so basically you just as if you are doing supers learning but Theta is initialized to be Theta hat and W there is nothing you can do with that right because you didn't know W before so w says something new so just the initialize W to be random so that's so called fine tuning and you can optimize the same laws or whatever laws you care about a question so Theta is the parameter for this V is
+
+45
+00:26:23,000 --> 00:27:36,000
+a function parametricized by Theta so that's what this week no oh I think I just mean this is just um fee is just an uh is a name it's just it's it's a fun you can call it a f sub Theta this is an o h sub data it's just a name for uh for this model that is parametric respect Theta so single fee says that is the new network with parameters data I just need a notation to indicate this function right I can't just write status Theta and Phi Theta you know they corresponds to same thing but
+
+46
+00:27:05,000 --> 00:28:20,000
+mathematically I have to write V subset of something to indicate that I'm applying this model on x so um you know I can give a blame for let's say terminal is p but but it's not um I didn't use it explicitly yet foreign have you come over so I haven't told you yet at all so um just because there are so many different environments I have to somehow do it in a top tongue fashion um so so here for the downswing task I can do it just because these two things are very like a you can use this for
+
+47
+00:28:07,000 --> 00:29:03,000
+almost almost every situation but when you talk about preach meaning I have to talk about you know what you do in computer vision what you're doing uh language at least there's some differences depending on the domain of course there are also kind of recent works that try to unify all of this um but but at least I have to somewhat um like talk about the domains and that's what I'm going to talk about next yeah okay cool I guess uh maybe I'll just do that so how do we approach right so
+
+48
+00:28:35,000 --> 00:29:44,000
+um so I'm gonna approach my reputation how do I do that so let's first talk about um um the the vision settings so um or more kind of like the the classifications like the standard kind of classification settings so so let's just uh you know for some minutes I just think of like a vision so so suppose you have some kind of like images right so there are two types of um pre-training so one type is called a supervised per training you may wonder you know why you know like I already emphasized so much that
+
+49
+00:29:15,000 --> 00:30:31,000
+the preaching should be mostly on unlabeled data but actually for vision because you have a lot of label data all right the imagenet is a pretty big data set so you can actually do supervised per training as well um and this is just exactly what we have seen before so you can just um what you do is you just learn a new network um let's call this new artwork you know maybe let's call it U transpose V of x um uh label data set say imagenet so um and here the notation is that this is the um this is the last layer
+
+50
+00:30:02,000 --> 00:31:16,000
+of the new network right the last layer was linear right recall right so and Phi Theta of X is the all the other layers right it's basically the uh the the last but one layer activation right so so feature of X just denote you know what you do in the first you know uh R minus one layers and then U transpose means the last layer of the network and so Theta of course so basically if you have a new network like I don't know whether this I think we discussed this you know in one of the um the lectures so
+
+51
+00:30:45,000 --> 00:32:08,000
+um in deep learning right so you haven't watched work you have a lot of connections you know and eventually octopus and why and you review all of this as your Phi of theta and you view this as the so-called u and sometimes people call this linear Health right so you just do this you know this is just exactly that's what we do um in the um in the new network lecture and then you just discard then you just uh discard uh you and and just take the fee Theta of X right the learned I as the as the as the protein model
+
+52
+00:31:28,000 --> 00:32:21,000
+so you think of this as the feature and this is a you think of this as a kind of a universal feature in some sense and the head is is special to the tasks you use right to the to the label datas I use right maybe use image nuts the Hat has a thousands you know um like classes you know um that's that's something special but the the features is something kind of more Universal you just take the features and and discard the hat and then once you have a new task maybe not image like maybe some other
+
+53
+00:31:54,000 --> 00:33:03,000
+classification task maybe let's say now you have a new task which is Medical Imaging right like you're detecting from a scan image whether some person has let's say cancer right so then you just take this part this V Theta and then you apply a new hat right I'm using W as the new hat right you apply a new hat and then you fine tune all um just a linear Probe on your Downstream task right so so you remove this hat and I apply something else and then you do some tuning on the downstream task
+
+54
+00:32:29,000 --> 00:33:28,000
+um so that's uh that's the supervised project if you're like uh the medical images are like a different size than like the ones that it was preaching on um what kind of like stuff do we need to do to make it work yeah I think typically if the size are different you just have to upside of it I'm assuming maybe in medical unit is lower resolution you just have to do something opposite right you just make the size bigger I think you can pack some either you can pass them zeros outside or you
+
+55
+00:33:04,000 --> 00:34:12,000
+can just um maybe wrap technique Subway there's nothing fancy uh also you mentioned earlier that like if the class the task isn't similar it might not work as well so like is that a concern here so um so here at least you'll have to consider much because because of that because um CR let's say the proton images you know they have the image night classes they are all like uh like sometimes animals you know all kind of like common objects right um but the only way you discard the Hat
+
+56
+00:33:38,000 --> 00:34:36,000
+you remove the hat and then you add a new hat you know maybe now your new tasks just have two labels right cancer or not right um and and you just apply to that um but so in terms of the matter you can at least you can apply it when the task labels are different um but whether it will work you know sometimes depends on how how different your new task is from the old task so typically if you use an image sniper training you always learn something reasonable about the features um you wouldn't be terrible but you know
+
+57
+00:34:08,000 --> 00:35:15,000
+but if your task for example your Downstream task is really not even common images nothing like that's just some kind of like a random images then probably it wouldn't help that much Okay so so here there's nothing really um that um let's fancy and people kind of like there's other ways like in the beginning of the uh the Deep learning uh era um and there are some other kind of like and the second one I'm going to talk about is uh the so-called uh contrastive learning which is now unlabeled
+
+58
+00:34:43,000 --> 00:35:57,000
+um unlabeled uh like a unsurprised learning algorithm for pro training or some other people call it self-su questioning so so contrastive learning so now I don't have any labels I just um have unlabeled inside I need to Define loss function on unlabeled data sets so how do I do that um so I need to first introduce a notion called Data augmentation this so a data augmentation is um something that as the name suggests you are augmenting one example into uh a artificial example that still makes some
+
+59
+00:35:28,000 --> 00:36:40,000
+sense so and typically for images what you do is you just say uh I have a original image and then you augment um by doing some kind of like so-called run you can do a few things maybe a random crop to crop us a a patch of image as a new image or you can apply a random crop plus a flip you can flip the image you know just with the mirror flip and or you can do some color transformation color transformation means that maybe you make the image darker you know brighter or sometimes you can just even
+
+60
+00:36:13,000 --> 00:37:01,000
+do weird more weird kind of like color transformation you change although the the brown color to the white color you know like you can do some kind of like changing of the color scheme and there are many others you know um you know some of them are more advanced and sometimes you can even learn the transformation but these are kind of the common ones so basically given an image you can do this random operations kind of like you can try to choose to flip or not that's a random decision you can
+
+61
+00:36:37,000 --> 00:37:37,000
+choose to crop which part of the image like you can do some kind of like random color transformation so you have some Randomness here and then give an image X basically you can generate a random augmentation that's called X hat and if you do if you do this again you can generate another one which can be which I'm going to call X tilde and if you do it more and more times you can join even more of these augmentations so these augmentation is used in Surprise learning actually as well uh we
+
+62
+00:37:08,000 --> 00:38:10,000
+didn't discuss them just because they are low level details for super certainly what you actually do is that you can give an image and the label you can generate the augmentation and then just assume the augmentation is your new image so um so you just replaced all the image by the augmentation and and every time you do this you know with a new augmentation like like every time you see this or this image you you replace the image by a new augmentation and and tune with that argument images and that seems to improve the uh in some
+
+63
+00:37:39,000 --> 00:38:32,000
+sense you make the data set bigger in some sense because these are you know every time you augment right you're gonna get a different image in some sense even though they are something similar but still you make an effective size of that side a little bit bigger um so um so that's why people use it in um um uh in Surprise learning but now I'm going to use it in honest questioning um I actually now people call it self-suppressed learning so I'm going to use this to create some kind of
+
+64
+00:38:05,000 --> 00:39:13,000
+supervision uh or create some kind of Express logs what you do is you say I'm going to call this X hat first of all I'm going to Define some notation this is called a positive pair so so positive pairs are augmentations of the same image so one um you can imagine you know one property of the positive pair is that these two images two augmented images are probably should be somewhat similar semantically even though they may not have the same color scheme they may not have exactly the same orientation or the
+
+65
+00:38:42,000 --> 00:40:08,000
+right so they are still somewhat similar right so so what you do is you say uh you are gonna um try to make um so you you're going to design loss functions such that one you want to make a fee of theta of X hat and Phi of theta X tilde um close so basically you say I have two augmentations one is x height and the other is X tilde um you want the these two augmentations to have um similar uh representations in the including space so that's one goal of the loss I'm going to tell you exactly what the loss looks
+
+66
+00:39:28,000 --> 00:40:21,000
+like but this is one goal of the loss but if you just have this goal you can see that this loss function is a little bit unquestionable in some sense because maybe you should just map every image to the same point then everything has exactly the same representation then you satisfy this this goal right so so it's ideal that you should have something to counter balance to avoid you to just collapse everything into one one thing so how do counterbalance the way your counter balance is that you
+
+67
+00:39:55,000 --> 00:41:21,000
+um just to say um you want random images to have different representations so let's erase something here which one I should use here so basically to counterbalance this you the second goal is that you want suppose you say I'm going to have some two random example let's say you have um maybe X and Z so maybe a cat and dog right and then you augment X into X hat as the same way here and then you argument Z to Z hat so because x and z you know are two different images maybe one is cloud on
+
+68
+00:40:57,000 --> 00:42:26,000
+the other stock so the argumentation is probably looks very different as well and the augmentations are semantically very different so then your second goal is to make uh V Theta X hat and V Theta Z hat the augmentations of two different examples are far away so this is the to counter balance to avoid you to collect everything to the same point and actually there's a name for this pair it's X hat Z hat is also called uh either random pair or negative pair so um at the very beginning I think people
+
+69
+00:41:49,000 --> 00:42:46,000
+you call it negative pair which is not exactly right in the sense that x and z are just random choice of two images there's no guarantee that they are exactly they don't have exactly the same they don't have the uh the same class or same kind of like meaning right there is some small chance that both x and z are both from the same class right even you have like a following classes there's still a little bit chance that x and z are from the same class but in most of the cases x and z are from different
+
+70
+00:42:18,000 --> 00:43:22,000
+classes um and and they are semantically different so Random pair might be a little bit more accurate but negative pair is is what people call it at the beginning and I think now people just use this inter-exchangeably so um so basically you want to write random pairs to have different representations and you want positive pairs to have similar representations so um so this is the design principle how do you do this exactly so um there are multiple papers they are kind of like a at least four or five papers that use
+
+71
+00:42:50,000 --> 00:43:43,000
+this kind of like a principle um and sometimes actually uh some papers actually just even drop the number two you just use one and somehow still sometimes it works just because there's some other kind of like counter balance in in a system that can kind of achieve too without explicitly encouraging it but let's now talk about those let's talk about one case where the simplest case we have both one two especially encode it in a loss function which is called Sim clear and this is I think
+
+72
+00:43:17,000 --> 00:44:53,000
+basically the first um first paper that makes this kind of Ideal work um so how do you exactly encode these two kind of principle so it seem clear what people do is the following so what you do is you say you first take a batch of example a random batch of example like in SGD let's call this example X1 up to xB so FB example and then you first do some augmentations so your augment to um X hat one up to X Hat B and X tilde one up to X tilde B as as you can see these two are the augmentations of the first example these
+
+73
+00:44:15,000 --> 00:45:25,000
+two are the augmentations of the second example and these two are the augmentations of the the B's example and then here is the loss function so let me write down the loss function and then I can explain so so the intuition is that you want to design loss functions that basically maybe maybe let's see so oh I don't have a different color today so because these two are augmentation of the same example you want them to be to have similar representations right and maybe the same thing happens
+
+74
+00:44:53,000 --> 00:46:13,000
+for these two right so any any pairs you should have similar applications but if you look at this one and this one suppose you pick something like this then you want them to have different rapid stations and what you do is that you make the loss function the loss function is equal to this this is another button complicated and the first set but it's actually not that hard um so I guess so here the indices is the most important thing so this is I this is I this is I this is I and here this is J
+
+75
+00:46:32,000 --> 00:48:07,000
+sorry my handwriting is a little bit unclear so okay so maybe the first thing to realize is the following so um maybe let's focus on this term maybe let's call this term a and this term B realize that this is also a right so just a little the same term so this is really something like a lot minus log a over a plus b something like this absolutely speaking so and and if you do some simple math you'll see that this one is uh decreasing in a an increasing in b um this is uh relatively easy I guess
+
+76
+00:47:35,000 --> 00:48:44,000
+you can either take a derivative or just at least the increasing in B is pretty easy because this function is this function is decreasing in B and log is a monotone function and you have a minus in front and for a is the the reverse Direction so um that means that if you minimize this log function you are trying to encourage the term a to be smaller because it's decreasing a right sorry you want the term a bigger because the loss function is decreasing a the bigger the a is the smaller the loss
+
+77
+00:48:12,000 --> 00:49:38,000
+function is so you want this a term which is this inner product between actually a term is exponential of inner product but so you want a which is equal to exponential X hat I transpose V Theta X tilde I to be um this U1 is to be big topic right you want this to be big that means that you want this representation of the X hat I and the representation of the X tilde I to be as close to each other as possible you want your inner product to be big right that fulfills our first goal where we want the representation of two
+
+78
+00:49:03,000 --> 00:50:08,000
+examples the augmentation of the the representation of the augmentation of the same example to be as close as possible that's the kind of the first goal and and then you want this B term to be uh to be small right because the function is increasing B and you are minimizing the function right the bigger the function B is the smaller uh oh sorry the the function is increasing B right and you want the function to be small so you want a b to be also small right the smaller the B is the smaller the function is right if you want these
+
+79
+00:49:36,000 --> 00:50:45,000
+two to be small and what are the terms in B basically you have this kind of term foreign where you have I and J here right so basically you want to say that for different when it's the augmentation this is augmentation of the I example this is augmentation of the JS example so their augmentations should have um or should be small so so they're they're in a paradox should be small so that means that the representation should be um far away uh from each other any questions sure also how um
+
+80
+00:50:27,000 --> 00:51:22,000
+exponential is an increasing power if you want to experience yourself actually smaller then it means you want an argument of the exponential the first one is straight so J only shows up once all the others are I so there are other interpretations of this loss function it was um I'm not sure what they are they are easier to understand or be harder to understand than this you know one interpretation of this loss function is that you can view this as a multi-class classification kind of like questions so
+
+81
+00:51:10,000 --> 00:52:22,000
+you are trying to distinguish so basically in some sense you are you can supposed to do a lot of math you can see that this is kind of the same laws as uh as the following hypothetical question so the question is like given this data set I want to say given for example X hat I the I think that the first augmentation of the ielt example I want to distinguish which one is uh is is the positive pair and which one is negative pair so basically let's say suppose you are this is another interpretation which I I personally
+
+82
+00:51:46,000 --> 00:53:03,000
+think is harder to understand um but uh but let me just anyway say it so suppose you have some example x height I and you have the corresponding X tilde I so you can kind of view this else as you want to given this x height I you want to test which one of this these three examples are uh the most correlated with I in some sense uh and I and you want the x height I this one to to stand out in some sense uh compared to the other correlation you want the correlation between these two to be dominating all the others so that
+
+83
+00:52:24,000 --> 00:53:24,000
+you can kind of say this one is my my body in some sense it's my it's the it's the it's the the other example in the pair um yeah so um but anyway you know the the exact form of the loss function is not that important right so there are there are actually other ways to implement this it's not like it's really necessarily have to use this loss function the principle is probably more important than the loss function right so cool so I guess just to summarize this is a loss
+
+84
+00:52:55,000 --> 00:54:10,000
+function that only depends on X right so you didn't use anything about label or self-supervised uh loss function so it sells price because you self-surprise just means you don't use any supervision except some part of your yourself um okay any other questions oh we are fighting in this case we are the specification like because I wish images feature the feature the rapid stations the the function that computes the representation is the feature extractor or the um something like that it makes sense
+
+85
+00:53:45,000 --> 00:55:04,000
+of ultimate blaster that's why I have to transports Okay so [Applause] okay so the next thing I'm going to talk about is how do you do page training when you have language um and there I'm also I'm going I'm going to tell you one method um uh which is also like a self surprised or unsurprised per tuning um but the method is a little bit different so Okay so this is basically discard the very last layer so and use the walls remaining Network to perform like all the possible damage
+
+86
+00:54:54,000 --> 00:55:57,000
+causing the future oh no there's no there's no last layer anymore here right like this field is a is a new network like like this field setup is kind of like uh something right for start from X you know a lot of neurons they draw a lot of your arches something like this right and eventually you also put some embeddings this is free oxide and and that's it that's that's your representation um so you don't have to be scarves but you have to add the last layer when you do the classification
+
+87
+00:55:30,000 --> 00:56:46,000
+drawing is a little bit too flushed cool so Okay so um large language models so the first thing I need to address is that how do I encode the data right so I have for some text where they are discrete words I need to first turn them into numerical numbers um I guess you know if you remember I think uh uh a few weeks back right so we talked about this event uh model right this model that you include data by this very simple binary Vector right every every document is encoded as a as a zero one vector of
+
+88
+00:56:21,000 --> 00:57:21,000
+some size so so those are you know very simple uh so today we're we're gonna do the the more realistic one so you just and but but the encoding becomes easier actually just because um what you do is you just directly encode each Vector um each word uh I I it's just the the display token so okay let me just say this um so so I'm saying that this is um this is a way to encode but the encoding is kind of like a um to some extent much conceptually much simpler so basically the first thing is
+
+89
+00:56:51,000 --> 00:57:44,000
+that let's define what is an example where you have a we have like language so typically I think you know for me the best way to think about think about the example in language is that you think of as as a document or something like that no a sequence of words because you cannot view every word as example then you lose the the examples are supposed to be somewhat kind of like independent with each others right so if you use if you use your word as an example there's too small for granularity so you view
+
+90
+00:57:18,000 --> 00:58:20,000
+each document as example um so that's kind of the mental picture I think of so you have a sequence of word maybe X1 up to XT and and this is a one example in reality what people do is that people don't really kind of like just literally look at which you know the the exam the the documents because what you are given is that you are given for example all the Wikipedia text on on Wikipedia and this is a gigantic file which is really just a sequence of words and everything is concussion together and then what people
+
+91
+00:57:49,000 --> 00:58:43,000
+do is that you just truncate uh you just take a consecutive kind of sequence of like Words as one example maybe you take something like you know maybe 500 Words consecutive 500 words or maybe a thousand words as one example but so but the only case you know um I think you know you know if you don't care about the details you know implementation details it's just fine to think of each example as a kind of a document an important thing is that it's a sequence of words and and there's another small detail in
+
+92
+00:58:16,000 --> 00:59:14,000
+the implementation so um when you really do this you know you sometimes you don't really operate on a granularity of words right for example one possible choice you can operate on the granularity of characters right you view each character as One X I uh people don't really do that people what people do is that people are operating on the the level called tokens and each token typically these days in the best model each token is kind of like a word but sometimes smaller than a word so basically you can think of like most of
+
+93
+00:58:45,000 --> 00:59:50,000
+the common tokens uh oh sorry what most of the common words are a single token like the the top I think I think last time I checked this it's kind of like that the first like 20K frequent words are are all just a single token by themselves but sometimes you have longer words that just never show up very often and then you break them in some way into uh into two tokens right so a very very long word might be two tokens um this is just another small detail just in case you are implementing anything like this but you know for
+
+94
+00:59:18,000 --> 01:00:36,000
+conceptually you just think of each word as a single x i here and you have a sequence of words keywords here that's one example so and then what you do is that you say and if let's say suppose you know you have a vocabulary so each word is uh in some like sex one two V so you have like V possible words um and each talk uh each uh example is a sequence of words and when you say language model basically people always refers to a probabilistic model probabilistic four P of the joint probability
+
+95
+01:00:03,000 --> 01:01:10,000
+in some sense this is kind of like the same kind of like modeling methodology as with what we do with mixture of gaussians right you're modeling The Joint probability of your data of your ex but if you just directly model the probability this joint probability is kind of very difficult because this one has support this one has support size is distribution right so like how many possible sentences you can have here you can have uh support size is something like V to the T because each word can
+
+96
+01:00:38,000 --> 01:02:10,000
+have t v choices and you have t words so this is really exponentially large uh family of possible sentences and and if you model this distribution it's kind of challenging so what people do is that people do is use chain rule so you say this challenge probability can be written as P of X1 times P of X2 given X1 times P of x3 times X1 X2 up to P of x t given X1 up to x t minus 1. and then you model on each of these p x t Little T given X1 up to x t minus 1. you model this conditional probability uh this
+
+97
+01:01:39,000 --> 01:02:44,000
+conditional probability using some parametric form and then you learn that parameters and the the good thing about this conditional probability is that now you only require the one the problem is one word right that's the problem of that one word uh is of size V right so like sorry the the support of this probability right so like the number of choices words here is V so instead of V to the power t okay so nice question is how do you model this how do you build a parameters form for this conditional probability
+
+98
+01:02:14,000 --> 01:03:32,000
+so I'm not going to tell you exactly how you do it if I generally you just do it with your network I'm going to tell you you know there's some kind of details I'm omitting here but roughly speaking what you do is the following so um so first the first thing you do you have to do an embedding followers meaning for every word Acts you embed this maybe for whatever word I this is a word I you invite this word into a vector e i and this Vector e i let's say is in dimension d so every word will correspond to a
+
+99
+01:03:00,000 --> 01:04:09,000
+vector so you're going to have V vectors each Vector corresponds to word and and these vectors will be learned so these are parameters of our system so so so so after so these are the parameters and then um after I have these parameters and what I'm going to do is I'm going to um after I have this embeddings I'm going to put these embeddings into a gigantic image work and let them let the new artwork to output on the conditional probability in some sense so basically roughly speaking
+
+100
+01:03:36,000 --> 01:04:33,000
+here you're gonna have some model which I kind of view as a black box these days people call this you use something called Transformer I'm not going to tell you exactly what Transformer do that's because it's actually pretty complicated and and it's kind of out of the scope of this course um you know if you you can take a look at PayPal or take some other Advanced courses but you know for for the first other concept concept this is a black box right action many many people don't
+
+101
+01:04:05,000 --> 01:05:13,000
+have to up many people who use the Transformer don't have to open up the black box so so that's why I'm only telling you what's the what's the input and output of this black box so but this is a new network this is a kind of like complex Network and the the way to use this black box is the following so you just say I have some sequence of words right X1 up to x t I'm going to first encode them by the word embedding I'm going to have e of X1 up to e of x t so e sub x t
+
+102
+01:04:39,000 --> 01:05:56,000
+so these are vectors and this Transformer takes in the sequence of vectors and then output you a sequence of vectors so so the output let's call them C1 I think let's call it I call it C2 C3 up to CT plus one so um and let's also just uh give a name for this Transformer like let's call this function V Theta so so this function V Theta after given um out of the input embeddings it outputs a sequence of vectors each of these Vector let's say is still of Dimension D even though this Dimension D
+
+103
+01:05:22,000 --> 01:06:53,000
+you know in reality this D might be the different D from this but they are vectors okay so after you get these vectors then uh you can use these vectors to compute the conditional probability that you the the you use these vectors to predict conditional probability so basically you say that I have this let's do this I guess just so now after you got these vectors C1 up to CT so I'm going to use C T to predict P of x t given X1 up to x t minus 1. okay so what I do here is the following so
+
+104
+01:06:20,000 --> 01:07:34,000
+what I want to predict is uh is this thing right so this is actually this probability distribution is about in sometimes it's a vector right it's a vector of Dimension V because to describe this proper distribution you have to describe P of x t is equal to one the first word give me x what up to x t minus one up to P of x t is equal to V given X1 up to x t minus 1. right so to model this probability you have to model kind of predict V numbers and these V numbers is supposed to be sum up to one
+
+105
+01:06:57,000 --> 01:08:24,000
+and how do you do this this is kind of like you know multi-class classification um like uh so what you do is you basically you say I'm gonna have a soft Max of sun uh WT times the vector CT so let me specify here so c t is a vector of Dimension d and WT is additional parameter uh this is a parameter that you will learn so this WT is of dimension um V by D so basically WT times CT will be Dimension V so you have like multiple so for every possible choice you get a vector right and then you apply a soft
+
+106
+01:07:49,000 --> 01:08:52,000
+Max to make them probability so this whole thing will be in dimension V so in some sense this WT times c t is just the logits and then you apply a soft Max to turn them into probability and that's your prediction for this uh for this problem so in some sense you just view each word as a class right you have V classes and how do you predict uh um something with how do you do a classification with v classes what you do is you first use a linear this is a linear hatch on top of the city and then
+
+107
+01:08:21,000 --> 01:09:53,000
+you do a soft Max to turn them into probability um so I think the definition of soft Max I think we probably defined this in one of the early lectures right so let me just Define it again so I should use this problem So Soft Max is just like if you have soft Max Alpha Vector U is really uh something like this exponential U1 over sum of exponential UI and then exponential U so V over sum of exponential UI something like this right so you turn on the logits U into a probability Vector which sum up to one
+
+108
+01:09:24,000 --> 01:10:40,000
+any questions [Music] so I'm going to use C2 to predict X2 oh I'm going to see it you know it's a it's a in you can index in any way I I chose this is to indicate that C2 is to use to is used to predict X2 given as well so and actually there's one thing I didn't tell you which is actually important so when you predict this probability uh this probability right this is my model to predict the probability right I need to insist that I haven't seen other words like I I have to insist that I only have
+
+109
+01:10:11,000 --> 01:11:44,000
+seen X1 up to x t minus one right if I have seen x t already I can just output X the true value of x t I've seen right so um so so actually this Transformer uh there are multiple versions of Transformer the Transformer here I'm talking about you know on the term is called Auto regressive Transformer is this is just a name what I mean is that you you you design this Transformer in a way so that City only depends on X1 up to x t minus one so Define you design this architecture such that you have this property such
+
+110
+01:10:59,000 --> 01:12:09,000
+that the city Only depends on X1 up to x t minus one so that when you predict x t you are not going to be able to see any other words after x t so that's why you have a you have a proper definition of the probabilistic model um but but this is like a just think of this as given the Transformers internal property ensures you to have this right how do you connect all of the neurons by ensures this property inside so this the in many of the dimensions uh I call it d right now um but the dimension is just a parameter
+
+111
+01:11:42,000 --> 01:12:47,000
+you can you can change you can change it to anything of course it has to be some or large something like maybe a third and something like that I understand yeah how do we do we have to create as many uh that's a good question right so if you use one hot Vector probably you should use embedding of Dimension V right because you have V choices but now I think the embedding Dimension is often smaller than a vocabulary size I think the vocabulary people typically use is something on about 40K maybe 60 60k
+
+112
+01:12:22,000 --> 01:13:41,000
+something like that um something on that level um but the dimension the dimension is probably a thousand only Matrix you mean the the mapping from the I to the e i um it's not a it's not uh uh it's learned so so basically you just learn this so so you have E1 up to EV right each word has a vector and you concussing them all optimize The Matrix and you view this as a parameter of your this is part of the parameters of your training okay so now the final step is just that after you already Define the prediction
+
+113
+01:13:16,000 --> 01:14:29,000
+you have to Define loss function to learn the parameters right the parameters are the question was great like the parameters include E1 up to EV also include WT right and and that's it right that's all also the parameters in the Transformer which I didn't specify that's a new network which is viewed as Black Box so and now you learn you take a loss function right which contains all the W's which is a function of W's the Theta and the Eis the E the e and then under what this loss function
+
+114
+01:13:52,000 --> 01:15:34,000
+is just the cross entropy loss of all the positions so cross entropy laws of all precision of position I and and if you really think about what's the cross entropy loss for the for the soft Max for this kind of things is really just this um but but you do necessarily have to really exactly see why is this but it's really just the minus log probability uh of pt and x t um so if you call this thing PT suppose we call this PT then basically the X teeth entry a minus log p x t actually is this is the axis entry of that Vector PT
+
+115
+01:14:52,000 --> 01:16:04,000
+and and this is just the the the the cross-centric Plus but don't worry if you don't got this line it's really just a empirical you just have to when you implement this you just have to call the cross-centric below sync and give it to it um running a little bit late uh any questions nothing I didn't I cheated a little bit so here I'm taking so this definition I can only Define H for T is two in some sense I don't have a production model for X Y I only have the prediction for X2 given
+
+116
+01:15:38,000 --> 01:16:50,000
+X1 X3 given X2 I didn't have a probabilistic model for X1 in priority just people just forgot about it just don't use it you know it doesn't matter that much you know you can try to fix it to make a principle but I don't think it matters that much anyway so just because you you have so many problems like a public probability test model and if you ignore one of them it's not a big deal um Okay so now let me talk about uh how to adapt um how to adapt uh this language model to to Downstream tasks so I I've erased
+
+117
+01:16:15,000 --> 01:17:19,000
+the fine tune and the linear probe but uh if you can still do those those are very general though you can use those function and linear probe for almost anything so and for this kind of like language model the way you do find tuning in probe is just that you on it's it's just the only thing you have to decide is that which output you should use as the representation of this documents so you have so many outputs here and you which one you take is the representation of this sentence so you just take c one
+
+118
+01:16:47,000 --> 01:18:04,000
+option is you take CT as the representation and then you add some hat W and your W transpose this is your prediction model for Downstream tasks or task and then you can choose to only fine tune W or you can choose to fine tune W and the parameters that that you use to compute CT right the parameters used to compute CTR those parameters in the Transformers those Eis those embeddings so so that's easy and and just because it's generic and for language models the interesting thing is that you can also
+
+119
+01:17:31,000 --> 01:18:36,000
+undo this uh with uh um some other ways where you can do adaptation with other ways so one way to do this is so-called the zero shot uh learning and here is it's just very easy so basically whatever task you have you just turn it into some questions or some kind of like closed test um like you have a blank to fill in and then you just give it to the to the model and then the model to generate the next word so basically what I'm saying is that you just say for example suppose you just turn you can have X
+
+120
+01:18:09,000 --> 01:19:27,000
+which is just the you know this model can take in your sequence forward right you just say maybe is the speed of light suppose you care about the speed of light is constantinal note and you just turn it into a question right you call this you call this um this is X1 X2 X3 up to XT and then because this model can generate maybe let's say this is x t minus one and then you use this model to generate x t because this model can do conditional generation right you can given X1 up to x t minus one you can
+
+121
+01:18:48,000 --> 01:19:42,000
+generate x t and give maximum after x t you can generate x t plus one you can just keep generating the uh the tokens you know afterwards and you just put this into the model and let it generate and if you generate the next word is no or yes then you get the answer and maybe sometimes it generates something slightly different from just yes or no then you have to pass the answer in some way but you just write the model to generate the answer that's not that's that's one way and so basically you are using the
+
+122
+01:19:15,000 --> 01:20:12,000
+generation power of this model that's probably the important thing right because giving this mod so basically here the important thing is that the way you have this model makes it that given some sequence of words you can generate the next token and then you can feedback this new token to the to the system to generate another one and you can keep generous so so so so so that's why this gives us opportunities to have other adaptation method which based on generation and another kind of like a
+
+123
+01:19:43,000 --> 01:20:57,000
+even more intriguing way to to uh to adapt is the following is called in context learning so the in context learning so here you are dealing with you know a so-called fuel shot cases so you have a few examples so suppose you um and let me just give an example to there are so many flexibilities I'll just show one example so what you do is you just concatenate all your examples into a so-called prompt concatenate examples into uh in something into into actually in the language of this lecture
+
+124
+01:20:29,000 --> 01:21:38,000
+we call it document right but but in the if you look the paper is called prompt so what I mean it just means you you can correct all of this into a sequence uh for example suppose you care about you know learning how to add up two numbers suppose you have a question Q which is something two three is what and then you do have a you do have a you have some examples right you say you know that this is five so this is your X task one and this is your white task one so you're just concaten them into a into
+
+125
+01:21:08,000 --> 01:22:31,000
+a sequence of tokens so like this and then you just keep concatenating and you say Q six plus seven no no plus I choose do not use plus because I want to make it difficult right so something like this you're trying to learn what this symbol means right so and then this is X task 2 and Y and then you're Contracting the Y times two so you say answer is 13. and now suppose you just have two examples and you want to learn and now your question is 15 this symbol 2 is equals to what so you can cut in all of this together
+
+126
+01:21:48,000 --> 01:22:55,000
+and you call this X1 up to x t and you give this X1 after x t the sequence of all the symbols to the model and let it generate and then you ask this sequence to generate our XT plus one so use this to generate x t plus one right or maybe even XT plus two so and so forth and and it turns out that if you give these things to the model and they will generate something reasonable for you so we will generate something for example for this case it will generate a 17. and then you got answer the answer
+
+127
+01:22:31,000 --> 01:23:23,000
+is 70. so and you see that this is sometimes says that you learn the downstream tasks you'll learn that this symbol means addition from this um I'm not sure whether this is a little abstract but I think what I can do is the following so I think I'm this is about time and we can stop um like we can stop the class and but I can show you some uh uh some examples you know just the live
+

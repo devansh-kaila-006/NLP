@@ -1,0 +1,644 @@
+1
+00:00:05,000 --> 00:01:18,000
+advice happened it happens that I write too small font please feel free to stop me and let me know it's just uh as I said every after a few lectures I stopped uh I I start to forget about it so please remind me um so okay so I guess um first let me briefly reviewed the last lecture just very quick so last lecture we talked about these two important Concepts um under fitting and overfitting so I got some so so here you know our goal is to make the organization work right so we want to generalize two unseen
+
+2
+00:00:42,000 --> 00:01:59,000
+examples so um and last time we talked about two possible reasons for why your test error is not good enough right so one possible reason is overfitting so overfitting means that your tuning hour is actually pretty good your children loss is pretty small but their test loss is pretty high so and we have discussed the possible uh reasons for why um you can have overfitting and two possible reasons are if maybe you have two complex of model for example last time we discussed that you know if you use a 50 degree polynomial for this very
+
+3
+00:01:20,000 --> 00:02:26,000
+very small data set where you only have like four examples then you may overfit or maybe you don't have enough data right if you have more and more data um if you have like a million data then a 50 degree polynomial wouldn't be a problem and also we discussed that um another reason underfading so under fitting is much easier understating in some sense basically just means that you don't have small enough tuning loss or tuning error right so your model is just not powerful enough so that you cannot
+
+4
+00:01:51,000 --> 00:02:51,000
+even fit to the training data you have so so and in some sense these are kind of like two complementary situations right so in this case you probably want to make your model more expressive and in this case you maybe you want to make your model less expressive or less complex so we use this word in your complex expressive you know a lot you know without the formal definition right so we say some models are more complex you know some models are less complex typically you know you can somehow feel it right so a fifth degree
+
+5
+00:02:23,000 --> 00:03:21,000
+polynomial probably is more complex than linear model but actually you know if you really want to have a you know concrete definition it becomes a little bit tricky right so what is the right complexity measure of the model someone asks about that as well in the last lecture you know and the answer is that there's no um Universal measure for what's the right complex model complexity measure and and there are a few you know um um kind of like a complex financials people often use you know they all have
+
+6
+00:02:52,000 --> 00:03:52,000
+their kind of like particular strands and they are like and and also like there's no um you know real kind of like a formal Theory to say which one is better so these are kind of complex measures that can be you know um theoretically kind of Justified in certain cases but they are not kind of like a um Universal so so what are the complex measures so I'm just listing a few just to follow kind of like for your knowledge in some sense so so I guess the most obvious one is how many parameters they are right so if you
+
+7
+00:03:24,000 --> 00:04:20,000
+have more parameters than your model might be more complex and this is you know very intuitive however the limitation here is that maybe you have a lot of parameters but you actually the the effective complexity of the model is very very low maybe all the parameters are very very small then maybe you can say in this case maybe the complexity is actually not as big as your thoughts so so to kind of like a deal with this kind of like scaling thing right so what do you feel complex your all your parameters
+
+8
+00:03:51,000 --> 00:05:00,000
+are basically zero even though you have a million parameters then people consider kind of like Norms of the parameters right okay but this may not be no this is actually typical the Norms of parameters is actually very good uh they are very good complex measures for linear models um and and this there's no basically before deep learning kind of like uh arised um um like uh you know before I think we are using Norms as complex measures a lot um and still we use them in some cases but these also have some you know
+
+9
+00:04:29,000 --> 00:05:24,000
+limitations for example sometimes you may for example would be that you have a very low Norm a low Norm solution and you add some random kind of like a noise to the to the model and when you add the noise you make the norm bigger but actually the noise doesn't really change the complexity right because you add some noise and when you take the Matrix modification you average all the noise to some extent so so these are you know there are also this kind of like issues so some of the other kind of more more
+
+10
+00:04:56,000 --> 00:05:48,000
+than complex measures people have considered uh are for example something like lipsteousness right whether your model is ellipselessness uh it's Ellipsis or maybe your model is smooth enough and here I'm using the word smooth uh you know relatively kind of like um informal way you know you could mean this could mean the bound and the secondary derivative it could mean the bonus third of derivative something like that if your model is kind of like no it's kind of like oscillating or kind of
+
+11
+00:05:22,000 --> 00:06:18,000
+fluctuating a lot maybe that means it's not very complex um and there are other kind of like a complex measures for example how environment your model is with respect to for example certain translations certain environments um that you should have in a data set for example whether your model is environment to data augmentation um but in general there's no kind of like a very kind of like established theory on what is exactly the right complex measure and sometimes it also depends on the data as I would see as
+
+12
+00:05:50,000 --> 00:06:56,000
+you will see today so so if you if your data you know sometimes for you know for example suppose your data um um for example let's talk about Norms right so different Norms you know what what type of norms are you talking about L1 Norm L2 Norm sometimes L2 Norm is the right complex measure for certain type of data and sometimes L1 Norm is the right complex measure for a certain type of data so basically I don't think this is kind of like there's anything super concrete we can um like it's not like I have a kind of
+
+13
+00:06:22,000 --> 00:07:28,000
+like just a fixed like a suggestion for you to consider so so in some sense you should just keep this in mind and kind of like a kind of consider them you know when you um when you do your own data set so um so so this is the um okay so now we have to discuss the complexity measures and now that in the the the the the rest of the lecture I think I'm going to cover two things so one thing is that so once you have some kind of like guess on what's the right complex measure you are looking for how do you make the complex
+
+14
+00:06:56,000 --> 00:07:50,000
+measure small right so so um how do you encourage the model to have small complexity right so it's easier to do this because you just change how how many kind of neurons or how many kind of like hidden variables in deep networks where you can change the number of parameters but if you want to change the norm what you do so that's called regularization I'm going to discuss that in the first half of the lecture and then in the second half of lecture I'm going to talk about you know how do you
+
+15
+00:07:23,000 --> 00:08:14,000
+um I'm going to talk about you know some kind of more General ml device for example how do you tune your hyper parameters like when you do regularization or when you kind of like choose your model complexity right you can use a lot of hyper parameters meaning you're going to choose how many parameters you have you're going to choose you know how strong your organization is so so how do you tune your hyper parameters um and on what data set you should tune your hybrid parameters and at the end
+
+16
+00:07:49,000 --> 00:08:53,000
+I'm going to probably spend 30 minutes on even more applied angle about some email or device right so like for example how do you design the ml system you know from scratch you know there are a lot more things in reality more than what you're doing research um so so that part will I'll use some slides to talk about some general no ideas on how to design ml system uh in in the in the in reality so so that's the general kind of introduction of this course of this lecture um I'm going to start with
+
+17
+00:08:20,000 --> 00:09:23,000
+regularization I need questions so far foreign I think we have probably mentioned this um I think in the sometimes like in the previous kind of lectures because just because you know um just because you know uh we have mentioned this you know informally so by regularization mostly we just mean that you add some additional term in your training loss to encourage low complexity models so um so for example you so we use J of theta as our training loss and then you consider this so-called regularized loss
+
+18
+00:09:06,000 --> 00:10:26,000
+where you add a term Lambda times R Theta so here this R Theta is often called the regularizer and Lambda is you know I think there are different names for this but you could call it regularization strengths or regularization coefficient regularization parameter regularization strengths whatever you call it if let's call it regularization strength so this Lambda is a scalar and R of theta is a function of data um which um which will change as data changes so um and this and the goal of this Rotator is
+
+19
+00:09:47,000 --> 00:10:49,000
+to you know either additional kind of like encouragement to find model Theta such that are obviously small so for example typical R of theta could be um something like you know L2 regularization so you say R Theta one possible choice is that you take this is probably the most common choice um you take the L2 North square and you multiply about half the half doesn't really matter this is just some kind of conversion um you know that because anyway you can multiply a Lambda in front of it so so
+
+20
+00:10:21,000 --> 00:11:16,000
+whether you have half or not here you know we just change your choice of Lambda but just uh this is you know um just a convention um and so so this is called you know L2 regularization also in deep learning people called Ray Decay there is a reason why people call it way Decay I guess probably I wouldn't have time to discuss it today so you know the lecturer knows there's a very short paragraph you can see actually if you use this regularization and update rule will look like a very Decay so there's
+
+21
+00:10:48,000 --> 00:11:51,000
+one step in the update rule where you Decay your parameter will shrink your parameter by scalar so but anyway so you know it's just a name like either it's called vertical you call it Auto regularization so let's play one of the pretty common one so and and you can see that if you add this thing to your loss function and you're minimizing your loss function so then you are trying to make both the last month and also make the the L2 Norm of your parameter small and the Lambda in some senses kind of kind
+
+22
+00:11:19,000 --> 00:12:14,000
+of like controlling the trade-off between these two terms right if you take Lambda 2 back then you only focus on the regularization you just only focus on low low Norm solution but maybe you don't fit your data very well if you take Lambda to be you know for example zero literally zero then you are not using your regularization you are just only fitting your data and actually when you make the Lambda very very small this can still uh do something right so even say let's say Lambda is .0001 Right very
+
+23
+00:11:47,000 --> 00:12:44,000
+small still this might do something because maybe they are multiple Theta such that J of theta is really really close to zero or maybe even literally close zero so so if you don't have this then you are not doing any type working right if you don't have if you literally make lambda zero then you are just picking one of the solution where J Theta is zero but you don't know which one you pick but even as long as you add a little bit of organization then you are using this as a tie breaker in some
+
+24
+00:12:14,000 --> 00:13:30,000
+sense so so you are finding some solutions such as J Theta is very very small but you use the the r the norm as a tiebreaker uh among all of the solutions that have very small tuning laws so so this is probably the most typical regularization people use and another one is the following so you can take R Theta to be uh the so-called zero zero Norm of the parameter but actually this is not really a norm this is just a notation so this is really just defined to be the number of non-zeros in the model in in cell
+
+25
+00:12:56,000 --> 00:13:56,000
+so you count how many non-zero entries in Theta and that's the uh that's what this notation is for some sometimes people call it zero Norm but it's actually not a norm uh literally it's just the number of non-zeros in a parameter and sometimes people call it sparsity because you know if you have very few non-zero entries then it sparse otherwise it's it's dense so if you add this to the the thing then you're gonna have a different effect you are trying to say that I'm going to find a model
+
+26
+00:13:25,000 --> 00:14:26,000
+such that the number of non-zeros in it is small and this is particularly meaningful for linear models in the following sense because if you think of the state as a linear model then say you have Theta transpose X right suppose you have a linear model and then what is this this is really just some of say the i x i from one to D and then you can see that the number of non-zeros is really how many if suppose you have like s non-zero answers in Theta that means that you are using only s of the coordinates of X
+
+27
+00:13:58,000 --> 00:15:00,000
+size so basically the number of non-zeros is in Theta is the number of coordinates or number of features you are using uh from x i right so you can imagine that maybe for example for some applications you have a lot of like a coordinates in our features in your input features right so you have so many different kind of like informations but you don't know which one you should use to predict right for example suppose you want to predict house the price of a house then you have so many different features but some
+
+28
+00:14:28,000 --> 00:15:27,000
+features may not be that useful so then you can imagine that that could be a situation where you should use this as a regularizer because you want to say I want to use as few features as possible but also I want to make sure my training loss is good right so I want to find the simplest explanations of the of the existing data or simplest meaning that you want to use as few features as possible so and and once you find this Theta such that Theta sparse right so suppose you have a Theta such that you only have a
+
+29
+00:14:57,000 --> 00:16:15,000
+few non-zeros uh in Theta then you are selecting the right feature so in some sense you know you have a sparse model means you are selecting the features right because those non-zeros corresponds to its features that are selected by the model so so people often call this kind of like a feature Selections in some in certain kind of contexts so um however I mean you may have realized that this regularizer as a function of theta this sparsity one is not uh differentiable right so you're just counting how many
+
+30
+00:15:40,000 --> 00:16:44,000
+non-zeros they are right so suppose you have one suppose you have like you have one entry that is um maybe it's just zero zero zero right you do an if the testimo change in this uh in any of the coordinates you're going to change the this function the value of this function by a lot so that's why it's not differentiable right a differentiable function should satisfy that if you change Theta if the decimal is small then you should change the function output by a small amount but actually here if you
+
+31
+00:16:11,000 --> 00:17:09,000
+currently the sparse is zero but if you change the state a little bit your sparsity becomes one so you can have infinite testimony small changes to make the regularizer value change by a large amount so that's that's why it's not differentiable so so it's not because because it's not differentiable then um you don't have gradients you don't have like a derivatives so that's that cause the problem in in using this so so basically even though I told you this is a regularizer but literally in reality
+
+32
+00:16:41,000 --> 00:17:49,000
+nobody use this exactly in their algorithm because if you use it you get this you know you put it here but this term has no gradient how do you optimize it so so if because it's non-diffensible so then what we will do is that um you like you change um you have a surrogate so this is a typical surrogate um the reason why this is surrogate is a little bit kind of tricky um but um um but you know but this is you know has been your surrogate for the sparsity so this is a differentiable surrogate
+
+33
+00:17:15,000 --> 00:18:27,000
+um for the for the sparsity of the model so you use the one Norm so here one Norm just means the the sum of the apps value is the sum of the absolute value of each chord so and you can see you know I wouldn't attempt to give you a very formal justification for why this is so good um why this is a good Target for the zero um you know one reason could be that you know you can see at least one Norm is closer to than two Norm to zero Norm right Y is close to closer to zero than two and another reason probably you know
+
+34
+00:17:59,000 --> 00:19:01,000
+this is not really very solid mathematical reason but it's just to give you some you know intuition so suppose you think of theta as a as a vector in zero one suppose you really just have a binary Vector then indeed this is equals to this right so that's that's probably another kind of intuitive reason why they are somewhat kind of like related but you know you can see a lot of problems with this argument right so why I'm assuming Theta is between is only taking value from zero and one right so if they are
+
+35
+00:18:32,000 --> 00:19:45,000
+from zero and two then these two are no longer like related and more so um so so I'm not saying that this is really a good argument for why they are related so so if you really want to I'll say they are related um or this is a good surrogate I think you have to go through more much more mass um any questions so far regularizer with the second nominal regularly you mean yes okay yes that's what I'm gonna do next so um all right so right so that's a great question so why um you want to encourage sparsity
+
+36
+00:19:13,000 --> 00:20:06,000
+um sometimes and sometimes you want to encourage the two Norms to be small right so let's answer that question you know let's think of this as a as a surrogate for the sparsity so the question I'm trying to answer is why sometimes this is better sometimes this is better so in some sense the the fundamental reason is just that you know in some sense the regularization or another way to think about regularization instead of just encouraging low complexity is that regularization can also improve can also
+
+37
+00:19:39,000 --> 00:21:00,000
+impose structures kind of like prior beliefs about the Theta so so this is probably another at least you know one of the other ways to think of requisition this also imposes structures and this what are the structures the structures you know probably sometimes units you have a prior belief so for example suppose you believe you you have a prior belief because of domain knowledge right so such that um you somehow believe that uh Theta sparse right so in in smart SATA then in this case you probably should
+
+38
+00:20:30,000 --> 00:21:32,000
+just use R Theta is the the one Norm or the zero Norm just because you believe that your model is sparse why not just encourage that right so so this you know when you have this belief then you should say okay so if you if you encourage the one normally you're you're in some sense you you limit your search space right so yeah like you limit your search space before you are searching over all possible parameters and now you're only searching over low Norm low one non-parameters and because you believe that your true model
+
+39
+00:21:01,000 --> 00:22:05,000
+is in is is having low Norm then even narrowing the search space is always new never narrowing your search space is always helping you because uh you didn't lose anything right because you know you know that all every model you excluded are not going to be uh the right solution so so you never search space the search the new search space still has the right model then why not do it so so that's another interpretation of um of the uh of the regularizer so it's trying to it can impose additional prior
+
+40
+00:21:34,000 --> 00:22:36,000
+belief um uh in the in the in the structure of the model right so if you believe in one Norm then you should you encourage well not or whatnot if you believe that your true model has a small L2 Norm then you should encourage um small L2 naught and and you know if if you go into more mathematical uh Theory I think L2 Norm typically corresponds to situations where you believe that all the features are useful but you have to use them you know uh in a combination right so you have to use each of the features you know a little
+
+41
+00:22:04,000 --> 00:23:08,000
+bit an L1 Norm or l0 Norm typically corresponds to situations where you believe only a subset of the features are meaningful and you should discard other ones because other ones are just kind of like are there to confuse you in substance so so if you believe your model is his sparse you should use L1 norm and if you believe your model shouldn't be sparse then typically people use l tuna so and and if you have a linear model so suppose you have a suppose you have a linear model and and then this this law this loss if
+
+42
+00:22:42,000 --> 00:23:39,000
+you use this L1 normalizer this is called lasso I guess I'm here I'm just the final name because I think it's probably useful for to at least a third of this name this this uh acronym uh was actually I don't know what it originally stands for but you know this is uh so like this has been like there for like 20 or 30 years which is a very very important algorithm for linear model you apply L1 uh norm regularization and it's called lasso in everyone in machine learning should know
+
+43
+00:23:11,000 --> 00:24:18,000
+the equity so um right and taking a little more broader perspective so um so if you think about like a non-linear models like deep learning models so what are the most popular regularizers these days I think L1 Norm is not used very often and actually pretty much it's never used um you know I don't know exactly you know how frequent it is but you know I think probably less than 10 percent of model use L1 recognizer maybe even less than that 10 probably is much overestimate maybe one percent so
+
+44
+00:23:47,000 --> 00:24:44,000
+um and but the L2 regularization is almost always used like even though sometimes you only use a very weak Auto regularization indeed I'm talking about deep learning model so sorry maybe let me just clarify for for linear models people tried uh you can try almost anything anything would be reasonable and you probably should try all of them you could try one Norm two norm and sometimes you can try different Norms which I didn't write down but you can try 1.5 Norms something like that so for
+
+45
+00:24:16,000 --> 00:25:16,000
+nonlinear model for deep learning models I think basically L2 Norm is something that you almost always use but you only use of it with relatively small Lambda people generally don't use very large Lambda I don't know exactly what's the reason you know um researchers don't really know that much either but a small Auto regularization is typically useful for deep learning and in deep learning I think some of the other regularizations you know could be useful for example you can try to regularize the lipsense of
+
+46
+00:24:46,000 --> 00:26:03,000
+the model um and you can try to use data augmentation which we probably haven't discussed I'm going to discuss that um in a later lecture but you can use data augmentation which tries to encourage your model to be environment with respect to a kind of translation cropping this kind of things for for images um I think those are pretty much the the only regularization techniques in deep learning um yeah um [Applause] this kind of pertains to my employer yeah what you suggest initially using the
+
+47
+00:25:26,000 --> 00:26:33,000
+and one day to kind of eliminate the features that's a very good question so I think this kind of algorithm was pretty popular in uh um for before deep learning era so when you use linear models I think using L1 to do a selection and then you use L2 I think you know I don't know how exactly how popular they are but this is definitely one algorithm people try to could you could try to use um in deep learning I think it's probably less likely to be useful you know but also depends on the situation
+
+48
+00:26:00,000 --> 00:26:54,000
+for example if you don't have enough data maybe you are more or less in a linear model case but you just need the nonlinearity to help you a little bit maybe then in that case you should still mostly use some kind of like more like linear model type of approach if you are in the the typical deep learning setting for example you do for a vision project right you have like images right as your inputs I think in those cases you probably don't want to select your features first I think all the inputs
+
+49
+00:26:26,000 --> 00:27:20,000
+are useful like I'm able to use them as much as possible and you just want to let the new light works to figure out what's the best way to use those inputs any other question by the way this lecture will be pretty kind of we don't have a lot of math right most of the things are about um just uh I I don't think there's even a theory here sometimes they're just experiences because especially if you talk about um like the more the Machinery in the last five years right everything seems
+
+50
+00:26:57,000 --> 00:28:02,000
+to change a little bit right so I like I cannot say anything with about 100 guarantee I can only say okay it sounds like people are doing this a lot and that's that's the best thing I can I can tell you in some sense um so so feel free to ask any questions any other questions right so and the next thing I'm going to discuss is the so-called implicit regulation effect and um this does uh this released more to the the Deep learning and so one reason uh that people started to think about this is
+
+51
+00:27:42,000 --> 00:28:31,000
+that you know I haven't told you what exactly means so one motivation that people started to stand up for research is that people realize that in deep learning you don't use a lot of regularization technique right so you use L2 as I said you only use a weak out to regularization and and often some of these latest ones but they only have a little bit right they can be useful but people don't necessarily use them very often so why in deep learning you don't have to use strong regularization at
+
+52
+00:28:06,000 --> 00:29:00,000
+least like you can feel that the regularization stop method stop matter from that much it still matters when you really care about the final performance you care about 95 versus 97 but but you don't have to even you don't use regularization sometimes you get reasonably good performance so so that's why people are especially with theoretical researchers people are wondering why you don't need to use a strong regularizations in deep learning and this is particularly mysterious because in deep learning people are
+
+53
+00:28:33,000 --> 00:29:25,000
+using over parametrization like we are we are in this regime where you have more parameters than the number of samples we call that in the last lecture we have drawn this uh double descent thing right where you have this kind of things right here is the number of parameters and this is the test error and you know we have kind of discussed that this peak might be just something about the sub-optimality of the algorithm which let's say you don't care for the moment but at least you have to
+
+54
+00:29:02,000 --> 00:29:58,000
+care about why here um why it's go going down you know still here right so why when you have so many parameters a lot more parameters you can still make your model generalized and and it seems that more and more Paramus makes it looks better so so so this the overall primary Choice regime is kind of mysterious because you don't use strong regularization but you can still generalize so that was the kind of the motivation for people to study this and people realized that there's you know even
+
+55
+00:29:31,000 --> 00:30:31,000
+though in this regime suppose you don't use any expensive regularizer you don't you make that lambda zero literally zero right in this regime still it can generalize and the reason it can generalize in many cases is because um you can still have some implicit regularization in fact even without explicit regularizer and where that effect comes from we know what kind of make that happen the reason is that um the optimization process the optimization algorithm the optimizers can have a con implicitly
+
+56
+00:30:00,000 --> 00:31:02,000
+regularize you so so why this can happen I think the reason is that let me draw kind of like illustrative kind of figure which I kind of like use pretty often so suppose this is the let's say this is the the pyramid like suppose you have a this is the Lost landscape the Lost surface so meaning that here is Theta let's say is one dimensional and because we are in this deep learning setting where we have like a non-linear models and non-convex loss function so maybe a loss function it looks like this
+
+57
+00:30:36,000 --> 00:31:35,000
+maybe so this is the loss function and you have two maybe you have multiple Global Minima of your loss function right so so this is a global minimum this is a global minimum and but this but you have multiple Global minimum in your loss function however I'm here I'm talking about trending logs right if you really look at the test loss you're going to look they will look a little bit different the test loss would be different from the training loss so test loss maybe look like something like this
+
+58
+00:31:10,000 --> 00:32:17,000
+maybe okay let me draw something I'll come to my figure so that um so this is the training loss now test loss probably look like this so that means that even though both of these two Global Minima are um are good solutions from the training loss perspective one of them is better from the test test performance perspective Right This Global minimum is good and Better Than This Global minimum because the test performance is better so and in some sense like the regularization effect is trying to
+
+59
+00:32:04,000 --> 00:32:50,000
+choose the the right Global minimum right you want the regularization in fact to choose the right Global minimum so so that you can do some type working or you can encourage certain kind of models maybe this model is more kind of like ellipses so this model has more Norm than this model so that's why you prefer this one so if you use explicit regularization what you do is that you you're going to say I'm going to change the tuning loss I'm going to add something to prefer this one than this
+
+60
+00:32:28,000 --> 00:33:27,000
+one I'm going to reshape the tuning logs right that's what the explicit regularization would do but the implicit regularization we'll do is the following so if you consider an algorithm that optimizes for example suppose you have you run algorithm this algorithm which is always initialized this is initialization and you do green in this set so you're gonna do something like this and it converts to this one so so this algorithm will only Converse to this one but not this one just because you initialize at this far
+
+61
+00:32:59,000 --> 00:34:00,000
+right right so that is kind of in some sense a preference to convert to This Global minimum over this Global minimum because your algorithm somehow prefer one Global minimum than the other just because your algorithm has some certain specifics right so the initialization make it to prefer to converge this one and and there could be other kind of effects for example if you um use you know bigger step sets maybe you are more likely to converts to this one maybe or maybe vice versa you know depending on on kind of like the
+
+62
+00:33:29,000 --> 00:34:26,000
+situations right so this is a very illustrative thing with one dimension then you don't really have a lot of like flexibility here but if you have a very very complex thing then if you run different algorithms different algorithm will converge to different Global minimum and that preference to certain type of global minimum is in some sense is a regularization effect um so so that you don't converge to arbitrary Global minimum um does it make some sense you said so how does like having a large
+
+63
+00:34:03,000 --> 00:35:07,000
+number of parameters ensure that it initializes at that point yeah I I was I was silent on that in some sense like I didn't really say why the initialization has to be here like this is a active area of research so what we are sure about is that the algorithm could have this effect the algorithm could possibly um prefer certain kinds of global minimum than the others but why it would prefer which kind of global minimum we don't exactly know for certain kind of like toy cases we know but for uh for
+
+64
+00:34:35,000 --> 00:35:41,000
+the general cases we don't I'm going to show you one cases where we actually can say what does the algorithm prefer to do but that's very very simple case for General case I think the the research this is still very open research on question I saw two other questions here this seems like of the authorizer is keeping a number of problems it doesn't quite necessity no no here that no no the what do you mean by the name optimizers the access is the value of the parameter it's just they only have one parameter
+
+65
+00:35:08,000 --> 00:35:57,000
+I'm just I'm joining the the landscape of the pyramid and I can only Draw Something in one dimension so so so this is the value of the parameter you are just tuning in this parameter you are doing good instant and this is the loss surface so so it does depend on where you initialize right so if you initialize at different places you're going to converge different Global minimum and and they may have different generalization effects different algorithms and then just choose the one that has the best
+
+66
+00:35:34,000 --> 00:36:33,000
+performance that's pretty much the right to do um of course there are some I'm going to discuss this you know but uh more detail later but but you know basically you know like you can have some intuition where you have you know the theoreticians have tried to understand you know what kind of like algorithms can help generalization but I think the conclusion at least so far is not no no like it's very far from conclusive they can give you some intuition but they are not going to be like predictive you know
+
+67
+00:36:03,000 --> 00:36:58,000
+I don't just tell you like what to do so you still have to try a lot yeah so yeah going back to this you know this is just one dimension you know another way to think about is that if you can think of like a two-dimensional question for example you are skiing in the in the in a ski resort right so your objective is basically minimizing your like uh you're trying to go downhill right that's your objective so and and this key result probably have a lot of villages right like that you can eventually go home there are
+
+68
+00:36:31,000 --> 00:37:25,000
+multiple parking lots right so so you you like in some sense you are saying that you know one of these parking lot is great right so this one of this parking lot is really where they are so you want to go to that one um so so diff but but uh but different algorithm would lead you to do diff to convert to different uh different parking lots right so for example someone is doing very fast skin then when you do it that you cannot go to those kind of small Trails so then you lead you go to one of the parking lot
+
+69
+00:36:57,000 --> 00:38:08,000
+and some other one prefers like um a wider kind of like trails and then you go to the other parking lot so so different algorithm will lead to lead you to different parking lot and different parking lots have different generalization performance eventually so um so this is the high level um intuition so I'm going to um let's see I'm going to discuss a concrete case which um which will also be part of a homework question so this concrete case uh just to give you a concrete sense of how this
+
+70
+00:37:33,000 --> 00:38:38,000
+could even be possible so I'm going to show you the high level thing and there are some mathematical part which will be in the homework so this is the linear this is a in a linear model so interestingly even though this implicit requisition effect was mostly discovered after deep learning uh start to be kind of like powerful but actually you can still see it in linear models and that's how researchers start to do research so um so so let's say suppose we are just in the most vanilla linear model setting
+
+71
+00:38:05,000 --> 00:39:09,000
+where you have some under data points this is just the the trivial linear regression and your loss function is something like just the L2 loss the screen squared error something like this you have a linear model but let's say let's make the the the one different thing is that we assume n is much smaller than d so you have very few examples and a very high dimension so what is d d is the dimension of the data and the N is the number of examples I'm going to assume only is much smaller
+
+72
+00:38:47,000 --> 00:39:55,000
+than b so this is over parameterized you have multiple Global minimum while you have much so first of all you have multiple Global minimum why because they are I'm claiming that they are minus Theta such that minus Theta satisfies y i is equals to Theta transpose x i for all I why because you know how many equations here you have right so so if you want to so this is the equation to make training loss zero which is means Global minimum right so if you have all of this equality then it means you are either
+
+73
+00:39:29,000 --> 00:40:31,000
+Global minimum of this training loss and why there are multiple status such that you can satisfy this that's because you can count how many equations they are right so there are any equations right and D variables and these are linear equations right so so I guess the linear algebra tells us that if you have any equations T variables and if n is less than I think if n is less than D or D minus one I think only is less than D then uh you're gonna have at least one solution and if any is much much smaller than D then you
+
+74
+00:40:06,000 --> 00:41:13,000
+have a Subspace of solutions and that's called the uh the what's the the kernels of the anyway you have a Subspace of solutions um uh for for this kind of linear system equations right so um and that's why you're gonna have much for Global minimum of the chaining blocks because the entire Subspace of solutions are Global minimum of the tuning loss so the question is which one you're going to converts to right so which one your Optimizer will will choose so it turns out that you know if you use
+
+75
+00:40:39,000 --> 00:42:06,000
+a good InDesign with zero initialization then you are going to choose the one with the minimum L2 naught so here is the claim so the claim is that if you do good in distance with initialization Theta is zero uh this will converge to uh the minimum Norm solution so what does the minimum solution mean formula it means that you converts to a solution with the smallest L2 Norm among those Solutions such that those global minimum of the loss function so so we use green designs you are not only just finding a Theta such as the loss
+
+76
+00:41:36,000 --> 00:42:33,000
+function zero right so typically when you think about optimization the optimization is trying to find a solution such that the loss function is minimized right that's true you still find you definitely find a solution such that the loss function is minimized but you also have you actually have a tight breaking effect among the solutions such that the Optimus the loss function is minimized you actually choose the one with the smallest L2 naught so guys you know in some sense you know the kind of intuition is the following
+
+77
+00:42:13,000 --> 00:43:45,000
+so I'm going to try to draw this this is a little bit um I need to try to draw this well um so suppose you have a suppose let's say the intuition is that supposed to let's say you have n is one um and say these three so you just have one equation one linear equation and um so and you have like three variables so that means that the family of solutions is a two dimensional Subspace so make sure to draw this okay okay so so here the Subspace I'm drawing here is this is the family of theta such that
+
+78
+00:43:37,000 --> 00:44:48,000
+you satisfy that the loss is zero right this is the Subspace right so you have a substrate Solutions and but which solution you converge to that's the question it turns out that if you if you start with let me see what maybe I will write here um it turns out that you're going to find a solution such that this is the solution of the fund this is the solution drawing this is a little bit challenging I guess how did I do this I think I did this so so you consider that you project zero to this Subspace right so that you find
+
+79
+00:44:29,000 --> 00:45:22,000
+this point this point is the the solution with the minimum knob that is closest to zero among on the Subspace and this is the solution that you you will find you're not going to find other Solutions with good in descent on um with initialization zero so basically that's the claim the claim is that you're going to find this particular solution but not the other Solutions and the reason is actually fundamentally reason it's pretty simple like especially if I draw it in this way of
+
+80
+00:44:56,000 --> 00:46:26,000
+course if you want to prove it it's a little bit more complicated um so the reason is really just that you start with zero this is uh where you start with right we need that and you have a property such that when you how do I um you need a series this so you have a property such that if you start with if initial is zero right and then at any time so uh your Theta is always in the span of all the data points here I'm gonna have actually one data point so I'm only so um so so basically your Theta cannot
+
+81
+00:45:45,000 --> 00:46:38,000
+move arbitrarily in any places you only have you have a restriction on where the setup can go so actually for this particular case what happens is really just that you are just moving it along this direction and here you'll find this point that has the Subspace and that's what the gradient design is doing so green in design will not do something like this will not converge to here it will not converge to here it will just go directly go to this this mean this closest point where the point that is
+
+82
+00:46:13,000 --> 00:47:08,000
+closest to zero on the Subspace so so this is this is probably a property of the optimizers right you can imagine you may have optimized other Optimizer suppose you design some crazy Optimizer which does this or does this then you will convert to a different points but if you use Golden design you're going to do this you show that green inside is doing this is just by saying that the good instant is always in a soft the span of the data I think this is uh this is actually something we have we have approved for
+
+83
+00:46:51,000 --> 00:47:58,000
+in the kernel kernel uh lecture I'm not sure for a different purpose you know it's not for this purpose remember that in a kernel lecture we try to show that your parameter is always in a linear combination of the data and and then there the purpose was that you want to represent it by the betas in that lecture so it's a different reason but it's different on goal but it's the same fact right your status is always in a span of the of the data [Music] is defined to be the all the solutions
+
+84
+00:47:33,000 --> 00:48:29,000
+that have zero loss so these are all the spelling is that's my definition of the Subspace this is the family of solutions that have zero training loss so and the question is which one I'm gonna convert to in kind of like I was arguing that you know they're much for Global minimum right so this whole spine is our Global minimum all of them are Global minimum and which my own converts to so so different algorithm probably would convert to different points so if you run cooling design you're
+
+85
+00:48:02,000 --> 00:49:00,000
+going to converts to one particular one in this in this bag right but but this um um this this phenomenon also shows up in other cases but it's going to be you know much more kind of complicated like like I think they are only a very limited number of situations where we can theoretical proof where you converge to um but but it's almost always the case that the optimizer has some preferences the optimizer will not converge to arbitrary zero training loss solution it will converge to one particular zero
+
+86
+00:48:35,000 --> 00:49:48,000
+General solution and sometimes that solution just to General is much better than the other ones [Music] so um so it's not only one or linear models or right so so this so only for linear models the final of zero zero loss uh solution is a spot right so if you have non-linear models then the family of solutions satisfying this wouldn't be a spot maybe it's a manifold something some other weird structure uh right so so in that sense this is very special Solution that's gonna be in that's bad
+
+87
+00:49:23,000 --> 00:50:20,000
+it's going to be the constraint optimization problem that we just saw that like it's going to constraint itself to this like minimizing a second right right so so I didn't show you the full proof so this point turns out to be the point that you converts to turns out to be the the minimum solution and it turns out that you actually just going straight at least for this at least one case so you know not it's actually it's not even always true that you are going in a straight line like
+
+88
+00:49:51,000 --> 00:50:54,000
+some but uh but you always go in this Subspace um so I'm answering the question maybe I didn't um can you prove that yeah you you can prove that prove it yeah I think the homework question I actually asked that you're gonna converts this this Pawn is exactly the minimum normal solution and also you're going to convert to that oh okay actually you can have a actually you can have a pretty concrete representation of this point right it's really just some inverse some of the Matrix times something you can you can
+
+89
+00:50:22,000 --> 00:51:19,000
+compute what exactly is and and you can show you converge to the point um I'm not sure whether the homework asks you to so I think the homework has to show both but we will have a lot of hints you know along the way it's not going to be interested show this that's it and maybe for example another just to give you a sense on you know what these kind of things can change right supposed to initialize here then you wouldn't converge to here so you probably would convert to somewhere here
+
+90
+00:51:03,000 --> 00:51:55,000
+and you know and so uh and if you use stochastic reading is that you probably wouldn't commercial exactly here either your power will convert to some somewhere definitely so so so where do you exactly converts to it it's it's a very hard question we don't really know uh we only know that this this the only thing we know right now I think formula is that this matters if you use different algorithmic cucumbers different solutions and different solutions generalize differently so you
+
+91
+00:51:30,000 --> 00:52:31,000
+have to consider the effect of the optimizers and going back to this the reason here is really so I guess like a this in some sense this kind of is trying to explain why you can you can challenge here that's because because of this implicit requisition effect even though like you don't have regularizers you still implicit regularized L2 Norm so and that's why in this regime even though you have a lot of parameters but actually you are still implicitly regulating out norm and if you look at
+
+92
+00:52:02,000 --> 00:53:03,000
+the norm the norm would look like this so this is the norm as you change the parameter so so basically this is saying that when you have a lot of parameters actually your real Norm is actually relatively small and that's why you can generalize so um so so the the the reason why you don't generalize in the middle is because this minimum normal solution is not actually doing well in the middle for some other reason so um so the norm actually turns out to be big but actually the norm is very small
+
+93
+00:52:33,000 --> 00:53:32,000
+in the over parametric 3G even though you use a lot of parameters thank you Okay so so now let's talk about you know um how do you really do um how do you really find out what's that you know I've told you that we don't know too much about you know what how does the optimizer uh change things right so we also don't know exactly how does the model complexity uh uh change things right so you only know some intuitions right so you know that if you have more complexity it turns out to be more
+
+94
+00:53:11,000 --> 00:54:10,000
+likely to over fit but you don't know exactly what is the right complexity right so how do you find out the right model the right optimization algorithm the right you know regularizer all of this where you have so many decisions where you probably have like 10 decisions you have to make in this machine learning algorithm so how do you find out what's the what's the best thing so so I think the the typical way is just that you are user uh validation set to um to figure out what's the best
+
+95
+00:53:40,000 --> 00:54:45,000
+decision so maybe just to motivate that just briefly so the the easiest way to do is that you just use a test set right so you have some test set and you just you try all kind of algorithms all kind of models all kind of like a regularization strength and you see which one has the best performance uh tested so that's okay as long as you only use one you only use the test set at the end right so to try all of this algorithm in advance you know you you and then you collect some test the site or maybe you
+
+96
+00:54:13,000 --> 00:55:12,000
+collect the test set before but you never touch it right so that's okay so you you so you if you only use the test test once then you can use the tester to evaluate the performance of all possible algorithms all possible kind of like models uh you you want to use so so that's that's that's that's that's that's a good thing so however the problem is that sometimes um you like you um you want to do this iteratively you want to look at a test set and see what the performance is and then you go back
+
+97
+00:54:42,000 --> 00:55:50,000
+to say okay maybe I'll change my model size right or maybe I'll change my uh uh like my Optimizer right so maybe I'll change from Green instant to stochastic in science maybe I want to add some regularization effect I add some regularization on like a function so um um so if you want to do with iteratively then the what I said before was not going to work that's because you know so typically if you have a test set this you can only use it once so because if you use it multiple times
+
+98
+00:55:15,000 --> 00:56:30,000
+what happens is that you are you could kind of like overfit to the test set so basically the your later decision becomes kind of like a over 3 are our decisions over fitting to the test set you have seen before so so the only the validity of the test type is only insured when you only suggested after you you do the tuning so and if you see the test set and then you like uh you you do the training and then you test it again then the second time you test on test that it will be not guaranteed to be valid so you may all over a fit to
+
+99
+00:55:53,000 --> 00:56:59,000
+the test set so does it make sense I'm trying to be not over complicated this right so that's why I'm trying to use informal words for it but if there's any questions right so so how do we all deal with this right so the test set we can only use it once or at least we can only use it we cannot use it interactive interactively you can also see the test stats tune and then see your tester get set again so so one way to deal with this is that you um you um you you have a whole doubt or you have a
+
+100
+00:56:26,000 --> 00:57:37,000
+validation set so so basically you split the data into a three part so one part is called training site and one part is called validation set and also test that and for test start this is your kind of like uh this is a very you have to be like a very careful about it you shouldn't touch touch it this test that is only only about the very very and you are using a test set to evaluate your performance so and but the validation side this you use this to tune hyper parameters and by hyper parameters here I mean all
+
+101
+00:57:12,000 --> 00:58:11,000
+the kind of like the type of parameters that you are you are choosing for example the the batch Stars you know the the the Lambda in the regularization uh maybe the the choice of the optimizer the number of neurons you're going to use in the in deep learning in your deep learning model um how long you have you're going to train in all of these you know decisions um that you are going to decide in the in this process they are called hyper parameters and so you're using mobile edition set to tune the hyper parameters
+
+102
+00:57:41,000 --> 00:58:39,000
+and you are using the chain inside to tune the real parameters right by the to optimize the parameters right so I guess typically we don't know so to tune the parameters right these parameters are just a numerical numbers right in the model which anyway you don't know what where the meanings are but the hyper parameters are those kind of things that you uh you know their meanings right batch size learning rate step size right so they all have some meanings uh and you want to use this validation set to
+
+103
+00:58:09,000 --> 00:59:06,000
+tune the hyper parameters so so basically the kind of process is that you start with the tuning and then you you valid you start with training with some hyper parameters and then you validate on your performance uh and then you go back to to tune again maybe using some other hyper parameters and then you do this iteration for many times so and after you do all you are done with everything and you find out a model that you are happy with which you know by your happy with you I mean that you found another model that is very good on
+
+104
+00:58:37,000 --> 00:59:36,000
+a validation set then you finally test your model on test set and that can be only done worse so so in some sense I'm not sure how many of you have for accounts in this kygo computation right it's kind of structured exactly like this so there is this online platform where people release their data sets for and set up some kind of kind of like challenge for people to submit their machine in the model to solve their tasks so basically you know kygo competition so they have a like the organizer I have a test set which nobody
+
+105
+00:59:07,000 --> 01:00:05,000
+can touch at all like this test side is only the it's only used once at the very end when you decide who is the winner so but and then the the the the organizer released these two actually I'm not sure sometimes they give you a division right so they say this is advantage that this is the training side sometimes they just released the total um all of them to you and then you can you can divide yourself you know even the release in this format you can re-divide them you know whatever you
+
+106
+00:59:36,000 --> 01:00:29,000
+want to do so let's say suppose you have divide your you know all the training example into these two sets you can do whatever kind of like um whatever kind of like uh optimization uh you want so and I think typically they do have like a desk in the validation side which is used to for the for computing the scores on the leaderboard whether there's a leaderboard which kind of like tells you how well you are doing against others at least temporarily right so so that's the validation side that's that's evaluate
+
+107
+01:00:03,000 --> 01:01:09,000
+on the validation side but this leaderboard may not be exactly uh the same as the final rank it's possible that you know finally you found out that somebody is succeeding in the leaderboard but eventually in a very final test um the the performance is not like as the validations I suggest so so but but this is the general setup that people are doing um does it make sense so one common question you know that people kind of like generally ask you know which I ask myself as well is that you know how how reliable this
+
+108
+01:00:36,000 --> 01:01:35,000
+validation site is right so like a like if you have very high performance on the valuation side should you trust yourself so on one side you shouldn't trust yourself you know 100 because if if you can trust the organization side performance why you need to test that well the test stat is supposed to give you the final verdict in success right it's it's a very uh like a it's a guarantee it's something that guarantees to give you the right answer so so the value set is never 100 you know you
+
+109
+01:01:05,000 --> 01:01:55,000
+probably shouldn't 100 trust it so on the other hand in Prior college so people realized in the last five years that I think there is a sequence of paper on this people realize that actually the validation side performance you know is actually well card with the test set like so this is a reasonable indicator about how good your performance is on Tesla it's just not there's no theoretical guarantee that these two are exactly the same so but but in most of the cases if you don't do
+
+110
+01:01:30,000 --> 01:02:34,000
+anything crazy you don't kind of like a somehow just memorize the entire validation Side by creating some kind of like um some kind of like uh like lookup table kind of things then typically a validation size performance the performance and radiation set is kind of very close to test that and this has you know there is a there's a very um important paper in the probably three or four years ago um by Berkeley people so they actually look at them like maybe 300K gold competitions and and they are like they look at the the
+
+111
+01:02:02,000 --> 01:02:56,000
+best performance you know the the the rank of the performance on the validation side on the leaderboard and they look at how they correlated with the the final winner the final performance and they found that they are very correlated so which suggests that the validation side is actually a pretty good indicator for test set even though it's not guaranteed um and any and in this case the typical machine the uh the typical machine learning kind of practice is that you know if you look at the the
+
+112
+01:02:29,000 --> 01:03:30,000
+um the um um like the the when people publish papers right so in some sense people publish results based on validation search um so for example if you look at image United performance in some sense people are uh like the the so-called test performance that people report is actually it's actually a performance on a validation side because that that so-called test set of has been seen so many so many times is I think actually it's lit uh I don't know exactly whether there's a label like name for it like in
+
+113
+01:02:59,000 --> 01:03:53,000
+the image not uh the official data set but at least that's that you know that you report your performance um with that side shouldn't be considered as a test set because test that you should only use it once but actually people have used it so many times maybe a million times so so so basically abstract speaking I think these days when you publish paper you use the validation set only when you have the Kegel computation you use the tester to really decide the winner but but empirical it sounds like they
+
+114
+01:03:26,000 --> 01:04:31,000
+are very close so so actually that's why we are not worried too much about it any questions oh I think it's this is a [Music] I think it's called hey go or kaigo I don't know how to be an artist uh this is a platform so the platform hosts a lot of computations maybe like um a hundred every year or something like that you can submit your model and sometimes there is a kind of like there is a price uh for winning the the competition so um right and by the way I think this validation
+
+115
+01:04:06,000 --> 01:05:03,000
+is that sometimes now people call it development site as well um I don't know how popular this name is uh but at least if you say but addition said I think everyone would know what you're talking about development side I think most people would know as well but it's a relatively new term in the last five years trading certain validation sets as part of like a bigger so like once it's actually decided on what type of parameters you want to use right so how do you how do you do the
+
+116
+01:04:47,000 --> 01:05:50,000
+split right so so here um so the most typical way is that you just split randomly you reserve probably a tenth of the data set as validation size maybe 20 you know depending on how many data you have so um and I think what you are probably thinking is the so-called cross validation which does something much more complicated you can kind of split your data set into uh you can do multiple splits and try multiple experiments on different splits so um I think uh um I I think I'm not going to cover it uh
+
+117
+01:05:20,000 --> 01:06:17,000
+for this lecture mostly because I think these days if you have a large enough data set typically you just do this static spelled just because it's much easier you don't have to run your algorithm multiple times and this is just almost like the like like in most of the larger scale machine learning situations you just use this so but if you just have like 100 examples then indeed as you said you know if you fix like 20 examples that's validation side it's a little kind of like wasteful so then you have to do
+
+118
+01:05:48,000 --> 01:06:56,000
+some cross validation so we have a we have a kind of like a section in lecture notes about cross validation um there's a there's a description of the the of the Practical um I think you know if you're interesting you can you can read it it's nothing very complicated either thank you okay so I got some um yeah so I'm gonna use the last tournaments to talk about some more um applied perspective um I'm gonna use the slides so I guess I'll see that this can work okay great so uh
+
+119
+01:07:22,000 --> 01:08:36,000
+it's not censored is it wait okay sounds good um okay good so um so so I think this lecture um um so we're talking about some ml device so um I think I um so here on these slides are made by our other instructor crispy uh with the help of Alex Radner um I'm pretty much just repeating uh whatever um he's saying in the slides so um I think the slides you know used to be a little bit longer than this I'm going to release the longer version as well so I shorten it you know to only 20
+
+120
+01:08:00,000 --> 01:08:55,000
+minutes or 30 minutes um and part of the reason is that I think slides also contains something that has been covered on the Blackboard on the Whiteboard and also part of the reason is that there are some applied Parts on which uh I think we don't have a lot of time to discuss in um in this quarter so but I'm going to release the the longer slides as well for your reference so so so so this set of slides are mostly for kind of like a little bit more applied kind of like situations for example you are thinking
+
+121
+01:08:27,000 --> 01:09:18,000
+that you are for example your startup and you are doing machine learning to solve some concrete problems right so um so it's a little bit less like a research because you know you're gonna see that you're gonna have more much more issues than a concrete research setting right in research actually you sometimes also have this right in research the most typical setting is that you probably have a con very concrete data set right you know that the input output you know everything there's no any room in flexible you
+
+122
+01:08:53,000 --> 01:09:41,000
+cannot redefine the problem and you just want to get the best number that's one type of research I don't think this is the most typical one either right like but um but this is one type of research and then from there you can have more and more flexibility you can change your data you can refreeze your problem you can find out what's the right problem and and once you really do it in in Industry then it's going to be you know much more complicated so some disclaimers to start with I
+
+123
+01:09:17,000 --> 01:10:15,000
+think this is Chris disclaimer which is also mine so these are you know like there's no Universal kind of like what is ground shoes here right so there's no ground shoes it's really just some experiences and some um uh some experiences from people doing right you know in real life so um and and things change you know over time sometimes people thought that was the right thing to do in five years ago and now things changed so I'm going to go through this a little quickly so um you know
+
+124
+01:09:45,000 --> 01:10:50,000
+um so um but you know some I'm gonna omit some of details as well but feel free to stop me um right so so there are many um so in some sense there are many phases of IML project if you really do it in Industry right so so for example one thing you want to discuss is that you really need ml system even to start with right some of the questions are not really necessarily suitable for ML I think at least I knew I'm not I don't do as much industry uh work you know as um you know Chris is also entrepreneur
+
+125
+01:10:18,000 --> 01:11:17,000
+besides you know um a professor um so uh so he knows a lot about this but even I know that sometimes you know people actually when they really uh sell their product as a ml system but actually the underlying system is not really using much ml so sometimes you don't really need ammo and and and when you need when you use the ml if it doesn't work you know what you do so and uh and and also like you know how do you deal with all the kind of ecosystem so and when I use the runner example you
+
+126
+01:10:48,000 --> 01:11:55,000
+know we're going to have a Spam detector and the question is how do you know detect spams um um you know we'll use this example a lot in this like in this course so this is the seven steps for ML system so here again it's more a little broader than just the ml research right so you're thinking about designing a system that can actually work in practice so um so acquire data and you want to look at the data you know and maybe you want to create some kind of like twin development test set as we discussed you
+
+127
+01:11:21,000 --> 01:12:12,000
+want to um Define our refund specification which I'm going to discussing in some sense this is saying that you have to have a evaluation metric for for your model in what sense you want to you want your model to succeed and then you want to build your model and try a bunch of models maybe you are going to spend a lot of time in step five and then you're eventually you're going to measure uh models performance you know not necessarily only according to the specification you have defined in step four but maybe
+
+128
+01:11:46,000 --> 01:12:48,000
+you'll have like other match measurements for example speed training time so and so forth and then eventually you have to repeat and maybe you have to repeat a lot of times so um I'm going to go through these steps you know relatively quickly I only have like 15 minutes so but you can kind of like um if you're interested you can look at a longer slides as well so um supposed to say um you want to decide what is Spam or not so so ideally you want a data sample from the data that your stump product will be
+
+129
+01:12:18,000 --> 01:13:16,000
+around right so you want to have your data to be somewhat kind of like closer to the the final test data right so you don't want to just collect some spam data from 30 years ago and then and use this data to choose something that's that can work not these days but sometimes this is not always available because you never know what what the spam emails will be 10 years after so you have to make some sacrifice um you know sometimes you don't even have the features you know it may be like your existing record didn't save
+
+130
+01:12:47,000 --> 01:13:41,000
+everything maybe it just saves the title of the email didn't save the the entire content then that would limit your capability of detecting spec and there are many legal issues to look at the data um and this is according to crazy you know I think this is true as well so you're getting wrong on the first try right so like sometimes you like you'll find out that the data you collect are not the right one you have to repeat and then you know after collect some data you have to look at them right so
+
+131
+01:13:14,000 --> 01:14:02,000
+and this is something that we actually don't really teach a lot you know in in this machine learning course looking at your data right because you know we are mostly assuming that you already have your data you you make the right assumption already you already know your data is gaussian and then you uh you you are engaging discriminated analysis right but we never say how do you how do you decide whether you you really make the Assumption of the about the gaussian Assumption so but in practice you have
+
+132
+01:13:38,000 --> 01:14:35,000
+to do that because you have to um uh see whether data makes sense you know there are many nuances there for example sometimes your data are not as good as you think maybe there are some kind of like um maybe the format is not right maybe there's some kind of like outliers um so and so forth and and only if you look at the data you cannot see uh what's what's going on there so I actually you know even research sometimes I experience this right so like I think in one of my projects um like uh I think we use we just use
+
+133
+01:14:07,000 --> 01:14:58,000
+the wrong data from day one in some sense I think the data like some of the data will just crafted you know just by accident and we are tuning on them and until only until like um like one month I think we realized that so of course in research it's probably easier to tack that you know one month is a long time for us to detect it I think but but actually you know you can easily detect them but for for real life cases you know sometimes it's even harder for example you don't even necessarily have the tools to look
+
+134
+01:14:32,000 --> 01:15:40,000
+at look at your data you maybe have to build some tools to look at your data and and you need to kind of like think about different subpopulations maybe spams from edu emails or spams from.com emails and and see uh what are the differences so this will give you a lot of intuitions on you know what data you should use and our Workshop models uh you should use and and do this at every stage because you know like um in for example we will really do them and this is also while the reason why you want to build some tools to look at
+
+135
+01:15:06,000 --> 01:16:05,000
+data conveniently right so sometimes like if you just look at it once then sure then you can just uh maybe print out something right so but if you want to look at many times then you should have some convenient tools which actually eventually will reinforce and let you to more likely to to look at data right so I think at least in research I I also realized this so if the data is very hard to visualize then people are less likely to to to visualize the data so so sometimes it requires an investment so that you
+
+136
+01:15:36,000 --> 01:16:43,000
+can um you can have this tool so that in the future you are you have less of um uh on um kind of like cost to look at your data and you should do this at every stage uh in many cases um so and and this is um I guess you know this is about domain knowledge where you sometimes you know some of the data requires expertise right like um to know so so some I think there are there are some examples you know in the slides which I uh removed just to save some time but like in short and sometimes you know for example if your
+
+137
+01:16:09,000 --> 01:17:11,000
+data is crowded like experts only experts can know like a like for example you have medical data only experts can know that your data are crafted but like from a machine learner um perspective the data looks fine so I will talk about children depth on tester split so um so this of course is something important for you to um to do um and in practice you know it's other lesson um clear um than uh than in research right because in research you already got sometimes you already got a split even
+
+138
+01:16:40,000 --> 01:17:40,000
+at the first place right so before like you got a data the data already has a split but in real life sometimes you have to avoid certain kind of like leakage uh so for example maybe sometimes for example let me take an extreme case right so suppose your data has reputations so if you have like a million data but actually it's just a two like every data points is repeated twice so essentially you just have 500k and but repeat it twice if that's the case then you split the data then you're
+
+139
+01:17:10,000 --> 01:18:10,000
+going to see some reputations between like you some examples in the test will also show up in the training exactly the same so that would be disasters so so you have to kind of avoid some situations and this actually happens in in the Kegel context so actually in many in many many like exactly like I actually I I try to do some of this Kegel contacts at some point at least at that time like that's probably three or four years ago um maybe maybe more than four years maybe six years ago at that time many of
+
+140
+01:17:40,000 --> 01:18:51,000
+the contest so if you look at them there's some always some kind of like forum for discussions discussing like uh uh okay [Music] like I think I'm sure this happens more in the industry which I'm not less familiar with but in even in the Kegel contest so um so in many of the Kegel context if you look at the Forum always after like a half like a like a half a month I mean after a few weeks someone will figure out some leakage but just because you know something examples are very very
+
+141
+01:18:29,000 --> 01:19:19,000
+close to test example so that they just use this leakage uh to to hide the number so it's kind of like some kind of like weird rule so that you can make the validation performance much better than you thought and and everyone has to use that and it's kind of interesting I don't know why it's like everyone who found this kind of late cage they always post it in the Forum somehow and and then ever I don't know whether this is always true but like for the few cases I've seen they do this and then everyone
+
+142
+01:18:54,000 --> 01:19:47,000
+else will have to use this small Gadget to improve their model performance because if you don't use it your model performance is just not as good as others um so yeah I don't know whether they now they have maybe they have some better ways to to detect this leakage to design the computation much better um I don't know so but this is something you have to pay attention you know um in practice and also another kind of tricky thing is that what is a good spirit so we have discussed whether you should do
+
+143
+01:19:20,000 --> 01:20:27,000
+random splits right so in research as I said you know random side is pretty much the best way you can do because you really literally care about uh the validation performance but um but the problem is that um sometimes you know uh in the real world like your test you like your the the the the test data set is actually not really what you care about so um so so that's why when you split it you also want to split the the children validation set in a way such that the validation set is some of the closer to the real test set
+
+144
+01:19:53,000 --> 01:21:04,000
+let's so I guess this is the situation so suppose you say you are thinking about stock price prediction right so so your final goal is to predict the price in the future right so that's something you just don't have at all right so and and so now suppose you have data between um 2020 or 200 2020 right so you have these 20 years of data so how do you do the tune uh uh validation split should you just just do a random split or you should do some other things so one possible option is that you should
+
+145
+01:20:28,000 --> 01:21:29,000
+probably split into for example 2000 to 2015. that's the tune and to 2015 to 2020 that's the validation why you argue that why that's a possible option um possibly just because the last five years is more predictive of the future than the the earlier years so you know I don't I don't necessarily say I'm not necessarily saying that this is the the only option or the best option but this is at least something to consider right so this was kind of like a kind of like a um this is not what we
+
+146
+01:20:59,000 --> 01:22:05,000
+do in research just and the reason is just because you know like you care about the performance in the future which is something you don't have access to right so I guess this is a right so the better split is they use the first 50 days to predict the last 50 days so um okay and create a specification right so so I think this is mostly related to like how do you kind of like Define what you want to predict and and what's the what's the kind of the goal right so are you so in many cases you
+
+147
+01:21:35,000 --> 01:22:41,000
+can use Machine model in many different ways uh uh from uh from from what you wanted to use it right so and also you care about kind of different um kind of like uh perspectives for example you know what is a spam right so like the definition of spam sometimes you know are different um between different people right so like um maybe do you think like an ad right from some from from say Google do you think that's that as a spam you know maybe I always think of like that but some something else probably prefer to
+
+148
+01:22:08,000 --> 01:23:02,000
+receive some emails some add emails with very low rate right so so you have to specify exactly what you want to predict right so what is really the definition of span and you don't want to have ambiguities at least you know from this day's perspective right so like a machine learning models don't like ambiguities you really want to have a clear cut what is the spam what is not and and also like a what level of expertise is hard to understand it because you know if you specify the spam
+
+149
+01:22:36,000 --> 01:23:41,000
+you know you can have a definition but if your labeler don't are not able to uh label the spam according to your definition is not going to be useful right suppose you have a very very complex definition of spam and then you say I have this data and I'll ask laborers to label them but the laborers cannot execute my definition of spam easily that's going to be another issue and and also the specifications like uh um so you use the specification you want because you want to kind of like a uh uh
+
+150
+01:23:08,000 --> 01:24:10,000
+on you use the specification to define a set of examples right so because eventually if you just have a some kind of description text description about what is a spam that's probably not useful you have to really have a set of test examples and the test examples have labels and that's is really your definition of span so and for example one of the quick and dirty tests here is that um what are your definition of the span um can pass this so-called you know inner annotated agreement so basically
+
+151
+01:23:39,000 --> 01:24:39,000
+what you say is that you write down some definition and then you select a some randomly selected or you get some examples of emails and then you ask um three annotators to see whether they can agree on which email is a spam or not according to the definition you give them and often you don't really get that high of agreement you know you know you don't get 100 agreement you know in many cases you know people's interpretation of the same definition would be different um and let's say you know you have 95
+
+152
+01:24:09,000 --> 01:25:21,000
+agreement I think that's already considered to be great and then you have 95 of agreement then the question becomes you know whether uh uh it's meaningful to shoot for some accuracy more than 95 right if the annotators don't agree with each other uh um only agree with each other on 95 percent of 95 of time actually sometimes you can do better than that just because humans are sometimes you know lesson um have less in accurate like interpretation or sometimes machine models can do better but you know
+
+153
+01:24:46,000 --> 01:25:43,000
+typically you probably shouldn't shoot for much higher than 95 in many cases so um and and then you know you're gonna you know do this iteratively for example you have to kind of examine the specifications you gotta look at you know what's the discouragement you know why you have discouragement maybe that means you have changed your specification and um and and and you know and the last question is kind of interesting what do you tune the people on the machine eventually at some time if you kind of
+
+154
+01:25:14,000 --> 01:26:13,000
+have a lot of like a different um sometimes you have to tune the people to label them correctly right so for example even like the image classification problem we have this clearly defined labels right so dog cats you know but once you go to the the more the the the breeze of godox right so some some of the laborers don't really recognize different breeds of dogs so you have to tune the labelers uh in some way so I have a friend who did this like a in PhD and and basically he has a lot of kind of training documents for the
+
+155
+01:25:44,000 --> 01:26:48,000
+labelers you know Amazon account workers and and I I they have to actually ask the Turkish to pass some exams to be able to to be a labeler for them so so so it's actually kind of complicated okay so I guess I'll I'll be quick given that we are almost running all the time so and then when you do the model this is the more machine learning part so you want to implement the simplest possible model so um and you keep it simple and then um um and sometimes I think this is the this thing so don't get embarked on new
+
+156
+01:26:16,000 --> 01:27:21,000
+models uh use them to understand data right so sometimes like a um the problem is that um the models are not only the angle sometimes you know you want to use the model to understand uh what are the problems with the data right so and and sometimes you can you can fix the data and then the model becomes the performance becomes much better so um so this this is a whole Loop right your bottleneck may not just be only about the model sometimes it could come from some other places maybe a data maybe a specification maybe the chin
+
+157
+01:26:48,000 --> 01:27:52,000
+test split so and so forth and and you have some bass lines so that you know what you are what you are doing and you need to do some mobilization studies on so and so forth and and then step six you know you need to match the output so and uh you have to measure the output so that you don't you know make mistakes twice and you want to catch up catch new mistakes as soon as possible um and you want to measure kind of different things and simple things for example um like like there are a bunch of kind
+
+158
+01:27:20,000 --> 01:28:18,000
+of like qualities you care about here um and and so and so forth and this is probably one thing that um um that we it's one challenge we are really facing these days about machine learning model maybe I would say probably one of the most important challenges so the reason is that you have a description shift right so you're training an validation description are very different from a distribution that you will test eventually um or maybe they are similar but there is some kind of like special
+
+159
+01:27:49,000 --> 01:28:47,000
+subpopulations that make them different right so for example you're tuning on San Francisco street views a new test on Arizona street views for example when you build a automatic autonomous driving car then you know you tune on some street views and you have to test on some other places and that creates a distribution shift and then uh you can you can have surprises and you know there are not so many kind of like good uh ways to do this you know except that you have to kind of be careful about it and these are new
+
+160
+01:28:18,000 --> 01:29:22,000
+algorithms um and um and this is incredibly hard right there's no real solutions in Industry I don't think there's real solutions in um in in research either so I think we're gonna have for one guest lecture by James o about the robustness of machine learning models there are a lot of recent work on it um but so far we don't have you know I think we have definitely better algorithms to to be more robust but I think the performance is probably the robustness is still not um ideal enough
+
+161
+01:28:50,000 --> 01:29:13,000
+Okay so okay I think I'll just jump to step seven so yeah you have to repeat and look how data I release the longer version of the slides you know if you are interested in some of the details thanks
+

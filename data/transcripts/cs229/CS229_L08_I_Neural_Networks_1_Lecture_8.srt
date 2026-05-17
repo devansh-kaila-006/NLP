@@ -1,0 +1,300 @@
+1
+00:00:05,000 --> 00:01:15,000
+hello everybody hi my name is Masha um some of you may have met me already as part of office hours and seen me post on Ed and things like that I'm really excited to be giving the lectures today it's going to be in a slightly different format than tenu's or Chris's so feel free to give me feedback on that afterwards on Ed or by email whatever you like but the topic today is actually kind of fun um so we're going to start our foray a little bit into deep learning so neural networks
+
+2
+00:00:41,000 --> 00:01:56,000
+um I'm assuming everyone here has heard of neural networks before anyone who hasn't yeah that's what I thought pretty much so it'll be fun to see how the ideas of what's happening in the state of the art actually come back to all the things we've been talking about so far so ideas and linear regression ideas and logistic regression all of this will connect to how neural networks work so before I get into you know the mathie notationing type of material I wanted to start with some motivation
+
+3
+00:01:16,000 --> 00:02:50,000
+uh who here has heard of gpt3 yeah a lot of you so it made big waves a couple years ago is a huge huge model but it was able to do really impressive things like in this case here it came up with a poem on its own right and the hope is that these deep learning models learn to be so expressive that they can do creative things like creative writing more recently this was very very recent um has anyone heard of Dali 2 a few of you yeah so this is very very recent and so dally 2 is able to generate images and the prompt here is
+
+4
+00:02:04,000 --> 00:03:18,000
+an astronaut riding a horse as a pencil drawing and you can see the the main one that I picked out and then a bunch of different versions of what else it can come up with so deep learning is very very powerful for better or worse but it also has so much potential to do such amazing things right obviously this is cool but there's also applications in medicine applications and education applications in things like autonomous driving which could hopefully make our roads safer so there's lots of potential here
+
+5
+00:02:41,000 --> 00:03:44,000
+and that's sort of the backdrop to where we're going to start we're going to talk about the origin story of all these things so we're going to start with supervised learning learning with non-linear models so so far most of what we talked about has been linear models and now we're getting into the non-linear territory and I'll talk a little bit about what that means and then we'll get started with neural networks we'll figure out what the heck they are how we can Define them and that
+
+6
+00:03:13,000 --> 00:04:38,000
+next lecture we'll actually talk about how you can optimize them and I believe Tangy will be giving that lecture any questions before I get started cool all right so first let's think about linear regression so we've seen this a bunch and so we can get started with a data set that we might have right so we might have some excise and Y eyes so some inputs and outputs in our data sets and say our data set is of size n right and uh we know for linear regression that we have a prediction that we can
+
+7
+00:03:57,000 --> 00:05:42,000
+make according to something like this right so we have a linear function that we're using to predict and this function depends on our inputs X can anyone help me out with what our cost function might look like in terms of y's and H's for linear regression okay H minus y okay I heard somewhere some over I yeah this looks good to me this look good to everyone familiar hopefully we've seen this all before awesome okay so we have a prediction here and we have our label and what we can do is we can also write
+
+8
+00:05:16,000 --> 00:06:37,000
+this directly in terms of our parameters so our parameters here are Theta and B cool I just plugged it in makes sense so far right and what we can do is run things like gradient descent or stochastic gradient descent in order to optimize this cool so last lecture you talked about a slightly different set of models you talked about kernel models and so with kernel models we still have a similar setup right so we have our xi's our y eyes right and then what is our H Theta of X look like so what does our prediction look like
+
+9
+00:06:33,000 --> 00:08:01,000
+with kernel models does anyone remember from last class hint it's very similar to what we had before yeah and what's 5 of x sorry the feature map exactly so what's interesting about this setup is we're still linear in parameters right but we're non-linear in the inputs because Phi of X can be any non-linear function that you discussed last time so what if we want to be non-linear in both the parameters and in the inputs so generally speaking what if we want to do something like
+
+10
+00:07:39,000 --> 00:09:11,000
+this say our H Theta of X is anything non-linear so let's say Theta 1 cubed x 2 plus maybe square root in there Theta 5 x 4 and maybe square root the whole thing right so this type of model could be a lot more expressive potentially right but we also want to think about how can we make this computationally tractable how can we make this useful okay so we have some non-linear model and by the way all these notes will be up online afterwards so if you don't finish writing something please don't
+
+11
+00:08:42,000 --> 00:10:31,000
+worry about it it will be up and if you want to follow along I should have mentioned this earlier but there is a template up as well um so it's going to be what I'm writing on so the blank version cool so let's go back to our um our non-linear model now we can assume that are excise are in Rd so some Vector of features or inputs and our y i is some scalar so just an R right this is pretty standard we've been looking at this type of formulation a whole bunch and then our H Theta is a mapping from r d which is our
+
+12
+00:09:43,000 --> 00:11:24,000
+inputs to R which is the dimensionality of our outputs so the cost function we're going to think about here for our now non-linear model it's going to look very familiar so for one example I we're going to have j i of theta is equal to the square of the difference between the class label and the prediction so y i minus H Theta of x i and all of that squared so that's the cost for one example if we want to get the cost for the whole entire data set we're going to average so what this is going to look like is
+
+13
+00:10:41,000 --> 00:11:52,000
+we're going to have JF Theta 1 over n n is the size of our data set from I equals 1 to n and then here we have j i of theta so this is for entire data set okay so this constant is a little different from before this is a common convention in deep learning It's usually the this is called the mean squared error so it's usually the average the constant really doesn't matter your Optimizer is going to be the same regardless of what constant you're going to have out front of that sum does that
+
+14
+00:11:27,000 --> 00:12:48,000
+make sense quo all right so now we're going to talk about how do we oh yeah question why is it there foreign so n is the size of your data set so you're just this is the mean squared error so you're averaging over all the squared errors in your data set so the reason the constant doesn't matter is when you take the gradient your X that's going to result in your minimum is going to be the same regardless of whether it's 1 over n or one over two you asked why do we use it at all sometimes it's
+
+15
+00:12:30,000 --> 00:13:59,000
+helpful for scaling but other than that there's no real magic behind this it's just a convenient thing to do makes sense to average over your errors um yeah it's a nice way to scale things thank you no problem cool so what we want to do once we have this cost function is we want to minimize it right one way to do that we can use gradient descent and so this notation here we're assigning this kind of like coding notation you can think of we're assigning the right side to the left side
+
+16
+00:13:23,000 --> 00:14:48,000
+okay can anyone tell me why this is gradient descent what is written here and not like stochastic gradient descent what makes it gradient descent yeah exactly so you're considering the whole data set here and the reason for that is if we write out what's actually going on here our J of theta is so that 1 over n is here and we have I equals 1 2N over j i uh sorry j i that's Theta right so we're reasoning over the whole data set so each update here considers the entire data set that we have
+
+17
+00:14:12,000 --> 00:15:47,000
+cool all right so here's stochastic gradient descent so the idea here is we're considering now only one single example every time we update Theta right so we have some hyper parameter Alpha um Alpha same as for gradient descent some number greater than zero um and uh we're basically initializing our parameters Theta randomly at the start and then we go through some number of iterations we sample uh some example from our data set and we do this with replacement and we continue on until either we
+
+18
+00:15:08,000 --> 00:16:19,000
+converge to something we're happy with or we reach our and it are maximum number of iterations so this is with replacement um I'm gonna briefly sketch out what SGD usually looks like more commonly in deep learning settings just so you guys have an idea so this is one variant here is going to be another one and so the variant that's in algorithm one that's going to be in your notes this other one is not but I just think it's helpful to know some of the terminology when you go into the foreign
+
+19
+00:15:47,000 --> 00:17:18,000
+deep learning as well okay so we go through a for Loop where um let's say we're indexing at k we have one tip and Epoch so Epoch is basically a term to mean you've gone through your entire data set and so in deep learning you'll often see or if you read deep learning papers you'll see oh we trained for blonde number of epochs that's what that means that's how many times the optimization is basically gone through the data set so for k equals one to an Epoch we can Shuffle the data
+
+20
+00:16:50,000 --> 00:18:15,000
+and then for J from one to n eater here we might not have enough time or desire to go through the entire data set so maybe we decide that we want to go through 500 examples out of the data set and call that an epoch that's also fine so we have 4J equals one to n itter we're doing the same type of update and here we have no replacement in this inner for loop with the J index because we don't want to look at the same example twice in the data set does this make sense yeah pretty much pretty much and slightly
+
+21
+00:17:50,000 --> 00:19:23,000
+different terminology cool [Applause] yeah so you're basically like having this number by any form you mean like n times for like 40 itself like if the leadership like and Banks and this other one the latter so the question is what does an Epoch mean and uh basically it's if you go through the entire data set it's how many times you go through the entire data set any other questions here cool I'll talk about the last version of gradient descent for today and this is mini batch gradient descent
+
+22
+00:18:44,000 --> 00:20:17,000
+so with mini batch gradient descent the main difference is you're considering b or a batch number of gradients at a time the reason we want to do this is with things like gpus and parallelism this actually speeds up computation so uh we can compute B gradients at the same time or simultaneously as opposed to doing them sequentially and that can be quite a bit faster so let me write out some of that so we're Computing B gradients and they look like maybe grad J J1 F Theta all the way two
+
+23
+00:19:40,000 --> 00:21:22,000
+grad JB of theta and we do this simultaneously cool so one question you might be thinking about how do you choose B and very often you choose B empirically so you test things out you look at your validation set things like that and you'll talk about evaluation a bit later as well but one way to choose B is choose the maximum B that your GPU memory can handle and that's sort of a good way to speed up what you're doing but the trade-off is usually and this might come up in your homework as well
+
+24
+00:20:52,000 --> 00:22:25,000
+um usually the lower the B the better the performance of the algorithm and I'm not going to talk too much about why this is the case this is also active research but just to give you some idea of how folks go about choosing these numbers any questions about mini batch gradient descent yeah I guess this is exactly the same as small American Pacific so that you're just doing physical I think a lot of badge as a whole stool yes yes precisely any other questions yep [Music] yeah so with replacement means uh say we
+
+25
+00:21:59,000 --> 00:23:25,000
+picked example two we can pick example two again in the future whereas with out replacement in the corner case it means if we picked example two within that J for Loop we will not pick example two again until we get to the next epoch you're just randomly choosing one example it can happen to be the same example cannot does that make sense in the middle one you randomly pick examples until you reach and it Earth whereas in the left one you're more trying to go through your entire data set and then do that again
+
+26
+00:22:53,000 --> 00:24:13,000
+any other questions on anything gradient descent related yeah we actually do not Pierce nowhere with voice replacement so with the mini batch no because uh you're considering say say your batch size is 10 or 64 or whatever you don't want multiple examples in that to be the same you want all the examples to be different between batches um you can you can yeah um sometimes you don't sometimes you do um it's sort of like a design choice but you can in this case when it's saying
+
+27
+00:23:51,000 --> 00:25:05,000
+without replacement it means that within one batch you don't have doubles no worries other questions okay all right so next we're actually going to Define some neural networks so we talked a little bit about how we optimize these things but we didn't really get into for example well how do we Define the neural network yet or how do we compute the gradients right like when we talk about multiple gradients how do we actually compute these things and we need to be able to do this in a way that's
+
+28
+00:24:29,000 --> 00:25:47,000
+computationally efficient and progress in machine learning really took off in the last you know 10 20 years because of advancements in Hardware because we're able to paralyze on gpus and make these things so much faster and also algorithmic developments as well of course cool so uh we're going to talk about neural networks today and how we Define them the back propagation which is how do we compute these gradients that will be covered next lecture okay so this example came up at the very
+
+29
+00:25:11,000 --> 00:26:31,000
+start I think maybe first lecture or something like that but the example here we're looking to predict housing prices right and we looked at how we can do this with linear regression with linear models and say with our linear model given the size of a house we have some data where we have some you know size and prices and we can plot them on this plot and our model maybe looks something like this with something like linear regression okay what's a problem with this why might this not work so well
+
+30
+00:26:03,000 --> 00:27:15,000
+any thoughts yeah that's a good first one so prediction might have a non-linear relationship with the input right and we only have a linear so maybe that model doesn't capture the relationship that well what's another reason this is not great yes exactly the second issue with this is that prices can't be negative and when we have a linear model like we do they can right nothing's preventing them from being negative can anyone think of like the simplest thing you can do to fix
+
+31
+00:27:02,000 --> 00:28:18,000
+this problem yeah yes you can fix the intercept to be zero so what does that mean for negative numbers so fixing the intercept to be zero would be this right yeah which also doesn't make sense so one thing we can do let me write out these four issues first but I will show you a solution in just a second does anyone know a function that can fix this for us so I say that later okay any other ones yeah Riley's has anyone heard of Rollies one person with you okay so we're gonna talk about railings in just a second
+
+32
+00:28:13,000 --> 00:29:53,000
+okay so the issues um that we talked about here are the prediction might have a non-linear relationship with the input and the second issue is we can have negative braces okay so are what we want are relu to look like or what we want this function to look like is something like this so basically for all things that are in the negative side we map to zero so that's what our value is going to be and what that looks like in math terms we have our regular prediction but we want the maximum between what you
+
+33
+00:29:17,000 --> 00:30:49,000
+know linear regression would output as a prediction and zero and then our parameters here are going to be W and B so this is value this is how it's usually written and this is the notation that we will use so you can say that value is a function of T here and then really we can just write our prediction as this value function which is WX plus b and uh does anyone know what relu is what it's called in deep learning terms yes yes any other so like what category of functions is it in deep learning yeah
+
+34
+00:30:15,000 --> 00:31:44,000
+exactly activation function so our value is an activation function can anyone tell me is value linear okay raise hands if you think it's linear okay non-linear yeah yeah it is definitely non-linear the maximum crates or non-linearity there okay so this is our non-linearity in deep learning or often is it's also sometimes called one neuron okay so going back to our housing price prediction setup yeah questions yes activation functions are by definition non-linear we'll talk at the end a little bit about
+
+35
+00:31:26,000 --> 00:33:22,000
+what happens if they are linear other questions cool all right so let's set up our high dimensional input example right so far we've uh especially in this plot we've been looking at one input one output so scalar to scalar so what if we have more features so high dimensional input and this is the case when we have X B in Rd and Y B still scalar so we're still predicting housing prices for example so our new terminology for our prediction is value of wtx plus b okay and so our X is just going to be
+
+36
+00:32:28,000 --> 00:34:03,000
+stacked features or inputs so we have X1 all the way to XD and this is in Rd and then our weights our weight vector W is going to be in what dimension can anyone tell me based off of how I've written it D that's right because we're making a DOT product with x and then our B is called our bias and it is going to be scalar what we want to do in deep learning is we want to Stack these neurons so output of activation functions is going to be the input to the next one and this is what creates that
+
+37
+00:33:44,000 --> 00:35:08,000
+expressivity of deep learning models basically they have a bunch of non-linearities that are stacked one on top of the other and this becomes a super flexible framework that can represent a lot of different domains okay so now let's make the housing price prediction problem a little bit more concrete so let's say our X is going to be in R4 and say besides PSI size size or a square footage which is X1 we're also going to consider things like number of bedrooms in the house um what's another thing maybe we can
+
+38
+00:34:33,000 --> 00:36:09,000
+consider the ZIP code that the house is in maybe it's close to a Subway or something right and the last thing we'll consider is maybe something like wealth of the neighborhood so these are our features or inputs and uh what we might want to do is compute some intermediate variables so what I mean here is maybe there are some things that combine some of these ideas um and help us make a prediction for what the price of the house might be so one example is maybe the maximum family size that a particular house can accommodate
+
+39
+00:35:26,000 --> 00:36:49,000
+so what would the maximum family size potentially depend on out of the four inputs that we have size and number of bedrooms yep I would agree with that so we can also think of other variables like maybe how walkable the neighborhood is and that might depend on the zip code for example and the last one is maybe School quality in the neighborhood that this house is in and this will be our A3 so A1 through A3 are some intermediate variables that we think might be helpful to make predictions about housing prices
+
+40
+00:36:22,000 --> 00:37:53,000
+okay well so how could we maybe write these out in terms of math notation well let's use our values that we just found out about and do value of some linear combination of the features that we think might make sense in this context so maximum family size maybe we have um combo like someone said there of the size which is X1 and then maybe we add the number of bedrooms which is X2 and we have some bias term which is going to be theta 3 here so Theta 1 Theta 2 theta 3 are all parameters and then we can do the same thing for
+
+41
+00:37:11,000 --> 00:38:50,000
+the rest of these intermediate variables so we can say Theta 4 so walkability depends on X3 which is zip code and then we have another bias term and then finally A3 so we have value of theta 6 um so A3 is walkability maybe that depends on um or sorry A3 is school quality so that depends maybe on zip code which is X3 and maybe on wealth of the neighborhood which is X4 and then we have some bias here as well okay so these are the intermediate variables that we think might be helpful here okay and the last thing that we might want to
+
+42
+00:38:01,000 --> 00:39:39,000
+do here is is um let me sorry let me just change this notation so it's not confusing for the notes later these are all W's and the biases are going to be B's thank you these are b2's a few ones make sure oh sorry okay no I actually had it right the first time ignore me so these are these were all Theta parameters at the end of the day it doesn't matter I just want to make sure that it matches your notes so it's not confusing later so one two three Theta four Theta 5. okay
+
+43
+00:39:26,000 --> 00:40:55,000
+so this is actually one layer that we defined here okay and finally once we have these intermediate variables we're actually going to make the output we're going to construct the output right and our output is our H Theta of X which is going to be if we follow this construction we're going to write value of and here we're going to make combinations a linear combination of these intermediate variables a right so we're going to have Theta 9 A1 Plus Theta 10 A2 plus Theta 11 A3 plus Theta
+
+44
+00:40:11,000 --> 00:41:35,000
+12. okay one thing so this is going to be our end goal or end prediction here one thing that usually happens in deep learning is we actually for the output we don't use a relu so it's sort of like convention nothing is necessarily stopping you from doing that is just by convention usually we just have a linear layer at the end cool so now that we look at this diagram that's here on the on your right so we have all the things that I talked about right we have the size the number of bedrooms the ZIP code the wealth and
+
+45
+00:40:55,000 --> 00:42:32,000
+it's going into these intermediate variables right so this is A1 A2 A3 okay and the weights that we're considering that are relating um sort of taking from the first set of inputs X to a so for example here we have Theta 1 here we're going to have Theta 2 and so on this makes sense and this structure that we yeah sorry questions uh right now they're all scalar everything we're talking about right now is scalar so whenever we have the subscript it's usually scalar yep um towards the end you're just using those
+
+46
+00:41:48,000 --> 00:43:07,000
+intermediate videos it's possible that some of the original variable files still be useful so is there any way you can kind of transport them yeah I mean if you look at a two for example if you set the um say this is X3 is positive and you set Theta four to one and Theta 5 to 0 then you transfer over all the information from three pretty cool okay but this structure we came up with the structure based off of our knowledge right this was not something that was determined by some algorithm we just
+
+47
+00:42:28,000 --> 00:43:50,000
+came up with it because it seemed to make sense so this is called prior knowledge and infusing your model with it basically but what if we want to be a little more General what if we don't want or don't have the prior knowledge to do this in a way that results in good performance so this is getting into something called fully connected neural network and what this means is we no longer think about these ideas of family size walkability School quality we don't know what those intermediate
+
+48
+00:43:08,000 --> 00:44:29,000
+variables might be but maybe they depend on all of the inputs so each intermediate variable will depend on every single input so this is going to get messy but I'll try to use different colors so every single variable here will depend on all the ones that came previously and this is a much more General way of thinking about this right we don't have to infuse this prior knowledge into the system we can let the neural network figure it out so what this looks like mathematically is maybe we would have
+
+49
+00:43:56,000 --> 00:45:40,000
+like A1 uh b equal value of you know some weight X1 plus some weight X2 plus some weight X3 plus another weight X4 and plus the bias term and we can do this for A2 and so on and so forth does that make sense cool so what this looks like if we start looking at Vector notation now more this might look like this so we have A1 is equal to their value of of W1 this higher index notation in square brackets is going to refer to layers so this would be the first layer and this would be the second layer in this
+
+50
+00:44:56,000 --> 00:46:52,000
+network so we have W1 layer one transpose with all the inputs X now this is a vector so now we're doing a DOT product and we add some bias term okay can anyone tell me what dimensionality W uh W1 in the first layer is yeah yes that's right and that's because our X is dimensionality four and our bias is still a scalar okay and then we can do the same thing we can say this still first layer okay and last one same thing okay and then finally we have our prediction and the prediction now is going to use
+
+51
+00:46:14,000 --> 00:47:58,000
+weights from the second layer and it's going to operate on those intermediate variables a okay so we're going to have W2 and here we have B2 and now W2 is going to be of what dimension yeah I heard it somewhere yes because a is of Dimension 3 here and the bias still scalar okay so this is a two layer neural network and this is the same thing as saying we have one hidden layer so intermediate variables are referred to in deep learning as hidden units and the associated layers are hidden layers
+
+52
+00:47:24,000 --> 00:48:42,000
+okay any questions on that yeah uh yes great question great question um so you're going to be limited by compute but aside from that it's a lot of experimentation so for example gpt3 has a lot a lot of layers but it's also dealing with a lot of data if you have just a little bit of data and just a few examples you probably don't want to use a very big model and I think you'll talk a little bit about why shortly any other questions yeah different hidden units if they're all
+
+53
+00:48:10,000 --> 00:49:34,000
+relying on the same input so the hope is that the network learns different representations but technically nothing is really stopping it from exactly what you said just replicating ideas but it often doesn't um and it's trying to learn these A's in the best way that can help the neural network make a prediction H Theta of X right so this ends up working actually quite well yeah for example um [Music] [Music] yeah so that's actually an active research area as well it's called
+
+54
+00:49:03,000 --> 00:50:10,000
+interpretability in deep learning and either figuring out if there is any or figuring out how we can induce there to be some level of prior knowledge so some interpretability I think there's a question at the back yep yes that you're going to be applying to what yes so w are the weights that you're going to be applying to the x's and then W so those are W1 with the square bracket at the top and then W2 with a square bracket at the top is going to be the weights you're applying to the A's
+
+55
+00:49:48,000 --> 00:51:10,000
+yep all right okay so this is some notation yes yes question is just linear and so what's the point of the neural network versus just a writing um yeah so that's a great question you're completely right if you get rid of the values things are just going to be linear their values are what make uh the neural network be more expressive so those non-linearities those activation functions are really the heart of the neural network okay cool I'm going to move on in the interest of time so we have a two-layer
+
+56
+00:50:36,000 --> 00:51:59,000
+neural network and we just talked about uh all these things the only difference here is that we're changing notation a little bit so we're introducing the Z which is just a linear combination of x's with our weights and our biases and then we still have our A's the number of A's here is M so this is the number of um hidden units that we're considering so we had three in the last example more generally we'll have m um and then yeah that's otherwise this is exactly what we just wrote out before
+
+57
+00:51:18,000 --> 00:52:38,000
+this make sense to everyone any questions on this okay so we're going to talk about vectorization we're going to make this even more vectorized right so we had like a lot of notation a lot of indices here we want to get rid of as much of that as possible one to make things cleaner and not have to write all these indices everywhere and two which is the more important reason vectorization actually makes things faster it makes things uh better able to be paralyzed on for example gpus so what we can do first is think about
+
+58
+00:51:58,000 --> 00:53:34,000
+those weights in our first layer right those W's with the square square bracket one and what we can do is we can transpose them so they're rows and stack them in a matrix and so what we're looking here at here is M by D so m is our hidden unit dimension and D is our input dimension so these are all the weights in our first layer and then what we can do is we can actually write out those equations from before in this vectorized form where for example we can write out Z1 if we take the first row of this
+
+59
+00:52:52,000 --> 00:54:29,000
+Z1 will be W1 of 1 transpose X1 plus B1 1 right which is that first row that we had before okay and but this looks way way nicer and this is our vectorized notation any questions on this so it's the exact same thing just more compactly written cool [Applause] foreign this is actually called preactivation so this is before we applied our values and we have these Z's this is couple capital W I'll do it with those little bars at the top um and it's all our weights from our first layer
+
+60
+00:54:01,000 --> 00:55:43,000
+we take the X and we add our biases which are also stacked together and all of this is going to be of Dimension M which is the same Dimension as our hidden units now we want to get A's out of this and to do so we need to apply the relu to every element in the Z vector so our A's are A1 through a m and we want to apply relu to each one of these Z's we're actually going to abuse notation here a little bit and we're just going to write this by definition to be value of Z so it's an element-wise
+
+61
+00:54:52,000 --> 00:56:33,000
+operation and we're going to refer to it the same way as we would for a scalar okay and then what we can do is we can write our second layer weights in the second layer we only have a scalar output that we want so we only have one weight Vector to include here that we're going to transpose to be a row and this is going to be in dimension 1 by m any questions on that part okay and we're still going to have our bias in the second layer which is still scalar and so our final output here
+
+62
+00:55:50,000 --> 00:57:36,000
+is going to be this W2 Matrix times a uh dot productive with a and the bias term and what I said before is that vectorization helps us paralyze things on gpus okay so we talked about two-layer neural networks what if we have more layers so notation just follows right so before we stopped with one hidden layer which is a two layer neural network and now we're going to have R minus 1 hidden layers which is an R layered neural network and like I mentioned before so all the hidden units will have values whereas
+
+63
+00:56:59,000 --> 00:58:44,000
+the hidden layers whereas the prediction just by convention will not and we'll refer to these big W's as weight matrices and these bias terms will just be called bias nothing really changed and these A's will be hidden units one thing to note is the dimensionality of these A's right so what is the dimensionality of a k so a layer k and that's going to be we're going to refer to that as MK okay and so can anyone tell me what the dimensionality is of w layer one so I say that louder
+
+64
+00:58:10,000 --> 01:00:15,000
+D cross k what do folks think so it's K cross d is that looking yeah yes yes there we go okay so it's M1 cross D so D is our input so we want this uh Matrix to do matrix multiplication with x x is of Dimension D so we want that last Dimension to be D the First Dimension is the dimension we want as the output the output will be A1 A1 is of Dimension M1 does that make sense okay and then so just for practice what would W2 be yeah [Music] this would be an R layer network with r minus one hidden units
+
+65
+00:59:26,000 --> 01:01:11,000
+what is the dimensionality of W2 can anyone help me M2 cross M1 because the input will be a one that's what's being multiplied with W2 and the output will be A2 so we want M2 output okay cool and so this can more generally we can write this for WK we're going to have our um MK cross MK minus 1. and b k is just going to be um MK dimension any questions here no okay awesome so we got this question earlier why do we need an activation function relu can anyone remind me why do we need it
+
+66
+01:00:38,000 --> 01:02:53,000
+yeah so it's our non-linearity it's what makes what we're doing here non-linear but for fun let's see what happens if we don't have the relu at all or we have it be just identity this is a one sorry okay so we have our hidden layer A1 and then say we only have one hidden layer so our output here is going to be W2 of a plus B2 okay and then if we actually substitute in for A1 what are we going to get so we're going to have W2 of W1 X plus b okay all of that a oh sorry that was a plus B2
+
+67
+01:01:51,000 --> 01:03:29,000
+right and then we can actually expand it out and we're going to get watch my math so I don't mess this up I'm gonna get W2 w1x Plus W2 B1 plus B2 so what does this really look like well we can Define these to be say this is W tilde and say this is B tilde right the the second term doesn't depend on X at all and the first term does okay so this is just a linear function of X as we would have in linear regression essentially everything would collapse and we're here linear in these
+
+68
+01:02:44,000 --> 01:03:57,000
+parameters any questions about this so if we lose the value we lose the non-linear expressivity of the neural network yep yeah you can definitely have other ones um so in the notes I think we mentioned the sigmoid activation function and the tan H activation function I would probably say value is the most common but it really depends on your application the kinds of outputs you might want things like that um there are definitely other ones and there's also b-sides uh just you know the kinds of
+
+69
+01:03:36,000 --> 01:04:58,000
+outputs that you might want these activation functions have certain properties when you um try to compute gradients with them and things like that and that's a little bit beyond the scope of this lecture but if you have questions about this later come come by and I'll be happy to chat any other questions on this yep [Music] perhaps the closest drink yes why are you still landed so commonly used despite it being quite close to me it works well oh yeah good good good uh Point yes you're it you're right
+
+70
+01:04:37,000 --> 01:06:19,000
+thank you I meant it in the sense that the parameters are going to be linear here yep other questions okay okay one last new ish idea I want to talk about and that is connection between neural networks and kernel methods so kernel methods we talked about this very briefly at the beginning of this lecture so the kernel method output or prediction is going to look like H Theta of x Theta transpose Phi of x so we're linear in parameters here but not an X yeah everyone agrees okay so looking at that penultimate
+
+71
+01:05:47,000 --> 01:07:51,000
+layer AR minus one what if we write it as Phi B of x where uh sorry 5 beta where our beta is going to be all our parameters so our parameter is W1 um all the way to the penultimate layer w r minus 1. and also our biases which are 1 all the way to VR minus one okay and then we can write the prediction from our neural network as W of R so our last layer Matrix multiplied with Phi Beta of x if we fix our parameters so we're fixing beta here and we can add our biasterm okay so really this looks pretty much the
+
+72
+01:06:51,000 --> 01:08:21,000
+same right the only difference is within the neural network Phi Beta is actually learned so the algorithm is looking for the best possible features for this data whereas in the kernel methods we choose the kernel so there's more of that prior knowledge and prior structure that we're infusing into the algorithm whereas here there's flexibility in that these five beta parameters can actually be learned to best fit the data and because of this sort of structural similarity the penultimate layer output a r minus 1
+
+73
+01:07:52,000 --> 01:09:25,000
+is sometimes called the features or the representation within a neural network and so if you ever hear terms like representation learning or something like that it's talking about those hidden layers within the neural network and what we're learning there any questions here yeah at the back uh fire e beta um that's all supposed to be one line right yes so the the whatever that Greek letter is called is the only subscript uh so it's WR Matrix multiplied with five underscore beta of X plus all of that plus the
+
+74
+01:08:58,000 --> 01:10:17,000
+biastern BR part of the is not like a subscript at all no okay thank you yeah so other questions no all right um so today we talked about two different things we talked about supervised learning with non-linear models um and what that might look like what the cost function looks like and the second thing we talked about are neural networks how do we construct them we first started with two layer neural networks and then expanded that notation to be our layer neural networks and next time tangyu is going to talk about back
+
+75
+01:09:51,000 --> 01:10:28,000
+propagation so how do we actually optimize how do we perform stochastic grade in descent or any kind of gradient descent in this framework so how do we compute the gradients for the cost function and for the neural network any last questions okay
+

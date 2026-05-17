@@ -1,0 +1,420 @@
+1
+00:00:05,000 --> 00:01:06,000
+so I'll be telling you about some of the applications of machine learning especially in healthcare settings so I'm assistant professor here at Stanford my name is James so and a lot of my group works on actually developing and deploying such the AI systems for biomedical and for healthcare applications right so feel free to stop me if you have questions at any point so what I want to do today is to just firstly give you a few examples right a few case studies of like how what kind of AI systems are we using and deploying
+
+2
+00:00:38,000 --> 00:01:36,000
+in healthcare settings and also talk a bit about then what are the some of the challenges in actually building AI systems for healthcare applications right um so the first example I want to give is actually based on this paper that we published a couple years ago it's on a computer vision system that we developed for assessing heart conditions right so the idea here is that you know there are these kind of ultrasound videos so if you go to the Stanford Hospital right or most of the hospitals
+
+3
+00:01:08,000 --> 00:02:08,000
+they'll take a lot of these kind of ultrasound videos which is looking at the human heart um and we developed the system to basically read these ultrasound videos right and based on these videos to assess the different cardiac conditions of the patient and the system is also now being uh we develop the system as published and then we spent a lot much of the last two years in trying to actually deploy this at different parts of Stanford for example that's a setup that we have using the sets the emergency department
+
+4
+00:01:37,000 --> 00:02:40,000
+here at Stanford okay so so how does this work right um so if you think about these ultrasounds videos right this car cardiac ultrasound also called echocardiogram so an example of this is shown on the left here right um so if you think about like the hearts as like a power pump right so the standard way to estimate like how much power the heart is generating especially by looking at these ultrasound videos right so there are actually millions of these videos are being collected every year around the US and the current
+
+5
+00:02:12,000 --> 00:03:02,000
+workflow is that the cardiologist The Physician would actually look at these videos and they would try to identify you know which frame of the video where the heart this chamber of the heart is actually the most expanded where it's the largest and also try to identify the frame where the chamber is the smallest right and by looking at how much the volume of the heart changes from going from the largest to the smallest then they can get an estimate of how much power the heart is producing right if
+
+6
+00:02:37,000 --> 00:03:32,000
+you think of the hardest like a pump so um so as you can imagine that process can be quite um labor intensive because it's quite manual right because they have to go through an entire video by hand and then once they find the frame they have to actually Trace out the boundaries of the chamber right to figure out its volume of the on the of the Chamber of the hearts uh all of those steps currently is down basically with sort of manual annotations um so this is where we thought like these kind of machine learning
+
+7
+00:03:05,000 --> 00:04:06,000
+applications especially computer vision can be very useful right so we developed a system called Echo net right and what econaut does is to basically mimic this clinical workflow right so it takes its input the same kind of cardiac ultrasound videos like the one we see here right so it produces like a real-time segmentation of the relevant chamber of the heart which is the one that's shown in blue right in addition in addition to doing this real-time segmentation of the heart chamber it also produces like a real-time
+
+8
+00:03:35,000 --> 00:04:38,000
+assessment right of how much power the heart is producing which is technically called this ejection fraction so that's the first thing is shown here uh so by doing this is sort of really simplifies and automates these different manual parts of the clinical workflow oh so no I wouldn't go into too much detail of how the algorithm the details of the algorithm but it shares like a high level overview of what it's doing right so it's basically taking input these videos right um and they're basically two sort of
+
+9
+00:04:09,000 --> 00:05:06,000
+components right of the algorithms it's like the top arm and then the bottom arm so the top arm is basically looking through these videos using a spatial con spatial temporal convolutional Network right so it's because it's a video so we have both the spatial information right for in the given frame how big the chamber is there's also the temporal dynamical information right so this is sort of a modification of the standard kinds of confidence you probably typically have seen on imagenet
+
+10
+00:04:38,000 --> 00:05:36,000
+type applications by adding an additional Dimension corresponds to this to capture the temporal Dynamics okay so so it's sort of like a three-dimensional convolution in that sense right so it's going through that in the top enter extract the features in the bottom is basically doing this real-time segmentation right so it's basically producing like a segmentation of this chamber of the heart that was colored in blue right and these two arms will come together at the end right to make like a
+
+11
+00:05:07,000 --> 00:06:01,000
+actual real-time assessment for how much power or the ejection fraction of the hearts for Every Beat right because once you have the segmentation for every you know every beat right so you can actually then sort of assess the power so after it does this assessment right so there's a final classification layer where it's actually trying to predict all sorts of relevant and interesting clinical interesting um cardiac phenotypes right so there's like the probability of heart failure or
+
+12
+00:05:37,000 --> 00:06:38,000
+you can predict that you can also assess the ejection fraction which again so basically how much power the heart is producing and so it turns out that we can also use the same kind of layer to predict all sorts of other functions like liver or kidney function because it turns out that see once you know how the heart is doing that you can actually learn a lot about the rest of the body Yeah question I guess he wants me to do with sequence we do something like that resonance but sometimes how do you decide
+
+13
+00:06:10,000 --> 00:07:05,000
+yeah so it's a great question um so here if you look at these videos right so the heart is actually pretty repetitive right you know you know roughly about every once a second where the heart will expand and contract so there's actually a lot of repetitive spatial information right which actually makes it quite well suitable for these kind of more convolutional architectures which are looking for these the spatial patterns or you know or temporal patterns and here in particular we basically are
+
+14
+00:06:38,000 --> 00:07:44,000
+looking at the time scale of basically once every second right so the we get maybe around say I think 60 frames per second right um and then so for every second then we make like a one assessment of of like the ejection fracture and also the assessment of the heart condition for every individual beat which is about once a second and then what happens in the end is that you know you have a for every bit of the hard drive we get an assessment of okay so how much power is that heart producing and How likely the hardest
+
+15
+00:07:11,000 --> 00:08:16,000
+have different diseases right the video itself actually could have multiple seconds right you can actually capture many beats right so at the end we actually do like aggregation across all of those speeds to say uh holistically for the patient then what is the status of the patient thank you cool other questions great um so this is the system now that's actually used and developed here using Stanford and data from Stanford and we also test the system both at Stanford and at other hospitals right so one of
+
+16
+00:07:52,000 --> 00:08:43,000
+the places we tested especially in the hospital in Los Angeles Cedar Sinai um and you know we just took the algorithm without any modification and then just shipped it to Cedars right and then to see how what did it do right and we're actually quite happy to see that even without any modification right on a different hospital where they had different ways of collecting these images collecting videos and data right the algorithm actually had very similar performance as it did at Stanford right
+
+17
+00:08:18,000 --> 00:09:33,000
+so the AUC is quite high it's about Point uh 0.96 all right okay so that's the first example um any any questions about that okay so the second example I want to briefly mention right is an application of AI more for a telemedicine or Telehealth applications so what is Telehealth right so that in normal settings or usually if uh you know if if you have some sickness or if the patient has some illness right they'll actually come in to visit the doctors in person right um but recently last few years there's
+
+18
+00:09:00,000 --> 00:09:58,000
+been uh explosion of the need for visiting and having patient doctor interactions not in person but through uh you know digital formats right especially without having to digit number start having the patients needing to leave their homes as you can imagine that really the need for these kind of Telehealth or telemedicine applications have really expanded especially during the pandemic right so for example this at Stanford in Stanford hospital so just over the last two years there's actually something
+
+19
+00:09:30,000 --> 00:10:36,000
+like a 50 fold increase the number of these digital or televisits right compared to about two years ago so one of the you know so telemedicine could potentially be really transformative for healthcare right it means imagine like not having to actually leave your home and drive an hour to come to Stanford right much easier to see doctors and also make appointments um one big challenge right was telemedicine in general is the idea that you know can you actually get sufficient information without having the doctor seeing the
+
+20
+00:10:08,000 --> 00:11:07,000
+patient in person right um and in particular like oftentimes right lots of information that the doctor gets is by you know sort of visual interactions with the patient if I actually see you face to face then you can often examine them quite closely and that's difficult to do with you know when you're doing this on on Zoom where you know through some other video visits so and that's really one of the big challenges Telehealth is in getting high quality images right from the patient to
+
+21
+00:10:39,000 --> 00:11:37,000
+the doctors and for example at Stanford there are actually a large number of visits that are wasted right so patients will set up a visit with a doctor but then the doctor is not able to get sufficiently good quality images from the patient right so so then they can't really make it informed recommendation or informed diagnosis right and then they have to sort of reschedule when we turn that back into like in-person visits so there's actually a large number of hours both by the patient and Physicians that's wasted
+
+22
+00:11:06,000 --> 00:12:06,000
+because of this lack of quality images so what we want to do is to basically um you know see can we actually use machine learning and social especially about using computer vision to improve the quality right of these images for specifically for this Telehealth type applications right because it turns out that you know people are very good at taking photos for their Instagrams and for their Facebook but maybe they're not so good at taking photos that are clinical quality with our eie like of that are
+
+23
+00:11:40,000 --> 00:12:35,000
+informative for this clinical decision making process right so the idea is can we actually use machine learning to guide people and help people to take more clinically informative images that's a lot of the motivation behind this um algorithm that we developed it's called True Image right which has also been sort of commercialized through Stanford's um and so the motivation is quite intuitive right so similar to how like online check check deposit works right so idea is that you know we want
+
+24
+00:12:09,000 --> 00:13:00,000
+something that's very simple it can be run on you know on people's phones and then it would automatically tell people like you know is the image that you're taking maybe off your skin Legion right is that sufficiently high quality for your dermatologist right for your clinical visits if it's not so good quality then the algorithm actually provides real-time feedback right guidance to the patient on how to improve the quality right maybe it says that you want to zoom in a bit more or
+
+25
+00:12:34,000 --> 00:13:31,000
+you want to move to the closer to the window to get better lighting right so provide these real-time guidance until they get sufficiently high quality right um so yeah so basically the True Image algorithm is you know it's uh so it basically runs right it's designed to be run sort of at the patient's facing side right so maybe like so the patients could be taking a photo right of their you know of their skin and then they want to use that to send it to their dermatologist for their televisions
+
+26
+00:13:04,000 --> 00:13:59,000
+right and the outputs obviously was decide like if the photo is sufficiently good quality right if it's sufficiently good quality then that's fine right so the image just goes through as normal if it's not so good quality right the algorithm would decide okay how does give a recommendation to the patient right say how do you actually improve the quality of your photo in this case maybe it says that's okay you can move to a brighter lighting right and the patient will retake that uh and if it's
+
+27
+00:13:31,000 --> 00:14:44,000
+good enough then no it's surf passed through the algorithm it's a setup an application clear to people okay um so a little bit more about under the um okay I'll just jumped into the sort of the how do we how well does this work right so the algorithm we actually conducted like a prospective study here at Stanford right um perspective study means like there's actually like a real-time study where we recruit the patients they use these tools it's almost like a clinical trial right so this is done in the dermatology
+
+28
+00:14:18,000 --> 00:15:26,000
+clinics that Stanford operates um and we tested this on maybe about 100 patients right um and it was actually quite effective right so by the patients using this algorithm they were able to basically filter out but 80 percent right of the poor quality photos which are IE like photos that are um they would have sent to the clinician but otherwise would have been sort of useless by the clinician because there are not sufficient high quality to actually make a meaningful informed diagnosis right um it's also nice that this is actually
+
+29
+00:14:53,000 --> 00:15:51,000
+very fast right so on average it takes actually like less than a minute for a patient right to generate a high quality image by going using the stream image algorithm um and this is the sort of an example of the kinds of improvements that you see here right so maybe like this it's like an initial image that someone would actually really would take and send it to to their doctors for these Telehealth applications right for these one of these Telehealth visits um and you know that True Image algorithm identify that though this
+
+30
+00:15:25,000 --> 00:16:42,000
+image has the following issues with the blur and the lighting it makes a recommendation and then after using the algorithm right the patient actually have much better image that um now would facilitate their televisit so this is actually being now uh it was tested at Stanford in dermatology settings right and it's also being integrated now into the Stanford Medical Records cool any questions about this before we move on yes this is pretty useful easy just based on it yeah but beyond that are there any other like readily
+
+31
+00:16:21,000 --> 00:17:28,000
+convertible fields in this exactly like oftentimes you need to be a doctor assistant looking at your throat or something interesting things yeah yeah so it's a good question so I think Dermatology is probably the the most immediate application of this right um there are also a few others or from like Primary Care settings right where often the doctors actually get more information just by inspecting what the patients look like and how they're how they behave right so this is where it could also be useful
+
+32
+00:16:54,000 --> 00:17:51,000
+for other settings where if it actually requires taking a biopsy of the patient right for more like pathology or you know cancer diagnosis Beyond skin cancer then um then the patient will still have to come in to the visit yeah so it's a good question so uh so what the algorithm does is that it actually does incorporate quite a bit of domain knowledge so one of the developers on our team for doing this she's actually one of my postdoc with the dermatologist so she sees patients one day a week and
+
+33
+00:17:33,000 --> 00:18:23,000
+we actually did our initial piloting of this in her Dermatology Clinic all right so for example the kinds of domain knowledge that comes in will be uh first we actually you know take the image and we first segment out this just the skin part of the image right because if you take an image there could be all sorts of background right maybe our Furnitures and chairs and we don't really care about the quality of those backgrounds so if you segment out to the relevant human skin um and to identify and after we stick
+
+34
+00:17:58,000 --> 00:18:52,000
+about the human skin right and then we also try to map onto what we think are the likely issues towards the image if there are issues right so oftentimes the things that come in would be like is the image does it have enough lighting right so the kinds of lighting that's required for a dermatologist is actually quite different from the lighting that's you know for on the standard photos so that's actually one place where often people make mistakes right and another place where the expert analogy is very
+
+35
+00:18:25,000 --> 00:19:21,000
+useful is in terms of how much Zoom is needed right sometimes if people zoom in too much that's actually not so good because then they lose the context of the surrounding like if you just zoom in Only onto your legion then you lose the context of the uh this neighboring parts of the skin or if it's too zoomed out you also don't have enough information right so there's like an optimal Zoom which we get basically actually by so the way that we train two images is actually by having dermatologists uh
+
+36
+00:18:53,000 --> 00:19:53,000
+generating annotations about what is like the optimal Zoom from like a database of of images cool yeah good questions um it's like another example it's very quickly mentioned it's um we've also been developing these algorithms for uh using machine learning to improve clinical trials right so clinical trials are like the most expensive parts of of medicine right each trial could actually cost hundreds of millions of dollars to run right and sort of like they're really the bottleneck of this entire
+
+37
+00:19:33,000 --> 00:20:29,000
+biomedical translation process right so one place where we found that where machine learning can be very useful is in helping these clinical trial or helping the drug companies to decide what are the a good sets of patients to enroll in a given clinical trial because you want the patients to be that they're diverse right so they really cover diverse populations and also that's the drugs likely to be safe and effective right for that set of patients right so this is basically a tool that we
+
+38
+00:20:01,000 --> 00:21:09,000
+developed called trial Pathfinder and you know for helping to guide the designs of the clinical trial specifically the designs of the which cohorts of patients are eligible to participate in a clinical trial and this is being piloted Now by some of our collaborators and Partners at Roche Genentech which is the largest biopharma company and if you're interested the more details are described in this paper good so now that we've talked about a few examples right of where machine learning can be used in healthcare settings and
+
+39
+00:20:40,000 --> 00:21:36,000
+where in case having a substantial impact I would also like to discuss some of the challenges and opportunities that arise when we actually think about deploying machine learning in practice right because you know in in 229 we talked a lot about actually how to build these algorithms right and there's also a lot of interesting challenges you know I've rebuilt them thinking about how do we actually really deploy and use them in practice so just to set the stage I want to give you like a concrete example with sort of
+
+40
+00:21:09,000 --> 00:22:07,000
+like a little detective story right so here's the story right so um you know I mentioned this Dermatology aif applications right so the Dermatology is actually one area where there's been sort of the most intense interests and investments in developing AI algorithms right precisely because the data there is relatively easy to collect and oftentimes these algorithm also work as follows right you take your photo then maybe of a legion right you can take your phone and take that photo and then behind the scene here there will be
+
+41
+00:21:39,000 --> 00:22:39,000
+some sort of often like a convolutional neural network right this looks through this photo and try to classify it's just likely to be cancer or not right so in this case it actually predicts that it's likely to be melanoma so it's skin cancer and the recommendation is that the patient the user should go visit the dermatologist as soon as possible okay so the reason why this is useful right is that there are actually several millions of people every year who have skin cancer but they're not diagnosed
+
+42
+00:22:10,000 --> 00:23:06,000
+until it's too late our skin cancer if you diagnosed it early on then it's actually very treatable but if it's too late then it's deadly right and potentially many of these people right they actually could have made earlier diagnosis uh no because they all have many of them have access to not be able to take these photos so that's the reason why there's a lot of interest now both by academic groups and also by commercial companies like Google again pushing out like these kind
+
+43
+00:22:38,000 --> 00:23:46,000
+of AI for Dermatology applications so of course oh yes go ahead one question so do you what's the target consumers this is like the ordinary patient or it's actually the doctor because I mean if there's something growing on your skin I mean like I think your status to actually show a doctor or something like that so what what is your target base yeah yes good question so there are algorithms there people are putting out that are consumer facing right there also alcoholisms that are more
+
+44
+00:23:14,000 --> 00:24:16,000
+clinician-facing so most of these ones here are actually more consumer facing and the reason is that to actually make an appointment to see a dermatologist could be like a three months or six month wait wait time yeah uh whereas uh maybe people just they don't want to make a visit every time they see something because they don't know if it's like to be serious or not so basically for that kind of applications where a lot of these consumer facing algorithms are being put out yes just focusing because we all do we don't
+
+45
+00:23:53,000 --> 00:25:06,000
+want people that actually has the cancer signal but be classified as like uh now yeah so that from here probably like what what if the absence is that's possible that is anything successful Hardware produced Maybe yes yes it's a good question um so here I'm Tony showing like sort of the AUC of these algorithms from their original Publications and papers and in addition to AUC people also care quite a bit about like the sensitivity and specificity which I also mentioned in a bit right and in particular I think
+
+46
+00:24:30,000 --> 00:25:20,000
+the sensitivity is probably the important thing here a sensitivity here means that if the patient actually has skin cancer how often would algorithm say that they actually do have skin cancer right so that's actually really the important part if you you know if patient doesn't have skin cancer and the opposition says you have skin cancer that's not great but it's actually not too bad right because maybe they'll get a check then they say it's it's okay but if you actually miss the diagnosis and that can
+
+47
+00:24:55,000 --> 00:25:57,000
+be um more potentially like more more more damaging to the health Okay so you know given that there's a lot of interest in algorithms certainly we're interested in thinking about how to potentially use them and deploy them here at Stanford right um so we actually took three of these state-of-art Dermatology AI models right they're all solving this task of you know given photo predict whether it's malignant or benign right skin cancer or healthy um and we tried trading out here at
+
+48
+00:25:28,000 --> 00:26:29,000
+Stanford right so if you look at the original algorithms they all have very good performance right so AUC is very high um however when we tested them at Stanford on real Stanford patients right the performance is suddenly dropped off quite a bit right it's much worse as the aec dropped from like 0.9 to 0.6 okay so let's sort of the the setting of this little detective story right so what we want to understand is okay so why did this happen right why did these algorithms performance perform so
+
+49
+00:26:01,000 --> 00:26:59,000
+importantly on Stanford patients because we really need to understand that if we really want to be able to use this in a responsible way in practice and just to be clear here right so these are actually just you know images from real Stanford patients right there's no sort of adversarial perturbations or attacks down on top of these images so before I tell you what we found right um what's this people actually like to guess like what do you think are the some potential reasons why the algorithms performance dropped off so
+
+50
+00:26:32,000 --> 00:27:48,000
+much when they're applied on the real patients any ideas a lot of times so like when it was in real patients it was 0.93 and my life wasn't Stanford equations it was 0.6 for this was uh is that our Stanford Creations were the real patient information so the 0.93 was the performance of these models on their original test data so the original test data also came from you know real patients that these companies or these groups have collected that 0.6 is the performance of this algorithms right
+
+51
+00:27:17,000 --> 00:28:45,000
+when you apply them to actually stand for patients [Music] was a test data taken from a different types of different types okay so that so that could be one fossil Factor like is there some differences like temporal differences in data sets oh yeah go ahead [Music] okay [Music] foreign [Music] okay so that's also a good idea so maybe there's like some age differences between the original test patients and the Stanford test patients yes for both people okay okay so that's also a good idea so
+
+52
+00:28:31,000 --> 00:29:36,000
+maybe there's some changes in the location which drives different distributions of diseases right skin diseases that are more common here these are good ideas um there's a yeah any other suggestions yeah okay okay so that's also a good idea so maybe there's some uh differences in like what kinds of cameras were used or how the quality of the images across these the original test data and the data here yeah so these are all good ideas about there's actually a couple of really big
+
+53
+00:29:14,000 --> 00:30:36,000
+factors that are haven't been talked about yet people want to say more days [Music] okay okay so maybe there's some caution but whether the models are being overfit or not into the original test data okay yeah so these are all excellent suggestions so you know we actually did sort of a systematic analysis like an audit to try to figure out what happened here um and the goal of this audit right mathematically is that we really want to explain this drop off the performance right so we see about today let's travel
+
+54
+00:30:10,000 --> 00:31:20,000
+from 0.93 to this point six I will want to understand what are the factors that statistically explain right this difference in the model's Behavior so I actually think of one of the the biggest single factor is actually label mistakes right uh so what does that mean so it if you look at the original test data right the data that was used to evaluate these original algorithms right in their initial Publications so it turned out that there is no test data had a lot of mistakes in their annotations
+
+55
+00:30:46,000 --> 00:31:48,000
+all right so what happened was that's the test data were generated by having these Dermatology images right and then they would have dermatologists to visually look at the image and say okay is this benign or is this malignant because that's relatively easy to collect right however just even having expressed dermatologists visually look at images can also lead to a lot of mistakes right so the actual ground truth uh come from you take a biopsy of the patient and then do a pathology test to
+
+56
+00:31:17,000 --> 00:32:08,000
+say does this patient have skin cancer or not all right so that's what ground truth from the biopsy is basically the the labels that we have here at Stanford right but the labels from the original test data actually had a lot of noise in them because they were just coming from these visual inspections right so and this actually explains quite a bit of the drop of the model's performance and this is maybe not something that's um that's sort of the first thing that comes to mind if you think about like
+
+57
+00:31:44,000 --> 00:32:38,000
+somebody build a test data set and they evaluate it we're oftentimes in machine learning right we just assume that's okay the test data should be pretty clean should be good right but in practice uh the quality of the label itself in the test data can often be highly variable depends on the real world applications all right so the first question that we should always ask is okay so how good is the quality of the test labels right how good is the quality of the test data so a second big factor which people
+
+58
+00:32:13,000 --> 00:33:15,000
+mentioned right is that there is actually a distribution shift in the different types of diseases right so the original test data o has relatively common kind of skin diseases again because it's relatively easy to collect the data here we have at Stanford has both common and also less common diseases right because all sorts of people come to Stanford to get treatment right and the algorithms perform worse on the less common diseases right and because of this distribution shift it's also explains to some of the drop-off in
+
+59
+00:32:44,000 --> 00:33:49,000
+the model's performance so the third factor is that actually turned out that these algorithms um had significantly worse performance when applied to images from darker skin patients right so specifically if you look at the actual the sensitivity death model which as we said is what we really care about if a patient has skin cancer How likely is it to find those skin cancer right this the so the sensitivity is actually much lower when the algorithms are applied to images that come from dark skin patients
+
+60
+00:33:19,000 --> 00:34:22,000
+and you know we dug deeper into this it turns out that that's the original training and test data sets had very few and in some cases zero images that come from darker skin individuals right and no that's just I think the overall takeaway here is that oftentimes when we look at the application of machine learning in real world in practice right um it's very difficult to interpret the performance level model right so if someone just tell you their AUC right it's very it's almost meaningless unless
+
+61
+00:33:53,000 --> 00:34:54,000
+you really know the context of what is the data that's used to evaluate that model so here I talk about you know the Dermatology settings but we actually did sort of similar kinds of audits of all of the medical AI algorithms that are approved by the FDA so so as of last year right there's like over 100 medical AI systems that were approved by the FDA so they can be used in on patients so each symbol here corresponds to you know one of these algorithms right and here I'm just stratifying them by which
+
+62
+00:34:28,000 --> 00:35:39,000
+body part they apply to right so some of them apply to you know to the chest or to the heart Etc so there's a bunch of interesting findings we have from other things algorithms but I just wanted to highlight maybe a couple of the Salient points just for today right so the most interesting things may just look at the color right so I colored each of these algorithms uh blue if the algorithm actually I reported evaluation performance across multiple locations maybe from multiple hospitals or otherwise it's colored Gray
+
+63
+00:35:04,000 --> 00:36:07,000
+so it's already quite clear right that most of these algorithms are over 90 up to 130 did not report or couldn't find the evaluation performance across multiple locations right we only see how well does it work at one site okay in addition to that right so four out of these only four of these 130 devices were tested using a prospective study right by perspective I mean more like a human in the loop study right so they had the algorithm and they tested how well does this work you know uh in a
+
+64
+00:35:39,000 --> 00:36:39,000
+real setting was was maybe doctors were as patients so the remaining the 126 of 130 were only tested on for retrospective data right and that means that's now somebody collected like a benchmark data set beforehand and then they apply the algorithm to that Benchmark data sets so retrospective Benchmark data set could actually have come from the same hospital where the algorithm was being trained or developed since we saw from the previous example in dermatology setting right so if you only have data from one location that's
+
+65
+00:36:11,000 --> 00:37:29,000
+collected retrospectively right that can potentially mask substantial limitations for biases in these models okay any questions yourself yeah it's a good question um this is actually something that we are working together with the FDA on right so the FDA has a quite rigorous process for evaluating drugs right for example like for the covet vaccine to be approved at the FDA they have to run like a very large scale randomized clinical trial right and to show that the drugs are safe and effective
+
+66
+00:37:09,000 --> 00:38:01,000
+the evolution standards for medical AI algorithms by the FDA is actually quite different compared to like drugs right so for example these algorithms they do not have to go through like a prospective clinical trial right it doesn't have to be randomized in a clinical control right so that's why many of them were tested on these just retrospectively collected like Benchmark data sets right so one of the interesting challenge going forward is to figure out what's that feel like what's the proper
+
+67
+00:37:35,000 --> 00:38:50,000
+way to evaluate and to monitor these algorithms in practice okay so now given that these challenges that we we saw here right um so I just want to quickly go through a few lessons that we've learned uh or recommendations that we have for how do we improve the reliability right or trustworthiness of these AIS especially as they're being deployed in healthcare or biomedical context right now based on some of our experiences from both building deploying and also evaluating these models so I'll say a little bit a couple of
+
+68
+00:38:21,000 --> 00:39:27,000
+slides about each of these points right so the first one is that I think as we saw that there needs to be a much greater amount of transparency about what data is actually used to Benchmark or test each of these algorithms right um so for example just to give you a concrete visualization of this so we actually did a survey analysis of what are all the different types of data that are used to Benchmark Dermatology AI models right so now each Square here corresponds to one of these Dermatology AI models right this is where people
+
+69
+00:38:54,000 --> 00:39:57,000
+have published the paper on this right and so that's the square so that are the models for the papers right so the circles are the data sets okay so the size of a circle corresponds to how big that data set is and there are two colors right so the red circles are basically the private data sets which means that these are data set that someone could be a company or academic group that has curated but they're private so that nobody really has access to it and then the blue ones um circles corresponds to the public data
+
+70
+00:39:27,000 --> 00:40:30,000
+set so these are like the the openly available Benchmark data sets right so for example one here it would be like a relatively large public data said it's often used by many of these algorithms for benchmarking and what's quite interesting is that there's actually a large number of these algorithms maybe about half of them right that's um were mostly tested or entirely tested um relatively small actually private data sets right basically like all of those ones on the on the top right
+
+71
+00:39:59,000 --> 00:41:00,000
+all right and those are the ones where it's actually could be potentially problematic right because then it's actually very hard for people to audit and to understand like what's going on enough data and what's going on in these algorithms so you know so we've been very keen to try to uh release much more like publicly available data sets right so no I mentioned that we built this thermal uh this Cardiology video algorithm and actually as a part of that paper we had created and released I think one of the
+
+72
+00:40:35,000 --> 00:41:39,000
+maybe the largest publicly available Medical Data medical video data sets right so it has basically all of the videos that we trained and tested on right so we released all of those there's over 10 000 videos along with the patient's information and annotations right so this is all publicly available so that people can use this for additional research I think this is still maybe one of the largest public data set of medical videos okay so in addition to understanding what data goes to developing the models
+
+73
+00:41:10,000 --> 00:42:10,000
+right so we're also very interested in thinking about you know more quantitative ways to understand how to different types of data contribute to the performance or to biases of the models right so what does that mean right so from a machine learning or statistical perspective right oftentimes you have your training data right here you have these different each symbol could be like one of these sources of training Dynamic data from a particular Hospital right and then you have your favorite learning algorithm so we're a model
+
+74
+00:41:40,000 --> 00:42:43,000
+agnostic or it could be a deep learning model or could be XG boost random Forest right and you have whatever performance metric that you care about in deployment it could be accuracy or some sort of loss or F1 score and let's say if your model actually gets you know 80 accuracy right so ideally what I want to do is to be able to partition that 80 accuracy back to my individual training you know individual data sources of my training set right so I want to say that oh how much each of the data points for
+
+75
+00:42:12,000 --> 00:43:13,000
+Insurance data sources contribute to the model's performance and the reason why that's useful is that you know if the mod or if the model actually makes mistakes right in deployment or if exhibits biases in deployment as we saw right then we also want to be able to say very quantitatively like what specific training image or training Source actually are responsible for introducing those biases or mistakes in the model's Behavior right so if we can actually do this end to end from the data to the model and
+
+76
+00:42:44,000 --> 00:43:47,000
+then going back to the data right so then this will make the whole system much more accountable and more transparent okay so you know in a bunch of Works um you know with my students we have actually developed sort of approaches for doing this right for exactly trying to do this data valuation uh it's based on these ideas we're calling sort of data chaply scores so the idea here is that we're able to sort of compute a score for each training point right could be a training image and the score will actually
+
+77
+00:43:18,000 --> 00:44:16,000
+quantify how much how much does that image contribute to the model's Behavior either positively or negatively in deployment right so this is for example if we use our Dermatology as our running example right so the training set could be quite heterogeneous could be quite noisy as we saw right and the models trained on this could have relatively poor performance when it's deployed in clinical settings so data Shuffle score that we propose actually would just be like a number a score for each of my training image
+
+78
+00:43:47,000 --> 00:44:49,000
+right the score could be negative right if that image is somehow not informative or contains some misadmentations or introduce some sort of outliers or bias to the model right so the model if it's trimmed down that image actually does worse and the positive scores right indicate that these are the images the training points that are informative such that when the models train down those images they actually learn and do better in deployment it's actually capturing some informative signals
+
+79
+00:44:18,000 --> 00:45:19,000
+right so these Japanese scores can then be computed throughout the efficiently on these different data on individual data instances and this is actually quite useful also for improving the model's reliability right because one thing that we can do now is to you know weight my training data by the Japanese scores right so a simple idea that we after we complete the sharpiece course a simple experiment that we can do is to just take the original model and just retrain the model on the same data set except now
+
+80
+00:44:50,000 --> 00:45:51,000
+I'm waiting each data point by their shafly scores so this has the effects of encouraging the model to pay more attention to data points that have high chapty scores right which are the again the data points that we believe are the more informative uh or have better annotations right and by doing this this action actually can substantially improve how well the model Works in deployment settings right and the benefit of this approach is that it's quite data efficient right because we just still have the same data
+
+81
+00:45:23,000 --> 00:46:22,000
+set we didn't have to go out and collect a new data set right we'll have the same data sets and actually the same model architecture the only difference now is that the same model architecture is now being trained on a weighted version of the data rather than the vanilla kind of training okay so so those stars are you know two I think quite complementary ideas right once we want to be much more transparent about what the data is coming from right and what's the data Shuffle scores this
+
+82
+00:45:58,000 --> 00:47:03,000
+helps us to understand how do the different types of data really quantitatively contribute to the model's behavior and by understanding that contribution let's also give us ways to quickly improve the model's performance um so the third lesson we learned actually quite important is actually really useful to try to really understand why does the model make specific mistakes right because as a general message if we want to ensure that the AI systems that we deploy are safe or responsible it's
+
+83
+00:46:32,000 --> 00:47:34,000
+actually the mistakes that are the most revealing right we want to look at because by looking at the mistakes we can actually understand what are the potential blind spots where the weaknesses what the limitations of the model um so we developed a bunch of algorithms to try to basically provide more high-level natural language explanations for why does the model make specific mistakes as a way to teach us about blind spots of these machine learning models so here's one example right so let's say
+
+84
+00:47:07,000 --> 00:48:05,000
+if you've actually put in this image so image the true label is uh zebra but if you put it in this image whereas a lot of the outputs almost some of them will make a mistake and predict this to be a crocodile rather than zebra right and in this case we'd like to understand why okay why did that happen and this to work so the explanation we provide using this tool that we call sort of uh you know conceptual explanation of mistakes it's actually automatically generates a reason for why
+
+85
+00:47:36,000 --> 00:48:46,000
+the model made the mistake in this context right so in this case it's because there's not actually too much water in the image right so in other words if the image this image has less water and maybe more field right then it would actually have gotten the model could have gotten the correct prediction of zebra rather than crocodile right so you can view this conceptual this mistake explainer sort of like a raptor around in a different computer vision you know AI systems right so it takes one of these AI systems right and
+
+86
+00:48:11,000 --> 00:49:15,000
+looks at the mistakes the models make and then it provides like this high level natural language explanation for why did the model make that mistake on that input so this is quite useful because then we can apply our AI explainer right this mistake explainer to also sort of explain you know why did some of these Dermatology models make mistakes on these different users on these different kind of patient image um so here are actually Four example inputs right where the original Dermatology AI classifier made wrong
+
+87
+00:48:47,000 --> 00:49:58,000
+predictions so the correct diagnosis the correct label is written on top and what models the predict is written on the second line and in each of these examples right so our mistake explainers or automatically provides uh sort of a reasoning of why the model actually made that mistake so for example in the first example right so we learned that the reason why this model actually made the wrong prediction here is actually directly because of the skin tone right so it's it's um uh because of the darkness of the skin
+
+88
+00:49:23,000 --> 00:50:23,000
+tone so in other words right if the skin actually had been lighter right or else being equal then the model would have actually gotten the correct prediction in the second example right so explainer learned that it's really because of the blur in the image that led to the model to make that mistake right and if the image at the same image had been sharper right the explainer learned that then the model would have actually gotten the correct prediction which is on top so in the third example it's because of
+
+89
+00:49:56,000 --> 00:50:57,000
+the zoom right so it turned out that it's actually too zoomed out and that's really the reason why the the classifier made those mistakes and the fourth example is because of there's like two it's too much hair in the image right and despite actually understanding why the models made these mistakes in each of these specific instances this actually gave us quite a lot of insights into potential limitations and blind spots of the model right here we've already learned that and potentially it doesn't really work
+
+90
+00:50:25,000 --> 00:51:22,000
+well on dark skins uh it really needs to have pretty Crisp Images it can't be blurry and there's certain level of Zoom that it needs in order to make this diagnosis and also if there's too much hair in the image then that doesn't the model doesn't really work well right and this insights are actually pretty actionable right for example you can then take these insights and then as a guideline to help the users to improve their image quality right so that's maybe you actually tell the human users
+
+91
+00:50:55,000 --> 00:51:52,000
+like we did with True Image right you want to zoom in a bit more or you want to um you know take sharper images right it could also give us insights on you know if we want to collect additional data right what additional data should we collect in order to improve the model's Behavior across these different and improve their weaknesses right maybe we want to collect you know more diverse images across different skin tones we also want to maybe collect more training data with more like hair in it
+
+92
+00:51:25,000 --> 00:52:35,000
+foreign that we need to have much more human Loop analysis and testing of these AI models right because if you think about how Machinery is often developed right um I think it's often optimizing for the wrong objectives because most of the time right you have a data set that's fixed the static data sets right then algorithms optimized you know with SGD try to optimize for its performance on on that static data set that's actually not what you really care about right it's what you really care
+
+93
+00:52:08,000 --> 00:53:02,000
+about is actually how well the algorithm really works in the real world applications which oftentimes it's not really in isolation right but it was some team of human users especially in healthcare setting like most of these outwards on the top right here right they're not just working isolation but there's often some clinician who takes the input from the takes the recommendation from the algorithm and then make some final decisions right so in the ideal setting what you would really like to optimize over is
+
+94
+00:52:35,000 --> 00:53:45,000
+maybe some to like an SGD right to optimize the model's performance directly for their final uh usage right rather than under accuracy on the static Benchmark data set um but that's actually challenging to do right so to address this challenge what we developed um these platforms called radio which actually makes it very easy to collect real-time feedback right from users at all sorts of different stages of my model development right so basically it was one line of python code right we can basically
+
+95
+00:53:12,000 --> 00:54:17,000
+create a wrapper around any machine learning model and this wrapper also creates like a interactive user interface right which can then be shared like as a URL with any user right so if they open up that URL then they can just interact with the model in real time on their browser without having to download any any data or having to download or write any code right and by doing this right that makes it very easy for even for non-computer scientists to be able to interactively engage with the model right to test it
+
+96
+00:53:44,000 --> 00:54:58,000
+out and provide feedback on you know of the sort that we discovered that we discussed before okay so creative is actually now um now is recently acquired by hugging face but still public right and it's also being used by basically all of the larger major attack companies and the many thousands of machine learning teams it's also what we use to power some of our own like deployments here at Stanford so just to summarize right so I think these are sort of the four main key lessons that we learned from
+
+97
+00:54:28,000 --> 00:55:31,000
+our experiences in applying in building and deploying and auditing these AI models right uh no I talk a lot of here about applications in healthcare settings but I think many of these have lessons and applications also apply more broadly in other other domains where machine learning is being used okay and all of the papers and the sort of the the algorithms I mentioned are all available on my website and here again are the different references and I also want to thank the students a lot of these works
+
+98
+00:55:02,000 --> 00:56:15,000
+so maybe we'll pause here and then see if people have any more questions [Applause] paper button yeah yeah good so the hell of ideas that we want to estimate the impact of individual data points right and we do this by basically adding and moving into this data points across different contacts right so in each context I basically have a different subset of my data right and then say okay so what's the impact of adding this particular data point to that subset right if I add this point that's an improve my model's
+
+99
+00:55:53,000 --> 00:56:55,000
+performance before after adding a compared to before adding it uh and we do this basically across a lot of different scenarios each scenario corresponds to a different random subset of my training data and the reason why we do this across many scenarios is to really capture potential different interactions between different data points and then back then we finally aggregate across all these different scenarios to get one single score the data shopping score for each individual training point the snc you have to retrain the model
+
+100
+00:56:24,000 --> 00:57:24,000
+multiple times with different subsets of the data and I'd evaluate them on your test to see how they detect an individual yeah so in principle if you want to do this exactly then you need to retrain the model many times so we actually came up with a bunch of different efficient more efficient algorithms that enables us to estimate the sharpiece score so without having to retrain the models right so for example in some other applications we can actually come up with sort of analytic mathematical formulas right to
+
+101
+00:56:54,000 --> 00:57:59,000
+either exactly or approximately compute the shaftly values without having to retrain the models yes I have a review party um that's right yeah so the original ideas for these kind of shafly values actually came from economics from Game Theory where they're the people are interested in ideas of how to allocate credits among different users or among different participants in the game right so imagine if all of us if we solve we do a course projects and we get some bonus and how do you split about that bonus
+
+102
+00:57:27,000 --> 00:58:22,000
+about each of the individual participants so that people don't complain people they're happy with their bonus so it's developed in that context of more like Game Theory credit allocation um and we extended that idea to the context of the data right now instead of having individual workers or participants now I've based everybody brings their own data sets so data is what works together to train the machine learning model basically the performance now is basically how what is the bonuses
+
+103
+00:57:54,000 --> 00:59:04,000
+how well does the model perform right so then we can see okay so how do you allocate or attribute the performance the model back to the individual data sources or individual data sets cool any other questions yeah um [Music] did it tell you are those pre-provided by the team or are those like generally attached Me by that novel yeah it's a good question so what we have is basically we have a library of Concepts right uh like what we call like a concept bank so basically we can look at all the sorts of common
+
+104
+00:58:36,000 --> 00:59:42,000
+visual concepts like the concept of water or concept of stripes or concept of zoom and color right so those are OB Concepts right so I'm going to create like a pretty large library of hundreds of these Concepts right and then those then that's basically the input into the explainer as the explainers try to see okay so what of these Concepts would actually be able to explain the model's mistakes in cases where the concept that we provide are not complete but maybe there's some texture information right
+
+105
+00:59:09,000 --> 01:00:00,000
+the that actually leads to the mistake but it's not in our concept Bank we'll have some additional ways to try to automatically learn Concepts right in a more unsupervised way directly from the data for most of the concepts we use are actually you know from these large concept banks that we can just learn ahead of time okay great yeah and then we can wrap up here
+

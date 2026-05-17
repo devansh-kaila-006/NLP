@@ -1,0 +1,552 @@
+1
+00:00:05,000 --> 00:01:08,000
+so I guess um let's get started um from today um we're going to talk about um just in two lectures on the topic reinforcement learning so reinforcement learning is um a pretty important sub area of machine learning but it does have a slightly different flavor um we're not going to spend a lot of time we only have just because this course has covered a lot of topics we are only going to touch on on some very basic concepts of reinforcement learning this lecture and and the the lecture the
+
+2
+00:00:37,000 --> 00:01:33,000
+two lectures after next lecture we're going to have a guest lecture on the kind of the the broader impact of machine learning like robustness you know societal impacts and so forth and then we're gonna have the last lecture which is also going to be on reinforced learning so so this lecture is here just mostly because you know I think you need this lecture for solving well homework questions and homework four um this lecture will give you the basic concepts so that you can solve that homework question so
+
+3
+00:01:06,000 --> 00:02:05,000
+um okay so reinforcement learning so so I think reinforcement is kind of like at least on the surface it's very different it sounds like very different from some of the other machine learning problems because there are a bunch of like a different different things so maybe just to give you a rough sense of what kind of questions we are trying to solve today so maybe the running example you can have is that you have a some kind of you're trying to let a robot learn how to navigate a certain part of like some
+
+4
+00:01:35,000 --> 00:02:42,000
+space right so you want to control the robot to do something so so we are trying to solve this kind of like controlling tasks um so maybe you want a robot to kind of pick up some object or maybe on the robot to go to some place so and so forth so um so there are a bunch of differences between RL and super external and surprise learning so the difference is you know so so here are some differences I'm not trying to be very comprehensive and also there are intersections right so there are certain sub areas of RL which is
+
+5
+00:02:19,000 --> 00:03:21,000
+more similar to surprise learning so here I'm just only going to you know talk about some high level differences so the first of the the first of all Ro is about sequential decision making so sequential so I guess there are two things that you need to pay attention here so the first thing is that this is about decision making so before when you talk about supervised learning you are talking about prediction right you're predicting the house price you are predicting whether um somebody has you know cancer or not
+
+6
+00:03:03,000 --> 00:04:01,000
+you're predicting you know some wise some Target right so but here you are not really just only about prediction of what will happen in this world you also this is also about you know what you should what kind of decisions you make sometimes these decisions are made after you make the prediction right maybe before after you know that this person might have cancer then maybe you need to kind of give this person some treatment right so that's the different part where you have to make decisions based on the
+
+7
+00:03:32,000 --> 00:04:29,000
+prediction sometimes you don't you don't predict you just make decisions you know directly that's also possible but at the end of that you are making decisions and second this is sequential decision making um so your decisions have a long-term impact right so so especially maybe you think about controlling your robot right so if you let the robot go forward at this step then and next step like a your your um uh let's do about you know the set the uh the configuration or kind of the
+
+8
+00:04:00,000 --> 00:04:57,000
+robot will move right so so right so this the the the decision at this step does affect your decision at the next step you know think about for example treating a patients right so if you give the patient you know some kind of pill today then maybe the the patient becomes better and next day then you have to change your strategy or at least you know the the decision you made yesterday probably would affect the decision you make today and then which would also affect the decision you make tomorrow so
+
+9
+00:04:29,000 --> 00:05:37,000
+so I think that's the two important thing about RL and you'll see that this is a kind of like why uh this is uh challenging because you have you have to consider the long-term kind of consequences our long-term kind of like consequences of a decision it's not like you can just say I just great delay choose a decision based on the current situation choose a decision that can make the next day the best right so maybe you can make a decision that makes the next day you know very good but then the day after tomorrow
+
+10
+00:05:05,000 --> 00:06:04,000
+um you know you got into some weird situation right so so this is you know you think about you know your life decisions sometimes you shoot for short-term rewards you do something but then you miss out for example long-term investments in some other opportunities right so so greedy approach sometimes you know doesn't work very well and in many cases we just purely greedy approach doesn't work um and there are some other kind of like um um kind of things about you know another thing about decision making is the
+
+11
+00:05:34,000 --> 00:06:28,000
+following so when you make decisions right so decisions can give you multiple on on benefits right so one thing is that you you are required to make a decision because that's the problem formulation right when you control the robot you have to make a decision how do you control it right you want to turn return left or turn right but another thing about decision is that when you decide uh what you do today you also collect information from the environment about you know what the environment will
+
+12
+00:06:00,000 --> 00:06:49,000
+look like so so decisions also affect you in terms of the information right so you can make decisions to kind of query in sometimes the decisions part of the job is to query the environment so you collect more information maybe let's take the patient treating patient uh example as another example right so maybe your decision could be that I'm going to measure the patient in terms of certain kind of measurement right that's another decision and that decision doesn't really treat the patients but it
+
+13
+00:06:25,000 --> 00:07:13,000
+does collect information for you so that you can treat the patients you know later better so so decisions also give you additional information so sometimes you have to think about you know what our decision uh um you know you have to trade off the different kind of like effects of decisions where sometimes the deficiency the decisions just you know directly give you some reward but sometimes the decisions give you reward uh it doesn't give you a reward but give you information so that you can use that
+
+14
+00:06:50,000 --> 00:08:01,000
+information to um to get reward in the future so um so I use the word reward which you know I haven't really defined so that's another actual difference between this and surprise learning so here there's no supervision so um you super no um like I know our latest supervision so so what does it mean so for example if you think about controlling a robot right so one supervision could be that someone some human is telling you that how should you control the robot by some expert knows that how you can play with
+
+15
+00:07:33,000 --> 00:08:25,000
+this robot but um the kind of questions we are solving here are those questions where you sometimes just don't even know what's the right way to control the robot where for example suppose you want to fly a helicopter right so um like a like a you know if you if you really fly a real helicopter you know there's some personal some training rights you have to be trained to be a uh to be somebody who can fly the helicopter but suppose you are developing a new helicopter that can fly automatically
+
+16
+00:07:59,000 --> 00:08:51,000
+then you are trying to figure out what's the the decisions you have to make right so um or maybe like I think about treating a patient you have to find out the sequence of treatment you should give the patients right it's not like somebody already knows it if somebody already knows it then probably the problem is already easy right you should just use that expert you know on policy but but sometimes you are trying to figure out the best way uh to uh to make decisions so so that's why there's no uh
+
+17
+00:08:25,000 --> 00:09:19,000
+or very little uh supervision um so um so sometimes you are not really trying to predict what's the best prediction you actually figure out a best prediction by kind of like interacting with the environment by some trials and errors um just because humans sometimes don't know the optimal decisions either um and but if you don't have any supervision how do you figure out what's the best decision so so the kind of like the way to deal with is that you have um you learn not by you know imitating some
+
+18
+00:08:54,000 --> 00:09:58,000
+human kind of like supervisions but you are trying to learn uh from some reward function so what does it mean is that um so so humans specify the reward function so the humans specify what you want the robot to do right so if the robot pick up this object that means success then that's a reward function that means reward is high and if the robots fails to do that the reward is low so we specify the reward function and then you let the machine learning algorithm to figure out how to maximize
+
+19
+00:09:27,000 --> 00:10:33,000
+reward function so um that's the that's not another kind of like ice pack here you know these are not completely kind of mutually exclusive so I've kind of mentioned this right so another kind of interesting feature is that you you collect more data interactively I think this is pretty much Echo what I've mentioned before the decisions also give you more data where you can make a decision to query some information or even you don't make decisions deliberately to query information they
+
+20
+00:10:04,000 --> 00:10:58,000
+still give you additional information once you make the decision so so so because it's sequential right so you do you make some decisions and then you get some data and this data could help you in the next round to make better decisions foreign of course you know there are many different variants of the reinforcement setting where sometimes you know you can assume you have more inspiration from some experts you know can give you a demonstration um and sometimes you don't have reward function you know sometimes you know uh
+
+21
+00:10:33,000 --> 00:11:32,000
+you cannot have interact interactive collection of the data and there are a lot of different variants right if so basically you can add the adjective before reinforcement to have um to to have a virus so you can say offline reference planning that means you don't have super you have more supervision but don't have data interaction you can have other kind of like combinations but this is the the main kind of set of features of reinforcement any questions so far I know this is very abstract but yeah
+
+22
+00:11:01,000 --> 00:11:58,000
+little supervision Point again yeah um so basically um you don't so so what could be a supervision here because you are trying to make prediction or make decisions right one plus most information would be that you like that the expert an expert who knows how to solve the task to demonstrate how to solve the task right so for example suppose you want to control the robot and you say okay maybe you knows how to control these robots and then you just demonstrate to me how do you make the robot to solve the task
+
+23
+00:11:30,000 --> 00:12:18,000
+and that would be your supervision right but in many cases you don't need to have this supervision sometimes you don't have the supervision because the humans don't know what are the best way to control the real box and sometimes you have the supervision but you don't need them or sometimes you have the supervision but it's kind of hard to collect supervision because you have to find an expert so um so that's the basic idea actually but but just to be fair you know recently I think in the last two or
+
+24
+00:11:55,000 --> 00:12:51,000
+three years people are moving towards more and more like human uh supervision because it turns out that um there's trade off right if you don't use supervision you don't use humans probation that sounds great because you don't need humans to demonstrate for you but um you need to collect more data and do have more trials and errors you have to try out different kind of like ways to control your robot and see which ones succeed and which one fails and then learn from that um but as opposed to humans tell you
+
+25
+00:12:23,000 --> 00:13:12,000
+something then you don't have to try that many times you can let the robot fall down less often right maybe without even trying on the robot you still already know how to control the robot just because you learn from the humans so so I think in the last few years I think people are moving towards you know using more and more humans foundations and sometimes you are using like imperfect human supervisions where I use all you like all you use kind of like sometimes they don't have the expert
+
+26
+00:12:48,000 --> 00:13:49,000
+information sometimes it could be just some data from the passed away so you have seen the robots you know going around doing some tasks imperfectly in the past and use those data as supervision on to to learn some something better uh than the past data that's even possible um but we're not going to go into all of these details right so for this lecture there is no supervision just you know nothing about you know what's the right decision um but you're going to figure out the decision by trying uh uh try different
+
+27
+00:13:18,000 --> 00:14:11,000
+strategies so basically all the algorithms will look look like this some more kind of like trials and arrows right so you start with a robot you don't know how to control it but you don't know how to use it to solve any tasks and then you try different kind of like decisions actions and then some actions you know it just happens to pick up objects for example and some other actions just happens to fail and then you try to use those actions that uh succeed uh and you know whether you succeed or fail because
+
+28
+00:13:44,000 --> 00:14:41,000
+that's your reward function right if you succeed you have better reward and if you fail you have lower work so so you know whether the excess succeeds and then you try to kind of like a boost the chance to uh your algorithm tries to kind of like amplify or boost the chance to take those actions that can succeed in the past and you kind of do this bootstrap thing and you and and eventually you find one set of actions or one set of policies that just always succeed with you know with very high probability and
+
+29
+00:14:13,000 --> 00:15:24,000
+that's that's how I would roughly speaking uh how it works so um okay so so basically everything is is through this reward function right so the reward function is kind of the the signal you rely on to to learn what is good and what is bad any other questions to Performance regarding the reward function so the reward is is something to collect but you can also see something more we can see for example when you manipulate the robotic arm you can see how they are where the arm moves towards right so you
+
+30
+00:14:57,000 --> 00:15:56,000
+can also observe other things I'll formalize that as well but roughly speaking you can observe yeah basically like for example if you treat a patient you can observe something about how the patients you know behaves or or like a performance and if you if you tune a robot then you can see the how the robot kind of moves right those are additional information you can collect and sometimes this information is is viral kind of like a pixel kind of like you can collect the information as well different way sometimes it's from the
+
+31
+00:15:27,000 --> 00:16:27,000
+camera sometimes it's from the internal like recording of the of the system sometimes it's from something else thank you yeah you can have much more reward functions in many cases but then you have to say you decide which one is more important you know how do you balance them right so um so in our lecture we are going to we are going to just have one reward function and sometimes you can also have constraints for example you can say you have one reward and a bunch of constraints which you have to satisfy
+
+32
+00:15:58,000 --> 00:17:05,000
+um that's also a valid setup okay I think I probably have seen I have said to a lot about the high level idea um you know which is probably a little bit hard to map to the the real thing so uh so so let me try to Define uh mathematically how how does this work and I'm going to use this running example a very very trivial running example so this one example is that you are trying to control a robot navigating a 1D tape so suppose you have a tape which is like this and you have a robot which you know it
+
+33
+00:16:44,000 --> 00:17:44,000
+says ASMR and I can move you know to the left or to the right you know you can you can take some action right to move it left or right and maybe there's a goal somewhere else maybe this is the goal so you basically want to move this robot to the goal which is kind of trivial if your human knows this task you know the person would be able to move it you just keep going moving to the goal right that's easy so um but we are gonna let the uh the algorithm to figure out what's the right uh the strategy
+
+34
+00:17:14,000 --> 00:18:40,000
+so um and so this is my um write an example and I'm going to formulate you know on the set of problems so um this is the formulation is often called Markov decision process so let me Define a bunch of quantity uh kind of terminologies so there is something called state as and you can have a set of states and that's denoted by capitalize so so for this example a state is a state basis is the situation that the robot is in right so a stage basically is suppose you have like a say one two three four five seven six
+
+35
+00:18:05,000 --> 00:19:12,000
+actually maybe let me just change the goal to be here to be consistent with my note maybe I say 10. so a state basically is describing what's the the current situation of the the robot right so so here the state is probably three because the robot is here right so and here you only need 10 numbers 10 there are only 10 states so that's the only thing you care about right so but if you really have a real robot maybe you have to describe the steel box in many other uh parameters or many other kind of like uh
+
+36
+00:18:38,000 --> 00:19:41,000
+um like numerical kind of numbers right for example you may describe the robot speed the velocity the height the the center of minus one and so forth right then you can have a high dimensional state right so like you have a lot of numbers to describe the state of the um the robot and the family of the the states will so the basic state in that case will be of a high dimensional vector and the family of states will be just all the high dimension vectors that can describe the robot um so Fox you know maybe another example would
+
+37
+00:19:10,000 --> 00:20:12,000
+be that you know if you think about you know playing goal in the state would be the the current board right so where the all the kind of like um how the how does the bar look like and then you have a lot of States because there there's like a 361 entries on the board and every entry you can have a white and black you know and nothing you know you have three choices then you have three to the power of 361 uh possible States so um so that's the this is the the concept of state and there is a concept called
+
+38
+00:19:40,000 --> 00:20:47,000
+action sometimes typical we use a for action and and there's a site of action this is the set of actions you can you can take which is called a so so in this case basically these are all possible kind of things decisions you can make right so and it's called action technically in in this language so for example here maybe like I'll just allow the you you take two actions left and right you can just move left or move right um and when you control a real robot probably you can take other accents you
+
+39
+00:20:14,000 --> 00:21:36,000
+can change the you can accelerate or de-accelerate or maybe you can change the um the force you know at different drones you know many other things right so so and um and if you play Gold then there are actions to really just um put something on the board right um okay so um okay so this is the set of actions and then I need something called Dynamics or transitions to describe how does the actions influence the state so this is called Dynamics and I think also sometimes it's called transition
+
+40
+00:20:58,000 --> 00:22:26,000
+or transition probabilities so so or sometimes it's called State transition probabilities um so basically this is the um so basically you're asking about a question so I guess maybe let's define annotations this PSA this is the you're asking the question when applying when applying action a I to state as you know uh the probability distribution you're asking where I should arrive at next time so the probability distribution probability problem just a distribution of the next state
+
+41
+00:21:58,000 --> 00:23:07,000
+and the next step often just notation wise it's often called S Prime so basically you're asking so in other words you know p as a z is the probability of X Prime is equal to Z given as an a so PSA is the probability distribution and this proper distribution is the conditional probability distribution conditional you are at currently UI State s and you play action a and you ask yourself you know what's the distribution of the possible next step and there's some Randomness here right
+
+42
+00:22:35,000 --> 00:23:42,000
+so uh you know for robots you know sometimes you can think of as deterministic because you you do something and deterministic deterministically it moves to some other place but for many other kind of environments you know you take some action but the how does the the environment how does the the state changes you know is probabilistic there's some Randomness involved so so the randomness is trying to capture on that so so that's why in this sense you know the this um so for every ice and a it's PSA is a is
+
+43
+00:23:10,000 --> 00:24:36,000
+a distribution so PSA if you write PSAs this you know the the probability of every state right so um suppose maybe let's say suppose you have a state s which is equals to you know one two something like this right so then um if you you can also view this as a vector you say this is PSA one this is the chance to arrive at the state one uh and this is the pic at this the last date maybe let's maybe I'll just uh I think yeah maybe maybe I'll just sorry maybe let's just uh I think I realized that maybe
+
+44
+00:24:02,000 --> 00:25:07,000
+let's say this say m is the number of states so my my state is just to have like a m State one two three four up to n then you can list the probability to arrive at each of the states and write as a vector this is a vector that is in RN and this is the probability Vector so this this Vector itself you know all the uh the entries are some sum up to one of course you know you can also have deterministic transition Dynamics right so you can say that only one of these numbers is one and all the others are
+
+45
+00:24:42,000 --> 00:25:50,000
+zero and there's a deterministic transition dynamics that just means that you just you always translate to the same state given the same action uh and state and same state and actually you always translate to the same next state [Applause] Okay so I think I'm gonna have an example um based on this uh robot thing um just to give your concrete uh idea so suppose you say you have this action set which is you know IO and r and this means that you push the robot you know so the left or to the right but
+
+46
+00:25:25,000 --> 00:26:45,000
+let's say suppose you know there's some Randomness in this environment you even try to push it it doesn't necessarily always move which is only a a good chance it moves with some chance you just fail to make it move right so um so maybe then maybe let's say suppose you know so L action says say succeeds with probability let's say 0.9 then that means that if you look at or if you use this notation it means that suppose you have you had P suppose your item P um say you're either State seven
+
+47
+00:26:07,000 --> 00:27:12,000
+and you apply the action L right so PSAs is the state and L is the action so so then you ask you know what's the chance to arrive at some other state right you write seven and you you try to move it left but you know that it only succeeds with probability 0.9 that means that with 0.9 you're going to arrive at six so this will be point nine and uh with you know 0.1 chance you're gonna arrive at seven you stayed at seven so that's point one and with zero chance you're gonna arrive
+
+48
+00:26:40,000 --> 00:27:46,000
+at any other places for example you are not arrive at five with zero chance and you're gonna wrap other places with zero chance so that's the that's one example of the the transition Dynamics and then you can write down the transition Dynamics for other so the action maybe just a for example suppose you say P seven R so now you're asking I stay seven if I try to move it to the right um you know where it should arrive at you know we know that it should arrive at 8 with some chance with trans points
+
+49
+00:27:20,000 --> 00:28:40,000
+say point I guess so in my example I make it a little bit complicated just to so let's say R say R actually succeed I'm just making this up just to make it interesting with probability 0.8 then it's saying that you know with probably 0.8 you're going to arrive at eight the answer eight so you get 0.8 and with probability um 0.2 you are going to stay at seven and with probability um zero you're gonna wrap at any other states so that's mean p7 um are maybe five will be zero and all
+
+50
+00:28:01,000 --> 00:29:15,000
+the other p7 r z will be zero if Z is not equals to seven and eight and you can Define you know like a whatever transitions you know you want you know so so you can you can write you know using the same ways you can write out all the transition probabilities uh for every state action pair okay so that's my uh that's my kind of description of the environment or by the way by environment people generally refers to this kind of entire system right so how does the um like how does things change based on
+
+51
+00:28:41,000 --> 00:29:53,000
+your action right the environment basically just means this entire system um um okay so now I have defined uh the transition probability and now I have to talk about sequential decisions right so so far I only talk about one action well how does one action affect the system so we have sequential decisions then what happens is that uh your interacting with the environment or the system um so like like the following so first of all you you say I'm going to have an initial State as zero which is the
+
+52
+00:29:16,000 --> 00:30:49,000
+initial state and uh and let's say the initial state is given but sometimes you can also say the initial state is randomly drawn from from some distribution okay and then so what you do is that the algorithm and chooses some action a0 from the set action set so and then after the algorithm choose the action the decision or action the environment uh oh step is that you you basically sample as one from this distribution right so you basically translate your state based on this rule that we have described so you
+
+53
+00:30:09,000 --> 00:31:33,000
+say S1 is going to be sampled from ps0 a0 right ps80 is basically you know if you apply a0 on I zero what's the chance on what's the probability to arrive at new States and you sample uh one state one concrete state from this probability distribution and then the algorithm chooses A1 and in this action I but here A1 can depend on what so A1 can depend on S1 and s0 so so ice one is considered as something that is given to the algorithm right so you observe as one after you played action You observe more information and
+
+54
+00:30:55,000 --> 00:32:23,000
+the more information is as well and then you can play your new A1 based on S1 and I zero and then you just keep doing this right so the next round you just say I'm going to continue I'm going to say the S2 is generated from PS1 A1 and then algorithm picks are a A2 and A2 can depend on all the history right all the historical observations you have seen so um so that's the idea okay so for example you know if you really think about this you know this thing maybe you start from three and you apply you start from the state
+
+55
+00:31:40,000 --> 00:32:40,000
+three and then you can apply R action and then with some chance you know you're gonna move arrive at four and then it's supposed to arrive at four then you can say I'm going to decide again what my action should be and you say okay my action should still be R and then I I I can observe by there it does move right so with some chance it will move and and you just keep doing this foreign that's kind of describing the decision process and there's one thing we haven't described which is the reward right so
+
+56
+00:32:16,000 --> 00:33:33,000
+how do we decide when you succeed or not uh eventually right so um so the reward function um there's so something called reward functions so the reward function is a function that Maps uh is a function that Maps uh from Maps the state uh this family of states the state of states to real number um so basically sometimes you write it as RS right as is a state and you apply the reward function you get RS in some other cases you can also have reward function that depends on the action uh sometimes it can depend on the
+
+57
+00:32:58,000 --> 00:34:01,000
+next state but let's follow for the purpose of this course let's say the reward function only depends on State so um so basically you know for example for this you know robot case maybe you can say um you know suppose you want to somehow have a reward function that characterized whether you achieve the goal State six maybe you can just Define your word function to be R6 to be 1.0 so so achieving sex you know give you a high reward and then you save R of s is same you know I'm making this up it
+
+58
+00:33:30,000 --> 00:34:41,000
+doesn't really matter exactly but you say your water is very small or even active if your state is not six so suppose you'll Define a reward like this in some sense you are encouraging uh the algorithm to reach the the algorithm to reach text and not reach any other state because for other states you get Negative reward and for the six you get positive reward Okay so and but this is only a reward for one step [Music] more expensive expensive as if you take a certain model is less expensive yeah yeah you can do
+
+59
+00:34:11,000 --> 00:35:15,000
+that so basically yeah that's what I said so your reward function can be a function of s and a as well or in many other cases but for the simplest let's just say the reward is a state is it um the mass doesn't change much it's almost almost the same yeah and sometimes actually depends on the state and action and the next state so you can depend on okay cool and this is only about one step um eventually you have to care about the the sequential decision making it's just not about one step right so the total
+
+60
+00:34:48,000 --> 00:35:55,000
+payoff is defined to be sometimes it's got Total return um so this is defined to be you know rs0 plus r is one so and so forth um Plus rst so so this is the total reward basically just to sum up all the rewards at all the steps and and now here I didn't specify you know how many steps we can have right so if you have even number of steps then this doesn't seems to make a lot of sense because you know your reward will be sometimes going up to going to Infinity right if you have infinite
+
+61
+00:35:28,000 --> 00:36:34,000
+number steps and each step you get a reward something like one then you're worth eventually will be Infinity um and it becomes not very informative because you cannot compare one Infinity with another Infinity so um and there are two ways to deal with this so one way to deal with it is that you say you have a discounted reward and but but you have infinite how is it by the way Horizon means how many steps you're going to play uh in this sequential game so and so basically on the discounted
+
+62
+00:36:05,000 --> 00:37:24,000
+reward is the following so you have rs0 plus some gamma rs1 plus some gamma Square R is two so and so forth and where this comma is less than one and larger than zero is so the so-called discount Factor count vector and here you have even a horizon basically just means that you take sum to Infinity this is T but here I still have I don't know like a you can feel awake so I'm taking this like in this case all right so you know this is just a demonstration you know this is not that I just the total payoff doesn't really
+
+63
+00:36:54,000 --> 00:37:52,000
+make a lot of sense if you really have if you just do this but you have infinite Horizon it doesn't really make out that's it's because it's going to be Infinity so this is the real definition we have infinite Horizon so you have discounted reward and the reason why you have to only have this discounted reward is that um so I guess there are several ways to think about this so one thing is that you can think of this as um um a kind of Interest kind of like it's kind of like you know in the finance
+
+64
+00:37:24,000 --> 00:38:22,000
+where you like the the return you get the reward you get in the future doesn't work as much as as the reward you got in right now because there's a there is an interest rate or inflation rate you know something like that so so basically you say that you discount what you get in the future by a little bit exponentially right if you get some reward after tea times you're gonna have so basically here the t's term would be like this your rewards uh in the in the future by uh by some Factor governments to the
+
+65
+00:37:57,000 --> 00:39:16,000
+poverty just like you know like in financial economics you know you you're returning the future this doesn't work as much so that's one way to think about this and another technical way to think about this is that um um if you do this then you um even you have infinite Horizon then your total reward is always bounded so so so suppose you have wait did I oh that's from last week so basically suppose your gamma is less than one and bigger than zero oh and suppose each stat a reward is bounded by minus m and n
+
+66
+00:38:48,000 --> 00:40:13,000
+suppose you have this two then you know that your total your discounted reward discounted payoff this concrete pay off this uh is you know at the most say one plus Gamma or I'm sorry I'm the first time you can only get n and the second time you get n times gamma and the third time you get M times gamma Square so and so forth right and and this series you know will converge uh so so the total sum will be something like n over one minutes comma so basically you guarantee that at least you have a bounded return and this is
+
+67
+00:39:33,000 --> 00:40:42,000
+the maximum return you can get um in the in the best case so so technically this make it possible for two reason about infinite Horizon because uh your return is always kind of at least bounded there's always a number uh uh kind of meaningful number for the return you have some questions I saw some oh no question okay um Okay so right um so in the if you look at the RL paper you know literature sometimes also people talk about fun and Horizon which means that you just have a hardcore thoughts for how long you're gonna play
+
+68
+00:40:17,000 --> 00:41:17,000
+this right so that's another way to formalize the problem which we are not going to talk about in this lecture but I'm just gonna tell you that the existence of such definition so if you have final Horizon you just say you have a horizon which is called T this is basically saying that you just have to stop it start you just have to stop at t-step and then your reward will just be you don't have to have discount factors you just say I'm going to I adopt the first two steps so also this final Horizon thing on an
+
+69
+00:40:49,000 --> 00:41:43,000
+infinite Horizon you know they don't have you know fundamental differences you know from a technical point of view if you know how to solve one you know you basically know how to solve the other of course there are some kind of dependencies if you really care about a theory um um so here you know your um Oreo kind of like dependencies depends on gamma and here your dependencies will be on T but fundamentally they don't really matter that much but the infinite Horizon case is a little bit easier to understand uh
+
+70
+00:41:16,000 --> 00:42:17,000
+in terms of the at least for the beginning you know if you just derive the mass the mass is cleaner so that's why we do the infinite Horizon case and by the way the gamma typically empirical people do use gamma do use the discount factor and Gamma is something like probably 0.99 and sometimes in green case people even do 0.999 so so if you're in this regime in some sense the way you think about it is the following so when God says let's say gamma is 0.99 what does this really mean it means that you have to really take a
+
+71
+00:41:46,000 --> 00:42:49,000
+t a power that is kind of on all over 100 to make this government to the priority to be somewhere different from what right so basically 199 to the power 10 this is still pretty close to one this is probably like I think this is what how to do the mask here right if you really care about it so so it's kind of like one minus Epsilon y to the power T this is close to one minus Epsilon t or something like this at least for the foreign T is small so so if you really do it uh so if you do the calculator
+
+72
+00:42:17,000 --> 00:43:22,000
+calculation so this to the power to the 10 this is still close to one this is probably like point nine but only if you lose the power to higher so you reach the power to 100 then you're gonna have this I think this is one over e something like that it's like point to about yeah exactly so so basically this is saying that the the power has to be large enough so that you this discount Factor starts to matter right when the power is only 10 it doesn't really matter and and what exactly this power has to be I think if
+
+73
+00:42:52,000 --> 00:44:03,000
+you if you do some colorful masks I think what happens is that um sorry I'm just reusing this part so one minus so gamma to the power of one over one minus gamma this is something like a one very roughly speaking so only your power becomes one minus more over gamma then uh you start to see the effect of the discount factor and after that it indicates pretty fast so so in some sense you know if you really want to kind of have a way to Transit between final Horizons and infinite Horizons then basically this one minus 1 over
+
+74
+00:43:29,000 --> 00:44:40,000
+gamma it's kind of like your effective Horizon length in some sense because after when T is much much bigger than this one minus more over gamma then the discount Factor just start to be super small so then you don't even have to care about those kind of steps foreign I Define this mdp so this whole thing is called imadp so this whole formulation is called the mdp markup decision process and you can see that this Markov decision processes are defined by a bunch of kind of like Concepts so one thing is the set of
+
+75
+00:44:17,000 --> 00:45:29,000
+States another side is another thing is a set of action and the set of transition probabilities PSA as in as a and a right so and you'll have a discount factor and you have a reward function so basically after you specify these six things or five things then you specify MVP and there's a well-formal problem and the goal of the mdp is that maybe I'll just write a go here even though it's pretty so the goal here is to maximize the so basically you want to find out a way to maximize the
+
+76
+00:44:59,000 --> 00:46:10,000
+maximize uh the discounted payoff let's say so basically given mdp you want to figure out how to maximize this discounted payoff the payoff I think means the sum of the reward discounted sum of the reward and reward basically means one uh one step I think people sometimes also call the the sum the summation version sometimes you call it return and occasionally also people just call you reward um but I think I I like to kind of have a differentiation of the terms just to make it not too confusing
+
+77
+00:45:55,000 --> 00:47:04,000
+okay any questions about the formulation so so far we didn't really do any derivations right so just to clarify so this all of these are definitions like how do this it's kind of like a word view how do you view this world in some sense like what's the what's the important Concepts and what are the goals [Applause] okay I'm running a little bit slow um but it's fun um [Applause] okay so now the next question is how do we um how do we solve this problem right how do we find out the best action and
+
+78
+00:47:04,000 --> 00:48:03,000
+for the um for starters we're going to assume that this PSA are given so you know the transition probability you are just trying to find out what's the best action you should take to maximize the reward but in reality you don't know necessarily know the PSA you don't know the transition problem you have to somehow learn them from from observations so I think you know I think for this course you know we don't really talk too much about how to learn the PSAs so we in some sense you can mostly
+
+79
+00:47:33,000 --> 00:48:32,000
+assume that the PSA they are given and the only questions to figure out what's the best action to take so um the first thing to realize is that you know there's the so-called Markov property so I didn't emphasize that but let me do that right now so the Markov property means that when you take the environment you advance the the state by change the state it only look at the previous action on the previous statement so the environment how does the environment change the state only depends on the
+
+80
+00:48:07,000 --> 00:49:13,000
+previous state and the previous action right that's kind of described in this PSA on this framework here the PSA the next state only depends on previous state and previous action so in some sense your state there is a mark of property right so you only have to look at the previous state to decide what's next state um you don't have to look at the entire history so because of this Mark of property it means that um it means that you know you um you only have to uh when you make the decisions you only have to look at the
+
+81
+00:48:40,000 --> 00:49:44,000
+immediate State the current state so the the optimum decision I time t often maybe that's called action just to be consistent with the terminology actually I type T only depends on the state iced tea because anyway like whatever you do is like basically after you CST you can forget about the history because the history doesn't really matter you know conditional St rather history is independent with the future conditional St after you CST you know everything about the current configuration so so
+
+82
+00:49:22,000 --> 00:50:43,000
+you'll have to use the St to predict to to make decisions um and uh to maximize your reward so basically because of this um there's this concept called policy so policy is a function that takes in a state and output action so this so I guess technically I'm going to say this is knifing state to actions right so it's action is equals to it's kind of like action is equals to the policy applied on a state so basically you only have to look for policies instead of looking for entire trajectory
+
+83
+00:50:04,000 --> 00:51:05,000
+of actions because either way you what the the way you make decisions is that you look at the immediate current state and then you apply some function um um on the state to to get your action right so so basically unknown thing becomes a policy instead of a sequence of states does it make some sense that's a great question so so the question was that you know whether you do this sounds like it's greedy right so um it's not in the following sense so when you decide what policy you'll use
+
+84
+00:50:49,000 --> 00:51:41,000
+you do have to think about the long-term ramification of Your Action but it's only that but the action doesn't depend on his the I think this is more about the you don't have to care about the history so you you don't have to care about the the previous history you just heard about what currently you know conditional today right so what happens today is all that matters but I can't forget about what happens you know I don't care about how do I arrive at this situation right so so
+
+85
+00:51:14,000 --> 00:52:08,000
+um in some sense like uh how how do I say like like for example if you have a robot right so if the robot already kind of dropped the drop the bottle you don't care about you know how the robot drop the bottle you just care about the bottle noise on the ground I have to go pick it up right so so so this is more about for guys in the history and when you but when you decide the policy you do have to think about the future you see that when we optimize the policy when you find the best policy we do
+
+86
+00:51:41,000 --> 00:52:38,000
+think about the future a lot um yeah I'll get back to that as well yeah cool okay so this is the first thing so you only have to carry find a policy but this policy is not something it's trivial to find it right because these policy is a function right so you have to figure out what's the best action for every state so basically for every state you have to figure out the best action and that will give you the so-called policy okay so um maybe one way to think about it is that here suppose you want to move your robot
+
+87
+00:52:16,000 --> 00:53:19,000
+to the goal then the policy problem would be that if the state is on the left of the goal your policy should be taking the right action and if the stage is here you should take the the left action so and by the way the policy can also be randomized here I'm looking at a deterministic action right so you say you have actually you have a state you you output a single action for every state you have a single action that's called your optimal policy um but in many cases the policy could be a randomized function or it could be
+
+88
+00:52:53,000 --> 00:54:01,000
+something like conditional State as you can output the description of actions and you choose randomly from them for the purpose of this course I think we are not going to have at least for this lecture I'm not going to have random policy for the next lecture I think I'm going to talk about randomized policy um Okay so okay so now I'm going to um okay so how do I find a policy right so this sounds a little easier than finding a sequence of actions but how do I do that so um let me introduce another notion which
+
+89
+00:53:30,000 --> 00:54:55,000
+is called the value function so let's say you have on this is a value function V Pi this is a value function of a policy this is a function that Maps the state uh to a real number R in some sense this is trying to capture the value of the state so under this policy pie so basically this is equals to so V times s is defined to be inverse the total payoff uh obtained of say executing policy pi starting from State s so basically you think you start from State s and you keep executing your policy pi
+
+90
+00:54:36,000 --> 00:55:36,000
+just every time iteratively every time you see new state you apply a policy pi and then you collect some total payoff total discounted payoff I always have discounts you know just for the rest of lecture so I I compute the total payoff and I call that the the value of the state s right this is demonstrating how good this state as is under this policy pie because if the state s is good then you have it's a property of the both pie and ice right so if the policy is good you get better payoff if the ice is good if this
+
+91
+00:55:06,000 --> 00:56:33,000
+is probably at a goal then you probably get better payoff because you don't have to move anything right so uh this is just the question about the schools here um what producing is that that policy that you take an action yeah I think that's a good question maybe maybe let me justify it yeah this is just the uh this is just the intuition so far um so so what does this really mean is that you so you start with us as zero is equals glass a0 is equals to Pi of s0 and then you say uh X1 is equals to
+
+92
+00:56:20,000 --> 00:57:53,000
+uh is sampled from p i zero a0 right so you start with us and then you take action a or comes to the policy pi and then you say the environment take a step the environments draw the next stage given Ico and a0 and then you play A1 according to the observation as one pi over S1 so and so forth you played this game and then you say you look at the reward that you accumulate throughout this process and until Infinity and and you say you take this expectation the condition as zero is equals to s uh and this is definition of
+
+93
+00:57:17,000 --> 00:58:29,000
+the value function so value function is the this is the expected total payoff expected discounted total payoff of this game right the game is you know the the process is that you start with us and then you play this policy and the environment does what it should do and you always play this policy so that's the value of this data [Music] um like all the future states are selected the environment based on as new so S1 is selected by s0 and a0 and as two is selected by you know if you have maybe let's just continue here
+
+94
+00:58:07,000 --> 00:59:06,000
+I'm sampling as well from I'm sampling from the environment right so so if the environment is deterministic I'm just going to talk it's just fixed the environment decides it right if they if this is the environment is random then you sample one from it but eventually you take average over all the possible so basically simulate your world you know with all the possible possibilities but of course each possibility has different you know like each possible future has different probabilities some more likely
+
+95
+00:58:37,000 --> 00:59:36,000
+to show up some less likely to show up and then you look at the rewards for every possible reward of the future and then you take average over all the possible results so basically just you apply this policy and you you you try this policy on in the real world and and you you can in the real world is starcast take something randomly happen and uh but you just try this you know out and you collect all the reward and you take expectation of the reward the total rewards this is a definition I'm trying to give
+
+96
+00:59:22,000 --> 01:00:29,000
+you a you know how do you really do it that's a different question this is the the definition of the concept Okay so so why I'm defining this I'm defining this because there are two reasons to Define this well one reason that this is kind of capturing the the the value of the state as right so if the state s is good that means that this state is a good initial state if you start with this state you can accumulate more rewards and also this describes you know the kind of the the the goodness or the the the the the
+
+97
+01:00:04,000 --> 01:01:03,000
+quality of the policy if the policy is good then this value would be high right if the policy is just keeping the rising you get more and more reward so um so in some sense you can say um you know you can say that actually your problem is really just trying to figure out what's the the right pie that can optimize your value function so you can reforming a problem before we are trying to find the sequence of action to maximize the reward right so now I think we can just change our perspective saying that we
+
+98
+01:00:39,000 --> 01:01:47,000
+are trying to find out the the policy such that I can optimize my value function so basically your new goal [Applause] is that you are maximizing over all policies you maximize this V pi as zero so I'm here I'm assuming a zero is deterministic is given so um okay maybe I should just yeah so so suppose you are given some s0 right so that the question is that s0 is given and you are just basically maximizing you're trying to find out the best policies such that the value of s0 is maximized
+
+99
+01:01:13,000 --> 01:02:25,000
+under this policy okay so um right so basically in some sense if you can see if you can find out what this function is V Pi zero for every part if you can know for every policy suppose you can figure out this vat number then you can just enumerate overall policies and see which one uh has the uh has the best best return Total return right so of course that might not be our efficient algorithm but the conceptually that's what you're trying to do right so you're trying to figure out what's the reward for every policy and
+
+100
+01:01:51,000 --> 01:03:10,000
+then you try to pick the best policy so so so basically computing this V pi this Computing this is um is uh this is called um sometimes called policy policy evaluation you are evaluating how good this policy is and once you know how to do the policy evaluation then you can try to do the policy maximization right to maximize the power over the policy so so first thing I'm sorry is how do you do the policy evaluation so how do you do it it turns out that basically you just have to do a recursion
+
+101
+01:02:41,000 --> 01:03:55,000
+so so to do policy evaluation you just do some recursion so what does that mean so I guess suppose they think about the policy I State s right so let's just use the definition the definition is that basically you start from State s and then right the definition is that you say this is expectation uh of this you know the total payoff discount appeal assuming that you start with State as 0 is equal to s and because s0 is equal to S right so you just say this is equals to RS R Us this is the reward that you get in
+
+102
+01:03:30,000 --> 01:04:51,000
+the first step and then you say you have some discount Factor is you pull one gamma off because all the all the other terms has worked on there and then you say this is rs1 Plus gamma R is 2. plus gamma Square R is three so and so forth no that's the I put one gamma out right so before it was gamma square rs2 but now it becomes only one gamma right and if you look at the rest of this term this is something that that is actually uh something you have we have kind of like this is also meaningful in a sense
+
+103
+01:04:11,000 --> 01:05:42,000
+that this term is really just the total payoff uh obtained from starting at as one right basically this is just that you you start with S1 and you apply this policy iteratively and what's the payoff you should get right without the gamma nagama is a factor right so without a gamma right this this is basically the total payoff if if you start with S1 right so so that means that this quantity is really literally just a v pi ice once so that means that you got a recursion in some sense between V and V Pi between
+
+104
+01:05:04,000 --> 01:06:29,000
+vs and VS1 so maybe just a more formally so I'm I can write this as this so I think maybe technically I should say that without expectation this part is equal to okay I guess you know let me not to be too technical here but you kind of probably see what I mean so so here we pass one is basically the reward you get from executing from S1 but why I'm still having expectation here this is because S1 is also random right it's not like X1 is deterministic or determine determined as one is drawn from applying
+
+105
+01:06:07,000 --> 01:07:30,000
+it's drawn from this environment right like so iceman has this distribution so S1 is drawn from p as zero a0 and a0 is is pi of I zero so this is p of a zero Pi of I zero any questions so far so maybe just to be more expressive basically this is equals to R of s plus if you write out this expectation you can write it as a sum so basically you draw S1 from this distribution that means that you it means that you just say for every possible S1 in a set s you look at the density of S1 this is the chance that you see S1
+
+106
+01:07:02,000 --> 01:08:21,000
+in the next step and then you times V pi as one that's that's just how I expanded it the definition of expectation I think uh maybe people typically when sometimes you know it doesn't really matter what variables I use for exponent where I can use any variable so maybe let's just use as Prime just to be consistent with the typical notation so basically you you Loop over all possible X Prime all possible next state and you first say I'm looking at what's the chance to arrive at that State as Prime and then I
+
+107
+01:07:43,000 --> 01:08:54,000
+multiply that with the value function at as Prime so this is just equivalent to this uh um expectation about okay so why this is useful so first of all let me say this is called Velma equation this is an equation about the value of function V pi and it's often called Belmont equation so and also this is you know technically I think if you don't really want to have a sometimes this is called biome equation for v pipe because they're going to be another bioma equation which has exactly the same name people also
+
+108
+01:08:28,000 --> 01:10:03,000
+call it Battlement inflation for some other quantities I'm going to Define in a moment so so this Palma equation Y is useful it's useful because um this is a linear um this is a linear function in V in V pi x right so you can think of it as maybe I'll use here so you can think of V Pi 1 up to V Pi n we call that m is the number of states I defined so you can think of this all of this as the the variables as M variables and the Belmont equation gives an equations about these variables
+
+109
+01:09:33,000 --> 01:10:53,000
+right why there are M equations because for every s this is true for every eyes right forever as it has the equation that involves these variables Pi of V pile of us and v-pal fast part in a linear weight so so about my equation is the six of linear system equations in this variable we have one up to V pattern so um so so to figure out what is V part V Pi I you just have to solve the system equations I'm not sure whether this make is this too abstract um so sometimes maybe just just give your
+
+110
+01:10:15,000 --> 01:11:21,000
+concrete example right so so um for this concrete example here if you uh write out this balance equation what will happen is the following right so so you probably for the for the concrete example you have maybe something like V pi I'm just plugging in some concrete thing like maybe six so you you are trying to figure out what's the equation for v pass Six v56 if you think about the equation in your first off thing is the R6 this is the reward you get in the first step and then you time gamma times the
+
+111
+01:10:53,000 --> 01:12:11,000
+reward again in the future right so so where you have this sum right sum S Prime in s PSA on something like ice Prime V Prime X Prime right and you plug in all of these numbers here and then you get an equation which depends on V pass 6 and all of the other V5 as Prime and but this is a linear equation right so think of this as a variable all of these are variables this is a equation with a bunch of variables but they are linearly they are linear in those variables and you can write this for every
+
+112
+01:11:32,000 --> 01:12:45,000
+everything right you can say this is R5 plus and you have the system equations right each equation is a linear equation in the variables so so basically this means that you're just computing V pi s for every s by some linear equation solver by solving the linear equations and because they are linear you can use the efficient solver like um just uh how do you solve linear equations you can um I guess one way to do it is do some inverse of the Matrix you know maybe the other ways to do a linear equation
+
+113
+01:12:15,000 --> 01:13:32,000
+um but that's that's a sub module that you can just invoke you can evoke some off-the-shelf algorithm to solve the linear equation any questions [Applause] is it possible that there are infinite of solutions so um I think um I think in this case it's just not possible um why it's not possible it's probably not super obvious to see um and sometimes you know like you have at least you know it is it it passes the the trivials need to check but if you count how many equations how many
+
+114
+01:13:04,000 --> 01:14:27,000
+variables they are exactly the same so so typically you probably should have a reasonable you have a unique solution and I think in this case you can prove that there is a unique solution like uh just uh because this this set of equations has some special properties um maybe like not get into that too much okay okay great so so we know how to so basically we know how to evaluate V pi x maybe you can see it again a PSA this one there will be different depending on the initial state no no no this PS um PSA this PSAs Prime
+
+115
+01:13:59,000 --> 01:15:18,000
+this p is is the Dynamics right it's the transition probability which is uh uh which is global which is kind of like what you it's a given property of the mdp to the second one would be just r o uh six minus 0 to 5. if you subtract these two yeah oh no because all right rice that's a good point Sorry I think uh this is an a I think I only partially replace this this will be six yeah yeah yeah yes oh that is that is that's what you're asking okay okay cool cool sure so I think uh I think this will be yeah
+
+116
+01:14:47,000 --> 01:16:06,000
+that's a that's a great question so this should be six and also Pi of six so and then if you write this then you have gamma 5 pi over 5. X Prime V pi x Prime so all the coefficients are different um for different equations different lines thanks okay cool cool so we have completed the V Pi but V Pi but the next question is how do you so basically we have solved the policy evaluation now we try we need to figure out how do we maximize the policy part how do we find out the best policy so
+
+117
+01:15:33,000 --> 01:17:00,000
+um let me find out some places it turns out that you can use a similar technique to find out the best policy um so here is the some definition so first of all is Define V Star as to be Max pie V pies so what what does this mean this means that you are looking at all the possible policies that you can use starting from us you look at it you basically try all different policies starting from X and you you you're asking which policy give me the best reward total payoff and and the the value of the total payoff will be the uh
+
+118
+01:16:29,000 --> 01:17:29,000
+the the V Stars so V stars is the intrinsic value of this data aspect so you're saying that the state has just how how valuable the state ass is right and how valuable is measured by using the best possible policy right vitalize what you know depends on both the pi and X right like um you know if you use a bad policy V pass may be low but we've start is saying that what's the value of this stage if you use the best possible policy in the future steps and then you can also Define the
+
+119
+01:17:00,000 --> 01:18:18,000
+so-called Pi star this is the so-called Optimum policy this is equals to the arc Max over pi V pies right this is asking you know what is the basically you are just doing exactly the uh the arguments of the previous thing right so so the best policy that achieves the um uh the maximizer is defined to be the pi star this is the optimal policy we are trying to find out okay so um with this no two notations I think I can so I'm going to first to find out the V stars and during the pi star is you know
+
+120
+01:17:38,000 --> 01:18:45,000
+will be relatively easy to do because um as you will see so so the first question will answer is how do we find out what's the V Star of us what's the intrinsic value of each of the state so it turns out that you can do a similar type of bioma equation or as the V Pi but just the the whole thing involves a lot of Max operators um so here's what I mean so if you think about the V Star s again you try to get a recursion for V stars because V stars is kind of complicated because it depends on all
+
+121
+01:18:12,000 --> 01:19:32,000
+the future States so you want to have a recursion so I'm going to be a little bit the exact mask here you know I think if you want to make a rigorous you have to justify uh more formally but I'm not going to deal with that so I'm going to be slightly sloppy here just for Simplicity so you take an arc Max over Pi RS Plus gamma so so this here I'm using about my equation I just derived right so this is about my equation I just derived so because V part s is equal to this right and so let's think about this
+
+122
+01:19:04,000 --> 01:20:16,000
+right so first of all your maximizing over Pi so this one doesn't depend on Pi even right so you can just take it out so you just say this is R of s Plus [Applause] okay so now you look at this thing so Pi shows you want to maximize this and Pi shows up in several different places right Pi shows up here and Pi shows up here right so so the pie shows up here in a sense that if you use different pie you're gonna arrive you're gonna have a different transition probability so that you can arrive a different set of State
+
+123
+01:20:01,000 --> 01:21:02,000
+as part in with different probabilities right and and this Pi so here is trying to capture what happens after this type right so after you already see X Prime what's the future reward right this V prime minister is basically telling you know if you arrive at this S Prime what's the future possible payoff uh after X Prime so I'm going to um um so so I'm going to be a little sloppy here but let's say suppose we optimize this first V pi as you know first right this occurrence of Pi's
+
+124
+01:20:32,000 --> 01:21:37,000
+right so if you want to choose the pie such that this is the the best and what you should do so what you should do is you should try to uh figure out you know you should try to make the pie of ice give you the best action right so basically what I'm saying is that this is equals to maybe let me write it down then it's easier to expand what I want to prove so basically I'm saying that I'm going to choose the pile of eyes to be the action a that maximize this right so pi over 5 is some action right so I just
+
+125
+01:21:18,000 --> 01:22:30,000
+write a here and let's say I try to choose the best a such that such a pi of X is equal to a and I still want to maximize this however you know I apply affects two things right Pi also affects what happens in the next right so then I need to also try to make sure the pi uh makes the the future steps the biggest so and then the kind of the nice thing about this is that this term is something I already defined which I can it's a recursion right this is just V Star as Prime so basically if you look at the final
+
+126
+01:22:16,000 --> 01:23:30,000
+equation it's kind of like you are trying to say you are trying to try all multiple action AIDS you take at least that way that's why you take Max right so you try all possible A's and use oh I guess sorry my bad guys [Applause] for any possible A's you have a probability arrive at its prime right and then you say that um after rough added S Prime you you after that you use the optimal policy V Star X Prime starting from that and this is the basically this part is the is the reward the best reward you can get if
+
+127
+01:22:55,000 --> 01:23:57,000
+you apply action a like this type right if you're basically if you apply action as this step you know what's the reward you can get you're gonna have some transition probabilities to run X Prime and then after a rough at S Prime you have some Maximum possible reward V Star Express so that's why the sum is the the best possible reward you can get if you apply action a at this time at this step and then you Max over a and that's the that's the best thing you can do I guess it's similar to earlier when you
+
+128
+01:23:25,000 --> 01:24:24,000
+are finding out the entire policy or to find the optimal policy again we have equations we have variables yep okay so that's the next step that's a good question so but maybe just any other questions before we move on to the next step okay so good okay great so together equation and okay let's see what equations right you have for every eyes you have an equation and so you have the same number of variables and the same number of equations right the the variables and I'm equations
+
+129
+01:24:00,000 --> 01:25:19,000
+but the problem is that now the equations are not linear anymore so they are not linear equations so you still have a you have a non-linear equations that involves M variables and you have time of these equations so uh that's the challenge right so there's no any off-the-shelf solver you can use to solve these sets of equations that are non-linear so um that's why we need to um introduce this uh um so-called value iteration so how do we solve this equations to solve the equations by
+
+130
+01:24:49,000 --> 01:26:21,000
+the so-called value iteration so first of all let's just um think of this V Star let's just Define notation V Star to be V Star one up to V Star I this is a vector in RN okay so um I view this function as a vector because I only have n possible inputs I can view this function as a vector of dimension okay so and I'm going to say that so and then my equations can be written as this right so it's kind of like V Star equals to one is equals to something like you know maybe let's just say
+
+131
+01:25:37,000 --> 01:26:59,000
+of this equation is like this right R1 plus some Max something like this right and V Star is 2 is equals to R2 plus Max conduct this way that's my system equations that I I have so many equations each equation is look like this um so and I can abstractly write this as the following so I can I've circled this as this whole Vector let's call it V Star and the right hand side is something that involves Vista rbn right so you call this whole thing B of B Star so so basically this is just a function
+
+132
+01:26:22,000 --> 01:27:35,000
+of v start right so I'm just abstracting abstractly recognize a function of V Star which gives you a vector this is also black so then if I do this then basically my equation can be written as V Star is equals to B of B Star I'm not doing anything deep it's just rewriting the the thing with a very abstract notation right so this is my the form of my equation V Star is equal to B of V Star and bo3 star is just the right hand side of the development equation okay so and so what I'm going to do is that um
+
+133
+01:27:09,000 --> 01:28:02,000
+the algorithm is very simple to find out the equation so so this is kind of taking inspiration from the so-called fixed Point problem in math you know if if you have if you haven't heard of it that don't matter doesn't matter it doesn't matter um don't worry it doesn't matter so but roughly speaking the kind of the thing is that you think of this B as some kind of operation right so you say that this V Star is a fixed point of this operation you apply the this operation on a V Star it you
+
+134
+01:27:35,000 --> 01:28:42,000
+get arrive at the same thing so so that's the connection to the so-called fixed power problem but you know but if you don't know the the connection basically the somehow there's some Theory Mass which says that if you want to solve this config spawn problem you just have to iterate until it converges so what does that mean that really just means that you have the circle value iteration so what you do is you say you um you initialize some V in this Dimension R to the n um maybe you can just do v0
+
+135
+01:28:12,000 --> 01:29:22,000
+that's I think that's fine you just initialize you know some randomly or maybe just interest to zero and then you just have a for Loop so you have a loop such that at every time you say V is updated to be P of V and you just skip iterate and there's a guarantee that it will converge to the to the fixed point the fixed point will satisfy V is equal to V of v and that's the the V Star and this update really just means what this last Matrix really means that you say V as is equals to
+
+136
+01:28:52,000 --> 01:30:05,000
+r as plus basically the right Max right hand side of the the development equation so this is what really means right when you really Implement algorithm you say you compute the right hand side of the value of my equation with the hypothetical V right and then you you you give this value to the new value of field but you you update a new value of V by the right hand side of the bottom equation here I'm using this right it means like I compute this value and then I give this value to the to the vs
+
+137
+01:29:41,000 --> 01:30:38,000
+so I think you you yeah you can guarantee that there is a there is a unique one and you can convert to it uh in a certain amount of time I think that's the homework question yep so to do that you have to I think the homework question has some hints on it right so you basically compare the distance between this V and a 2v and you can see that the distance between this V is working V with the true V Star is kind of shrinking uh iteratively okay I think I'm running quite um yeah so there's one other algorithm which is
+
+138
+01:30:18,000 --> 01:30:58,000
+called policy iteration which is very similar um but I think I'll just leave that to um to you for reading on the lecture notes like it's it's basically kind of like a um it's also kind of not required for homework so so just optional you can read it if you're interested okay thanks
+

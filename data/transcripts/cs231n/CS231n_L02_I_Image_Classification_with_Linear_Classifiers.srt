@@ -1,0 +1,360 @@
+1
+00:00:06,000 --> 00:01:42,000
+We will be talking today about image classification. Basically continuing our our discussion on the topic of image classification from last uh lecture and we'll get a little bit into some uh topics that gets us closer to neural networks and and ultimately convolutional neural networks and so on. We'll start with linear classifiers. Moving to the next slide. This was the the syllabus that we've talked about last uh lecture in the in the previous lecture where we did talk about three major
+
+2
+00:00:55,000 --> 00:02:24,000
+categories of topics. Deep learning basics, perceiving uh and understanding the visual world, reconstructing and interacting with the visual world as the three major topics and and some sub um topics that we will be covering in the in the class and at at the end we will have some discussions around the human- centered AI aspects and today the goal is to cover the first three items datadriven approaches. I will I will try to tell you what this means and linear classification as well as the K nearest neighbor
+
+3
+00:01:41,000 --> 00:03:17,000
+algorithm. So like last the previous lecture let's start with our core task of image classification. Again, it's a core task in computer vision and we actually come back to this task quite often throughout the quarter because it's a very good benchmark and we have some examples to to tell you how the algorithms work. So this is one of the items that we come back to quite often. We we want to define the the image classification task today and then introduce two of the datadriven approaches for image classification. One
+
+4
+00:02:29,000 --> 00:04:07,000
+of them nearest neighbor and one of them the other one near linear linear classifier. There are some other approaches which we have listed in our backup slides and you're welcome to to look at them after the class. But this is what we will be covering. So what is image classification? Given an image and a number of predefined labels, predetermined labels, a set of possible labels such as in this example you see dog, cat, truck, plane, and so on. The job of the system is to assign one of those labels to this uh image.
+
+5
+00:03:19,000 --> 00:04:57,000
+So to us this is actually a very very easy task because our brains our co cognitive system is wired to get a holistic understanding of this image and assign a label to it. But when it comes to coding this and and looking at how a computer can make sense of this image that's a that's completely a different story and we want to see how machines can make sense of such data. So images are often defined by matrices of data more broadly more generally tensors of data and often the numbers are the each of
+
+6
+00:04:07,000 --> 00:05:50,000
+the pixel values are between zero and 255 which is a 8 bit um data structure and since this is an image a colored image assuming that it's with a resolution of 800 by 600. Since it's an R RGB image, it has three channels of red, green, and blue RGB. And therefore, it's a tensor of 800 by 600 by 3 as you can see on the slide. So, um, as you can probably guess, this is the semantic gap between our perception of this image and how the machine perceives and and sees the the image, right? And
+
+7
+00:05:00,000 --> 00:06:30,000
+in order to be able to uh even understand how this this could be very challenging let's look at some some challenges some some variations in this type of imaging u data. So let's assume for example as as one example let's assume that um we move the camera if the camera is moved for example panning the camera around even if the cat sits completely and perfectly still all of those pixel values every single pixel value of 800 by 600 by3 will be changed. So all these pixels will have a new
+
+8
+00:05:44,000 --> 00:07:16,000
+value. Again, for us humans, it's the same object. There's no absolutely no difference. But from a computer's perspective, it's completely a new data point. So this is one of the challenges, but there are quite a few others as well. For example, illumination is another um challenge. So if you've seen or if you've taken courses in graphics or maybe uh other other vision courses and or digital image processing uh courses for engineering applications you know that the value of each RGB uh
+
+9
+00:06:30,000 --> 00:07:56,000
+pixel the RGB values are a function of the surface material color and their light source and and that's Why same cat, same object may look at differently in terms of numbers when it comes to uh being pictured in different illumination conditions. With that uh in mind, so whether the cat is in a dark room or under the sun, still it's the cat. It's it's it's one cat. But um this is creating challenges for for the machine. Can you maybe name some other other challenges that um may
+
+10
+00:07:13,000 --> 00:08:38,000
+change the the values of the pixels and create problems for the machine to to recognize objects other than illumination and viewpoint changes that I mentioned. So background background clutter background objects yes which is actually our next slide. Yes, background uh clutter is another challenge. What? Anything else? Zooming in and out. Yes. So, the scale basically of the object in the in the image. Yes. What else? The resolution of the image that is that could be considered as that's definitely a
+
+11
+00:07:56,000 --> 00:09:10,000
+challenge. But often with um machine learning models or or any model that we want to recognize action um objects in in images since we normalize the size of the image resolution may not be that uh important unless there is zooming effects of the the objects. Occlusion is one of the major problems. Again as humans it's very easy to say this is cat these are cats. Even the last one which is actually a very challenging the one on the on the right. You can only see a tail and a little bit of probably paw in
+
+12
+00:08:32,000 --> 00:10:04,000
+in the right side. One could say yes that could be a tiger or it could be I don't know a raccoon with a tiny tail. But because this is because of the context, because we know this is inside a living room on a couch, most probably it's a cat. It's a cat. So again, for us humans, it's not that hard. Beyond that, there are many other problems. Deformation cats are very deformable. So they create challenges for for algorithms to be uh detected recognized. I mean not today's algorithms generally
+
+13
+00:09:20,000 --> 00:11:08,000
+for building uh step-by-step um algorithms that can detect objects. So deformation is one of the other major challenges and beyond that the intra class variation is one more important challenge. We know that cats uh can come in different sizes, colors, patterns or even they can they have different breeds and all of those are still cats. But um for the for the machines it's it's not that easy to recognize the intraclass variations. One other interesting challenge is the context because if you only look at that
+
+14
+00:10:15,000 --> 00:11:51,000
+that part that that image on the right or if an algorithm looks at this without considering the context it's very easy to classify this as a tiger or some other animal. But because of the context and because we know that there's the effect of shadows and so on, this could probably be classified correctly. So, but the thing is that the classifiers that we have today can do really great job, a good jobs at classifying the images, identifying the objects in images. Thanks to efforts like ImageNet and also all of the
+
+15
+00:11:05,000 --> 00:12:43,000
+follow-up works that created larger scale benchmarks for training larger scale models and um and and in this class what we want to do is to get to uh to a place that we build models that can recognize activ u recognize objects and also other um aspects. within the image. For the rest of this class, we are going to be working towards building step by step the building blocks that are needed for building those large algorithms. And before doing so, uh we have to look at the most basic building block
+
+16
+00:11:53,000 --> 00:13:23,000
+of classifying an image and that is building implementing a function like this. So if you've taken some of the computer science or engineering courses that often build frameworks through algorithms like for example sorting in uh as a as a computer algorithm it's often it often comes with some if then else rules and some for loops and so on. So there's there's a clear flowchart of um tasks and step steps if then else steps that creates an algorithm for sorting. But when it comes to images and
+
+17
+00:12:38,000 --> 00:14:18,000
+understanding the visual world that is um not happening that is a challenge there is no way to hardcode the steps for classifying images. Although there has been some efforts um in this space, there are papers that they've they've uh tried to come up with algorithms and steps to recognize objects. And one of those was based on um edge detectors, finding the edges in um in in the image as a first step. And then after after creating all of these patterns, look at uh the important patterns. for example,
+
+18
+00:13:29,000 --> 00:14:54,000
+corners. Extract some features that are around the corners or count the number of specific types of corners and based on those from those try to map that into the output class. So while this is been an interesting effort and and it had some success on very limited um variability of type of images but this is very hard to first it's very hard to scale these types of algorithms. Even if it works it's very hard to scale because you have to create these rules and everything for every single object that
+
+19
+00:14:11,000 --> 00:15:51,000
+you want to recognize. and second finding the logic for each of those requires a lot of uh effort by itself as well. So because of these challenges, I think um these types of algorithms which are u based on creating logics and procedures for detecting objects or classifying images have not been quite successful and machine learning comes with this datadriven approach. So with this new paradigm of and another paradigm of looking at this problem from a datadriven perspective, we define a a procedure of a three-step
+
+20
+00:14:59,000 --> 00:16:34,000
+process and the first one is to collect data sets of images and their labels. So there are many different ways of if you have if you want to recognize a specific type of object we or or specific types of objects we can look for data sets or single data points over the internet to create a data many samples from each of the examples. We used to be doing this 10 20 years ago uh using search engines and image search engines over the internet to create these types of data sets. Now we have all of the data sets. So
+
+21
+00:15:48,000 --> 00:17:25,000
+and then the second step is using machine learning algorithms to train a classifier. basically build a function train that takes the images in the training data and their associated labels and builds a model that can relate associate images with the labels. And then um the last step would be evaluating the classifier on new images which means implementing a function called predict that takes the model and some test images and for those test images that were were not part of the training images um predicts the labels
+
+22
+00:16:36,000 --> 00:18:10,000
+and returns those as the output. So a very simple procedure but instead of building a logic we are building a datadriven approach for it. As I said we want to talk about two popular methods and and classifiers. One of them is nearest neighbor classifier. This is the easiest form of classification. Um, and we specifically want to go over this because we can learn some of the concepts around building these classifiers and it's easier to explain some um some of the details and then we'll move
+
+23
+00:17:24,000 --> 00:18:40,000
+to the topic of linear classification. Okay. to do that what we do uh to build the nearest neighbor classifier as as I said we need to build the train and predict functions the train function needs to just memorize all of the data and labels so the training function basically doesn't do anything other than keeping everything in the memory and then the prediction function the predict uh function looks for the most similar training image basically It creates a lookup table of all of the images and all of
+
+24
+00:18:01,000 --> 00:19:29,000
+their labels. And during the prediction or testing time, what what it does is tries to find the closest one, the the most similar image and outputs the label for that image. Let's look at an example. So assuming that we have these five as in your in our training data then yes you you see my cursor and then um this is the query image the input image for for prediction. What we want to do is to see which of these training data and training images is the most similar to this one and for that we need a distance
+
+25
+00:18:46,000 --> 00:20:22,000
+function. So this distance function needs to take the two images each pair of images each of these images compared to the query image and return a value which defines the similarity between these two uh inputs these two images. There are many different ways of doing that. One of the most popular ones is L1 distance which is defined as the sum over all absolute values of pixel differences between the two images image I1 and I2. As an example, if this is a testing image, if we want to calculate the distance of this
+
+26
+00:19:34,000 --> 00:21:01,000
+image with uh an image in the training data, we do a pixel wise subtraction and the difference between the pixel values and then sum them up which defines this new this value as as the uh the distance between these two So this is the most basic distance function but it's actually very useful in many applications. We'll be coming back to this uh L1 and and any other variations of distances in the class quite often with this very simple definition. We want to see how we can get it get this
+
+27
+00:20:17,000 --> 00:21:58,000
+implemented. As I said the first step is to just memorize the training data. So the train function just keeps the data in the memory and then what the predict function does using actually some um Python libraries and numpy and so on. We can implement this in just four lines. We calculate the distances between each of the testing samples and the training data. Take the minimum for each of the testing samples and then output the label for it for the for the for the one with mean index. So this is going to be the uh
+
+28
+00:21:10,000 --> 00:22:37,000
+implementation for for the predict function. Yeah, the the pixel values as I explained the most the the the simplest form this is a tensor of 800 by 600 by3 and three channels and these are RGB values for each of the pixel uh locations. So yes the I should actually repeat the questions for online students too and the question was the pixel values what do they represent? Yeah. So the next question is why it's between 0 and 255. Um so the there are many different standards for storing images.
+
+29
+00:21:53,000 --> 00:23:08,000
+The most popular one that we use in in almost all images that you see online and uh and here they are RGB. RGB is a 24bit format sometimes 32 because there's an another channel alpha. We don't want to get into uh into those but the 24bit format it means that for each of the channels for each of the three channels of red green and blue which create all of all color color combinations we can have eight bits. So that's that's the standard that is uh defined. There are some other frameworks
+
+30
+00:22:30,000 --> 00:24:02,000
+too but this is the most popular one. So um with that let me go back to the code and ask you a question. So [Applause] I know some of the students uh most of the students um come with engineering backgrounds and a little bit of computer science as well. But we want to see with say n samples n examples that we have in the training data how fast the training and prediction happens. I'm hoping that you're familiar with the big O notation that we often u represent computational and sometimes space
+
+31
+00:23:22,000 --> 00:24:42,000
+complexities with. But here if you look at the the algorithms I'll I'll go with the training data in the in the training function uh and then I want you to help me with the the dancer for prediction for the training step the the training is of 01 because we are not actually doing anything we are not even moving any data we're just keeping the copy of the data in the memory so no operations it means that without operations with and operations of order one we can complete the training step. What about
+
+32
+00:24:01,000 --> 00:25:31,000
+the prediction step? For each of the single examples of the um the training the testing data, how many operations should we should we take? And uh yes, if we have n training data, it means that we have to calculate the distance of every single uh testing image with all of the images in the training data. So at least in the order of n operations. So this is um this is this is not really good because what we often want to do is because training is not doing anything but during testing during prediction
+
+33
+00:24:49,000 --> 00:26:03,000
+time we are spending so much time uh just to do comparisons with between the data and the each single data point and the training examples. This would be similar to the fact that each single time that you ask that GPT a question, it will try to see what the answer is and compare it with all of the possible answers over the internet, which will take years and then return your your your response, right? So it it wouldn't work when it wants to it wants to scale for very simple problems. We used to be using
+
+34
+00:25:25,000 --> 00:26:48,000
+these types of approaches. So what we often want is to build classifiers uh that are fast during prediction. They they do it much faster but it's okay if they take a lot of time to do uh during the training because that could be done offline. So with that um in mind although there has been a lot of efforts making uh nearest neighbor more much faster using GPUs and so on which are beyond the the scope of this class. If you're interested you can take a look at those. But with that I want to look at some of
+
+35
+00:26:07,000 --> 00:27:41,000
+the visualizations and and how this this algorithm in general works. So given this space that we have five classes of red, blue, green, purple and red sorry yellow. Um and each dot represents one one training sample in that class. If you partition the space for every single point, you see that we can we can create these five partitions. um let's say five or in this case six different partitions that each point um if if you have a testing sample that is in that specific region the color of that region shows what the
+
+36
+00:26:54,000 --> 00:28:17,000
+nearest neighbor for that sample will be. So this this is going to be the nearest neighbor algorithm. One nearest neighbor algorithm partition the space in this um setting. But do you see a problem here in this uh example? So the yellow one is is exactly is in the middle of all of the greens. And this means that probably that's an outlier. That's probably a noise. And this is the case for many many problems that we have to solve. And with that um the reason that u there are there is this this big yellow region in the
+
+37
+00:27:35,000 --> 00:29:04,000
+middle is just this single point and because you're only using one nearest neighbor this happens. So to make it a little bit more robust we can increase the number of nearest neighbors that we take which turns the nearest neighbor algorithm into a k nearest neighbor. And we often select more than one point or or sample. And we often take the majority voting for for identifying the label for any given testing sample testing image. But the problem that uh you can see here is now we have some white regions. Those
+
+38
+00:28:20,000 --> 00:29:36,000
+white regions are areas that we cannot make a decision a complete decision because those areas are areas that we have equal number of samples from the neighbors um from the three different classes and there's no way to identify what the label of that per that example in the in the white region is. And for for you if you create these these types of spaces for your problems this means that if if you look at these type spaces it means that those are good regions to go and collect more data for. So those
+
+39
+00:28:58,000 --> 00:30:33,000
+are unclear spaces. So it's a good way of finding regions that are important for data uh more data collection. Okay. So we can go larger on the value of the K. But one of the choices that we have, one of the um factors that that plays an important role is the value of K. But if you remember, we had another decision to make which was the distance function. We talked about the L1 distance. Again, sum of all of the absolute values between pair-wise differences of um the pixels. And if I visualize the L1 distance or
+
+40
+00:29:47,000 --> 00:31:22,000
+sometimes in some context we call it Manhattan distance, the the distance function is is kind of visualized in this way. If I calculate if I if I look at this square that I have in the in this space all of the points on that square are they have a same distance from the origin from the center point. So this is a good way of visualizing and seeing how uh this L1 distance function works. Another popular framework, another popular distance function that we use is L2 which instead of the absolute value calculates the square of
+
+41
+00:30:34,000 --> 00:31:50,000
+the differences sums it up but because of the square we also do a square root and visualizing that we'll get the circle um visualization where each of the points on the circle are they have the same distance from the from the center from the origin. So this visualization actually helps us understand the differences between these distances too and these are the the most basic and easiest distance functions that we can use. So there are again a lot more the um the reason this visualization is
+
+42
+00:31:12,000 --> 00:32:26,000
+helpful is because sometimes if you rotate the so x and y in these two visualizations are basically the features. If we have two pixel values, two two features then they have this 2D space and this X and Y are often those features. So if I rotate these features meaning if I use other types of features this L1 will have a different different framework different value while it's not any different for L2. So that's why this is a big difference between L1 and L2. And sometimes if our features are are
+
+43
+00:31:49,000 --> 00:33:22,000
+very specific and meaningful and we want to preserve their information, often L1 is is is more important is is better because it has um kind of as you can see um a shape that preserves and and enforces distances based on the features. But if uh there is features are more arbitrary then L2 distance makes more sense. If I um want to calculate the distance so the distance of all of the points on this shape from the origin are exactly the same right if I use the L1 distance. But for L2 distance, the points on this circle have the same
+
+44
+00:32:35,000 --> 00:34:02,000
+distance from uh the center uh or the origin of this uh this space. So um that's basically the the main what what these two images are showing. Any point on this shape when using an L1 distance have the same distance from the origin and for the circle any point on the circle if you're using L2 distance will have the same distance from the origin. Yeah. Why it's important to is better to use L1 if we want to preserve the features. So to answer that question, if I rotate the feature um axis the the
+
+45
+00:33:24,000 --> 00:34:47,000
+distances and this distance function changes completely, right? While if I do the same here, nothing changes. It's it's the exact same value of the uh features, right? Uh distance, sorry. So in this case L1 is very sensitive on the feature values while L2 is not. If you select another feature in the same space that is having a different creates a different shape then your L function the distance function changes as well. So if I draw the lines here again the question for online students is why it changes if we
+
+46
+00:34:05,000 --> 00:35:38,000
+rotate. If I select another feature that goes from this side, right, then the lines will look different, right? So if you rotate the this thing, but it's for that shape, it's not it's agnostic, right? So with these two distance functions that we talked about, if I revisualize the um space you can see with K equals to one with one nearest neighbor with L1 and L2 these are the space partitionings. One of the interesting things that you can see here is that with L1 uh function most of the part most of the
+
+47
+00:34:52,000 --> 00:36:14,000
+boundaries are parallel to the the the two axis the two features X uh one and X2 very much sensitive to the features while there we have a little bit of more smooth uh boundary separation. So there is a tool online on the lab website that you can uh play around with with this with different distance functions and different number of K. You can you can see you can create a different setup. So you can play around with it. But why did we talk about nearest neighbor to begin with first? Yes, it's it's the easiest um problem to
+
+48
+00:35:32,000 --> 00:37:08,000
+solve, easiest solution, easiest datadriven approach and um great to start with. But one of the main reasons that we >> we want to iterate and and discuss nearest neighbor is the fact that we can look into the the the topic of hyperparameters. Hyperparameters are often some of the variables that you have to make a decision on to be able to run your algorithm. In this case, the value k the number of nearest neighbors is defined is is a hyperparameter. Depending on how many number of uh nearest neighbors you take, your outputs
+
+49
+00:36:21,000 --> 00:37:47,000
+will be different. And then another choice that you have here is the distance function. So the choice of hyperparameters are often very much data set dependent and sometimes problem dependent and we have to have a way to identify those to kind of optimize for them for each single problem. And that's what does what is often referred to as hyperparameter tuning in machine learning algorithms in in deep learning algorithms and so on. And how to do that? How to set the hyperparameters? There are different
+
+50
+00:37:04,000 --> 00:38:25,000
+approaches. One of them is to choose the hyperparameters that that work the best for the training data. So you have a set of images or data in in your training data. You look for the best set of hyper hyperparameters that generates the best training uh or minimum training loss. While it works for the training data, it's not a good idea at all because especially with near nearest neighbor, K equal to one is always the best the best value, right? Because you're you're memorizing training data. So K equal to one will
+
+51
+00:37:44,000 --> 00:39:04,000
+give give you always the 100% accuracy. So we know that this is this is not a great idea. The second one is choosing hyperparameter that works best for for a held out testing set. While this is a little bit better than the first one, there is also a big problem here. Can can anybody say why this is a problem exactly? And so it's it's it's kind of cheating because you are trying to find the best hyperparameter that works on the testing data and you don't know how the model will work on any other data
+
+52
+00:38:24,000 --> 00:39:49,000
+points not not in the testing set. So yes that is that is exactly right. It's not a good idea because we don't know how the model will generalize and for sure never do it do this as as as we talked about it's kind of cheating and a better idea is to always separate take some part of the training data as validation set and train your model on the training data on the train portion of the the new portion that we call train and then Try to find or optimize your hyper hyperparameter on the validation set and
+
+53
+00:39:07,000 --> 00:40:24,000
+after you've found the best set of hyperparameters then use those hyperparameters to replicate the results for the testing set and do the predictions for the testing set. So this is a much better approach although it does have some uh challenges itself because um sometimes the the validation set that you've selected it may not be a good representative of the entire landscape because you your validation set is almost always much smaller and and that's why one of the a better approach
+
+54
+00:39:45,000 --> 00:41:12,000
+is to use um cross validation for setting hyperparameters. Basically you split your training data into a number of folds, a number of uh partitions here in this case five and each of the folds plays as the validation set once and iteratively you you run this five times for five-fold class validation. You do this five times and average the accuracies. So you set a a value of the hyperparameter. You run this for all these five uh sets. Define the accuracy. Calculate the accuracy on the validation set. Average
+
+55
+00:40:29,000 --> 00:41:45,000
+it. And then you do this multiple times to find the best setting for the hyperparameter. After you found the hyperparameter setting, you apply to the testing set. This is a little bit more reliable and and generates much better results. Although in larger scale deep learning it is less practiced because repeating this multiple times and five times with huge data sets is is very hard. So we often use intuitions for setting hyperparameters and the single validation set is some sometimes the the approach we go with. But this is pretty
+
+56
+00:41:07,000 --> 00:42:36,000
+much uh advised again outside computer vision outside larger scale data sets. Often research papers require doing these types of cross validation and um and and these types of uh statistical frameworks to make sure your results are uh reproducible on a testing set. Anyways, so there are different approaches. Let's um finalize the topic, wrap up the topic of um nearest neighbor and um look at the some examples, some results. So, let me introduce you to the CR10 data set. It's one of the data sets that
+
+57
+00:41:52,000 --> 00:43:19,000
+you're going to be using in your assignments um quite often. It has 10 classes with a number of training um images and testing images. The 10 classes, some of the examples are shown here with nearest neighbor. For each of the testing images, if we run nearest neighbor and select the top 10 nearest neighbors, they are all um visualized there. As you can imagine and guess, one of the first questions to answer is how many what should be the value for K? How many nearest neighbors should we take? And
+
+58
+00:42:36,000 --> 00:44:16,000
+one study, one of the quick experiments with five-fold each of those points is uh is one of the folds in fivefold for each of the values of K shows different values here. And as you can probably see here, K equal to 7 generates the best results in terms of accuracy, which is close to 29 28% accuracy, which is actually not too bad because this is a 10 classification problem. And with a 10 classification problem, often the random guess gets you a 10% accuracy. So this is much better than random guess. So it's working. It's
+
+59
+00:43:26,000 --> 00:44:49,000
+doing something but there's a lot of room to improve. So if we go back and look at the examples, we can actually see there are so many mistakes, especially with the with the one that is closest. For example, the fourth row, if you look at that, it's a it's a frog, but the first example seems to be a cat. Sorry, a dog. And um you can guess why this is happening because the distance is being applied on pixels and pixel wise they look like each other. They have the same type of colors in most pixels. So they are much closer.
+
+60
+00:44:08,000 --> 00:45:32,000
+This this example and many other examples show that distances that work on pixels and pixel values are not the best choices. we never we never practice them. There are much better approaches that we'll discussing um at the end of more um in the in the future lectures. And just to wrap up the topic, this is another example. If you look at this original image, those three images while they look very much different in terms of color or maybe uh occlusion or the one in the uh the the third one from uh from the left side is
+
+61
+00:44:50,000 --> 00:45:56,000
+just same pixel. It's the same image with one pixel shifting to the right. I think although from a human eyes perspective there's no absolutely no difference but the this the distance between that and the original image is the same as the other two examples that you see here. I'll um stop for a couple of questions and this is the summary of what we've discussed. So the question is what how we make a decision right that's in those cases you often go with random uh randomly selected one of the tops. So
+
+62
+00:45:22,000 --> 00:46:49,000
+if you are to collect more data, if you're uh for example, you're solving a problem now in genetics or you're solving a problem in medical imaging, when you visualize your um examples, your features or whatever. And then in this nearest neighbor space, you do see pockets of space that you don't have any any good samples for or there is ambiguity, then you often try to go and find other samples that lie in that same area in that space. Okay. Um so summarizing what we've uh talked about with K nearest
+
+63
+00:46:05,000 --> 00:47:52,000
+neighbor it was mostly about um understanding the easiest algorithm datadriven approach and then um talking a little bit about hyperparameter tuning and and how distance metrics and the value of K play a very important role. Moving on to the next topic which is linear classifiers. 20 five minutes uh time to cover this. I want to spend the remaining time of this lecture to to talk about this very important topic. This is the most important building block for almost all of deep learning. and um and we need to um see
+
+64
+00:47:01,000 --> 00:48:26,000
+how this this approach is different. So first we want to see how it's different from nearest neighbor. So this is a parametric approach meaning that now we are learning we are we are finding some parameters W or some weights that map the input image into the output classes the output numbers. In this case, when we create this function f that that maps input to the output, often those outputs are kind of membership scores of the image to each of those 10 uh output classes labels. So with this
+
+65
+00:47:44,000 --> 00:49:34,000
+setup that we we build, a linear classifier first maps uh uses uses w uses these parameters to map each of the inputs x into a value which is the output y. And how this is done is very simple. This image is basically an area of say 32x 32x3. So 372 numbers and this defines our X which is 372 by one vector and we know that we have 10 output classes. So we need 10 different scores and the scores are the the output will be kind of a vector of 10 by one and this means that we have to identify to find a
+
+66
+00:48:38,000 --> 00:50:13,000
+weight matrix W that is a 10 by 372 that maps X into the output scores. just to complete this linear function. We often use this bias um term as well. It's an input independent um value which actually has a lot of different use cases. I I can talk about it uh when I do some geometric visualizations, but it it sometimes creates a shift for different um class class scores and um helps with much better separation of each each class. So as I said, these linear functions are actually building blocks for building
+
+67
+00:49:27,000 --> 00:50:53,000
+neural networks. Each of these linear classifiers, linear uh functions when put together one after the other create these uh large neural networks. Although there are a lot other a lot of other things that that need to be added here but um this is one of the most important components. If we look at some of the popular neural networks, we can see that linear functions are everywhere in the in the architectures. So to better understand what this mapping and this function is doing, let's let's go back to our example of
+
+68
+00:50:11,000 --> 00:51:48,000
+CR10 and our uh training and testing samples and so on and even make it a little bit simpler. Instead of looking at large images of 32x 32, let's look at images of 2x two um an input image that has four pixels. This means that the input image is turned into a vector. As you can see here, we have to find a W and the values of B. So the input image is mapped into some scores as the output. So this is this is how the linear function from an algebraic viewpoint looks like. The output scores here we are
+
+69
+00:51:00,000 --> 00:52:41,000
+considering three classes of cat, dog and and chip. And um as you can see this function maps the image the vector representing the image into those scores. So algebraic viewpoint of linear classification. Now let's look at some visual uh perspectives of this linear classifier. As you can see, we often create these like each of these images as um we talked about for each this image for each of the classes we define some sort of we have a we have a row of this m row in the matrix W right. So this this row is kind
+
+70
+00:51:50,000 --> 00:53:15,000
+of a template for that specific class. If I separate it like this. So this image is multiplied by W and B and W is this is the template from each of the three classes of cat, dog and ship. And after training or building the model on the C4 data set, if I look at the visual uh perspective visual uh a a visual point viewpoint of the linear classifier, if I look at those templates that are learned for each of the 10 classes, you can see these these templates. So it's very interesting that in some of these cases for example for
+
+71
+00:52:32,000 --> 00:54:06,000
+the for the example for car you do see a front uh the front of a car templateish and um although this is all done with just one linear classifier. So the visual aspect visual uh viewpoint of the linear classifier and there is another aspect of um geometric viewpoint. What this linear classifier often does is finding those lines if it's in 2D space finding those lines that separates each each class from the others. And as you can see here, red, blue and and green are defined in different classes. And um in higher dimensional
+
+72
+00:53:20,000 --> 00:54:40,000
+space, instead of those lines, it's it's it's these hyperplanes as you can see in this example on the on the left. So you can also see the the use of the the bias term here because if if we didn't have the bias all of these lines should have passed through the origin from the center of that space which doesn't really make sense but with the with the bias we can actually create more reliable functions uh and and uh decision boundaries. So a linear function is very useful. A linear classifier is very useful for
+
+73
+00:53:59,000 --> 00:55:21,000
+many applications as uh we talked about and it's a building block of more complex neural networks but it does have its own challenges because it doesn't it can't classify many instances of separate uh data. For example, in in this case, if class one is the first and third quadrant and the second class is second and the fourth, there's no way to linearly separate these. Another example is um if if we have this type of separation between class one and class two that uh shows the distance from the origin being
+
+74
+00:54:41,000 --> 00:55:59,000
+between one and two as class one and then everything else is class two. Similarly, if there is there are three modes, three areas in the space that are one class and then the second class is everything else. So, in in all of these cases, it's actually very hard to to do the separation. So what we um should do so we talked about the linear classifiers and and how they uh they can actually map the input images into any form of labels in the outputs. But now what remains is how to choose the value W that for each of these images
+
+75
+00:55:22,000 --> 00:56:51,000
+maps the image into a score for each single class as the output. And in order to do that, we need to define a loss function, sometimes referred to as objective function that quantifies how bad the classifier, how bad the model is is working. So the level of unhappiness with uh respect to the score on the training data. After defining those, we need to find a way to efficiently change the values of W to be able to op uh to to to minimize that unhappiness basically minimize the loss function. And this is the this is
+
+76
+00:56:06,000 --> 00:57:47,000
+the optimization process. So the topic of next class, next next lecture. And in order to do that again for simplicity let's let's look at a easier and easier example having these three classes a linear function as you can see here and the three classes of cat car and frog. We need a loss function that tells how good our current classifier is. And in order to do that we need to parameterize the problem X I and Y I defining the input image label images and the corresponding labels. And then we need a loss function
+
+77
+00:56:56,000 --> 00:58:25,000
+in distance function that maps uh looks at the the differences and how bad the scores are compared to the ones that are predicted. this the predicted scores fx and w and the ground truth values the values that are already given y i's we often uh normalize them based on the number of samples as well but uh it's not that important so this defines the loss function the objective function so how we can do the um optimization and and how can we uh really find the the W's. There are different ways of defining this L
+
+78
+00:57:44,000 --> 00:59:25,000
+li LI and I want to talk about softmax classifier. Uh right now as an example for that cat if you remember the scores that were given were um 3.2 5.1 and a minus 1.7. These are um the the scores that are the output of the function. We decid we discussed fxi and w. And in order to turn these scores because these scores are unbounded and the values are often not very much uh controllable because this is just a linear function, right? In order to turn these into some scoring functions, the best the possible best possible way
+
+79
+00:58:36,000 --> 01:00:00,000
+is to turn these into probabilities which defines the probability of the class being this class K for each inputs image XI. Right? And in order to do that, we first this is the the function that we we use the soft max function. We first exponentiate the values of the scores to create these numbers. When we use exp on these numbers, the the numbers will always be the outputs will always be positive, right? And we need to make sure that the probabilities are always positive. And after creating these
+
+80
+00:59:18,000 --> 01:00:58,000
+numbers, what we can do is just normalize them. So exponentiate and then normalize based on sum of all of the samples. Right? So then we normalize them based on sum of all samples and this creates very um very good set of values that define a probability function. So this is a distribution function. they sum to one. And if I want to interpret this, it's very simple to say it's this this set of W's parameters thinks that this image is a cat with a probability of 13%. Or 13, right? And um
+
+81
+01:00:08,000 --> 01:01:34,000
+obviously this is this is making making a mistake in this example because the W is not a good setting. We should um optimize it and change it. So these probabilities are the counterparts of these unnormalized uh log probabilities which are often referred to as logits. So if you've uh taken other machine learning courses or if you I'm sure in other fields you've used uh logistic regression. This is a similar type of framework. This is the exact same framework as logistic regression and since we have multiple classes here
+
+82
+01:00:49,000 --> 01:02:25,000
+it's a multinnomial logistic regression. How do we define the function L? I told you that there are different ways of defining the function L. We want to define a loss function that what's the objective here? We want to maximize the probability of the sample belonging to the correct class. Right? So we want to maximize the value of3. Now we have other larger values in in that um set. So if you want to maximize this this is a maximization problem right in order to turn it because all of the objectives
+
+83
+01:01:38,000 --> 01:03:02,000
+that we define we try to build the minimization objective function. The first step is just to uh to negate the values right we negate it. So the maximization problem turns into a minimization problem. And then we also take the log of the value just to uh make the numbers a little bit more manageable. So negative log of that value will define the objective function the the loss function for solving this problem. Very simple. That's that's the objective or the loss function for um softmax and um for for this logistic
+
+84
+01:02:20,000 --> 01:03:49,000
+regression function and if you've taken as I said other other classes like CS2 229 um it's often referred to as maximum likelihood estimation as well it's the same algorithm so with that in mind I want to say that So as as as we discussed it's the negative of the log of that probability of the correct class which defines the objective function the loss function and that's basically that simple but there are other types of interpreting this this framework as well. So one way of um
+
+85
+01:03:07,000 --> 01:04:39,000
+redefining this loss function is saying that we have some estimated probabilities and we also have a probability function that that defines the correct probabilities. What we want to do is to match these two probability functions. Right? And in order to to do that we want to minimize the KL divergence call back laborer divergence. This is a information theoretic u perspective of looking at this uh loss function. And again those are exactly the same. this um KL divergence in this setting simplifies into the same negative log
+
+86
+01:03:53,000 --> 01:05:17,000
+function that we defined. And even going further, this is um exactly the cross entropy function because if if we define this um use this entropy of P which is um uh entropy of the correct values, correct probabilities plus the same KL divergence. Again, this simplifies into the same negative log function. And that's because when we use one hot encoding setting for the classes the entropy is zero. So that's one of the reasons that we call this function cross entropy or binary cross entropy
+
+87
+01:04:36,000 --> 01:05:49,000
+function in in all of deep learning you've probably if you've used any of the neural network frameworks you've heard about BCE binary cross entropy or you will be hearing about it a lot. So this is the same uh framework. We start very simple but we got to the to the uh similarities and differences between each of those. So the objective the sorry the loss function was defined as negative log of this probability and the probability was was defined by the softmax which we talked about and and
+
+88
+01:05:12,000 --> 01:06:38,000
+then optimizing for this which is the topic of next session will give us the right W's. But before I end I want to ask a couple of questions with this definition that you see here. What is the mean and maximum value that you can see for the loss function li? Yes, it's zero which we which turns into minus minus infinity but we have a a negative negation there. So it would be infinity that is correct. But then we also have to uh yes that that's that's definitely um that's right. And um let me actually
+
+89
+01:05:55,000 --> 01:07:40,000
+look at a second question. Yes, this one. So when we initialize all of the SI, so basically the W's in the beginning, it's almost random. So the probabilities of each of the classes becomes mostly um equal. What is the softmax LI? assuming we have C classes and especially if it's C 10. So because the probabilities are equal it means that all of the probabilities are around 1 / C right and then that will uh be defined as log of C and we have 10 if we have 10 classes then the log or ln of 10 is 2.3 which is the um x
+
+90
+01:06:55,000 --> 01:06:58,000
+we know we know about
+

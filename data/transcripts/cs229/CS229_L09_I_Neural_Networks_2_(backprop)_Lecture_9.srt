@@ -1,0 +1,488 @@
+1
+00:00:05,000 --> 00:01:01,000
+so I guess the last time um Masha talked about um on deep learning uh the introduced deep learning new networks and today we are going to talk about back propagation which is probably the most important thing in deep learning like how do you complete a gradient and implement this algorithm of course there are many other kind of like decisions you have to make um in deep learning and also they are um like a like this kind of like back propagation this Computing the gradient becomes kind of standardized these days
+
+2
+00:00:34,000 --> 00:01:35,000
+like you that don't necessarily have to implement your own like a greeting computation process where you can just order the gradient is done by the so-called Auto differentiation algorithm but this is actually the only algorithmic part in deep learning so that's why we still teach it and also in some sense it's still important because um this idea of computing gradient automatically you know actually has many implications in other areas for example suppose you want to study the so-called
+
+3
+00:01:05,000 --> 00:02:05,000
+Knight learning I'm not sure why you heard of this word like which is basically built upon this idea that you can do auto differentiation for almost any computation you want and and this kind of same ideas also shows up in other cases and also I know that um some of the previous courses right also covered uh the back propagation I think cs221 does cover back propagation in some sense so what I'm going to do is that um so in in the past and you know like in the last four years when I teach this
+
+4
+00:01:34,000 --> 00:02:28,000
+you know I have a lot of derivations you know with all of these indices and you compute the gradient of you do the change in very detailed way and this year I'm going to try a slightly different approach where I'm going to make this a little bit of more packaged in some sense like kind of divide into kind of like a sub modules um in some sense it's a little more abstract in some other senses you know it's it's cleaner because you don't have to deal with all the small indices like
+
+5
+00:02:01,000 --> 00:02:53,000
+like all the like sometimes there are five minutes is like you have to keep track and now everything is kind of in Vector form so and and this is not like entirely new it's not like I'm just doing experiment because in the last time I did both of the two versions right I have the the very fine grain kind of like derivations I also have the vectorized form um and I think I got some feedback from you that the the fun good derivation is not that useful because either you know you you feel like it's
+
+6
+00:02:27,000 --> 00:03:18,000
+kind of messy and I'm doing all of these computations like on the board and you kind of know how to do it it's very messy or if you haven't seen it before it's kind of hard to follow right so so if you haven't seen all of them like if you haven't seen kind of bad propagation at all like even for a very very simple case um and you want to do the the very kind of like a low level stuff I'll probably take a look at lecture notes afterwards you know like a look it's kind of like
+
+7
+00:02:52,000 --> 00:03:41,000
+independent what that teach here doesn't depend on anything there doesn't require any background but but it's it's more on the a little more abstract level to some extent like I would say it's more like on the vectorized level so everything is true as vectors so if you want to do the more low level details you know you can take a look at the lecture notes which which I think that those part is a lot easier and and mostly covered by some of the other courses as well so that's why
+
+8
+00:03:17,000 --> 00:04:10,000
+I'm making this decision you know don't don't worry if you don't see anything like if this my comments doesn't make sense here just you know if you haven't seen any bad propagation so this is this this I'm I hope at least uh this is still like a very like the materials I'm going to cover today still is completely fine if you don't have you haven't seen anything about um bad propagation um okay so um okay so let's get into the uh more details so I guess um so basically the
+
+9
+00:03:44,000 --> 00:05:02,000
+so-called back propagation this is just a a word that describes um like it's a terminology in some sense back problem that um is a kind of a technique for us to compute a gradient of of the loss function for Network so recall that last time I think we talked about this you know um um like you have a loss function for example you have a loss function J of theta which is maybe let's just look at one example J subscript this is the Lost function of JS example and um and this is something like y j minus H
+
+10
+00:04:25,000 --> 00:05:36,000
+Theta x j square right so this loss function can be other loss function here I'm just only using the square loss for Simplicity and this is a new network and recall that you know we talk about ICD stochastic winning descent in when you do deal with new artworks you always have to compute this gradient so the the algorithm is something like this right minus Alpha times J um the gradient of the loss function on some particular example J K maybe a random example um at the parliament Theta so basically
+
+11
+00:05:03,000 --> 00:06:07,000
+today what we're going to do is that so basically today how to compute this a gradient so this is the the main thing today and once you know how to compute these gradient you can implement this algorithm and there's a generic way to compute a gradient so what I'm going to do is I'm going to start with a with a very generic theorem and the theorem I'm not going to prove it you know it's you don't have to know how to prove it but but I think it's kind of good to know the existence of this here
+
+12
+00:05:38,000 --> 00:06:30,000
+so the theorem is saying that I'm going to write down a statement but a theorem is basically saying that if this loss function J by the way I'm going to focus only one particular example today right because if you know how to compute the gradient for one example then you know how to configure green for all the examples they're all the same so so the point is so and the theorem I'm going to write down today is that if you know how to compute the loss itself like in your efficient way then in
+
+13
+00:06:04,000 --> 00:07:10,000
+almost all situations you know how to compute the gradient of the loss and in a almost same amount of time it's kind of like a very in some sense you know if you heard of it the first time it's kind of striking um so let me let me write down the theorem so I need to First specify some of the Minor Details which don't matter that much um so anyway this theorem is going to be stated somewhat informally so so let me Define this so-called notion of um differentiable um circuits or these differentiable Networks
+
+14
+00:06:45,000 --> 00:08:05,000
+so and um and let's say this a differential circuits or differentiable networks are compositions of sequence of let's say um arithmetic and arithmetic spelling it correctly sorry operations and Elementary functions by the way my definition here is kind of like a little bit hungry as you can see but the point is you know you will see the point the point is not exactly about the the details it's more about the the form of the theorem so by arithmetic operations Elementary functions I kind
+
+15
+00:07:36,000 --> 00:08:44,000
+of mean that for example things like you know um maybe addition you know subtraction you know product you know Division and and some of the elementary functions you can handle you know actually most of the elementary functions you can handle so maybe cosine sine so and so forth right exponential log logarithmic maybe relu maybe sigmoid you know there are many many of these functions right so and suppose you have this is my definition of differential circuits or differential networks or differential networks and you can see a
+
+16
+00:08:13,000 --> 00:09:05,000
+new network is often one of this right because it will have a new network we have a lot of Matrix specifications and it's really just no matter how many Matrix modification you have it's really just some complex conversations of all of this you know like operations right so it's in some sense everything you compute you know are some combinations of these things right no matter is whether a new network or something else okay but but I'm going to insist that they are differentiable because you know
+
+17
+00:08:39,000 --> 00:10:02,000
+I'm going to have have to I'm going to differentiate on the output of this network so here is my theorem um so [Music] maybe I should be I think the blue color is a little better right is that right okay so um so and this is informally stated no it's not very far from the formal version like it's just a formal version requires some um some minor details about the differentiability so and so forth so like the claim is that suppose you have a differential circuit [Music] of say size
+
+18
+00:09:31,000 --> 00:10:52,000
+and and means how many kind of like basic operations you are using so this is my size the size means the number of basic operations and suppose this circuit computes computers a real valued function so I'm going to stress this this is a real value function of that Maps let's say l dimension to one dimension um I'm going to stress that this theorem only works when you have one one output so like the function currently have one output but it can have multiple inputs so then suppose you have such a circuit then
+
+19
+00:10:22,000 --> 00:11:54,000
+the gradient of this function that you are computing the gradient so what is the gradient the gradient at an important is a vector because you have IO odd inputs where the gradient is L dimensional right so so the gradient is an L dimensional vector the gradient at this particular Point let's say x x is just the abstract point and this can be computed in time time off and um I think I guess technically this is O of M plus d but I guess um um I'm not sure why I'm on my nose this is typo I think
+
+20
+00:11:27,000 --> 00:12:48,000
+oh I see so okay I guess time off and by our circuit of size often and here I have a implicit assumption because you know implicitly assuming like is bigger than D because if n is not less is less than D it's a little bit sorry a is bigger than l because you know if you have a circuit the circuit if it you know most of the circuits should read like all the inputs right so so you probably need at least an hour time to read all the inputs so that's why I'm assuming n is bigger than L if n is not
+
+21
+00:12:11,000 --> 00:13:11,000
+bigger than L then this has to be slightly change changed but the the message doesn't change so okay anyway what's the main message the main message is that if you can compute a function f by a circle of size n then its gradient can also be computed in a similar amount of time and and you just pay a constant Factor more and I think this constant is literally in most cases this constant is just one uh of course when you really talk about the absolute constant it has to depend on how some of the small
+
+22
+00:12:41,000 --> 00:13:48,000
+details like how to really implement this you know in the computer so so that's why I'm hiding a constant but in some sense you can feel you can view these Concepts even one um so um okay I guess okay sorry um I think whether the concept smart I think also depends on how do you count right so whether you assume you know you are the computer function f so maybe okay so so basically the constant would be two if you have to compute F and The Greener five right so so basically there's a so if
+
+23
+00:13:15,000 --> 00:14:06,000
+you know the function f already then this constant would be one if you don't know the function f then you have to first evaluate F and then do the gradient and then this constant will be two I'll I'll discuss this a little bit uh later as well but anyway for the moment you can just think of this you know you almost have the same amount of time you can only use the same amount amount of time to complete the gradient so gradient is never much difficult more difficult than Computing the loss itself
+
+24
+00:13:40,000 --> 00:14:51,000
+so and and this is very general because it doesn't have to be a new network right it could be any almost anything like this [Applause] so and if you want to you know instantiate the serum you know for um for new artworks of the lots of networks then F you know in this theorem what correspond to the loss function on a particular example J J's example and and Theta is the the variable acts here right so and the gradient of f corresponds to the gradient of the loss here right so and and what is the what is L
+
+25
+00:14:19,000 --> 00:15:30,000
+right so L is the number of inputs to this function f so here what is the input what's this variable in a car about the variable care about is the parameter Theta so L is going to be equals to corresponds to the number of parameters and an n so what is the the time to compute um this loss function the time to complete a loss function is kind of like the same as the number of parameters so if you think about you know you have a new network of you know a million parameters and how much time you have to use to compute the final
+
+26
+00:14:58,000 --> 00:16:14,000
+loss function where you basically have to give your input to your network and go through the entire network and do all of these operations and basically eventually the amount of time you have to spend is also similar to the number of parameters for evaluating the loss but only is the time to evaluate the loss so that means that the time for the gradient so Computing gradient also takes according to the theorem this also takes off on time so basically you only have to take all of number of parameters time to configure it
+
+27
+00:15:39,000 --> 00:16:37,000
+any questions so far like how is the dimension of the input already so um they sound pretty different possibly so here my does that depends on how you map the apply the theorem to to this setting so here I'm going to view this as a function of the parameters so the parameter is my input to this function I'm going to differentiate with back to the inputs right so so the the theorem generation is a generic theorem right so like there's some function and you are differentiate with respect the
+
+28
+00:16:13,000 --> 00:17:13,000
+input of the function right it depends on how you use this theorem so if you use this theorem you say the Theta corresponds to the X there right so then what is L I always dimension of the the X right there so so L is dimension of the Theta here any other questions okay so I guess the the plan for the next rest of the lecture is that we're going to show you how this works for Newark works I'm not going to show you for the how this works for our general circuits um it's actually not much more different
+
+29
+00:16:48,000 --> 00:17:44,000
+different if you do it for the general circuits but it's just like the whole thing is um you need to have a lot of dragon to really do prove this like with the general circuits because you have to consider how that all the generalities right so so basically I'm going to show the concrete example formula it works how do you complete a gradient um and and when you see the the concrete examples for the right works you cannot see how you do it for the for the for those for General circuits um which I'll probably discuss you know
+
+30
+00:17:15,000 --> 00:18:34,000
+if I have time at the end and um another thing like before I talk about the theorem here um I guess I like to say that this is also this theorem is also the basics for many of the so-called second order method so so basis and also for example for meta learning I guess we haven't introduced meta learning but I think the point that the product is kind of relevant is that um um so like I'm actually I'm not going to talk about what my learning is in this course just because it requires um it requires um uh more kind of like
+
+31
+00:18:03,000 --> 00:19:05,000
+um backgrounds but but the general idea is that you can use this um serum twice so that you can do something about a second order derivative but there is a there is a um there's a specific setting you can do so basically I think let me just give you a sense on what I mean here this is not kind of like a compared comprehensive because sometimes you're going to use these theorem in different ways but this is one way to use this serum in a clever way to get something more than what it offers so
+
+32
+00:18:34,000 --> 00:20:15,000
+um so for example suppose in the same setting foreign [Music] you can claim that for any vector v of Dimension L this is the same as your input dimension of x then this the hyacin the second order derivative which is a matrix this is a i o by L Matrix times this vector v can be computed in of n plus L time and that's I guess I said only is kind of like bigger than l so this is still kind of like an often type so so you can see that this is kind of like you know now it's kind of a more magical right because if you come on to
+
+33
+00:19:30,000 --> 00:20:30,000
+compute this Matrix typical it takes even just to memorize this Matrix right even you just want to kind of compute each entry in suppose each entry of this Matrix takes off one time then you always find L Square time to complete this Matrix so so certainly if you want to do to to get all of n plus L time your algorithm cannot just first compute this Matrix and then to take the Matrix Vector product that will be two inefficient because just Computing this major itself will take L Square time so however
+
+34
+00:20:00,000 --> 00:21:01,000
+um if you compute the whole thing without going through without doing the Matrix first and then take the Matrix Vector product and complete the whole thing all together then there is a way to speed it up and you can do it in all of In Time well and it's bigger than L basically right so basically you just take off and type [Music] right so Newton's method you know depending on which Nutri you're talking about the the vanilla Newton's method requires this Matrix then it's l Square time
+
+35
+00:20:32,000 --> 00:21:29,000
+so we only know how to do Matrix Vector python Vector product so so so that's why I think you know at least there are a bunch of papers in the last few years which tries to implement the original Newton's method without Computing the hesit so they try to use the highest and Vector product to have a different way to implement original Newton's method and and that you know was somewhat successful you know like I think you have you can have some new some algorithms that tries to only use
+
+36
+00:21:01,000 --> 00:22:20,000
+the highest inductor product um to to implement the approximate version of the Newton's method right so and and actually this you know this corollary um is actually pretty easy to prove and and uh and and when you prove it you know you can see how it's actually the proof also tells you how to implement this so so basically you know like uh um um the way to prove it is that you just say I'm going to Define new function G of x this new function is going to be the gradient times V so this is a real valued function
+
+37
+00:21:50,000 --> 00:22:55,000
+because this is a function that Maps all dimensional Vector to a real Vector you know if the output is a real Vector even though you have like there's some it's sorry the author is a real value scalar right even though these are vectors you take the inner part that becomes scalable and then so if you use the theorem so by the theorem you know that g of x can be computed in of and type just because you know the ingredient can be computed so that's why after the ingredients you take the inner product
+
+38
+00:22:38,000 --> 00:23:50,000
+you spend another of an of an actually of n plus L time just to be precise because you know computer gradient Takes Over N time and then Computing the the the the the inner Paradox L time you get all of n plus L Type and then you use the use the theorem again Ong G so before we are using the serum on F and you say the number F can be computed now you're going to use the theoremong G so you view G as the new F right so you you view the f as the what's the right way to say it like like a like so this G
+
+39
+00:23:24,000 --> 00:24:51,000
+will be the F in the theorem right then you verify whether G is satisfy the condition that's true because G can be computed in all of n plus L time and then that means the number of G can also be configured in it can be also be computed uh of n plus L10 right so this means that novela G also computed can be computed in of n plus L time because you can do this twice right and what is the the nubla G like the gradient of G of x if you do the computation what's the gradient of this it's really
+
+40
+00:24:09,000 --> 00:25:16,000
+just you take another gradient here um I guess this probably requires a little bit you know you can verify this you know using turn rules offline but then the gradient of G is really the gradient of the inner product of f x and V and this is actually the Hyacinth of f x times V foreign and and you can do this kind of things like for many other things where you for example if you define any functions of the gradient you can still to take the derivative right for example I think in my learning sometimes you have to have of maybe some
+
+41
+00:24:57,000 --> 00:25:47,000
+special function of the gradient and you have to take another gradient of it and that's that's sometimes you know a some module used in metal learning and then you can apply this again where you can say okay this because the green is computable in often time this function probably just a very simple function so the whole thing can be computable in often time and then you can take another derivative again so so that's that's when you know I'm not going to go into more details but
+
+42
+00:25:23,000 --> 00:26:23,000
+that's how people are using using it in metal learning as well so okay anyway so this part is Advanced material we're not going to test it in any of the exams or homeworks but just uh I feel like this is a good to know uh to some extent um just because this uh this is used in many other more advanced situations any other questions Okay cool so I guess now next I'm what I'm going to do is that I'm going to um discuss a concrete case right in right work I'm going to start with two layer
+
+43
+00:26:00,000 --> 00:27:22,000
+Network and then I'm going to talk about deep new Nets and um and basically I'm going to apply the auto differentiation right the the proof of the theorem is basically you have to give Auto differentiation algorithm or also called back propagation so so um basically apply the back propagation to the specific instance right new Networks Okay so I guess so let me set up some um so before talking about your artworks maybe let me briefly discuss a preliminary this is the chain rule I'm somewhat assuming that this is
+
+44
+00:26:49,000 --> 00:27:59,000
+covered in most of the Calculus class um but I'm gonna have to review this in here partly because I'm going to have potentially different locations from what you you know not exactly the same notations from what you learn from the calculus cost you know just because different calculus book has different notations so um for the purpose of this course what I'm going to do is that suppose I have a suppose J is a function of Theta 1 up to Theta p I'm trying to use as close notations as
+
+45
+00:27:27,000 --> 00:28:40,000
+our final use case even though this kind of like this part is supposed to be abstract right so all the notations are just some symbols right I'm trying to use similar notations just to avoid too many confusions so suppose FJ is a function of a bunch of parameters a bunch of like a variables and then um suppose you have some intermediate variables Suppose there is a um okay so how does this function works this function works by um by I guess maybe what is the this function is defined in this
+
+46
+00:28:04,000 --> 00:29:24,000
+following form so you have some intermediate variables so maybe let's say they are J1 which is a function of that the inputs Theta 1 up to zero p and also you have up to j k which are J some functions of so I guess you know I'm not sure whether this farmers make any sense so I'm kind of using the j i I suppose the function or under the variable of the of the output of a function I think this is pretty kind of like typical in emotional math books right so so you can view J as a variable and then this J is a function
+
+47
+00:28:52,000 --> 00:30:00,000
+of the state of up to Theta p and which function it is you just use J1 to describe that function so um does it make sense like yeah so and then just because I don't really necessarily care about exactly what the function is so I'm just going to give a name and this name you just call the same thing as the variable so and then your J is a function of you know these intermediate variables so and once you have this kind of like a two-layer setup then suppose you care about the derivative the chain rule is
+
+48
+00:29:28,000 --> 00:30:35,000
+saying that if you care about the the partial derivative of the the final output with respect to some input Theta I then how do you compute this derivative you can do the chain rule so what you do is you say you're going to enumerate over all intermediate variables so take the sum over J from 1 to K and for each intermediate variables you first compute the derivative which is back to the intermediate variables and then you multiply this derivative with the derivative of any mini variables with respect to
+
+49
+00:30:02,000 --> 00:31:30,000
+the variables you care about Theta I um and just to clarify the dimension so this is in R and everything is in everything is a scalar so far so okay so this is the the chain rule just uh in in the language of this course any questions okay so now I'm going to talk about a concrete case and uh and maybe let me also Define some notations so um so so maybe one important thing to note is that every time at least in the context of this course every time you have this partial derivative thing like we insist
+
+50
+00:30:51,000 --> 00:31:59,000
+that the this quantity the quantity on the top is a real valued function so so we are not considering anything about multi-evaluate outputs not because you know you cannot consider them it's more because you know typically in machine learning if you are taking derivatives derivatives of a material outputs uh function multivariable function a computational is kind of like a it's a problem so um so so so so so so in some sense I think in the machine learning people try to avoid that like at least at least on
+
+51
+00:31:26,000 --> 00:32:37,000
+the algorithm level of course in analysis probably you have to think about that that notion but on the algorithm level you always like 90 of the time you always try to take derivative of a real valued function you never try to take derivatives of multi outputs multivariable functions and in this course we only have to think about the case where this is a real value function so that's why in the notation so the notation here is that so suppose J is a real value function valued variable or function
+
+52
+00:32:04,000 --> 00:33:30,000
+then um of course it's kind of clear what what this would mean by so if you take this with back to some variable Theta that just means the partial derivative that's easy but what if you have a vector so suppose if a so this is easy this is just a so if Theta is a real value of vector this is just the partial derivative which is easy and what if a is is it the green one is not great maybe I'll use the black one so if a is a some variable in dimension d then uh then this would be also in dimension D
+
+53
+00:32:47,000 --> 00:34:04,000
+that's our notation I'm just clarifying the dimensionality right so and and if so basically this would be just a a collection of scalars you know the partial derivative of J with respect to A1 up to the partial derivative of J with respect to a d which is dimension d and we are also gonna we are also going to get into the situation where a is a matrix maybe a is a matrix of D1 D2 and now what does this notation mean becomes a little bit tricky because sometimes in different literature they are a little
+
+54
+00:33:27,000 --> 00:35:04,000
+bit different um on conventions for this um course what you want to do is just that this has the same shape as a so this is also this is just a um all the partial derivatives and and this is in the same as this has exactly the same shape as a itself so basically in in this course notation the the this kind of derivatives or gradient whatever you call it right so they always have the same shape as the original variable um all right Okay so um I think I need to okay so now let me talk about the two layer Network
+
+55
+00:34:30,000 --> 00:35:39,000
+this is just a review I think Masha has talked about this so um so you have something like so if you the loss function is evalued by the following so if you evaluate the loss function what you have to do you have to first compute the uh the output of the model and then you compare with the label and you come to a loss right so basically the computation to evaluate loss function is the sequence of operations so you first compute the so-called intermediate layers um by doing something like this this is
+
+56
+00:35:04,000 --> 00:36:25,000
+the first layer weights times the input on the data times plus some bias variables and say let's say this is of some Dimension and so and then you apply some anchovies value and you still maintain the same dimension and then you apply another layer maybe let's say another layer that's called o the output of the null layer is called o so you apply W2 a plus B2 and this layer because the output this is the output layer so you want to make this one dimensional so you get R1 um and often sometimes this is called H
+
+57
+00:35:45,000 --> 00:37:05,000
+the Del facts right this is the model output and then you compute a loss the loss is something about half times y minus o squared by the way I'm here only having one example X and Y X is the input Y is the output okay so that's just a quick review of the two layer networks I think I'm quite sure that we are using the same notation as measure um hopefully so um okay so now the question is how do I compute the gradient with Vector W1 W2 B1 B2 bye in general how many of the samples for all of them or like
+
+58
+00:36:37,000 --> 00:37:25,000
+that's another layer right so so that's when you that's about how you implement this algorithm right so if every time you just like take one example you just have to do it for one example if every time you take a batch then you have to do it for a batch but uh for the purpose of this this lecture you know this is a good question but for the first of this lecture uh we only have one example because eventually you just do all the for all even you have like 10 examples do all of them the
+
+59
+00:37:01,000 --> 00:38:17,000
+same way you just repeat the calculation of course you can parallel parallelize all the com the gradients of all the examples but the the method is the same so okay so how do I complete the gradient of of this right like the greeting of the loss with respect to the parameters so so what I'm going to do is that I'm going to um oh no this is uh yeah this is a variable called o uh I think I probably should uh how do I yeah I should change the notes yeah like this is fine in the latex right like but uh
+
+60
+00:38:01,000 --> 00:39:13,000
+how do I write this like so that it's not look like a zero um I think I think I think it's okay to let's see so is there any chance that I can do it on the fly to change the notation I think I should be able to what what you want me to change it to uh Sigma is going to be used it's going to be used for some other things tall okay but but just just this will make a introduce some inconsistency with the notes because in the nose this is all just to let you know okay um but I probably should change that in
+
+61
+00:38:39,000 --> 00:39:41,000
+the notes as well yeah and also like you you see that this one doesn't show up that often hopefully okay so um so what I'm gonna do is that I'm going to um um try to use some chain rule um um with this right so how do you chain rule so um for example you just if you just look at one entry of this Matrix right this is the Matrix you look at one and two you can use the chain rule to derive the the derivative of that entry so that's the typical way that we do it you it's going to be a very complex formula but
+
+62
+00:39:10,000 --> 00:40:00,000
+you can still do it right so you you use the chain rule multiple times and then compute the derivative of that entry and then eventually you get a lot of formulas and then you try to regroup those formulas into a nice form so that's that's actually written in the lecture notes you know if you're interested you can look at them um it's pretty much a sprute force computation um of course if you do that Brute Force computation multiple times then you get eleven like a little bit kind of like
+
+63
+00:39:35,000 --> 00:40:43,000
+expiration you can do it faster in the future so um what I'm going to do is that I'm going to try to keep everything as a vectorized notation and and still I'm going to chain rule but I'm going to do a more kind of like a vectorizing version of the chain rule so so because of that I'm going to have this kind of abstraction so so this is uh in some sense I call this chain rule from Matrix modification I guess there's no unique name for this this is just a um invited by me
+
+64
+00:40:12,000 --> 00:41:35,000
+but it's really a simple fact so so I'm going to um suppose so Z is equals to W Times U plus b where let's say so w is a matrix of Dimension I say I'm by D and U is a vector of Dimension T and B is a you know you don't have to do really necessarily care about the dimensions because you know the at least as long as they match then it's fun so and then I have some function applied on top of Z so so this is my abstraction right so you can see this is a little bit like this right because if you map this Z to this
+
+65
+00:40:56,000 --> 00:42:15,000
+Z and this W1 to this W and X to U and B to B12 uh B1 to B then it's kind of like that it's a kind of abstraction of a part of the problem so um and then I'm going to claim that then the derivative with respect to the W which is what I care about at least if you map it back to here we talk about derivative derivative with respect to w so then this is going to be equals to what is equal equal to a derivative with respect to j z times U transpose and maybe just to kind of like um make
+
+66
+00:41:41,000 --> 00:43:01,000
+sure you are convinced that the notation the dimensions match so this is supposed to be in R to the m by D because the derivative as I said should have the same Dimension as the original variable W so w is in M by D then this is M by D and this is in RN because Z is a m-dimensional vector so that's why this is AR and this is um in our 1 times d right because U is of Dimension d and a new transpose is of Dimension One by D I guess all the vectors are column vectors so if if it's R I know
+
+67
+00:42:24,000 --> 00:43:26,000
+dimensional Vector it's really M by one so all the vectors in this course is column vectors so so that's why this whole thing uh kind of match Dimension right because this is a column Vector this is the row Vector you take the outer product of them you get a matrix actually this is a rank one Matrix that's an actual interesting observation the gradient with respect to the rate Matrix for one example is always a rank for Matrix for one example not for all the examples no not for the the full grid if you just
+
+68
+00:42:55,000 --> 00:43:57,000
+have one example the gradient for the weight Matrix is typically one quad Matrix and if you look at and also we know the gradient with Vector B is going to be equals the gradient with respect to Z so this doesn't solve everything because you still don't know what what this quantity is right this quantity is unknown here and this is going to the same content here is unknown but but at least it solves the local part right it's kind of like chain rule right it says that if you want to derived take
+
+69
+00:43:28,000 --> 00:44:22,000
+the derivative we'll explain to W then you only have to know the derivative derivative with respect to intermediate variable Z and the next next I'm going to talk about how to take the derivative with back to Z so but this is kind of a decomposition right so it says that if you want to know the the derivatives with derivative with respect to W then you only have to know the derivative with vacancy um this is just what the formula tells me um but I'm I'm but here I'm verifying
+
+70
+00:43:58,000 --> 00:45:01,000
+that it does make sense because this is a one by D Matrix one by D vector or one by the Matrix and this is I'm the national Vector of M times 1 dimensional Vector because I view all the vectors as column vectors so that's why I'm by 1 times 1 by D will give you m by D why is the transpose that just because oh I think the fundamental reason is you do the calculation is exactly this um but but it just happens to match you know it has to match if the calculation is correct right right so and also you know maybe that's
+
+71
+00:44:33,000 --> 00:45:43,000
+a reasonable way to memorize it you have to make the dimension match so that's why it's the case so um okay how do you prove this so um proving this you have to go low level you have to do it for every entry so I'm going to show it once and then later I'm going to have more abstractions like this and I'm not going to prove it for you so for this one I'm going to do a quick proof um it's really just a derivation so so what you do is you just use the chain rule so so what you do is you look at the
+
+72
+00:45:16,000 --> 00:46:31,000
+derivative derivative with respect to any entry wij so and how do you do this you say you use the the most basic version of the chain rule you you Loop over all the possible intermediate variables so what are the intermediate variables these are these right sounds like it's very nice to use Z as the intermediate variables so I'm going to Loop over all possible intermediate variables K from 1 to M um and each of the ZR is one of the intermediate variables or z k so DJ over dzk and then d z k over d w i j
+
+73
+00:45:54,000 --> 00:47:16,000
+right and then I'm going to plug in the definition of decay so so then this uh what's the definition of c currency case there's um it's defined by this message specification what is the case dimension of here it's the case dimension of this the case dimension of this is going to be something like the definition of Matrix fabrication wk1 times U1 plus W K2 times U2 up dot until w KD times UD plus this P the b k and you look at the partial derivative of this with respect to w i j
+
+74
+00:46:42,000 --> 00:47:50,000
+so how to do this it's kind of like so first one you know to make this non-zero you have to make sure that this variable is show up in the top right if the variable doesn't even show up on the top there's no partial derivative the partial derivative will be zero so so this is only non-zero only if this wig does show up in the top so when w i j shows shows up on the top only if um K is equal to I right so that because only w k is something show up on the top and w i j so only I I and J are the same are I and
+
+75
+00:47:18,000 --> 00:48:58,000
+K are same then w i j can show up on the top so so that's why you only have to care about those cases where K is equal to I so you just uh the entire sum is gone so you only have to care about z i and then so you have maybe like I'll just do it slowly so this is wi1 times E1 plus up to W ID times UD plus b i over d w i j okay so w i j only show up once here on the top linearly so w i j show up here on the top in this term um somewhere in the middle right so there's a middle term which is look like w i j
+
+76
+00:48:08,000 --> 00:49:39,000
+times u j that's the term that's W where w i j shows up and the derivative of this respect w i j is equal to u j so that's why this is equal um this is equal to sorry times u j right so so that's my that's my DJ over dwij and and then I have to group all of this into a matrix form so if you're verified that so basically you group all of these answers into a matrix form it will be like this so you're gonna get all of this DJ over dzi into this D J over D is equal and in this UJ term will be grouped into
+
+77
+00:49:03,000 --> 00:50:30,000
+this U transpose so so I guess I'm using a very simple fact the simple fact is that if something maybe let's say um x i j is equals to AI times BJ then that means Matrix X is equals to A times B transpose that's the that's the simple fact I'm using right so if some if the entry of a matrix is equal to some AI times P J then you can write it as Matrix form where this Matrix X is equal to a times B transpose a is a vector B is a vector any questions foreign this abstraction it's so called vectorized form of the
+
+78
+00:50:17,000 --> 00:52:06,000
+chain rule to a problem here so what I got is that so what's the mapping the mapping is that Z maps to Z and the W one maps to w x map to U right and J maps to J so that's how I use this abstraction so and after I use this objection what I got is that I got W1 DJ over dw1 is equals to um DJ over DZ times U transpose will be X transpose act transpose okay so of course this is not done right because we want to compute those but we we kind of like we have a reduction in some sense so we we did some partial work
+
+79
+00:51:16,000 --> 00:52:24,000
+right our goal is to conclude this but now we said that you don't have to compute this DJ over DC and next I'm going to show you how to compute DJ over DZ so it's kind of like you are kind of peeling off every a layer by layer in some sense of course you can also do the same thing for B I guess the B is always easier so this will be to see this okay so so next question is how do you do the [Music] okay let's see whether maybe I should use the Newport foreign so so next I'm going to compute this
+
+80
+00:52:22,000 --> 00:53:46,000
+right from right the Z is DC so how do I do this I'm going to have another abstraction so um this is the abstract problem so note that my Z the the relationship between J and between j and z is through this a and W2 right so there's some complicated dependencies between j and z so I'm going to abstract one part of it just to make our um kind of derivation clean so the abstraction would be that you you think of um suppose you have a variable a which is Sigma of C and then J is a function of a
+
+81
+00:53:12,000 --> 00:54:53,000
+so a sigma is this entry wise Sigma is entry wise kind of like a activation function right Sigma is the value basically so I'm going to claim that in this case you can you know that your target the question you care about DJ over DZ is going to be equals to DJ over D A times Sigma Prime Z and this is a so I guess let me explain annotation here so this is our and dimensional vector this is also n-dimensional Vector let's say in this abstract in z a they are all n dimensional vector so then this all M dimensional vector
+
+82
+00:54:13,000 --> 00:55:34,000
+and this is the so-called entry wise entry-wise product right so I'm taking two undivision vectors I take an untrust product and I get the derivative I care about so okay and and then you can see that the only thing you have to carry you have to compute next is what is DJ over d a right because DJ over D is still I know I'm not going to do this proof for this it's actually even easier than the other one you just have to expand and to the channel [Applause] okay so now next let me try to
+
+83
+00:55:11,000 --> 00:56:51,000
+foreign so how do I deal with DJ over da I'm going to again abstractify this part of computation in some abstract form so my attraction is that um so the abstraction is that um I guess I'm going to have a is equals to W Times U plus b and J is equals to a function of a right um so why this is a reasonable abstraction because a maps to this a w Maps this W2 and this EU Maps wait am I doing something sorry my bad I have to use a different okay maybe let's call this talk okay that's a
+
+84
+00:56:08,000 --> 00:57:45,000
+perfect place to call it okay so tall okay so why this is a useful abstraction this is because the my thing in my mind is that tall means the the tall above and on the W here means the W2 above and B here means the B to above and and J means the J so know that the difference here is that this W now means the second layer right so and if you make this mapping right so then what you care about is that you care about DJ over d u here because you or I guess I didn't say what you corresponds to so U corresponds to a
+
+85
+00:57:04,000 --> 00:58:16,000
+right so U corresponds to a because a is what is Multiplied with the Matrix right so DJ over d u so that's what I care about so you can see that even though this abstraction is very similar to this abstraction the difference is that here I care about DJ over d u I care about the derivative with respects the input of the Matrix fabrication and before I carve our derivative with respect to the the matrices The Matrix in the matrix multiplication so right so so that's why it's a little
+
+86
+00:57:40,000 --> 00:58:56,000
+bit different and you're going to have a different formula for it of course because you are taking derivative with back to um you know Y is respect to W and the other is with respect to U so okay so what's the formula for this the formula for this is um if you write it in The Matrix form it's w transpose times DJ over d B D sort of so I guess if you check the dimensionality then this one okay I don't know what the dimension here so I guess let me specify the dimension so CW is maybe something like
+
+87
+00:58:27,000 --> 00:59:37,000
+um I don't know let me come up with the maybe R times and right so an U is of Dimension m and Tau then has to be intervention on so Dimension R sorry so then this is in dimension r and this double transpose is in dimension n by r and that's why they can be multiplied together of course you know okay I guess another thing is that if you don't want to remember all of these equations you want to remember is so first of all you don't have to remember all of them second if you want to remember them and you want
+
+88
+00:59:06,000 --> 01:00:03,000
+to kind of cheat a little bit you can just view the mask scalars and you can see then so for example this one would make a lot of sense if there are scalups right that's just the the tribute to rule and this one makes a lot of sense if they're all scalars because you want to take the derivative U with respect to U then W have to show up as the coefficient so so everything make a lot of sense if it are scalars and the only tricky thing is that if there are matrices then you have to figure out what's the right
+
+89
+00:59:35,000 --> 01:01:06,000
+transpose if you might left multiply right multiplies and so forth Okay so okay so once I have this thing then I can um apply this to the special case above right if you apply it then what you got is that you with this mapping that you got you DJ over da is equals to W2 transpose times uh DJ over dtau right that's because um right just I'm just replacing the note I'm just applying this General thing to this case and now you see that there's only one thing that is missing what is DJ over
+
+90
+01:00:38,000 --> 01:02:05,000
+detail and that's trivial right because DJ over D tall is just this is really just the very last thing j is just the Y minus Tau Square so DJ already told like everyone can compute this is just a I think minus y minus top so so what you really do you know eventually then what you really do eventually is that you first compute this maybe this is step one and then this is step two you compute DJ over da then then where DJ over Dia is used and then DJ over Dia is used to here so then you do this step three
+
+91
+01:01:25,000 --> 01:02:36,000
+and then you get DJ over DZ DJ over DZ then used it um here this is four wait uh maybe four is here then you get the derivative derivative with sector W1 so we really implemented you have to do it backwards you know when you do the derivation you know it's reasonable you know we can do here anyway but um I guess I'm doing it in the in this way from W to from the lower layer to the top layer so from the the first layer to the second layer but when you really do the implementation you have to first complete this and this and
+
+92
+01:02:00,000 --> 01:03:19,000
+one two three four uh I guess I didn't compute the derivative with respect to all the parameters so so I'm going to compute 0 to respect to W and B1 what if you want to compute the derivative with respect to W2 maybe that's a good question to see whether it's somehow digest this what if you want to do the DJ or DWT sure [Music] that the toe with respect to W2 and so and which for example which abstraction you need like I have lost three things right one two and three which might notice
+
+93
+01:03:03,000 --> 01:04:41,000
+yes it's cracked so I guess um the the I think you're gonna use this because W2 is the Matrix right you care about derivative with Vector Matrix then you want to use this so so basically so if you care about this then you view this W2 is the W here so I guess then you need a different mapping so I guess you need to use the first abstraction well first dilemma and and then you're gonna say W2 corresponds to a w and the U now corresponds to What U corresponds to the a here and and B1 B2 corresponds to the B
+
+94
+01:04:03,000 --> 01:05:33,000
+um and and Z corresponds to sorry not Z that so the Tau corresponds to Z so this is in the the right hand side is in the abstraction and the left hand side is in the in the real case I care about so so this means that this is DJ over the tall uh times I I had U transpose here now I had a transpose here so I'm going to have a transpose and I also know DJ over D B2 is going to be equals to DJ over D top makes sense foreign because everything is a vector-wise notation um and now what if you do it for
+
+95
+01:05:16,000 --> 01:06:16,000
+multiple layers you'll see that everything is to stay it's the same so you basically you're just gonna repeatedly use these two landmarks so the three landmarks are three abstractions um I guess maybe I should number them in some way maybe let's call this Lemma one and then here I'm using lemon one and maybe let's call this lemma2 and this is Lemma 3. so so I'm going to for the Deep networks I'm just going to use Lemma one two three repeatedly and I'm going to get
+
+96
+01:06:01,000 --> 01:07:58,000
+the gradient so that's the last thing in this core in this lecture foreign Networks so suppose you have multiple layers of new light works you know um so then I guess using the same notation as last lecture the first layer is this the second layer is some value times D1 sorry this is still the first layer this is the activation and then you do the second layer you have W2 A1 plus P2 dot dot and you get a R minus one layer which is value of C R minus one and then I say you have the auth layer the r
+
+97
+01:07:27,000 --> 01:09:18,000
+which is equals to WR times a r minus 1. plus b r and then finally you have a loss I guess I'll just write the logs here given that the loss will be J will be a half times y minus ZR Square okay so that's my computation of the of the loss function you know a sequence of matrix multiplication and and the activation functions so now I'm going to try to compute the derivatives the the partial gradient so first of all I'm going to compute DJ over d w k for some case later so how do you do that
+
+98
+01:08:40,000 --> 01:10:02,000
+yeah this is a little bit awkward um I guess maybe it's okay to I I know all the you all know this is deep nuts right so better yeah nothing different this is the the same thing as in last time I'm just recording the notations so and I want to compute a derivative with respect to case Matrix so maybe that's a derivative respect to W2 I think right so Source K is two now how do you do it so if I do this with respect to W2 then um the thing is that you want to use the landmark right so the landmark
+
+99
+01:09:32,000 --> 01:10:40,000
+um level one I guess maybe that's the most relevant because number one is trying to take derivative with respects with some w so you just do some pattern matching you want to apply number one so so what's the the abstraction here that I'm talking here is that if you um okay so how do you do the pattern matching so I guess you say that what's the definition of c w k WK is involved in this computation in the following way so WK is involved in the following way c k is equal to WK times a k minus 1 plus
+
+100
+01:10:05,000 --> 01:11:27,000
+b k this is hot WK is involved and then you say I don't care about what happens next I just abstractify the rest so then this is pretty much the same as the setting level one right so then using level one or you can you yeah using this or you know actually you can call it no you don't have to call it Lamar you can call it a formal or something right so number one tells you that if you take the derivative with respect to the Matrix is equals to the derivatives with back to z k z k is basically the output of the
+
+101
+01:10:52,000 --> 01:12:17,000
+matrix multiplication so times the input of the matrix multiplication which is a k minus 1 here transpose okay so that means that I only have to take the derivative with respect to Z K right z k is basically some of these you know intermediate variables right so how to take derivative with back to Z K so you need to think about you know how ZK is involved in this competition right so ZK is involved so I care about this and ZK is involved in the following way I'm not sure so DK is equals to railu
+
+102
+01:12:29,000 --> 01:14:02,000
+um okay sorry CK is involved you know directly in the following way so AK is equals to value of c k and then J the loss is a function of a k right that's the part that z k is directly involved because you first goes to the value you get a and then you you do some computation to get J and then you can use the the so-called MR2 so dilemma 2 will tell you that what is the DJ over DZ okay so it's going to be something about DJ over D AK times the the value Prime Times of c k this is gamma 2.
+
+103
+01:13:44,000 --> 01:15:19,000
+and the third thing is how do you deal with AK well what is the derivative respect to a k so if you don't know derivative is about AK then you have to see again see how AK is involved in this whole computation so how does it how is AK involved so AK is involved because AK if you use a to complete Z again to use a to confuse Z K plus one right so if you look at that part so basically ZK plus one is equals to some w k plus 1 times a k Plus B K plus 1. this is the the time the first time AK is used and the only time AK is used and
+
+104
+01:14:31,000 --> 01:15:46,000
+then you say the rest of the thing is abstracted as a general thing and then you say I'm going to use now I'm going to use the Lemma 3. because lemons 3 is also about Matrix for vacation right number three is also about Matrix modification but it's trying to take the derivative with respect to the input to the matrix multiplication right so a is the input right so um so using lamba 3 I'm going to say I guess maybe I'm not sure whether I should also make a explicit map so if you care about the explosive math then
+
+105
+01:15:09,000 --> 01:16:31,000
+it means that AEK corresponds to the U there in lamba 3. right so w k plus one corresponds to W there and B K plus one corresponds to the B there and J corresponds to J I guess Z K plus 1 corresponds to talk right so I guess if you just Pat if you keep Patty matching I think it's a little bit difficult to see the map the actually the probably the right thing way to the right way to think about it is that you think about the rows of these things right so Z K plus one is the output of the Matrix verification
+
+106
+01:15:52,000 --> 01:17:16,000
+AK is the input to the matrix multiplication and double case the The Matrix in the in the multiplication so so that's how you easily map the rows of them and then um so you get this thing is equals to w k Plus 1. transpose so and then oh sorry I think I have some is this this should be it should be so then you can see that if you look at this two sorry this is pile I must so if you look at this formula and this formula basically this is kind of like a recursion in some sense right so so here
+
+107
+01:17:05,000 --> 01:18:32,000
+you are saying that from DJ Dak you can compute DJ ZK and here from the like a yeah basically you can just recursively use this tool to get all of them so I'll just make it explicit so um so basically with all of this formula you are basically you already complete everything um it's just I'm going to reorganize this to make it a little clearer so what you do is that you say you start from the last layer yeah the last layer here so you'll first compute I guess you know maybe let me just
+
+108
+01:18:07,000 --> 01:19:31,000
+describe the final algorithm so you first compute the so-called forward path so you compute all all the the values of all the variables so in some sense I've already assumed that it's completed implicitly before so basically compute all the um Z1 A1 Z2 A2 so and so forth right so just by Computing all of this network evaluating the loss you get everything right so you get all the variables and then in the so-called backward path you complete the gradient so and the way you do it is that pretty
+
+109
+01:19:01,000 --> 01:20:34,000
+much like same as the two layer Network you start with the the last one so you first can compute this with the last layer and this is Trivial because J depends on ZR just in a very trivial way so this is just the minus y minus ZR right so this is our starting point and now you recursively use both of this to get all of the DZ of the DZ over d a so you already have DJ over DZ oh sorry DJ over dzr and then you can use that to compute uh the previous one using this right so so from this you can get
+
+110
+01:19:47,000 --> 01:21:38,000
+DJ over d a r minus one using this formula because we get this is w if I can do it on the Fly correctly yeah guys this is AR transpose DJ of d CR right so you you remove the index by one and you get to a and then you can use the a to compute the Z the D DZ over d a to come with a DZ already a DJ over DC so so this is number one this is number two number three you you get ZR minus one which is uh equals to um minus one right so so basically I have to do in this iteration you it goes from R to R minus one and then
+
+111
+01:20:56,000 --> 01:22:37,000
+you repeat right so then you can you can repeat you can say I guess maybe I shouldn't number them by so maybe I should number this one by one this piece two 2.1 2.2 or 3.1 um in the in the third round you get a r minus two using this equation maybe let's say this equation let's call it two let's call this one so to see you using two and then you got a z version using Hua and you do this repeatedly so you get everything about a and z I never after you get everything about ANC so so basically after
+
+112
+01:22:14,000 --> 01:23:39,000
+turning all the everything like this it's pretty easy to get the the gradient with respect to with respect to W because you can just say is using this maybe let's call this Ray you can say this is equals to right okay so I guess you can see that I do need a forward pass because in my backward path I do require a bunch of qualities for example it does require I know the quantity z r minus one so I have to save all the easy quantities A and R all of this in my memory and then in the backward Parts
+
+113
+01:23:30,000 --> 01:24:32,000
+I'm going to use them um so and why this is called backward pass in some sense if you think about the computational flow I guess um I guess this is probably my last point that I can make today so this is kind of like um it's the reason why it's called back propagation is because you can view this as you can see that you are the the way that you eat you change the indexes you start from R and R minus one and you do R minus two or mass three so do this in a kind of a backward way so in some
+
+114
+01:24:00,000 --> 01:25:15,000
+sense if you kind of draw a um kind of a computational graph or kind of a flow of the computation I'm not being very formal here but if you draw it in some sense then you can view this whole computation as you start with x and then you have the Matrix modification you need to use the weight W1 and B1 I'll do some matrix multiplication and you get Z1 right and then you do another metrics Buffet maybe you do another a maybe this is as I say you this you got Z1 and you've got the activation
+
+115
+01:24:38,000 --> 01:25:56,000
+say activation and you get you get A1 and then you do a matrix multiplication uh with also W2 B2 and then you get Z2 and you'll do this repeatedly until finally you guys ZR and you've got the the last J okay so this is kind of like the forward pass and and if you think about how how to kind of like conceptually how do you organize the information in this backward algorithm and sometimes what you do is that um I'm just trying to visualize this but you know of course I've everything of
+
+116
+01:25:25,000 --> 01:26:53,000
+all of this will be in computer so in some sense what you do is that um you first compute you first compute a derivative with back to this variable ZR okay and then you say okay how did you get the Z you get a z by some matrix multiplication right so let me say this is by matrix summation location where the input of this is a r minus one right so and um and so then you take this uh in some sense from this you compute the derivative respect to a n minus 1. right that's the that's my step two
+
+117
+01:26:14,000 --> 01:27:47,000
+point 2.1 right and and then you just keep doing this in a backward fashion so you you figure out you know where a come from AMS when I come from Arc minus one from come from Z are minus one so that's why you do a backward pass you say this is completely from ms1 right that's my step two point okay sorry I'm not numbering this correctly so this is 2.2 that's messed upon step 2.2 right so and now keep doing this eventually eventually I got Maybe C1 right so that's that's the so-called backward
+
+118
+01:27:00,000 --> 01:28:22,000
+back propagation is and in the middle you can also compute the derivative with resp to the W so because the derivative with Vector W is equals to something about a derivative with raised to Z so basically once you get this quantity you know you can start from this quantity to get the derivative with back to w uh R minus one I think or my spell r on minus what um and and then I you know every time you get one more DJ over DZ then you can get one more DJ over DW so from this you can get DJ over dw1
+
+119
+01:27:43,000 --> 01:28:40,000
+so so that's why it's called back propagation and maybe just to say one uh I know we are running out of time just one more word about this so so this is a a kind of very sequential computational graph but but actually if you have like a more complex computational graph right so which is not like as sequential as this you can do almost the same thing basically you just write all this graph and then you figure out you know how to do the back propagation and the way to do the back the general
+
+120
+01:28:12,000 --> 01:29:06,000
+way to do that function is exactly the same you just run in the graph in the backwards the only thing you have to figure out is that how does this you know like like what's this relationship basically this Arrow right so how does the the derivative with box a depends on Z right so what's the derivative respect to the input of this of this module of this you view this modification as a as a generic module let's say right so and and the only thing you have to figure out is that how do you write this
+
+121
+01:28:39,000 --> 01:29:30,000
+so-called backward function this backward function takes in the derivative with respect to the output of this module and output the derivative with respect to input of this module and and that's that's the so-called backward function for example if you write pie charts if you need to write a new module basically you have to implement the forward function and the backward function the forward function is how you get Z from a and backward function is how do you get the derivative with back to
+
+122
+01:29:04,000 --> 01:29:50,000
+a given a hypothetical derivative with respect to Z the hypothetical I mean like just some vectors right you're taking some some vectors and you get some light results and this is the function you have to implement for the module and and once you have this module then you can run like a then you just everything else is systematic yeah I think I should stop here okay thanks
+

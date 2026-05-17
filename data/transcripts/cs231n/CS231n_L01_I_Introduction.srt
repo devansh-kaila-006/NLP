@@ -1,0 +1,368 @@
+1
+00:00:06,000 --> 00:01:19,000
+This is CS231N and uh I'm professor Falei from computer science department. I will be co-eing this uh quarter with professor Isan Adelli and uh my graduate student Zay. So you'll meet them as well as our wonderful uh TA team that you will meet later. So I just want to uh get started. Yeah. So this is what excites me that um AI has become such an interdisciplinary um field that what you're going to learn in this class of course it's very technical it's about computer vision and
+
+2
+00:00:42,000 --> 00:01:53,000
+deep learning but I really do hope that you take it to whichever discipline you work in and are passionate about and apply it. So we hear a lot about the field of AI. So how do we position uh computer vision and the scope of this class? If you consider AI as this big bubble, um computer vision is very much a integral part of AI. Uh some of you have heard me saying that not only vision is part of intelligence, it's a cornerstone to intelligence. Unlocking the mystery of visual intelligence is
+
+3
+00:01:17,000 --> 00:02:26,000
+unlocking the mystery of intelligence. But one of the most important tools, mathematical tools to uh to solving AI is uh machine learning or some people call statistical machine learning. And this is exactly um you know what we will be talking about within the field of machine learning. Uh in the past 10 plus years, we have seen a major revolution called deep learning. And I'll explain a little bit of what deep learning is. Deep learning is a set of uh uh algorithmic techniques that is built
+
+4
+00:01:52,000 --> 00:03:01,000
+around uh a family of algorithms called neuronet networks. And uh so if you ask me to pinpoint the the scope of this class, we'll not be able to cover the entirety of computer vision. We'll not be able to cover the entirety of machine learning or deep learning, but we're going to cover the core intersection of these two fields. And of course um just like the entirety of AI, computer vision is becoming more and more a uh interdisciplinary field. A lot of the techniques we use as well as the
+
+5
+00:02:26,000 --> 00:03:43,000
+problems we work with intersect with many different other fields like natural language processing, speech recognition, robotics and AI as a whole is a field that intersects with mathematics, neuroscience, computer science, psychology, physics, biology and many application areas from medicine to law to education uh and business and so on. So what you will get for this lecture, our first lecture is I'll give a very brief history of computer vision and deep learning and then uh professor Delhi will uh go over the overview of
+
+6
+00:03:05,000 --> 00:04:29,000
+this course and lay the groundwork of how this course is set up and what our expectations are. So you know the history of vision did not begin when you were born or humanity was born. The history of vision began 540 million years ago. You might you might ask what happened 540 million years ago? Why are we pinpointing a relatively specific date or year in evolution? Well, it's because a lot of fossil studies have shown us there is a mystery period called um Cambrian explosion. It is the fossil studies
+
+7
+00:03:47,000 --> 00:05:01,000
+showed about 10 million years in evolution. During that time, which is a very short period of time for evolution, we see the explosion of animal species in the fossil study. Which means before Cambrian explosion, life on Earth was pretty chill. It was actually in the water. There's no land yet. No animals on the land yet. And animals just float around around. So what caused this explosion in animal speciation? There were many theories from climate to chemical composition of the ocean water.
+
+8
+00:04:23,000 --> 00:05:48,000
+But the most uh compelling one of the most compelling theories was the onset of ice. uh the first animal a trilobyte um they gained photosensitive cells. So the eyes we were talking about were not sophisticated lenses and retinas and nerve cells. It was literally a very simple pinghole and that pinhole collected light. Once you collected light is completely different without senses life is metabolism. It's very passive. It is just metabolism and you come and go. With senses, you become an integral
+
+9
+00:05:06,000 --> 00:06:24,000
+part of the environment that you might want to change. You might want to actually uh survive in it. Some some animals becomes your or plants become your dinner and you become someone else's dinner. So evolutionary forces drives um um intelligence to evolve because of the onset of senses because of the onset of vision along with uh haptics or or tactile sensing those are the two most uh the oldest uh senses for for animals. So that entire course of 540 million years of evolution of vision is the
+
+10
+00:05:45,000 --> 00:07:04,000
+evolution of intelligence. Vision as one of the primary senses of animals drove the development of nervous system. The development of intelligence. Almost all animals on earth today we know of have vision or use vision as one of the primary senses. Humans are especially visual animals. More than half of our cortical cells are involved in uh visual processing and we have a very complex and convoluted visual system. So this is what excites me to enter the field of vision and I hope it excites you. So um
+
+11
+00:06:25,000 --> 00:07:55,000
+now let's just fast forward from uh u fast forward from uh Cambrian explosion to actually human civilization. Um humans does innovate and not only we see we want to build machines that see. So here is a a drawing by a couple of drawings by of course Leonardo Davinci who was just forever um curious about everything. He he studied um camera obscura for uh how to make seeing machines. in fact that uh even way before him in ancient Greece and in ancient China, we have seen documents about uh you know thinkers, philosophers
+
+12
+00:07:10,000 --> 00:08:30,000
+thinking about how to make uh how to project objects through pinholes and to to uh create images of objects. And of course in our modern life cameras have truly exploded. But uh but cameras are not enough for seeing just like eyes are not enough for seeing. These are apparatus. We need to understand how visual intelligence happens and that's really the crux of this course. So let's let's just talk about the a little bit of the history that brought us to this intersection of deep learning and
+
+13
+00:07:49,000 --> 00:09:25,000
+computer vision. So um so let me go back to the 1950s. Um the 1950s a set of very critical critically important uh experiments happened in neuroscience and that was the study of the visual pathways of mammals especially the seinal work by Hubo and Viso. They used uh electrodes to put into live cats anesthesized and then they study the receptive field of neurons that are in the primary visual cortex. What they have learned to their surprise are two very important things. One is that um vis uh uh neurons that are responsible
+
+14
+00:08:38,000 --> 00:09:59,000
+for seeing in the primary visual cortex have their own individual receptive fields. Receptive fields means that for every neuron there's a part of space it actually sees. It's not all the space. It's not very big. It tends to be a very uh uh confined patch of the space and within that space it sees uh uh specialized patterns simple patterns when the the the when you're measuring from the early uh early part of the uh uh visual pathway and by and large in the primary visual cortex which is
+
+15
+00:09:19,000 --> 00:10:35,000
+around here in the back of the head not near your eyes um it's oriented edges or moving oriented edges. So every neuron some neuron will be seeing the edge like this, some will be seeing an edge like this or this. And uh that's how vision the computation in the brain begins. The second thing they learned is that uh visual pathway is hierarchical. As you move beyond the the visual pathway, the neurons feed into other neurons and these the neurons in the higher uh layers or deeper layers of the visual
+
+16
+00:09:57,000 --> 00:11:17,000
+hierarchy have more complex receptive field. So if you begin with oriented edges, you might feed into a corner receptor, you might feed into a an object receptor. I'm overly simplifying but that's the concept is that neurons feed into each other and then they create this big network of um uh of uh computation. Of course most of you sitting here are already thinking the way I've been describing this will have a profound impact on the modeling the neuronet network modeling of uh visual algorithms. Let's keep going.
+
+17
+00:10:37,000 --> 00:12:09,000
+That's year 1959. It's very early studies of uh scene. By the way, um about 30 years later uh maybe not quite 20 something years later, Huba Visel won the Nobel uh Nobel Prize in medicine for studying this uh uncovering the the uh principles of visual processing. Another um milestone in the early history of computer vision was the first PhD thesis of computer vision. Most people attribute Larry Roberts in 1963 writing the the first PhD thesis just studying shape and this is a very very character uh representation of the world
+
+18
+00:11:22,000 --> 00:12:53,000
+and the idea is that can we take a shape like this and understand the the surfaces and the the corners and features of this shape um it's intuitive that humans do. So an entire PhD thesis is developed uh is devoted to this and that's the beginning of computer vision and uh and around that time in 1966 um uh as an MIT professor uh created a summer project in MIT and asked to hire a few undergrads very smart ones um to study uh vision And the goal was pretty much solve computer vision or solve
+
+19
+00:12:08,000 --> 00:13:28,000
+vision for one summer. Of course, just like the rest of the history of AI, we tend to be over optimistic of what we can do in a short period of time. So vision did not get solved in in that summer. In fact, it has blossomed into an incredible computer science field. If you go to our annual conferences every year now it has more than 10,000 people attending but 1960s is where you know between Larry Robert's uh PhD thesis as well as uh as well as this kind of project we in our field consider that
+
+20
+00:12:49,000 --> 00:14:02,000
+the beginning of the field of computer vision. A seminal book was written in the 1970s by David Barah who um unfortunately died too early. He wanted to study vision systematically and start to consider how visual processing happens. Even though this is not explicitly stated but there is a lot of inspiration from you know neuroscience and cognitive science. He was thinking about you know if you look at if if a um if you take a input image how do we visually process and understand the image maybe the first
+
+21
+00:13:25,000 --> 00:14:53,000
+layer is more like edges just like we saw uh he calls it primal sketch and then there is a 2 and 1 halfd sketch which uh uh uh you know separates different uh uh depth um u of the the objects in the image. So the ball is the foreground object and then the the the grass here. Oh no, not grass. The floor ground here is the background. So he does these two and a halfD sketch and then finally he he believes David Mar believes the the the grand holy grail victory of solving vision is to know the entire full 3D representation. And that
+
+22
+00:14:09,000 --> 00:15:38,000
+is actually a um the hardest thing of vision. Let me digress for 20 seconds because um if you think about vision right for all animals it's a illposed problem. Since the early trilobytes who collected light from underwater light the world through photons is projected on something on a surface more or less 2D at that time it was just I don't know some patch in the in the animal but right now for us it's a it's a retina um but the actual world is 3D so recovering 3D information the entire entire 3D
+
+23
+00:14:54,000 --> 00:16:04,000
+world from 2D images is the fundamental problem nature had to solve and computer vision has to solve and mathematically that's a illpose problem. So what did linker do? Anybody have a wild guess? >> Yes, nature the trick that nature did is develop mult multiple eyes mostly too. Some animals have more than uh more than two and that's and then you triangulate information but two eyes are not enough. You actually have to understand correspondences and all that. We'll touch on some of these topics but there
+
+24
+00:15:36,000 --> 00:16:46,000
+are other computer vision classes in uh in Stanford offers that also specifically talk about 3D vision. But the point is it's a very hard problem and and we have to solve it. Nature has solved it. humans have solved it but not to extreme uh precision. In fact, humans are not that precise. You know, I roughly know the 3D shapes but I don't have you know geometric precision of all the shapes. So that's that's one thing to consider and appreciate how hard this problem is. Another thing that is very
+
+25
+00:16:11,000 --> 00:17:33,000
+different for uh computer vision and and language is actually something philosophically subtle. Language doesn't exist in nature. You cannot point to something and say there's language. Language is a purely generated thing. I don't even know what word to use, right? It comes through our brain. It's generated. It's 1D. It's sequential. So this actually has profound implication in the latest wave of Gen AI algorithms is this is why these LLMs which is outside of the scope of this
+
+26
+00:16:51,000 --> 00:18:10,000
+class is so powerful because the the we can model language that way but vision is not generated. There is actually a physical world out there respecting the laws of physics and materials and all that. So vision has very different tasks. So I just want you to appreciate uh the difference between language and vision and and actually frankly appreciate nature how how it solved this problem. Okay let's keep going. 1970s. Um the early pioneers of computer vision without data, without really much of uh
+
+27
+00:17:31,000 --> 00:18:44,000
+powerful computers, without um the mathematical advances we have seen today are already beginning to solve some of the harder problem of computer vision. For example, recognition of objects here in um in Stanford. One of the pioneering work is called uh generalized cylinders by Rodney Brookke and Tom Binford. And ironically Rodney Brooks uh today is on campus actually some part over there giving uh giving a talk at the robotics conference and he went on to become one of the greatest roboticists of our time
+
+28
+00:18:07,000 --> 00:19:37,000
+and was founder of uh uh Roomba and many other robots. And then uh not very far from us in another part of Palo Alto uh researchers have worked on these uh also compositional uh compositional um um u models of uh human body and and objects. And then in the 1980s um digital photos start to appear. At least photos start to appear and people can digitize that a little bit. And then um there are some great work in edge detection. You look at all this and um it probably feels a sense of disappointment, right? Like I mean it's
+
+29
+00:18:52,000 --> 00:19:59,000
+kind of trivial to get some sketches and edges and it's not really going anywhere if that's how that's how vision you know uh works at that time. And in fact, you're not so wrong. That was around the time um before many of you were born that we entered AI winter. The field a entered AI winter because the enthusiasm and hence funding for AI research has really dwindled. A lot of things didn't deliver. Computer vision didn't deliver, expert systems didn't deliver, robotics
+
+30
+00:19:25,000 --> 00:20:30,000
+didn't deliver. But under the hood of this winter, a lot of things uh a lot of research start to grow uh from different fields like computer vision, NLP, robotics. So let's also look at another strand of research that had a profound implication in computer vision is that cognitive and neuroscience continue to blossom. And what is really important especially for the field of computer vision is cognitive and neuroscience is starting to point to us the northstar problems we should work on. For example,
+
+31
+00:19:59,000 --> 00:21:21,000
+psychologists have told us there's something special about seeing nature, seeing uh seeing real world. Uh this is a uh this is a study by uh Vidderman who shows that the detection of bicycles on two images differ depending on if the images are scrambled or not. Think about it from a photon point of view. These two bicycles land in the same location on your retina, but somehow the rest of the image impacts uh the the the viewer seeing the the objects in in um in in in the target object. So there
+
+32
+00:20:40,000 --> 00:21:53,000
+is something telling us that seeing the entire forest or entire world uh impacts the way we see objects. It also tells us visual processing is very fast. Here's another direct measure of how fast we we uh we detect objects. This is an early 1970s uh experiment um showing people uh a video and uh and the the task for the human uh the subject is to detect the human in one of the frames. I suppose every one of you have seen that human in one of the uh frames. But think about how remarkable your eyes are or your
+
+33
+00:21:16,000 --> 00:22:28,000
+brain is because uh you've never seen this video. I didn't tell you which frame the the the target object would appear. I did not tell you what the target target object would look like, where it is and gestures and all that. Yet you have no problem detecting the humans. So that is and on top of that these uh frames are played at 10 hertz which means you're seeing every frame for only 100 milliseconds. And this is how remarkable our visual system is. In fact, uh, Simon Thorp, another, uh, uh,
+
+34
+00:21:52,000 --> 00:23:14,000
+uh, cognitive neuroscientist, have measured the speed. If you hook people up in EG caps and show them complex natural things and ask human subjects to categorize things from animals without uh, versus things without animals, hundreds of them, and then you measure the brain wave. It turned out after 150 milliseconds of seeing a photo uh your brain already has a signal of a differential signal that categorizes. You might not be so impressed because compared to today's GPUs and modern chips 150 milliseconds is really orders
+
+35
+00:22:33,000 --> 00:23:51,000
+of magnitude slower. But you got to admire our wet wear. our brain, our neurons don't work as fast as transistors. 150 millisecond is actually really fast. Uh it's only a few hops in the brain in terms of neuroprocessing. So yet again, this is telling us humans are really good at um um seeing objects and categorizing them. In fact, not only were so good at seeing objects and categorizing them, we even developed specialized brain areas that have expert ability in recognizing faces or places
+
+36
+00:23:12,000 --> 00:24:39,000
+or body parts. And these are discoveries by MIT uh neurohysiologists in the 1990s and early 21st century. So all these studies tell us well we should not just be studying these kind of character shapes or the sketches of images. We really should go after uh important fundamental problems that drives visual intelligence. And one of those problem that everything has been telling us is object recognition. is object recognition in natural setting. There's a lot of objects out out there in the world and studying this is going to
+
+37
+00:23:56,000 --> 00:25:11,000
+unlock is going to be part of the unlocking of visual intelligence. And that's what we did as a field. We started by uh looking at how we can separate foreground objects from background objects. This is called uh recognition by grouping. in the 1990s. Keep in mind we're still in AI winter, but research is actually happening and progressing. And then there is uh um you know studies of features and and this is some of you might still remember like sift features and matching and when I enter grad school the most exciting
+
+38
+00:24:33,000 --> 00:26:00,000
+thing was face detection. I remember that first year in my grad school this paper was published and five years later the first digital camera used this paper's algorithm and delivered uh automatic face focus because of uh face detection. So things start to work and be taken into industry and then around the early 21st century a very important thing start to happen is internet start to happen. when internet start to happen um data start to proliferate and the combination of digital cameras and
+
+39
+00:25:16,000 --> 00:26:28,000
+internet start to give the field of computer vision some data to work with. So in that early days we're working with thousands of d uh images or tens of thousands of images to study the visual recognition problem or the object recognition problem. So you've got uh data sets like Pascal Visual Object Challenge or Caltech 101. So that was I'm going to pause here. Um and uh and and this is where the the the first thread of computer vision start to progress and you might be wondering why
+
+40
+00:25:52,000 --> 00:27:12,000
+is she proing uh pausing because I'm going to come back and talk about deep learning. So while you know this field of vision was progressing through neurohysiology to computer vision to cognitive neur uh neuroscience to computer vision again a separate effort is going on in parallel and that eventually became deep learning. It started from these early studies of uh neuronet network things like perception and uh and people like Ramart started to you know work and of course Jeff Hinton in his early days
+
+41
+00:26:32,000 --> 00:28:02,000
+start to work with a small number of artificial neurons and look at how that can can process information and learn. Um and you've heard uh people like uh the great minds like Marvin Minsky uh and his colleagues uh working on on different aspects of these uh perception. But he also did Marvin Minsky did say that uh perceptuals cannot um cannot learn these X or logic functions and that caused a little bit of a setback in neuronet network. Well, things continue to progress despite the setback. And one of the most important
+
+42
+00:27:17,000 --> 00:28:39,000
+work before the inflection point, first inflection point is this neocognitron work by Fukushima in Japan. Fukushima handdesigned a neuronet network that looks like this. So it has about six or seven or five or six layers and then he kind of he kind of designed the different functions across the layers which you will learn more that more or less was inspired by the the visual pathway that I was describing. Remember the CAD experiment from simple receptive field to more complicated receptive field and he was
+
+43
+00:27:58,000 --> 00:29:09,000
+doing that here. you know the early layers have simple functions and then the later layers have more complex functions um and and the simple ones he call it convolution or he uses the convolution function and the more complex one he was pulling the information from the convolution layers so Neocognitron was really a engineering fee because every parameter was handdesigned he has there are hundreds of parameters he has to just meticulously put them together so that this small neuronet network can
+
+44
+00:28:33,000 --> 00:30:00,000
+recognize digits or letters. So the real breakthrough came around that time in 1986 is a learning rule. That learning rule is called back propagation. It's going to be one of our first classes to show you that Ramahar, Jeff Hinton and they they they took neuronet network um um um architecture and introduced a error correcting objective function so that if you put in some input and know what the correct output is, how do you take the difference between what the neuronet network outputs versus the actual
+
+45
+00:29:16,000 --> 00:30:36,000
+correct answer and then propagate the uh the information back so that you can uh um improve the parameters along the neuronet network and that propagation from the output back to the entire neuronet network is called back propagation. it follows some of these basic calculus chain rules and uh that was a watershed moment for a neuronet network algorithm. So one of the most and of course we're still smack in the middle of AI winter all these work was uh was happening without public fanfare but of course in in the world of
+
+46
+00:29:57,000 --> 00:31:13,000
+research these are very important milestones. One of the most earliest applications of this uh neuronet network with back propagation is Yamakun's convolutional neuronet network made in the 1990s when he was working in the Bell labs and uh what he did is just created a slightly bigger network about seven layersish and uh and made it good enough with great engineering uh capability to recognize letters and it was actually shipped to uh some part of the US postal offices and banks to to read digits and letters. So that was a
+
+47
+00:30:35,000 --> 00:31:50,000
+um application of early neuronet network. And then um uh Jeff Hinton and Yan Lun continue to work on your network. It didn't go very far because um despite these um improvements and tweaks of these neuronet network things more or less just stalled. you know, we uh they collected a big data set of digits and letters and digits and letters kind of was quasy soft in terms of recognition. But if you put the system through, you know, the kind of uh uh digital photos that the neuroscientists were using to recognize
+
+48
+00:31:12,000 --> 00:32:35,000
+cats and dogs and microwaves and chairs and flowers, it just didn't work. And uh uh a huge part of this problem is the lack of data. And uh lack of data is not just an inconvenience. It's actually a mathematical problem because these uh these algorithms are high-capacity uh algorithms that actually needs to be driven by lots of data in order to to learn to generalize. And there is some deep mathematical principles behind this rules of generalization and model overfitting. And data was underappreciated was underlooked because
+
+49
+00:31:54,000 --> 00:33:09,000
+most people are just looking at these architectures. They did not realize that data is part of the first class citizen for for uh machine learning and deep learning. So this is part of the work that my lab uh my students and I did in the early 2000s um that we recognize this importance of data. We hypothesized that the whole field was uh was actually missing this underappreciating the importance of data. So we went about and collected a huge data set called image net that has 15 million images after
+
+50
+00:32:31,000 --> 00:33:47,000
+cleaning a billion images. And this uh 15 million images were sorted across 22,000 categories of objects. We actually studied a lot of the cognitive and psychology literature to to appreciate that 22,000 um uh images uh were uh oh sorry 22,000 categories were roughly in the order of the number of categories that uh humans learn to recognize in the early years of their life. And then we open sourced this data set and created a imageet challenge called the large scale visual recognition challenge. We curated a
+
+51
+00:33:09,000 --> 00:34:18,000
+subset of image net of a million images, a million plus images and a thousand object classes and then ran an international uh object recognition um challenge for for many years. And the goal is that we ask uh researchers to participate and their goal is to create algorithms. It doesn't matter which kind of algorithms. And then we'll test you on your algorithm's ability to recognize photos and see if you can call out these a thousand uh object classes in as correctly as possible. And here are the
+
+52
+00:33:44,000 --> 00:35:06,000
+errors, right? Like first year we run this uh uh we run this uh um uh competition, the the error the algorithm the best performing algorithms error was nearly 30%. And it's really pretty abysmal because humans can perform under like say 3% error and then 2011 it wasn't that exciting but something happened in 2012 that was the most exciting year. That year um Jeff Hinton and his students participated in this challenge using convolutional neuronet network and they reduce the error almost by half and uh
+
+53
+00:34:24,000 --> 00:35:50,000
+and truly showed the power of deep learning algorithms. And so the participating algorithm in 2012 image challenge was called Alex Net. And uh the funny thing is if you look at Alex net um it's not that different from the Fukushima's neo cognitron 32 years ago but two two major things happened over between these two one is that back propagation happened it's a principled mathematically rigorous learning rule so that you don't have to ever use hand to tune parameters and that was a major
+
+54
+00:35:08,000 --> 00:36:37,000
+breakthrough theoretically. Another breakthrough was uh was u um was data. The recognition of data and uh the understanding of data driving these highcapacity models which eventually will have trillion parameters but at that time was millions of parameters was critical for for uh for setting off the deep learning uh uh you know the the the to for for this to work. And really many people consider the year of 2012 the and the Alex net algorithm that won the image net challenge the historical moment of the birth of or rebirth of
+
+55
+00:35:52,000 --> 00:37:17,000
+modern AI or the birth of deep learning revolution. And of course the reason many of you are here is since then we are in the era of deep learning explosion. If you look at computer vision's um uh main annual research conference called CVPR uh the number of papers have exploded and arc paper has exploded and many new algorithms since then have been invented uh to participate in the image that challenge in the following years. We're going to study some of these algorithms but the the the point is that some of
+
+56
+00:36:34,000 --> 00:38:03,000
+these algorithms uh beyond Alex that have had a profound impact in the progress of uh of the field of computer vision and into the applications of computer vision. So um so a lot of things have happened that we're going to cover some of these. Not only the field of computer vision made a major progress in the in creating algorithms to recognize everyday objects like cats and dogs and chairs. We also quickly right after uh image that challenge uh the 2012 uh moment. We've got algorithms that can recognize uh um uh you know
+
+57
+00:37:18,000 --> 00:38:41,000
+much more uh much more complicated uh images, can retrieve images or can do multiple object detections, can do image uh uh segmentation. These are all different tasks in visual recognition that you'll find yourself getting familiar with throughout this course because vision is not just calling out cats and dogs. There's so much in in the nuanced ability of visual recognition and uh and of course vision is not just static images. So their work in video classification, human activity recognition. I'm showing you this
+
+58
+00:38:00,000 --> 00:39:19,000
+overview. You will learn some of these. It's uh these are all um you don't have to understand exactly all what's going on here but I want you to appreciate uh the the the different the variety of vision tasks. medical imaging. Those of you who come from a medical uh field is you know whether it's radiology or pathology or or even other aspects of medicine is deeply visual and this has a profound impact. Um you know scientific discovery even the uh the seinal uh picture you probably remember of the
+
+59
+00:38:39,000 --> 00:39:57,000
+first photography of black hole is uh uses a lot of computer vision. um and computational photography techniques. Of course uh you know applications in the sustainability and environment is also um you know computer vision contributed a lot of that and uh and uh we also have made a lot of progress in image captioning uh right after the image that uh 2012 moment this is actually work by Andre Capathy when he was my student his uh thesis work um then we uh also worked on you know relationship ship
+
+60
+00:39:18,000 --> 00:40:34,000
+understanding. So not only uh not only visual intelligence is about seeing what's on the pixel, you also see what's beyond pixels including relationships of uh of objects. Um and also style transfer. Um a lot of this work you will actually Justin Johnson who will come to guest lecture this course will tell you all about his seminar work in uh in style transfer. Um and of course in generative AI eras we get these really incredible results like you know face generation and uh uh this is the very
+
+61
+00:39:56,000 --> 00:41:26,000
+early days of image generation of Dolly that I think this is the early Dali of course now midjourney and everything has gone beyond these avocado and peach chairs but uh but really we are squarely in the most exciting modern era of AI explosion. The the the um combination the three converging forces of computation, algorithms and data have uh have uh taken this field just to a whole different level where we're now totally out of AI winter. I would say we're in an AI global warming period
+
+62
+00:40:41,000 --> 00:42:12,000
+and I don't I don't see any of this slowing down. So um for both good and bad reasons and also you know just a word because we are in the Silicon Valley we're in the very building of uh Juan building and Nvidia uh lecture hall so we cannot ignore also the progress of uh hardware and what that played. So here is just the the um the the the flop per dollar graph for Nvidia's GPUs. And before 2020, you know, the progress was steady. But as soon as deep learning started to drive these um these uh GPUs
+
+63
+00:41:27,000 --> 00:42:50,000
+and chips, you can just see the the the the G-flops have just completely taken off. And uh we're just by alien measure we are in this accelerated curve of uh of lots of compute as well as lots of AI. And these are just different graphs showing you conference attendance, startups and enterprise applications in AI all across not just computer vision but also NLP and others have um have uh just exploded. Okay. So quickly, last but not the least, it's been exciting. There has been a lot of successes, but
+
+64
+00:42:08,000 --> 00:43:32,000
+there is still a lot to be done in computer vision. So this problem is still not totally solved and with great tools comes with great consequences as well, right? So um um computer vision can do a lot of good, but it also can do harm. For example, human bias. Every single AI algorithm today, the large ones are driven by data. And data is an artifact of human activities on earth and in history. And a lot of the data carry our bias. And uh this gets carried in AI systems. We have seen a lot of face recognition algorithms
+
+65
+00:42:50,000 --> 00:44:10,000
+having the same kind of bias that humans have. And we do have to really recognize that we can also use AI to impact human lives. Some for the good, think about medical imaging. But some are questionable. What if AI is solely behind deciding your job or deciding your financial loans? So um again, is it totally bad? Is it totally good? These are very complicated issues. This is also why I always get so excited when students from HNS or law school or education school or business school attend my class because not all AI
+
+66
+00:43:30,000 --> 00:44:43,000
+issues are engineering issues. We have a lot of human factors and societal issues to to solve. I'm also particularly excited by AI's medicine and healthc care use. And this is something really dear to my heart that uh professor Delhi and Zay who are also co-instructors of this course. We three of us work on AI for aging population as well as uh patients and to try to use computer vision to deliver um you know care to to people. So this is a good use and also even in terms of technology human vision
+
+67
+00:44:06,000 --> 00:45:21,000
+is remarkable. I want you to come out of not only today's class but also this entire course to appreciate despite how much computer vision can do there's just so much more nuance subtlety richness complexity and also emotion in human vision you know look at these kids studying whatever that their curiosity lead them or the humor in this image there's still a lot more that computer vision cannot do so I hope that continue to entice you to study uh computer vision. At this point, I'm going to give
+
+68
+00:44:44,000 --> 00:46:23,000
+the podium to uh professor Delhi to go over the rest of the class. Thank you. >> Awesome. Thank you, Fay. Uh great start of the quarter and I hope my microphone is working um right now. Okay, good. I'm seeing some uh nodding of heads. All right. Uh so very excited to be here with you all and um I'm hoping that um you will have a fun and challenging course with an amazing list of co-instructors that we have and and great TAs. So in this class we are going to cover a wide variety of topics around computer
+
+69
+00:45:34,000 --> 00:47:14,000
+vision use of deep learning in this space categorized into four different topics. We'll start with deep learning basics and and let's start actually with a simple question of what is computer vision really. So at its core it's about enabling machines to see and understand images and uh basically this is the most fundamental task uh in the space uh in this space is is image classification. You give the model an image say of a cat and the model should output a label cat and that's it.
+
+70
+00:46:24,000 --> 00:47:58,000
+But it's uh this deceptively simple task um is the foundation for much of more complex applications from self-driving to medical diagnosis and so on. So how do we teach a machine to do this? One of the simplest approaches is to use linear classification as you can see in this slide. So imagine each of the images in our data set is shown with a dot in that uh space and each axis shows some sort of feature uh which was driven from the image itself. Here we are showing a 2D space but uh for simplicity but the task of a
+
+71
+00:47:11,000 --> 00:48:45,000
+linear classifier is to find the hyper plane or the linear function that separates these two say cats from dogs. But we all know that these linear models often go just uh only so far. Um they struggle when the data isn't cleanly separable with a straight line. So the question is what's next? We'll get into uh the the topics of how to model more complex patterns and um if if we do so we often face challenges of overfeeding and underfeeding which um are the topics we will cover in the early lectures of
+
+72
+00:47:57,000 --> 00:49:24,000
+the the class and to strike a right balance. the right balance. We use techniques like regularization uh to control model complexity and optimization to find the best fit parameters. So these are the nuts and bolts of of deep learning and and creating these u uh models training models that not only fits the data but also generalizes to unseen and and new data as well. And now comes the the fun part. Neural networks, we've been talking about them uh quite a lot. And what neural networks do unlike
+
+73
+00:48:42,000 --> 00:50:21,000
+the linear classifiers they they stack multiple layers of um operations to model nonlinear um functions to be able to either classify to to solve the same problem of uh image classification and so on. Um these are the models powering uh everything from uh Google photos and then now everybody's familiar with chat GPD chat GPTs vision models and so on. Uh in this course we will uh go deep into the uh details of how they work, how they are trained and we will be looking into how to debugging and improving them.
+
+74
+00:49:32,000 --> 00:50:58,000
+After looking at the deep learning basics, we will cover the topics of perceiving and understanding the visual world, which is a complex process that involves interpreting a vast array of visual information. And to do so, we often first define tasks that refer to specific challenges or problems we aim to solve. Some of the examples are object detection, scene understanding, motion detection and so on. And to solve um these tasks, we use uh different models which are computational and theoretical
+
+75
+00:50:14,000 --> 00:51:50,000
+frameworks we develop to mimic or explain how our visual system accomplishes these tasks. Uh one of the examples of the these types of models is uh neural networks. So by aligning models and uh with with tasks, we can create systems that can see and interpret the world around us. Speaking of tasks, let's uh go back to the topic of image uh classification, predicting a single label for an entire image. Um but we know that real world computer vision is much richer than this and let's walk through some of the tasks
+
+76
+00:51:05,000 --> 00:52:38,000
+that go beyond classification. First semantic segmentation um where we we are not just labeling the uh the object or the entire image as cat or tree or whatever. Here we are looking for labels for every single pixel in the image. So every pixel is is a grass, cat, tree or sky. But we don't uh distinguish between individual uh objects. And next we have object detection where um we now want to not only say what is the what is in the image but also pinpoint the location. And that's why we create bounding boxes around the
+
+77
+00:51:51,000 --> 00:53:08,000
+objects and associate them with specific labels. And finally we have instance segmentation. We will uh review we'll go into instance segmentation which is the most granular of them all. It combines the ideas of detection and segmentation together and every object instance gets its own mask. So these tasks uh require you know much deeper understanding special understanding in images and they push the models to do more than just recognizing categories. The complexity doesn't stop with with
+
+78
+00:52:30,000 --> 00:53:42,000
+static images. Let's let's look at some uh temporal dimensions. So there's the task of video classification as Fe talked about where we want to understand what's happening in the in the video is the is is there someone running jumping or or dancing. There is the topic of multimodal video understanding which is combining vision and sound and other modalities. uh for example in this uh this this example the person is playing a vibrophone to really understand what's happening here we have
+
+79
+00:53:06,000 --> 00:54:27,000
+to create a blend of visual features and audio features to be able to understand what's happening and finally there is the topic of visualization and understanding that we we will be covering in this class where we want to interpret what's being learned uh by the models and and um see an attention uh frame or attention map of what the model is is attending to to do a correct classification and so on. And then uh we have models beyond tasks. we we look into models and uh there the very first topic let me introduce to you
+
+80
+00:53:47,000 --> 00:55:10,000
+uh that we'll be covering is uh convolutional neural networks or CNN's there are a number of operations we will be going over the details um in the class starting from an image a number of convolution sampling and fully connected operations and finally uh creating the output and beyond convolutional neural networks we will study uh recurrent neural networks for sequential data and even newer architectures such as transformers and attention based uh frameworks. So next we will be covering some large
+
+81
+00:54:28,000 --> 00:55:46,000
+scale distributed training topics which is kind of new uh this quarter. I'm sure you've all heard about large language models, large vision models and so on. And uh we will be briefly discussing how these models are actually trained. We know that data and data sets are expanding models and and large models are are models models are becoming larger and larger. And in order to train such models, there are some strategies for example data parallelization, model paralization that we'll cover in this
+
+82
+00:55:07,000 --> 00:56:42,000
+class. But beyond that, there will be so many challenges such as synchronization between these models and workers and so on. as well as several other um aspects that we'll be covering in one of the lectures this uh quarter and and we will go also some uh over some of the trends um for training these large models. After completing this topic, what we'll do next is looking into generative and interactive visual intelligence where we will first start with u with self-supervised learning. Self-supervised learning is a branch of
+
+83
+00:55:55,000 --> 00:57:17,000
+machine learning in which models learn to understand and represent data by getting some training signals from the data itself. We will cover this this topic. It's a it's um uh one of the approaches that has enabled training of large scale models using vast amounts of data that do not require labels, unlabeled data. And they have played a key role in recent breakthroughs in in computer vision in general. And we will talk a little bit about generative models. They go beyond recognition. They actually generate.
+
+84
+00:56:36,000 --> 00:58:11,000
+This is an example of the content of a Stanford campus photo uh which is reimagined in the style of Van Go's uh star night. This is known as style transfer. A classic application of neuro generative uh techniques. Generative models can now translate language into images given a prompt. A model like Dolly Dolly 2 generates an entirely novel image. This showcases how generative vision models blend understanding, creativity, and control in in their generations. And you've probably heard recently about
+
+85
+00:57:24,000 --> 00:58:56,000
+the topic of diffusion models in in general. That's another thing that we'll be covering in u this quarter. They basically learn to reverse a gradual uh noising process to generate uh images. And interestingly, in assignment three, you will actually be implementing a generative model that generates emojis from text u inputs from prompts. For example, a face with a cowboy hat, which is den noiseis from pure noise. Vision language models are the next topic uh topic of interest we will be covering.
+
+86
+00:58:09,000 --> 00:59:43,000
+Um they connect text and images in a shared representation space and given a caption or or uh or image the model retrieves or generates its corresponding pair as you can see. So there are a lot of advances in this area that we'll be covering some of the key examples. Again this is a key task for uh crossmodel retrieval or understanding and visual question answering and so on. So we'll get get to that in the class too. Moving beyond 2D, models can now reconstruct and generate 3D representations from images. And uh here
+
+87
+00:58:57,000 --> 01:00:42,000
+you can see uh some waxel based reconstructions, shape completion and even 3D object detection for uh from single view uh images. So 3D vision enables more especially grounded understanding which is crucial for robotics and AI ARVR applications. And finally vision uh powers empowers embodied agents that act in the physical world. So these models often must uh perceive, plan and execute whether it's cleaning um up a messy room or generalizing from human demonstrations. So with with all of these we will be covering different
+
+88
+00:59:50,000 --> 01:01:27,000
+topics around generative and interactive visual intelligence and finally we will cover some human- centered applications and implications and as as um very nicely explained. So there is um computer vision and generally AI have been um having a lot of impact in the in the past years and it's very important to to understand the human- centered aspects and applications and some of these impacts are reflected by these awards that are um going to researchers in in this space. Um it was first recognized by the uh touring award 2018
+
+89
+01:00:39,000 --> 01:02:01,000
+which is the most prestigious technical award given to major contributions for of lasting importance for computing. Jeff, Antonio, Benjio, and Yan Lon um received the award for conceptual engineering breakthroughs that have made deep neural networks a critical component of computing. Beyond that, last year in in in 2024, uh Jeffrey Inon was jointly awarded the Nobel Prize in in physics alongside John Hopfield for for their foundational contributions to uh neural networks. And finally, I want to very
+
+90
+01:01:20,000 --> 01:02:47,000
+briefly mention the learning objectives for this class will be formalizing computer vision applications into tasks. As you can um see some of the details here, we want to develop and train vision models, models that operate on on images and visual data, images, videos and so on. Gain an understanding of where the field is and where it is headed. That's why we have some new new topics also covered specifically in this uh this year. So the four topics that I mentioned earlier, we will be going over the
+
+91
+01:02:04,000 --> 01:03:20,000
+basics in the very first very first few weeks. Bear with us because these are important topics and you need to understand the the details first. How to build the models from scratch and then we'll get to more interesting exciting topics of the day. um computer vision and and finally we will have one uh big lecture on human centered AI and and computer vision. I want to just leave you with what we'll be covering next session that's that's going to be image classification and linear classifiers
+
+92
+01:02:42,000 --> 01:02:54,000
+which will get us started with the world of CS231. Thank you.
+

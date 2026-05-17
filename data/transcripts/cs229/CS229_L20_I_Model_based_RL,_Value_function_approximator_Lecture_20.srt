@@ -1,0 +1,476 @@
+1
+00:00:05,000 --> 00:01:00,000
+uh so I guess so today we're going to um on the last lecture on reinforcement learning and I'll probably spend like five minutes to briefly wrap up the whole course but mostly we're gonna talk about reinforcement learning so um so this is supposed to be a more kind of like introduction into introductory lecture on some of the a little more advanced topics in reinforcement learning so I wouldn't talk about a lot about details but mostly I'm going to Define some terms and so that it's
+
+2
+00:00:33,000 --> 00:01:43,000
+easier for you to kind of like either take another course on reinforcement learning or read some of the literatures yourself so I guess last time we have introduced the basic concept concept of mdp a Markov decision process that's the main language that people use to think about reinforcement questions I'm going to start by just reviewing some of the the key idea to recall that you have mdp Markov decision process this is a kind of like um it's described by a few important Concepts so one thing is the state space
+
+3
+00:01:08,000 --> 00:02:29,000
+you have to specify the state space to specify the mdp you have to specify the action space and the mdp has this transition probability which is called PSA for every s and every a H ice is is in the um ice is the state is the action for every I said a you have this so-called transition uh probability Matrix or transition probabilities which is to describe what is the probability that if you start with a state s and take action a what is the probability to arrive at a new state so um and there is the so-called discount
+
+4
+00:01:50,000 --> 00:02:58,000
+Factor gamma and a reward function r so after specifying these five quantities you get mdp and we also talked about the concept of a policy so policy is something you are trying to learn from interacting with the system the environment um you're trying to learn the so-called policy which is a function that maps from the state and action so this policy tells you what you do what which action do you take when you see your state s um so Pi of ice is the action you take when you are either State s
+
+5
+00:02:26,000 --> 00:03:45,000
+um and we also introduced these two concept uh two type of value function so the first type of value function is the value function of the state s so this is the value of the state s and then the policy Pi so this is the expected reward uh expected future payoff um of uh executing the policy pi from say the S right so you keep update you keep um you keep taking action from the policy Pi you start with State s and then you cut you you compute what is the total future payoff in expectation and that's V pile of x
+
+6
+00:03:16,000 --> 00:04:32,000
+so and we also discuss this so-called V Star of us this is oblivious to the policy Pi this is asking you know what's the maximum possible reward you can get from starting from State s right so you maximize over all possible policies and you look at you maximize the V pile phase um and the maximizer of this process the arc Max of this is kind of the optional policy you care about you want to find out what is the optimal policy all right so I think we probably didn't have time to Define this you know
+
+7
+00:03:55,000 --> 00:05:13,000
+um uh formula last time so the optimal policy Pi star is the so-called uh uh the arc Max hi and this this is actually um there's a unique Pi star that maximized the vpa is for every X just because the policy itself is already a function of us right so you're finding a policy that Maps the function as to the action you already can take different actions for different status so um and this is one way to this Define this and another way to define this is the following so this is another way to
+
+8
+00:04:36,000 --> 00:05:58,000
+define optional policies you say that this is the greedy policy with respect to V Star so so this is alternative definition of the optimal policy which is defined to be Pi star of iris is defined to be the the best action you take such that you maximize your future payoff what's your future payoff the future payoff is equals to R of s plus the payoff you get from the future steps which is gamma times um this PSA as Prime this is sum over S Prime this is the probability that you see your X Prime after you take action a which is
+
+9
+00:05:21,000 --> 00:06:36,000
+the variable here and then you times V Star X Prime right so this part is the expected reward you take you you the best reward you can get after you take policy you after you take action 8 right you take action a you have some chance to wrap at S Prime and you multiply the best payoff you can get after your after starting from X Prime and and this so that's why this is the expected the best possible expect payoff after you take action and this is the payoff you get at State s so the total thing is the best payoff including the
+
+10
+00:05:58,000 --> 00:06:56,000
+current payout the current return the best future payoff if you take action and you maximize over a and that's the the best policy the best that's that's the definition of the optimal policy right so because this is already of the optimal Choice you're already thinking about the optional choice for all the future steps and then you take the action a that is the optimal um for this step taking into account the future steps and that's the optimal policy for the status any questions
+
+11
+00:06:34,000 --> 00:07:43,000
+I mean sometimes this is the way to find out the optimal policy because if you find out what's the the V Star then you can find out the opt-in policy because you just take the greedy policy with respect to P star and we also introduced this important concept of bellman equation which is the main tool that we use to find out to compute V pi and V Star so for V Pi if you're given Pi then about my equation for v Pi uh Development question for V Pi is equals is this so V path is equal to RS
+
+12
+00:07:10,000 --> 00:08:17,000
+plus gamma times this right so so so most of the Belmont equations you can pretty much verify intuitive for yourself right so because what is the the reward the payoff when you when you write State s accessing policy Pi you first look at what's the current reward for this step and then UK what's the future reward the future reward involved can be computed by considering all different possible outcomes of executing pile files right so if you apply a pile of us then you can you have some problems around S
+
+13
+00:07:58,000 --> 00:09:32,000
+Prime and that's you multiply that probability with the the the the payoff you get after arriving at State as per okay and and this is uh and one of the important thing here was that this is actually linear uh in the variable we pass so linear in uh in this um in a variable V Pi one up to V pi uh I I think I used M as the number of total States so so this is a linear equation of these variables so you can solve the linear equation by any linear system solver and we also introduced this uh um
+
+14
+00:08:47,000 --> 00:10:07,000
+equation for v star which is of a familiar form but the difference is that now you don't have the pi you are you have to maximize uh the action so you have RS plus a Max you take the Max Plus the best possible action that maximize the future reward right so so now this is not a linear equal system equations in terms of V Star but you can use the so-called on the the algorithm we introduced last time was this iterative algorithm that you do the Bell map update iteratively uh you can do this iterative algorithm
+
+15
+00:09:33,000 --> 00:10:40,000
+to find out restart and the question so far this is basically a review of the last lecture so um okay so so far we have deal with you know in the last lecture we have to deal with no Dynamics right so in all of this right so we have described the algorithm is so and so forth everything was you know was kind of like under the assumption that the algorithm so basically the algorithm to solve the V Pi or the algorithm cell V Star the iterative algorithm I guess I'm not sure whether you still remember the algorithm
+
+16
+00:10:15,000 --> 00:11:39,000
+the algorithm here was just something very simple so you take a loop and you just say I'm going to update V I have a working memory for v i update V uh like a vs updated to be something like RS plus Max but you just compute the right hand side and then with the the V plugging in here and then you update the the left hand side with itself so this is called value iteration algorithmic cloud value iteration so both the value iteration algorithm and the algorithm that solves the linear system equation in this case both of
+
+17
+00:11:05,000 --> 00:12:28,000
+these two algorithms are assuming you have a known Dynamics so the PSA is known the all the family of PSA is known um um like in both of these two algorithms because you have to compute PSA right so so in in the arrow language you are saying that this means that you have the known transition Dynamics or the known um like uh environment that's how people refer to this kind of settings so but in reality what happens is that this PSA is not known anymore so for example thinking you know sometimes you do know
+
+18
+00:11:47,000 --> 00:12:42,000
+it right for example suppose you consider this is a game like playing goal right you are playing the goal or chess so you do know the rules of the game right you know what happens if you play an action a what will happen next right so you're gonna move this the each of the the piece you know in some way right so you know the root the rules then then in those cases PSA is not but in many other cases the transition Dynamics is not known right so for example when you control the robot right so in some cases you probably know a
+
+19
+00:12:15,000 --> 00:13:10,000
+little bit about you if you control this the robot would move forward but sometimes if you're doing a low level control you are changing the joint of the robotic arm or the the hand your body hand um you don't exactly know how the the all the all everything moves exactly you probably have some rough sense but you never you are never able to model them exactly actually this is a challenge so so this is actually the reason why kind of like now people are using more and more learning techniques so I think in
+
+20
+00:12:42,000 --> 00:13:49,000
+the in the early days I think for example there was a company called Boston Dynamics so what they do is they basically just use rule-based so basically they build this PSA they try to figure out from physics what's exactly this dynamical systems should it look like and then they they build their policies based on on that Dynamic ecosystem so but um but these days I think people are kind of like at least trying to apply more learning techniques because there is no way you can figure out exactly what PSA is on just just from
+
+21
+00:13:16,000 --> 00:14:09,000
+the physical rules you have to use some kind of like learning based technique sometimes also it involves interaction with environments for example suppose I have a robot that is moving on this carpet then the speed will be different from the robot moving on the on the hardwood floor right so so so the so the the other environment is also part so like the floor the other things also part of the environment so then you can never model everything perfectly where you would never know the texture of the
+
+22
+00:13:42,000 --> 00:14:51,000
+the floor exactly so so that's why we have to learn the Dynamics to some extent so so I think that's the um that's what that's the that's the in some sense that's the real uh problem in reinforcement learning where the Dynamics is unknown so when you don't have the Dynamics right so uh what what can you do so um you have to know something right you have to somehow have some information about Dynamics so the typical assumption which is is that um so the the the PSA this is I know
+
+23
+00:14:16,000 --> 00:15:30,000
+but you have the but given a state s and action a uh we can sample as Prime from this transition Dynamics basically you can just try try the robot in the real world we can just say I'm going to try my action a in a real world and see what's the next S Prime is right the X Prime will involve a little stochasticity you'll do some Randomness but you're going to observe one random sample from this transition Dynamics um so so so so so so so that's why when people call sample complex it means that
+
+24
+00:14:59,000 --> 00:16:09,000
+how many times you have to try this where for how many state interaction you have to try to see ice Prime um by just try it in a real world um so so that's how people generally learn so learn by interacting with the environment by trying all these actions and and and you somehow learn the Dynamics in some way so that's the basic assumption and then there are two type of algorithms in reinforcement learning that are um the most popular I think most of the algorithm can be either categorized into one of this group so so
+
+25
+00:15:34,000 --> 00:16:42,000
+one one type of algorithm is called Model based RL so here the model means the dynamical the model means the dynamic mode or the transition Dynamics so as the name someone suggests you know basically model based arrow means that you explicitly uh learn the transition Dynamics how do you learn it that you know there are multiple variants you know it depends on the situations depends on your how complex your Dynamic is but you know the transition dynamics of the transition probabilities on probabilities I guess they mean
+
+26
+00:16:17,000 --> 00:17:33,000
+exactly the same thing for for you know they already they probably just always mean exactly the same thing um but sometimes people have different terms so so basically learn this PSA or especially you build a model to describe this PSA um or like and you learn this model uh from the the samples the samples are the data you learn from and and then you build some approximate PSA from the samples and that's um that's the typical kind of like types of um um type of like a the table types of kind of like uh model
+
+27
+00:16:55,000 --> 00:18:11,000
+based R algorithm so from samples Okay so and there's another type of type of algorithm which is called model 3rl you know I don't think there is a really a a precise definition of any of this but in some sense the model 3 are I would just say is the negation of this right so you don't explicitly learn a transition probability so so just the the doesn't learn the transition so it sounds a little bit kind of like um um you know if you don't have any contacts you know this sounds might be a
+
+28
+00:17:42,000 --> 00:18:46,000
+little bit tricky because how come you don't learn the Dynamics but still learn the policy so it's possible for example sometimes you can just directly optimize um optimize this without learning the Dynamics right so you can probably um just uh um you use some kind of like a stock so so they are there you know there are ways to to to note um learn expressive dynamics of course you know eventually any algorithm needs to somehow have some understanding about Dynamics internally in some sense but
+
+29
+00:18:13,000 --> 00:19:20,000
+you don't have to expressly build one um right so for example one possible option is just that you optimize this function V pass over over the policy Pi suppose you can somehow take really descent over policy pi then you can um you can avoid dealing with the Dynamics where you don't use the about my equation you just somehow it'd be you just somehow compute the derivative of this respect five so some of the passwords you know are like some some of the algorithms Q learning is one type of algorithm and
+
+30
+00:18:47,000 --> 00:19:55,000
+another type of algorithm is called policy gradients so I don't think we have time to discuss any of this model 3 algorithm I just want to write them down here just the buzzword so that you know if if you happen to kind of like came across them you know they are model 3 algorithm you know in some of the quarters we do cover this some of the course have well two more lectures like depending on how many holidays they are so um okay so and another kind of like a um some of the kind of the definition of
+
+31
+00:19:23,000 --> 00:20:42,000
+terms people use here is that so um there is something called when you say tabular case or tablet RL this means that you have decreased this space discrete uh action and state space so on the other words the size of the state space is finance and and the size of the action space is also finite and this and actually impresses you are in some sense whether it's final or not probably it's not the most important thing the real important thing is that the state and action space are not too big they are
+
+32
+00:20:09,000 --> 00:21:04,000
+not like a billion or something they are something that um that is reasonable like in the last lecture we are we are basically assuming this right we'll assume that the state space is like has an anxious right and and we didn't talk that much about action space but we implicitly say that we actually all the algorithms required at the action space to be somewhat confined and and you can see like this uh for example this linear system solver algorithm if you want to solve the linear system
+
+33
+00:20:36,000 --> 00:21:32,000
+equations what are the variables the variables are the V Pi one up to V Pi n where m is the number of states so if m is infinite then you cannot solve this linear system equations where you have infinite variables even if m is not infinite even if m is something like super big say like exponentially back or something like a billion then you cannot really afford time to solve this system equations so so in some sense the most important thing is that you really don't want to have like if you are a type
+
+34
+00:21:04,000 --> 00:22:11,000
+blockage you are implicitly assuming that the state space is not huge um but you know as you can see you know sometimes the state space is just have to be infinite or very big because you have the state space is continuous right so um so so that's another case where you have continuous continuous database sometimes you have continuous action space as well so so for example the state space is something like Rd so you have a d dimensional Vector to describe the state and your action typically the action space is smaller
+
+35
+00:21:40,000 --> 00:22:36,000
+than a state space well maybe the action space is something like RK where K is smaller than D sometimes D can be like 100 or maybe sometimes even more than 100 action space typically if it's continuous then K problem would be 5 10 or something like that um and sometimes you have the combination right so you have continuous State space but find an action space that's also possible um for example if you for example one table case where you have continuous State space but a final action space is
+
+36
+00:22:09,000 --> 00:23:10,000
+a target game right you play this entire game and you'll stay space is this pixel space where you see the what like the the the the the pixels right so that that is showing to you and the actions but actually are actually fine and you just have a few buttons and maybe like some kind of like handle you can you can you can choose to play um so the action space is somewhat final um all right so so these are just some kind of like terms just in case they are useful uh and when you read some of the
+
+37
+00:22:42,000 --> 00:23:56,000
+the other books or literatures um okay so then in the next um 20 minutes I'm going to discuss you know how do you do the model maybe in the next 30 minutes how do you do the model based RL follow tabular case right so so basically you can see that their model based model 3 and tabular continuous way is kind of like you have two like four combinations and we're going to do the model based Plus tabular so and this is actually not very hard so so what you really want to do here is that um basically
+
+38
+00:23:21,000 --> 00:25:01,000
+model based tabular you want to learn expressive an exclusive model um on that kind of like a somewhat simulator two model PSA so what you have is that you have um a collection so so suppose we have a collection of trajectories and forgot whether I Define trajectory spectrojectors I just mean a sequence of like State actions um so suppose you say you you have some state as zero uh maybe let's say we start from the state as zero and you take some action maybe a0 and you arrive at S1 and you take some action A2 A1 and you arrive at
+
+39
+00:24:18,000 --> 00:25:24,000
+S2 so and so forth right so this is the one introduction right a sequence of State actions right so and so so far I'm not uh I didn't really tell you how I got this reaction but I'm I'm gonna talk about how do you learn the the transition probability from some game introductions right so suppose I give one should actually and so often you need more than one production so then you say after I take a bunch of steps maybe I take two steps I reset so I reset and then I get another traction that's called maybe
+
+40
+00:24:52,000 --> 00:26:14,000
+let's call this should actually ice zero one a01 after super scriptures to indicate that this is the first Factory and then I restart I get a new initial State and I call this as zero two and then apply a0 to S1 to a12 so forth so I got a and maybe I can get more right I can get a bunch of three actors here the subscript is indexing the time and the superscript is indexing which structure you are in how do you ask me ask the transition Dynamics recall that all of these State and actions are discrete variables
+
+41
+00:25:34,000 --> 00:26:41,000
+because I'm in a typical case so so basically I just have to estimate PSA as Prime right what's the chance to start with us and and take action a to an arrive at Express so this is kind of like a in some sense the problem is the the same as the uh some of this like I think we discussed this generative learning algorithm where we have this event model right where everything is kind of content based so um so basically you can you can compute the Max mo likelihood of the of this transition you view this as a parameter
+
+42
+00:26:08,000 --> 00:27:36,000
+right so this is something you want to learn right this is a parameter and and then you try to find out the maximum likelihood estimate for this parameter and it turns out that it's just a as usual it's the most kind of Natural Choice basically you just count on the the frequency to see this right you look you say in the denominator you say I look at how many times uh like a uh we let's say we took action hey I'd stay nice so you basically look at all the cases will take action a and state s and then
+
+43
+00:26:52,000 --> 00:28:13,000
+in the numerator you count how many times we took action a at okay I guess maybe I'm a little too worthy here so so basically a number of times if you take action a and say I State us and you arrive at I Supply so so the denominator is the total number of times you take the action I State us and the numerator is how many among all of this occurrences of ice and a how many times you indeed arrive as S5 and um and then that's that's your transition probability that's that's your estimated transition probability
+
+44
+00:27:36,000 --> 00:28:49,000
+this is the estimate for PSA um right so any questions so far and once you have this it's it's just accounting based algorithm you just count how many fractions you really arrive at S Prime among all the sa how many fractions of those you know really arrive at S Prime and and that's the the empirical frequencies is your estimate for the transition probability yourself okay I'm using the right click I should use the black color okay so and once you have this uh a tool to estimate the
+
+45
+00:28:30,000 --> 00:29:47,000
+transition probability then um you can you can have a model based R algorithm I'll still use the right if it's okay I think the the black one doesn't seem to be very good um so the model bits are algorithm is doing the following so it's pretty intuitive so first of all you initialize uh some policy pi maybe randomly let's say and then um you have some data set initially you have no no data so there's a d is empty I'm just defining a notation basically I'm going to use this data set D some way so and
+
+46
+00:29:17,000 --> 00:30:35,000
+once you have this uh and then what you really do is that you say I'm going to I have two steps the first step is that I'm going to estimate I'm going to collect some data so so collect data by executing policy pi [Music] um so so if you actually policy Pi in a real environment you're going to get some samples right that's that's our assumption our assumption is that you are able to get samples from the Real Environment you don't know the PSA but you can get samples from the pic
+
+47
+00:30:01,000 --> 00:31:23,000
+so so you're actually a policy pie to get your environment so basically what you do is you get a family of the environment of sorry you actually you actually your policy pie to get some samples unless the samples you got let's say they are denoted by S01 um something and you apply a01 and then you get that's one one so and so forth and you have X1 and zero two right this is the same kind of set of samples here so you get some samples and and then you add all of this reaction right on the two lectures
+
+48
+00:30:42,000 --> 00:32:17,000
+the trajectories 2D so D is a kind of like a set of data and then I'm using the bar spacing your you know awkward way how do I I think I'll just I have to so let's say I'm going to so you got this data um this kind of data right so so this is a set of data that is that is kind of like this okay so and then uh you add them okay so on the Second Step this is the first step you collect some data and then in the second step uh your estimate you estimate the the PSA using data indeed
+
+49
+00:32:07,000 --> 00:33:20,000
+Okay so uh and let's still use PSE as the estimator right so suppose you get some PSA um um that is supposed to be estimated for the real transition Dynamics um and then in the step C um so you you can use for example is value iteration um all could it could be also part of situation I guess we didn't have time to discuss pulse iteration in the last lecture but if you are interested you can read lecture notes to see what's the policy iteration but let's suppose to use value iteration to get
+
+50
+00:32:51,000 --> 00:34:32,000
+to get V Star the value function um for the estimated PSA the estimates you know Dynamics so just pretend that the isometrics is the real dynamics and then you solve the best policy um the boss the the optimal value function uh for data Dynamics and then you take Pi star uh to be you take Pi on be the optimal policy for the same for the isometrics foreign Okay so so are we done so it sounds like we're done right because we estimate some it's kind of everything simple right you collect some data you ask me the the the
+
+51
+00:34:02,000 --> 00:35:17,000
+the the Dynamics and then you get the best policy of on the isometrics but actually what you really have to do is you have to take it you have to have another loop outer loop that repeat this process so what you really should need to do is you take have to take a loop and so that after you you have some policy pie you want to collect some more data using the current policy Pi initially the policy Pi was random and you collect data from the random policy and after you get some policy Pi then you should
+
+52
+00:34:40,000 --> 00:35:42,000
+take another loop to collect more data and then we estimate your transition Dynamics and then recompute your policy and then you keep doing this you probably don't have to do a lot of Loops but but you have to do sub iterations so the question is why why you need this Loop uh Auto Loop right why we can't just go with the first Dynamics right we have estimated right so if you ask me one Dynamics you know if it's accurate enough then why we cannot go with that the reason is that there is the in RL
+
+53
+00:35:11,000 --> 00:36:07,000
+there's this problem with the this kind of like so-called exploration exploitation trade-off um which I'm going to elaborate so so the immediate problem is the following so it's possible that in the first round when you collect data your data is not very good it's very bad low quality data right so for example suppose you want to control a robot and and you initialize people pause randomly you you just do some random you just push the random buttons or control the robot in a random
+
+54
+00:35:39,000 --> 00:36:34,000
+way then the data you collect are are basically just some kind of like a on the nobody just kind of like wiggling around a little bit right it doesn't really move much so the data you clock is actually very very bad and then even you have a lot of data you see your data cloud is not good enough just because the the robot doesn't really do much and then your ultimate Dynamics is also not going to be good enough and then um uh your policy is also good not going to be good enough so what you really
+
+55
+00:36:07,000 --> 00:37:08,000
+want is that you want to do this iterative so the next round when your policies is kind of like reasonably okay you collect some higher order higher quality data and then you do this again and then your pores becomes even better and then you get even better higher quality data so so that's why all you want to have this Loop another example you know um is the following so suppose you have this is another example suppose for example um let's say I guess you probably all some of you have used this kind of like a automatic
+
+56
+00:36:40,000 --> 00:37:35,000
+robot to clean the to do the cleaning for the for the house where you have this small um like vacuum that can like a robotic vacuum that you can that can move in your house right so if you haven't used that I think how it works is that it first kind of like explore your whole whole room and to try to figure out what your room looked like and then the next round is it's gonna kind of like do some kind of like a take some introductions to kind of clean your room you know so that it covers
+
+57
+00:37:07,000 --> 00:38:06,000
+every part right so so something like that um however but if you think about this right suppose you have said for example say something like you have a like a a big room and then you have a small room adjacent to it right so you have some robots um that kind of tries to clean the room and navigate through the room right so what if you at the beginning your robot only kind of goes to this part right so you just in the first round your policy just only look at this room then your Dynamic model will only be able to only
+
+58
+00:37:37,000 --> 00:38:32,000
+is only accurate for this room right you only know what's what's happening in this room what's the chairs what's the what's the on the stairs or other kind of like so so far so and so forth right so um and but you don't know anything about this one so so so the so that's why you cannot um so that's the that's a typical situation where the data of the quality of the data is not good enough because your your quality of your data doesn't even cover some part of the room so then
+
+59
+00:38:04,000 --> 00:38:58,000
+if you don't do anything special then your robot wouldn't have incentive to go to this room because the robot doesn't even know the existence of this room in some sense so um so this is actually even more challenging the case because here even you just do this Loop you wouldn't be able to necessarily wouldn't be able to kind of like figure out uh this small room because begin at the beginning you just you just only see the large room and you never look at a small room and then then you figure out of the policy
+
+60
+00:38:31,000 --> 00:39:36,000
+to clean a large room and you still don't know the existence of the small room and you just keep doing this eventually use the only kind of clean the large room and you just never notice the existence of the small room so so in this kind of cases um you need even something more than this kind of algorithm on to on to to be able to to to work so um and typically this is called um this is a phenomenal exploitation versus exploration so exportation basically means that you believe your current transition Dynamics you just
+
+61
+00:39:08,000 --> 00:40:02,000
+strongly believe their current transition Dynamics um or your current kind of understanding about the world in the environment right and you just try to find an optimal policy for that uh for the current understanding of about the world and exploration means that you try to explore different kind of strategies to see whether you missed anything in this world right so in this case you know maybe you missed the small room so so so you want to do exploration to figure out the existence of the small rule and
+
+62
+00:39:35,000 --> 00:40:30,000
+exploitation really just means that you just basically do the best thing for the current map um so so as you can see you know you need some exploration to kind of at least cover the entire kind of like the entire world so you know like the existence of any other options so so typically if you really run this kind of reinforcement learning algorithm you have to add some Randomness in the policy pie so that you can have some exploration right so you don't want to just always in every round you just
+
+63
+00:40:02,000 --> 00:40:59,000
+always collect data from the policy Pi that is optimal for the for the for the current environment you also want to have some extraordinary exploration by adding some Randomness so so basically what you really do is that when you collect data you add some uh by asking file with some randomness so in this case you know you have some small chance to go into the small room so that you can see the small room and then you figure out you should actually kind of clean that small room you know uh with some kind of like a
+
+64
+00:40:33,000 --> 00:41:32,000
+trajectory uh with some actions um so maybe another example is that for example suppose you can figure out where where which restaurant you want to go right in in Palo Alto downtown right so suppose you just um suppose so far you know two restaurants and you know one of them is better than the other for you and and the exploitation would mean that you just always go to the better restaurant for your taste right and then you just keep go to that by the restaurant uh for you however um you may also consider some
+
+65
+00:41:03,000 --> 00:41:54,000
+exploration because you know there are many other restaurants in Palo Alto and you don't know the existence of them even or you don't know whether they are good on or bad you don't know their their taste whether their taste fits you so so exploration means that you should try some of the other restaurants even at a risk that those restaurants are not as good as the one you have known but you want to try more uh with those uh try to kind of explore those restaurants and exploitation means that you just
+
+66
+00:41:28,000 --> 00:42:20,000
+believe that okay there's no uh nothing I should explore anymore I just I believe in the my current evaluation of all the restaurants I just take the best one I need to keep going to that best on that one so um and there's a trade-off because you know if you keep doing exploration then uh you keep trying all different restaurants then you all inevitably you're gonna find some restaurants that are not very good right so and you're going to suffer and you're gonna say okay this doesn't work the money you're
+
+67
+00:41:54,000 --> 00:42:53,000
+gonna you're gonna like have some um bad energy in some sense um but um but uh but on the other hand um if you're only doing exportation you can miss other opportunities so so it really depends on and if you really go into the the RO literature there are different ways to trade off these two things right depending on how confident you are with each of the uh the choices uh you may you may decide to exploit more or you want you might decide to explore more um okay but I think we are not going to
+
+68
+00:42:26,000 --> 00:43:26,000
+have enough time to go into the details there's a huge literature uh here like even just when you talk about this going to restaurant thing right which doesn't have a sequential aspect you just go to the restaurant and and have lunch or dinner there's no sequential decision you still have to think about the decision the exportation and the exploration trade-off so is there kind of like a to do it optimally you have to be on some kind of careful [Music] um okay any any questions so far
+
+69
+00:43:01,000 --> 00:44:03,000
+so like like do we know that we we really we are we are coming back and it's learning about the world we are here and how we are just trying I'm random yeah so so I guess um maybe you're asking about you know what uh how do we do expiration right so what's the kind of the guiding principle for for doing and it seems to suggest that one principle could be that you only want to explore when you can get collect more information uh yes I think that's that's that basically uh
+
+70
+00:43:33,000 --> 00:44:37,000
+it's pretty much like what you said um but sometimes random actually can serve that need so if you just do random perturbation of your current option typically you get some you get a actual good amount of information but of course in some other cases you have to directly go for those kind of um in certain places actually actually you are exactly right so for for the tabular role case typically what people do is not just random exploration what people do is you say you own you take those actions that are most uncertain
+
+71
+00:44:05,000 --> 00:45:07,000
+for you so suppose you have some action that you don't know what outcome would be you have no idea what the outcome would be or you have very little idea you have very huge uncertainty about what outcome would be you try those actions more uh as exploration strategy but for the continuous State space right so I think it turns out that people most most of the algorithm works are kind of like local randomized exploration uh you don't try some crazy option you try in your neighborhood I think that's what I
+
+72
+00:44:36,000 --> 00:45:33,000
+should probably make a lot of sense in many in in those cases where you have so many different actions right so um for example if you if you think about your career planning like like if you really have suppose you like in theory you have really really a lot of actions actions you can try you can instead of being at Stanford you can try to be a professional soccer player right so or you have you can be a musician you can be a many different there could be many things I mean you you are very uncertain
+
+73
+00:45:04,000 --> 00:46:03,000
+about some of those problems right so like I wouldn't know what if I try to be a musician what would happen so um but but I think we have so many actions when you talk about technical videos but typically we have so many actions I think you somehow the algorithms most of the working algorithms tries to explore locally so so for example I'm a student here at Stanford and then I try something somewhat similar maybe going to intern at Google or maybe like maybe trying to try and graduate school or something
+
+74
+00:45:37,000 --> 00:46:47,000
+like that but I wouldn't try something completely kind of different um um you know there's no we don't have like a really a strong Theory to to say exactly what you should do um so so these are just it's a mixture of like some theoretical explanation and some kind of like empirical observations questions okay so I got some um so I'm going to use the rest of the the 40 minutes or 30 35 minutes to talk about continuous State space so I've talked about the model based Arrow right so now that I'm
+
+75
+00:46:21,000 --> 00:47:30,000
+going to talk about model based plus continuous State space um and the the the the idea is pretty much similar uh it's just that you have to um somehow there is a you have to deal with the continuous database you'll see there's some challenge so foreign like at least when I kind of like after I learned it um I feel like it has a lot of things to do with your kind of like life decision as well like of course you can only 100 trust the algorithm like it's not like you should Implement an algorithm in
+
+76
+00:47:19,000 --> 00:48:15,000
+your life decisions um but but there are some kind of like inside theory that is useful for um for the general kind of like this you know this is a you can model your life as a reinforcement algorithms it's just that okay one difference is that um in a real life you have much more information uh like so like in the in the theoretical formulation you're only collecting information from the samples right so you know nothing about the environment at the beginning any anything you have to you have to try it
+
+77
+00:47:47,000 --> 00:48:53,000
+out right like if you want to know anything about PSA you have to try it out um and sometimes you can share more and sometimes you can travel less but you still have to try um in life decisions in many cases you don't have to try you can already predict to some extent uh what's the outcome is um other than that I feel it's pretty similar just just my two cents um anyway so um I guess so so what you do with continuous State space so um so one easy case just to start with is when D is two
+
+78
+00:48:30,000 --> 00:49:31,000
+suppose you have the state space is only Dimension two I think when this in this case basically your state space is a two-dimensional um pen you have like um maybe like a so two two axis and one way to do it is that you just discretize your this state space into discrete variables right so before what each of the state is like two real number but then you say I'm going to discretize the state space there's some boundary of course because your state cannot be too big and then you discretize something like this
+
+79
+00:49:02,000 --> 00:49:57,000
+and then for every cell you see all the states in there is the number of states in this each of the cell but you say all the states in that cell is going to be con treated as one state just because they're all pretty much similar so as long as you have like a fine enough granularity here then you can basically treat every cell as a single state so and suppose you have like granularity up soon then you are going to have one over absolute Square well of absolute choices for the first one well absolute
+
+80
+00:49:31,000 --> 00:50:27,000
+choices for the second one so you have one of absolute Square choices of states um and you can probably take absence to be something like 0.01 I don't know exactly but you you're gonna get a ref at a reasonable number of states maybe maybe quite a lot but not like maybe a thousands or something like ten thousands but but it wouldn't be too too bad so that's the that's easy easy Choice um however this doesn't really work for when your dimension is higher than two I think when dimensions three it already
+
+81
+00:49:59,000 --> 00:51:07,000
+becomes tricky because if you think about you know uh your display is in the three-dimensional space then say suppose these three and you do this round of apps on kind of like uh so each of these um size of each of this cell is absolutely you need one over absolute so the power three states I guess it depends on what option you choose but if you choose absom to be something at point zero one then you have like a hundred to the power three that's like a million which is already a lot right so so maybe sometimes it's
+
+82
+00:50:36,000 --> 00:51:32,000
+still okay but generally when these three is already kind of tricky and then you can see this doesn't scale very well because if you have these for any D this would be one of the absolute power D and and when D is five basically it's kind of and impossible completely impossible so so we need an other approach for but actually just to just to clarify so when these two actually this is actually pretty typically a pretty good idea because it's simple and clean and when you don't have to deal with any other
+
+83
+00:51:04,000 --> 00:52:11,000
+complications the only thing is that you have one for absolute Square um States but there's no any other complications um it's actually a pretty good solution I think you know it probably should work in most of the cases so but when D is more than three um it's going to be a problem so um so basically what we do is we're gonna we're gonna redesign everything that we have discussed you know with continuous State space in mind so so I guess there are two questions one question is how to learn
+
+84
+00:51:37,000 --> 00:53:04,000
+how to learn PSA for continuous State space and then question two is that how do you uh do the value iteration of both for continuous database so um so for question one so let's discuss each of them so uh and the basic idea is that you try to kind of like extend what you have done to the continuous State space in some way um so regarding question one so how do you do it the first question probably is that how do you even represent the PSA right so now you have infinite number of us here so before for every ice and a
+
+85
+00:52:28,000 --> 00:53:33,000
+you have a vector to represent right and the the right so forever I say this PS is a distribution and it's basically the vector over I'm possible choices if I miss number of states but now you have infinite of s here or maybe exponential number of ads there and for every PSA this Vector is actually a very high dimensional Vector maybe a exponential dimensional vector or infinimental vector so how do you even represent this so um the idea is that you can change the way to represent it you don't represent
+
+86
+00:52:59,000 --> 00:54:26,000
+this uh uh you you you can do the following there are many ways but this is one way that is probably common learning on Dynamics foreign so what you do is you first say I'm going to model this process as prime example from PSA by assuming as Prime is equals to F Asa plus some noise this is one option not not all not the only option but one option is you say you assume that ice Prime is computed by applying some functional ion a and then add some noise that's my that's my way to sample as
+
+87
+00:53:54,000 --> 00:55:12,000
+Prime from this two solution so this is a way to define a distribution the distribution basically has mean FSA and some gaussian has some variance you know um like a cosine like like the same as the cosine so so this will give you a random variable S Prime given as an a so and this FSA let's say maybe maybe f as a is deterministic this is just some function we want to learn and this part is the noise I'll give you the stochasticity or maybe like a Kasai is maybe it's from some zero with some
+
+88
+00:54:33,000 --> 00:55:44,000
+covalent Sigma so sometimes you just I guess probably have seen I've seen that this is kind of almost the same as what we do with um like uh surprise learning I will just treat this as a super streaming problem so S Prime is my label as an a are my inputs so I'm just trying to predict my label from the inputs and the way I model this is I model this by some kind of like some function plus noise right and then you can do Max molecular Hood and the max molecular hood is just the the square loss so and you learn that
+
+89
+00:55:12,000 --> 00:56:27,000
+you learn this model f by some Square loss so for example so so you have to introduce some parametrization for us so for example F could be a linear model suppose you say you have some parameter A and B and your f it could be just a s plus b either way right so this could be the F which is parametricized by A and B um so A and B are parameters s and there are inputs so you just have this linear model uh I think this is called linear dynamical model so this is a linear model and another option is that you say I'm
+
+90
+00:55:57,000 --> 00:57:34,000
+going to say FSA is equals to uh maybe you can you can make you can use the the same idea as the feature uh like the when you do the kernel you can say this is like something like a times V of us Plus B times I don't know I forgot what is this is called This is called you just have some other feature something like this so both of this two fees these are some some features right so this is um like what we did with kernel method right so you introduce some features and then you are linear in a feature space
+
+91
+00:56:48,000 --> 00:58:12,000
+of course you can also say that on FSA um so I guess here department is a and b as well uh you can also say my FSA if you have parametric specimens Theta is a new network neural network applied on ice and a um something like this and this new network is maybe say parameter as bad title so so you just say s and a are concatenated as inputs of a network and you apply this network with parameter Theta and the output will be my FSA and in each of this case you can model your S Prime like this and then you can try to uh
+
+92
+00:57:33,000 --> 00:59:18,000
+find out the uh and this becomes a surprise problem so what I mean is that once you have Department transition right so then you can say you can the learning loss function is that suppose you have some data suppose data are something like I guess I've written this several times um S01 a01 is 1 1 so on and so forth so you have a bunch of trajectories sorry my massive index so you have these three actually and then you you you break these structures into uh three tuples so you mean that you view this
+
+93
+00:58:59,000 --> 01:00:58,000
+you on the eyes a collection of three tuples right so you say you have I zero one a01 comma S11 so this is the first three things here and you view this as the input and this as the so-called label or output and then you say oh I'm going to have for these three things which is ice one one a uh one one and S12 right so this again is the input and this is a label and you do this for every three typos you know in every introduction so you get the basically you get a sequence of like three tuples
+
+94
+01:00:02,000 --> 01:01:36,000
+um so you guys eventually you guys you know as say p minus one and is the number of triggers uh 80 minus one and I guess the a lot of indexing here but basically just the view every three concatenate three consecutive kind of like numbers as a tuple and you view the first as an AST the input and the the outcome is the output um something like this okay so you have a data side of this right so this is a set of size n times t a is the number of two actually T is the length of the trajectory um and then you do a supervised learning
+
+95
+01:00:54,000 --> 01:02:25,000
+so you have you just use the surprise learning so you do some kind of regression let's say you say I'm going to minimize over my parameter maybe let's call it Theta and I minimize this over I minimize the laws over all data points so what is the loss the loss so there is a i there's also a t I is indexing on the num the trajectories and T's in the second induction timestamp and every time you want to predict what you want to predict as t plus one in the iot directory using this function f Theta
+
+96
+01:01:47,000 --> 01:03:05,000
+as t i t i so this is the input of this Supply saving problem you apply the model and then you try to match it with the um with the output a label of this problem and here I'm using a L2 Norm because the label is a vector right so in many of the cases you see this parenthesis is square because in those cases when you do the typical super string problem your label is a real number right house price prediction right so the label is the house price you know which is a real number but here the label is a vector
+
+97
+01:02:28,000 --> 01:03:39,000
+it's the same you just to do the L2 knob score sometimes you can change the loss function you don't have to always use L2 num Square maybe you don't even need Square sometimes so you can use other thoughts I want some touch so um and once you do this you get the Theta and this I will say that will be on model any questions so so I think the benefit here is that before you have to specify PSA for every ice and a right as a vector right so now you you learn this function as Theta so the number of
+
+98
+01:03:16,000 --> 01:04:18,000
+parameters is Theta and then for every ice and a you can compute FSA um if you know the Theta so that's the that's how you do the model based RL part uh sorry that's how you do the model estimation part how you ask me the Dynamics and then uh you also need to deal with the value or iteration how do you do the value iteration for continuous database space uh I don't think I have the the math there so when you do the value iteration you know before you are trying to kind of like update the value
+
+99
+01:03:47,000 --> 01:04:38,000
+function for every state or every time right so not that's not possible anymore because you have so many states you cannot update the value function for every state actually it's not even clear how do you even uh how do you even describe a value function because before the way you describe a value of function is you say for every V Star as for every result I have a number right so but before you describe it by listing all the ads right for every us you have a number that's how you describe V Star
+
+100
+01:04:13,000 --> 01:05:29,000
+but now you cannot really describe it like that so what you do is you say I'm going to parametrize the value function by again kind of liking before by some kind of like new network or linear model right so you can say I parameterize I write my vrs as on um like something like um maybe one choice is that you can say this is say that transpose times some feature of s so this is a feature and this is the parameter that's my option and another option is you say my V of us is a new network with parameter Theta applied on a state
+
+101
+01:04:56,000 --> 01:06:07,000
+s right so this data is a description of of the value function and you need to learn of course in the other ways to do this for example one way to do it is that you can um for example design some right uh the right features using physical intuitions sometimes you know that some coordinates you know only is only meaningful when it combines with other currents in some meaningful way so so I think some Mitch of this could also work because you could design some features and then use these features as input to a new network
+
+102
+01:05:35,000 --> 01:06:57,000
+um but generally you just want to have a parametress form okay so that so we have done so so after we have the representation of the value function and the next question is how do you do the update right so before what we did was that so recall the update was something like v as is other to be something like RS Plus gamma Max a all right that's what we did right so we come we have some working value for V and we compute the right hand side of the development equation and we update the V with the right hand
+
+103
+01:06:22,000 --> 01:07:45,000
+side and then we repeat so um but you cannot do this because you don't have before we do it for every eyes but that's not possible anymore so so what we do is we try to make this is true for the eyes we have seen so basically for continuous State space so for the continuous case we just try to uh Ensure about my equation for States uh that we have seen you don't you show this for every state as anymore you just ensure it for the states you have seen and if you if you just want to do that then you can do
+
+104
+01:07:06,000 --> 01:08:29,000
+some kind of loss function to ensure that so um let me elaborate on what what do I mean here so so you first the first step is the following so your estimate the right hand side of the Bowman equation four um first States say S1 up to s so I haven't told you exactly how I got these states right so suppose I got some states that I have seen right in like in the algorithm and I want to only ensure the spell my equation you turn this to be equal to this or someone encouraged it they are the same only for this kind
+
+105
+01:08:14,000 --> 01:09:36,000
+of choice of States s is equal to one of this that's my compromise because I cannot do it for every state so um so what I do is that I I try to First Complete the right hand side so how do I get the right hand side for every state s so what I do is I just um so so basically I want to compute RSI plus this Max thing but the problem is that you know here I have a sum over S Prime again that's again a lot of different choices for us so what I do is I'm going to first turn this into uh an expectation
+
+106
+01:09:09,000 --> 01:10:30,000
+we write this as expectation of v as Prime and X Prime is sampled from p s i hey so after you have the expectation you can use the empirical sample to estimate this quantity so basically what you do is you say so for every by the way I think I forgot to mention one thing which is that now I'm talking about um I'm talking about uh continuous uh State space but fine and action space just so this is a slightly simpler question than both of them are continues um or just because I don't want to
+
+107
+01:09:59,000 --> 01:11:27,000
+overconfect too much so so the con so it's continuous State space and final action space so um what I do is I first estimate this by sampling some X Prime and then I take the max because you have a final number of states action space actions you can just take the max so what you do is you say for every a uh you get K samples uh let's call it S1 Prime up to s k Prime these are sampled from this transition Dynamics PSA PS uh s i right so you understand as I you try the action a and you see what is the outcome
+
+108
+01:10:48,000 --> 01:12:40,000
+you have a bunch of random outcome um and then you still Define q a to be um RSI plus 1 over k times this average right you use the empirical average basically right the empirical average of PV ice SJ Prime so this is supposed to estimate this is supposed to estimate RS uh I think I'm missing a gamma here sorry it's supposed to ask me RS Plus RSI plus gamma expectation v s i so I'm supposed to use this to estimate this without a max and then I take the max I call y I to be the max of this QA
+
+109
+01:11:57,000 --> 01:13:27,000
+so then this is supposed to ask me this one so y i is supposed to estimate this quantity and for every eye I have estimate right so for every eye I have estimated for the right hand side of this bioma equation and then I ensure that this development equation to be somewhat correct for all the eyes um that I have considered so step so step B I need to enforce um like v as I to be close to y i right because you know recall that we have spent so much effort to complete this y i it's why it's supposed to be the right side of
+
+110
+01:13:01,000 --> 01:14:23,000
+the bowel make right hand side of the biome equation evaluate at is I and I want this to be close to the left hand side and how do I do that I do that by saying I'm Computing Theta to be Arc Max of this loss function that encourages this and the loss function is simply just some L2 loss say I take the average over all the possible ice I's and let's say v um my vsi is parametrized by some saying right work like this way so let's don't talk about the right works but it works for anything right so say this is a
+
+111
+01:13:45,000 --> 01:15:01,000
+neural network you're not with Theta applied on x i minus y i Square so basically you want this new network to Output the right value function that match the target the target is the right hand side of the bioma equation actually you know in the theoretical in the in the RL papers you do call this target so this is the target you want to kind of match and and you want to choose the the updated such that your left hand side which is this new network on SI to match the target and that's your data that you got in
+
+112
+01:14:25,000 --> 01:15:34,000
+this step and again you have to do it's a value iteration you have to iterate because if you get stated this way you have to iterate to recompute your your right hand side and then after the left hand side where you call it when you do development the value iteration you complete the right hand side and you up to the right hand side you do this iteratively so um So eventually you also have to have iteration which is you say you let's see so you each between these two steps so you say you have a loop
+
+113
+01:15:02,000 --> 01:16:36,000
+um but I think there's a little bit to that specify everything yes I think I specify okay so this is the loop maybe maybe sorry let's uh okay yes so um I'm a little bit I should save some space before so let's say this is a and I have a loop here right so but this is not still not enough because this Loop is doing what this Loop is only doing the value iteration for this Iceman after s n right I haven't told you even how do you get asthma after I sent right this is just a bunch of states that you have
+
+114
+01:16:03,000 --> 01:16:55,000
+seen so and also even you you like you can update you can do this for every us or value iteration is not enough because our model based algorithm has something even up on the outer layer of the value iteration right so you're asking the model and you do value iteration and then you ask the model again you do value iteration now you have to do another outer loop to update your uh it's your samples right so because when you do the model based algorithm you either have a loop outside the value
+
+115
+01:16:30,000 --> 01:17:46,000
+iteration so this is the look for Value iteration and then we have another loop outside it um which is supposed to do the uh to iteratively update the model so basically you have another look and in this Loop you collect some data um say S1 up to SN you collect this data from current policy right you collect the data and then you do the value iteration on this data and then on and then you collect it again and you do value iteration so this is how it imitates the model based our algorithm for Tableau case
+
+116
+01:17:19,000 --> 01:18:33,000
+right because for the typical case we also have this Auto Loop where you you collect data and you do value iteration and you connected you to evaluate iteration so okay so I think I'm missing even more more step you collect data you collect data and also you need to also in this also Loop you also have to estimate Dynamics collect data my bad so collect data Maybe one and two you estimate Dynamics and then three you do the value tuition and the value iteration consists of another loop which is this
+
+117
+01:18:09,000 --> 01:19:16,000
+um any questions I see some confusing faces so so basically I think I erased that oh actually it was part of party here right so this was the part that we deal with the tablet case right so we have to the the two steps I think maybe I should actually rename them I just want two and three and there was a one step that that was erased which is the the first stack which is the clock data right so before when you do the tabular case you repeat between the three you alternate between the three steps
+
+118
+01:18:52,000 --> 01:20:14,000
+collect data asthma Dynamics validation and now for the uh for the uh The Continuous State space number one is do the same number two was done by this part of the board where where we learn this you know with the supervised learning and number three is done by here this part of the board where we do this A and B stuff the A and B to kind of like uh to do the value iteration so so number three is the is this part where we do the value iteration and and eventually you have to do a loop for this one two three on top of this
+
+119
+01:19:34,000 --> 01:20:41,000
+one two three okay I guess that's all for today and for this whole course I guess you know we have covered you know surprise learning and surprise learning and reinforcement learning um yeah and we try to kind of like cover more and more deep learning uh these days but um but also like some of these maths are included mostly because I think these are um kind of the foundations of machine learning so um I hope you um you had some fun with the course thanks foreign
+

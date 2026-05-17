@@ -1,0 +1,524 @@
+1
+00:00:06,000 --> 00:01:00,000
+I think at the beginning of the course we announced that we would have um a few guest lecturers, people who previously taught the course to come and give uh sort of a single guest lecture about a topic that they're very familiar with. And I'm very happy to announce we have the first one of those lectures today. So uh I'll introduce Dr. Rohan Gao. He is an assistant professor in the department of computer science at the University of Maryland. uh College Park and he leads the multiensory machine
+
+2
+00:00:33,000 --> 00:01:44,000
+intelligence lab there. He was previously an instructor for CS23 uh 1N from 2022 to 2023 and he this is while he completed his posttock with uh uh Fei Jajin Wu and Sylvio Saves. So without further ado, I'll leave it to Rohan to give the presentation today. >> Okay. Thanks. Uh hello uh hello everyone. So it's really uh exciting to be back to the class of two thes 231N and I'm Rohan uh just like Zen introduced. So as you can tell I'm very interested in multi model stuff. So a
+
+3
+00:01:08,000 --> 00:02:09,000
+lot only vision but also how we can make use of other sensory modalities like audio tactile or other modalities just like with humans to uh perceive understand and interact with this multiensory world. But of course uh vision is the most important modalities right that's why we have this course uh deep learning for computer vision and I'm sure up to this point that you guys are very familiar with image classification right given a 2D image like this how to you know uh give a class uh label to see whether it's a dog
+
+4
+00:01:39,000 --> 00:02:34,000
+it's a cat or it's a truck a plane that's a 2D based image classification and from the last lecture I'm sure you have also learned some other tasks that you can do on images not only you can just assign a single label to see it's a cat a lot. And also you can do semantic segmentation to segment you know the picture into different portions components and also have some semantic meaning like where is grass, where is cat, where is tree and also you can also put a bounding box on top of the objects
+
+5
+00:02:06,000 --> 00:03:03,000
+uh you detect in the image uh to see where the dog is, where the cat is and also do instance segmentation that you not only you want to know the categories but also you know uh for each category if there are two dogs I want to have a se segmentation pass for each category that's instant segmentation. There are a lot of like tasks classification recognition task you can do uh based on 2D images but that's not u the only thing that we can use for computer vision system to do right and also our
+
+6
+00:02:35,000 --> 00:03:38,000
+world is not just static like this so if we look at this image hopefully at up to this point you have uh you know learned a lot of tools that you can uh train some models to know detect this classify this is a kneeling room right you have also have uh tools you have learned that to put a bounding box to see that this is a dog and this is a baby and also even you can even have a you know segmentation mask to segment them out to see where uh those objects you detect are uh in the image. So today we're
+
+7
+00:03:07,000 --> 00:04:16,000
+going to f focus on video understanding. So more formally what is video? Basically video is just like this 2D image plus time. There's an extra time dimension. So we now we are uh tackling things not only in this 3D image but also but now in 4D we have this uh uh uh three * t t is temporal dimension and h and w are the spatial dimension. Now we are uh considering this kind of image and videos as like a volume of images of of video frames. So an example task is video classification just like image
+
+8
+00:03:41,000 --> 00:04:42,000
+classification right. So we are given a video like this uh some some person is like running right we want to take this videos as input and also we want to train some model right a deep learning model we want to classify whether this person is doing swimming or running or jumping or what actions that he's doing right just based on this uh temporal streams of video frames so we also we have from the previous lectures I'm sure you have already learned some you know loss functions like cross entropy loss
+
+9
+00:04:12,000 --> 00:05:08,000
+and you and train a image classifier. Similarly, you can do you can use the similar tools, you know, just train a video classifier. You just get some features and use the same loss functions and train a video classifier. So now the problem on video understanding is that how can we uh get features of videos that you can apply the loss functions you have learned from the previous lectures. Right? So uh and also another kind of difference between image classification and the video classification video understanding is
+
+10
+00:04:40,000 --> 00:05:30,000
+that now the things the task you want to do might be a little bit different just from the previous example in images for example for image classification usually you care more about the scenes the objects right you want to just uh uh doing a classification what is the object category for videos usually just like this example I'm showing here usually you want to classify actions it's often actions like where the person what activities the person or some some animals are doing in the in the videos
+
+11
+00:05:05,000 --> 00:06:14,000
+that's what we care about usually in video understanding. So nature of things to recognize can be a little bit different. And another problem that uh we want to be careful about for video understanding is that videos are usually very big. Right? Well you talk when we talk about images it's just like three times H* W. It's a single you know matrix of some you know RGB RGB numbers. But now we consider videos it's a sequence of frames. It can be like 30 frames per second. So in movies it can be sometimes
+
+12
+00:05:39,000 --> 00:07:00,000
+we can have even higher like uh resolution uh and also temporal uh resolution uh video frames and so if you consider uh space to store videos you for example if we consider standard definition videos it can take about like 1.5 uh gigabyte per minute if we store this video. we consider even high resolution like 19 uh 1,920 times uh 10880 and now it takes like 10 gigabyte per minute. So it takes a gigantic space in order to store this kind of video data and also there's no way for us to just fit this kind of data directly to GPUs
+
+13
+00:06:19,000 --> 00:07:24,000
+right if we we just have the input then we can have have a lot of storage to store them to source this kind of data and also there are other things you can have to store like the weights the activations in your convolution neural networks so then uh your model uh will be uh very huge and uh the solution what solutions we can have to you know to make videos smaller to make them you know processable. So one simple solution is that we just make videos smaller right u so although the high definition videos
+
+14
+00:06:52,000 --> 00:07:53,000
+and also the original videos are long when we can shrink things both temporarily and uh spatially right we can just u for example for 3.2 two second videos like this. We can for example we can maybe for each for each second we don't maybe we don't need all the frames. Let's just take five frame because there are a lot of redundancies uh in the video frames, right? If we take five five frames per second uh and also we just have uh smaller spatial resolution like 112 * 112 and now we can
+
+15
+00:07:23,000 --> 00:08:30,000
+make the videos uh slightly smaller. For example, it's 5 588 uh KB uh for this uh simple video. But definitely we can also do uh larger resolution. We have the compute right just like images and also how to uh train a model on this long videos we cannot usually like in the previous slide I showed that we are training this video classifier on 3.2 in two second, right? But videos can be very long, can be minutes, can be hours, right? So, one one way that people do is that we train on clips just like uh we train on kind
+
+16
+00:07:56,000 --> 00:08:56,000
+of chunks of this video frames uh using a video classifier. And what we do is that we train models to classify short clips with some low of uh FPS, frame per second. And we just use a sliding window. We, you know, sample a lot of different clips and use them as training data and we train a classifier. And then during testing, during inference time, we just run the model on different clips. We sample a few clips, right? We made 10 clips and then we average the prediction results. And that is our
+
+17
+00:08:25,000 --> 00:09:34,000
+prediction for this long video. And uh then what is the same post like video classification model uh we can use. So I have mentioned basically video is just like a sequence of images right a sequence of video uh image frames. So one simple thing is that we just treat them as images right that's the simplest kind of uh tool uh we already have right we just run single frame convolution neuronet networks because we already have all the tools right we have learned that we can train an image classifier if we just take our
+
+18
+00:09:00,000 --> 00:09:54,000
+image classifier to just run on top of those kind of video frames to treat them as images we can indeed get uh decent predictions right especially like a video like this you can see that there are not many changes across videos right the person is running maybe there are some different movements uh on body. But generally it looks pretty similar, right? Maybe we just you run a image action classifier and uh on the every frame maybe all of the frames will tell you it's running and you if you average
+
+19
+00:09:27,000 --> 00:10:26,000
+the prediction results from each image each video frame then you'll predict uh running for this uh particular video. So actually also it's a ve it's usually a very very strong baseline right for this simple image classifier u for especially for video like this because there are not too many changes across uh videos. So if you are trying to design some uh video classifier you should always run this first uh because that's kind of simple things to try and maybe you can already get pretty decent results. So
+
+20
+00:09:57,000 --> 00:10:49,000
+the question is uh whether we just run on single frame or we run on chunk of frames. So for this simple uh single frame state and basically we just uh you have a video of like 30 frame maybe you just maybe sample a few frames and just use a image classifier to run on those like sampled 10 frames and just treat them as images and you just directly average the results. That's basically uh the per frames they in. So I think you ask a very important question is how to sample the frame that's a very key
+
+21
+00:10:23,000 --> 00:11:12,000
+question because we're given a giant I'm I'm I'm talking about we want to sample some frames and want to run a CN on the frame. So how to get those frames? So that is actually also an active area of research. Uh one simple way is that you do random random sampling. If you have a one hour video, I don't know where where the interesting part where the important parts are, right? We just sample maybe every one minute I sample one frame and then I run image classifier average results. But obviously maybe this is
+
+22
+00:10:48,000 --> 00:11:52,000
+it's a gives some good results but maybe this is not the smartest way to do the sampling. There are other methods trying to propose smarter sampling strategy. Maybe you can sample one frame. you can then use that decision to decide where where else to sample. I actually also have some examples later uh in later lecture slides. Okay. So this is uh a very very simple kind of uh video classifier just like we just adopt image classifier single frame CN and uh similarly just uh maybe we take one step further instead of
+
+23
+00:11:18,000 --> 00:12:37,000
+directly just uh run single frame CN and average the prediction results maybe we can doing some fusion right across the you know features uh on the uh using the uh single frame CN so this is often called late fusion Basically the idea is that we still take some 2D ends and we have some input uh maybe t frames and for for each frame we uh use a 2D and then we extract some feature vector u and then we get u maybe a feature feature map of b * h prime time w prime and then we get because we have t frames
+
+24
+00:11:59,000 --> 00:12:56,000
+right then basically we have t feature feature uh feature maps and then the simple thing that we just uh uh flatten all the feature maps to vectors and then concatenate them. Then we have a giant like uh feature vector that basically contains all the information all the features across all the frames right and then what we can do we can use tools that we have learned like fully connecting networks right we train a MLP that maps this uh vector to some ner dimension and then we train a classifier
+
+25
+00:12:27,000 --> 00:13:33,000
+on top of it made to map it to class score C right so this is uh uh called late fusion because basically you can see that we extract the feature maps and we process them very independently And then at the very late stage we concatenate the feature vectors and run some fully connecters to doing the classification. So uh this is uh uh uh this is useful but uh one drawback that you can you can already probably tell from this uh example from my description is that this fully connect right it's it's going to introduce a lot of
+
+26
+00:13:00,000 --> 00:14:03,000
+parameters because if you if we concatenate a lot of we flatten them and across time and this feature vectors depending on how long how large t is then you can have a giant feature vector and you use this giant feature vector you want to map them into some lower dimension and you have a very large fully contracting layer and that will introduce a lot of parameters. So it's not very efficient. So another way to do this is that instead of concatenating them right we we we don't do concatenation we don't
+
+27
+00:13:31,000 --> 00:14:27,000
+use uh just use the giant feature vector and then doing fully then have a fully concatenator to map them to scores. We can actually just do a simple pooling right doing pooling we don't you don't increase the the you know the length of feature vector basically if you have feature dimension some feature dimension for a single frame and you pull across time right for this t frames you just doing a pooling to do a tempo aggregation and then based on this uh clip feature d and then you uh instead
+
+28
+00:13:59,000 --> 00:15:04,000
+of now instead of d time t you just you still have a feature vector of time d if you do pulling right and then you have a linear layer to map d to some uh uh dimens C that match the cast score and then you train the uh cross entropy loss on top of it and that's also late fusion but now we are using pooling and the and the the the good side here is that now you have you don't have to have a very large fully connect but the pooling can also you know uh get rid of information that may be important so that's kind of
+
+29
+00:14:31,000 --> 00:15:32,000
+the downside of this operation so the the reason I'm calling late fusion right The important part is late, right? Uh and when it's late, maybe there's some information that has already been lost when you have using this 2D convolution networks to process images, right? For example, for example, as shown in this red circles here. So, what uh is very important to recognize this video is actually the the motion of this uh this man's feet, right? It's moving up and down, up and down, and you
+
+30
+00:15:02,000 --> 00:16:04,000
+can maybe tell that he's running, right? So if you if we just use a single 2D CN to process them indiv independently as a uh 2D image and extract some feature map and maybe up to you know very late stage of the feature maps you it doesn't actually already contain uh it doesn't contain the information of this move movement of this of the feet of this man anymore right at this very late stage. So, so some information this fit up and down is like showing these red circles which should be useful cues right but
+
+31
+00:15:33,000 --> 00:16:33,000
+now it's not there in the feature maps the intuition is that if you you think of if you if you extract features from the early layers right it's very close to the original video frames so it's so it will it will be there's larger chance it will contain this no- level kind of information there's no movement like from the video frames right and also you can if you concaten them or pull them It will come across time. It will analyze the motion across time. But because we are processing a lot of convolution
+
+32
+00:16:03,000 --> 00:17:02,000
+pooling, convolution pooling up to a relate stage you at a very late stage it contains more high level information like demand information instead of this low-level motion information. So that's why it's most likely it's lost there. So uh that's the downside of late fusion. So instead of doing late fusion then we actually we can do early fusion. Right? So to do early fusion if we want to make use of the feature vectors more closer to the actual video frames we can just you know take this uh input uh and then
+
+33
+00:16:32,000 --> 00:17:39,000
+we we get we we directly you know reshape them to 3t * h * w right we just directly aggregate the information temporally uh from the very beginning and then we use some uh 2D convolution the first 2D convolution just directly map them uh to from from channel dimensions 3T to D basically we use the 2D convol solution to process this temporal information uh in the first layer to map uh the the channel dimension from 3D to D to process you know the the video frames of all the information from the frames uh in the in
+
+34
+00:17:06,000 --> 00:18:01,000
+the very beginning of the convolution neural networks and the rest of network is then in standard 2DC end and uh uh the only difference that now we destroy and collapse all the temporary information into a single uh single using a single layer and then the rest is just like image classification and then you're doing uh this classification using standard cross entropy loss for each frame we get a features like D right and each frame each each each each each single frame will give you a feature D so you have T this feature
+
+35
+00:17:33,000 --> 00:18:34,000
+vectors D so for pooling we are pulling over the features basically we can do mean pooling to average the features or we max pooling we max over the features then after that we still get a feature that's D so it's pulling over the features not the frames okay so that's early fusion Um so then the downside of the early field is that u uh although we explicitly trying to handle you know the motion from the early layer but then the but then we the we are we are trying we we are too ambitious we're trying to you
+
+36
+00:18:07,000 --> 00:18:58,000
+know capture everything in a single layer right we just concatenate all the frames and then collapse all the temp information a single convolution network maybe it's not uh going to achieve what we wanted to achieve right so then another solution is that we uh instead Instead of doing late fusion or early fusion, maybe we should do something in between, right? That's kind of like slow fusion. That's exactly what uh this 3D convolution 3D convolution network is doing. So in the intuition is that we
+
+37
+00:18:32,000 --> 00:19:31,000
+want to use this 3D version of convolution and and pooling. We want to slowly fuse information over the course of the network. Instead of doing it at a very late stage or at a very early stage, we gradually shrink over, you know, temporal dimension and spatial dimension to get this 3D feature maps. So that's the idea of uh 3D convolution neuronet network. We just use 3D convolution and a 3D pooling operation. So what is 3D convolution? 3D pooling. So you have learned the 2D convolution right for 2D convolution there uh
+
+38
+00:19:02,000 --> 00:20:23,000
+basically if you you take an image like this 32* 32 * 32 * 3 uh uh image and if you if you use 2D convolution basically uh you have learned that you can for each kernel you have this uh uh filter right you can you can have like this uh convolution kernel that is maybe 5* 5* 3 that that runs like in a sliding window approach just you know slides across across space and uh goes all the way ac for for each uh uh for each computation you you know you map that uh uh to a single value in that final activation
+
+39
+00:19:42,000 --> 00:20:55,000
+maps and then finally you obtain this activation map uh of 28 * 28 * 1 in this case you come over all spatial locations right and map this uh channel dimension the depth step go all the all go all the way over the channel dimension and uh map three map from three to to one in this case. So that's 2D convolution. So the difference uh is that for 3D convolution now uh we just have one extra dimension. So here uh you can think that uh uh here the input is c * t * h * w right the the extra thing is
+
+40
+00:20:19,000 --> 00:21:16,000
+this t dimension that is a temporal dimension. So, but what I'm showing here because we can only show things in 3D, right? We cannot show things in in 4D. So, there's actually one dimension that is not shown here that is the C dimension. The channel dimension is not shown here. So you can think that uh for each grid point in this feature map there are um many features there are uh C features uh in that spatial in that grid point and then for this uh 3D convolution basically if we if we are
+
+41
+00:20:47,000 --> 00:21:57,000
+talking about like a 60 6 * 6 * 6 convolution because it have one extra dimension now instead of slide over you know the spatial dimension just just in the H and W dimension over the images now we are sliding over this you know cube right we are sliding over uh this uh cube of dimension t * h * w. So includes both the spatial dimension and the temporal dimension and also it goes all the way uh along the channel dimension. So then it will uh gradually you can you know uh just like 2D con the other part is just like the uh 2D
+
+42
+00:21:22,000 --> 00:22:35,000
+convolution it just to have this extra dimension and then you get the 3D 6 * 6 * 6 3D convolution and maybe another layer of five* 5 and finally after you process doing this 3D convolution operations and you flatten the feature vectors and then you use a 4D connecters to map them to the class scores. So that is uh basically the idea of 3D convolution. So let's walk maybe through some toy examples to you know to better understand it to compare uh the early late and uh uh the uh 3D convolution
+
+43
+00:21:58,000 --> 00:22:55,000
+neuronet networks right just to just to give you a flavor how it works uh uh in practice actually definitely it's the better can be much larger and more complicated but here I'm just trying to show that uh a toy example to to walk through you know the the size of the feature maps and also the receptive field to give you a sense about what's the difference between early fusion late fusion 3D convolution neural networks. So for uh uh late fusion right you can think that for example in this case maybe
+
+44
+00:22:26,000 --> 00:23:25,000
+originally it's of uh the input is like 3 * 20 20 is a temporal dimension and 6464 is a spatial dimension and you use a two you use a uh 2D convolution basically we we we we just because we're doing late fusion we we don't do anything over the temporal dimension initially right we just keep the 20 the the temporal dimension we just build up the receptive field spatially right now we have the uh conute com 2D layer to map the channel dimension from 3 to 12 but just keep the temporal dimension 20
+
+45
+00:22:56,000 --> 00:23:50,000
+and then gradually maybe we use some uh pooling layers still we you know we didn't do anything with the tempo dimension so it's still 20 right but we because of because of the pooling operation we build up the receptive field in the spatial uh dimension and then gradually we maybe use another 2D layer and we now the facial map is 24 * 20 * 16 * 16 and we also we gradually increase the spatial receptive field But we still keep the temporal dimension 20. So we did we didn't do anything over the
+
+46
+00:23:23,000 --> 00:24:22,000
+temporal dimension. And finally just using a single like a global average pooling we pull across the feature maps 20 * 16 * 16. So we pull over both time and and the spatial dimension. And now we get from this 20 * 16 * 16 we get a 1 * 1 * 1 feature point. Right? So basically we collapse everything in the final single layer and we build up the temporal receptive field in the single layer. So that's late fusion. So then for early fusion what's the difference? So now instead of building slowly in
+
+47
+00:23:52,000 --> 00:24:56,000
+space or at once in time at end now we are building slowly in space and all at once in time at the very beginning. Right? So so so the input is still that 3 * 20 * 64 * 64 but now we're just using a single com 2D layer. Now we just treat this 3 * 20 as a single you know the the channel dimension. we just map everything this three * 30 uh just treat all of them as channel dimension and then map them to 12. So basically we use a single con convolution uh layer 2D 2D convolution air to map uh to collapse
+
+48
+00:24:25,000 --> 00:25:25,000
+all the temporal information from the very beginning. So we build the uh temporal receptive field in the first layer. So now the temporal receptive field becomes uh uh from 1 to 20 and then the spatial receptive field gradually builds up and we use pooling and count 2D to build up you know the spatial dimension just as late fusion and finally we use a global average pooling now with glob average pooling is only just trying to you know uh doing the averaging doing the pooling across space. So we build a slowly space but
+
+49
+00:24:54,000 --> 00:26:08,000
+all at once uh at the very beginning. So that's early fusion. So then what is uh 3D convolutional networks? So for 3D convolutionary basically we build slowly both in space and time. So that's why we call it uh slow fusion. So the input can still be like the same 3 * 20 * 64 * 64 but now we are using 3D convolutions. So we uh uh in the first layer uh we we just uh uh uh to map things from uh three time to to 12. We also just keep the temporal dimension in this case. And then we build up a little bit temporal
+
+50
+00:25:32,000 --> 00:26:25,000
+receptive field and spatial receptive field. And then we use a pooling layer. And then uh like four times four times four pooling layer. And then we you know we pull a little bit of this temporal feature and also spatial features. And then we further build up both this spatial and temporal receptive field. And we have another con 3D layer and and then to further build up the spatial and temporal receptive field. And finally we're using a global average pooling but now we're pulling over this four * 16 *
+
+51
+00:25:58,000 --> 00:27:06,000
+16 feature map and then to further increase the uh temporal and spatial receptive field. So we are building up gradually in both space and time. So that's kind of the difference between uh early fusion late fusion and 3D convolution neural networks. So you can see that uh for the early fusion and 3D convolution neural networks. So both of them builds receptive field over time, right? But what's the actual difference? So let's look at it uh more more closely here. So if we think of it as like a a
+
+52
+00:26:31,000 --> 00:27:53,000
+feature vector uh for each spatial grid point. So the uh the count filter uh if it's a 2D convolution, right? for this grid point it it will consider all the temporal uh along the temporal dimensions t t is equal to 16 right so so it is local in space but extends fully in time right that's like the the the filter in 2D convolution uh neuronet network but but what what is the problem think about it so if you if we directly just go all the way through time dimension in this 2D dev convolution
+
+53
+00:27:13,000 --> 00:28:20,000
+what problem uh it's going to happen so the shortcoming of that is that there will be no temporal shift in variance because uh the 2D the future now extends fully in time right so if we want to ner some like global transition in color have different time for example if we want to uh uh because it's it's a temp it's a video right it's a some when we recognize temporal information if there if there are some changes from like blue to orange at different time step. Maybe there's some change uh that is happening
+
+54
+00:27:46,000 --> 00:28:48,000
+at time step four. There's another same change that is happening at time step 15. But it's the same change like from blue to to to to orange. Right? If you if we go all the way through through uh through time, the future extends fully in time. Then if we want to learn the global transition at different time, then we have to have a whole separate future in order to learn this, right? So we have to you know learn a different uh this kernel in order to learn this different transitions across uh at
+
+55
+00:28:18,000 --> 00:29:17,000
+different time stamp. So there's no temporal shift in variance. So uh so how to recognize uh this kind of blue to orange transition just anywhere in space and and time right just like when we are doing image classification we want to you know have some spatial invariance. We want to okay be able to recognize the cat the image contains a cat no matter where the cat is on the right corner left corner right we want to to share the you know the the the kernels to be able to you know to recognize things at
+
+56
+00:28:48,000 --> 00:29:46,000
+different at a different spatial location here we want to be able to learn this different types of motion different time this temporal patterns at different you know temporal time steps so that's kind of similar idea so then the that's exactly the benefit of 3D convolution neuronet networks right Now instead of extends fully in time right in this that t dimension originally for this uh early fusion t extends all the way in the temporal dimension t is equals to 16 but now t t is equal to
+
+57
+00:29:16,000 --> 00:30:18,000
+three and we can slide over the temporal dimension right just like uh we learn this uh spatial invariance using filter on local regions now this count filter only span a local window in time and slide over in the time dimension. So the then the the benefit is that now we can have some temporal shift invariance because each filter slides over time. So we can reuse this filter to recognize different motion patterns uh across uh these dimensions. So the transition from blue to orange can now be recognized at
+
+58
+00:29:47,000 --> 00:30:54,000
+every moment in time. Right? Uh and then the benefit of of this is that we don't have to have separate filters, right? Then now we are more efficient, more representation efficient. we don't need to know separate futures anymore. So that's basically the main difference between 2D con early fusion and the 3D convolutional network. And also uh in the last lecture I think uh you have already also uh seen some examples of some tools that we can use to you know visualize what we have learned right in a in a 2D convolutional
+
+59
+00:30:21,000 --> 00:31:37,000
+networks. Similarly, we can also visualize uh uh filters just uh for this 3D convolution networks as this kind of video clips. You can see that uh uh there the I'm not you can see it. Okay. The learner filters from the 3D convolution neural networks uh because now the filter extends both in space and time. So uh we can see that in in in in uh as a video clip and you can see that for this filters uh some of them are just like those like um filters you have simple im image classifier right you can
+
+60
+00:30:59,000 --> 00:31:58,000
+have this kind of color patterns and also the different edges but you can also see that there are some other filters there's some temporal transition right from from one color to another or from some one edge pattern to another So, so that's uh uh and some some doesn't learn motion and some maybe focus on just like the image p uh the color patterns but some learns motion in like different uh directions. So, we can just visualize these kernels uh like this to to interpret them. Basically,
+
+61
+00:31:29,000 --> 00:32:21,000
+the main there are two two difference. One is like this slow fusion right basically in terms of convolution operation. Yeah, indeed. Basically 3D convolution but 3D convolution definitely and 2D convolution are totally different, right? It's a you you you have another dimension of convolution. You have this temporal dimension. So the main difference you have this temporal dimension in the convolution operation but uh practically uh you if you use 3D convolution your networks it kind of gradually builds
+
+62
+00:31:54,000 --> 00:33:04,000
+this receptive field uh over space and time. Yeah. So uh we have talked about this uh tools 3D convolution networks or architectures right but what data we can uh use just like image network what data we can use to do video to train a video classifier. So one kind of example data set uh challenge data set that uh people have been tackling is this uh data set called sports 1 million which was introduced uh in uh 2014. So for this data set you can see that what what kind of task we can do we can do very very
+
+63
+00:32:32,000 --> 00:33:39,000
+fine grain uh sport cateory classification right you can see that the here the blue shows the ground truths and uh the uh below uh the it shows the top five predictions and the green shows the correct prediction and the red shows the incorrect prediction. You can see that uh uh the action categories is that it's very very fine grain right there are 487 different types of sports like there can be like marathon ultra marathon actually don't know the the difference between them but it's kind of very kind of fine
+
+64
+00:33:06,000 --> 00:34:08,000
+different types of sports categories in this data set and uh here are some results uh if we you know train this different types of classifiers we have talked about on this uh sports 1 million data set so One very shocking results you can probably see here is that uh for this single frame model that I ask you to try uh for if you want to develop some video classification model uh uh is that it actually has a very good performance right you can can see that the single frame model if you just train trade at
+
+65
+00:33:37,000 --> 00:34:48,000
+the image classifier uh it actually gives you like 77.7 uh classification top five uh accuracy and for the early fusion we talked about it actually has a slightly worse performance and for late fusion is slightly better and if we use 3D convolution new networks in this case on this data set it gets like a 2% uh two to 3% kind of boost uh so the takeaway message here is that uh definitely you should try the single frame model it can usually actually works pretty well and uh uh and the 3D convolution by the 3D convolution new
+
+66
+00:34:12,000 --> 00:35:05,000
+networks uh I showed here is the 3D convolution neural network used in 2014 right but over the past 10 years we have seen a lot of advancements so the members are also uh getting much much better as I'm going to talk about in the later slide yeah for both training and testing it's just treating videos as images and train image classifier that's exactly what uh single frame is doing basically if I understand question correctly it's it's it's using image classifier but it's training a lot of
+
+67
+00:34:39,000 --> 00:35:40,000
+frames on videos it's not a single frame each video yeah uh and also uh because this data set is a huge data set because like I mentioned Videos are very huge, right? When people sharing data sets uh video data sets, we cannot just share them uh just like as like imageet we have people can can download from some database because videos are really huge like this data set has like maybe 1 million videos, right? It's not very uh doable to download all of them to going to share it. Actually, this video actually
+
+68
+00:35:10,000 --> 00:36:26,000
+originally when it was released is shared as a list of URLs, YouTube URLs. But one thing can you can expect from this YouTube vial URLs that people you know modify their videos and delete their videos, right? And so so that that original list maybe have one million videos but now maybe the I I guess maybe the list maybe half of the videos are already gone or maybe not there. So this data set is not very kind of stable because of this reason. Okay. So um another kind of uh like I mentioned 3D convolutional networks have been like
+
+69
+00:35:48,000 --> 00:37:04,000
+improving yeah gradually right since maybe 2014. So one early kind of popular version of this 3D convolution network is this model called 33N networks. So basically uh it's actually very very very simple. Basically it's uh uh it's very similar to the VG architecture we use for 2D image classification. uh but it's now we just con we just convert things uh to three dimension uh convolution network right uh and uh for example for the 3D CNN uh it you use three * 3 * 3 and 2 * 2 * 2 pooling and
+
+70
+00:36:26,000 --> 00:37:39,000
+except maybe for the first layer has some changes uh it's so over architecture it's very similar to like VG uh architecture it's now just we have this extra dimension and uh for this so it's so that's why it's called the VG of 3D ends and it's uh the model uh it was trained on this sports one mini data set that uh uh I just mentioned and because it uh it was introduced like in 2014 right and that that time uh imagine that you want to train such uh model it needs a lot of compute right because this uh
+
+71
+00:37:01,000 --> 00:38:01,000
+uh not so many people have access to you know a lot of GPUs at that time so Actually this model was trained at Facebook and they uh they and they literally released this model this the pre-trained weights they they train this 3D model on sport and release the feature um pre-trained model as a feature extractor. So many people actually who cannot afford to you know train a video model themselves actually started to use this model as a feature extractor. So you can just take a video and extract features from from this uh
+
+72
+00:37:32,000 --> 00:38:29,000
+from this uh uh using this uh pre-trained model say 3D model and then maybe train some other classifier. So uh people start to to to you know use it uh that's why how it get got popular. So so the question basically is about uh when we're talking about media classification about how many frames we should take as input in terms to extract the features. So basically for all this uh models we are talking about we assume that we are just passing a clip a predefined length like 16 frames right and or 32 frames
+
+73
+00:38:01,000 --> 00:38:59,000
+you train a single model that always takes 16 frames or 32 frames as input and there are other techniques we're going to talk about how we're going to aggregate this kind of clip level kind of prediction but for for now we're just doing clip level kind of feature extraction. So the the downside of this uh 3D CAN is that uh it's very computationally expensive right basically we just directly in a bootstro way we just make to make this VG kind of style from 2D to 3D and uh you can see
+
+74
+00:38:29,000 --> 00:39:38,000
+that uh for Alex that uh for this for this G-flop basically what what it means is that it's it's it's the ga flops it's trying to measure how many floatingoint operations you need for a single forward pass basically just trying to measure you know whether the network is efficient or So for Alex net it takes 0.7 g flops for VG16 it takes like 13.6 six g flop but for C3D right you directly doing this kind of mapping from 2D 3D to 3D now it takes like 13 uh 39.5 g flops so it's 2.9 times VG so it's not
+
+75
+00:39:04,000 --> 00:40:13,000
+very efficient right so uh that's the kind of the the downside of this kind of network uh and if we look at the performance on sports 1 million uh uh this just 360 now uh gets uh about like 4% uh gain in terms of it top wide accuracy. uh but uh so this is just like one example of the 3D convolution network we can do right but there are definitely can be other things right we have talking about a lot of tricks that we we we can do for 2D image classification right we can have this residue connections like you
+
+76
+00:39:39,000 --> 00:40:40,000
+you have seen in in ResNet right but definitely we can also do that just improve say 3D to adding some residue connections or other techniques we talked about in 2D convolutions and indeed there are also a lot of work on trying to improve this different 3D different types of 3D video convol uh video uh architectures and also papers on that but apart from that let's think maybe a little bit more on whether we should treat space and time in a separate way right because that indeed very very very different things right
+
+77
+00:40:09,000 --> 00:41:32,000
+spatial kind of information temporal information so maybe we should actually explicitly try to model things that is uh exists there temporally that is motion right so we humans actually can incredible job uh processing motion. So maybe uh take a guess what actions the the humans are doing here in this uh simple video. You can yeah say it out if you want. What's this seating? Yeah, just from this very a few points you can actually do pretty good good job, right? This is to recognize what actions uh that this person is doing,
+
+78
+00:40:54,000 --> 00:41:54,000
+right? Or maybe two person, right? Yeah. Now there are not any appearance information, right? Just a few points, right? Just motion. We can actually have a very good understanding about some activities that is going on in this videos, right? So how to pro so that's why how we process appearance and motion might be very different. maybe we should have separate kind of uh networks to process them. Right? So indeed that and that's kind of motivation uh for this work that uh was introduced in 20 uh uh
+
+79
+00:41:30,000 --> 00:42:31,000
+14 and uh uh they are trying to propose uh a two stream network to process appearance information and and the motion information separately. So basically uh one way to measure explicitly measure of motion is to use this uh concept called optical flow. So for optic flow basically the idea is that uh we want to measure the the motion the changes uh of the the motion of the pixels uh in adjacent frames. Basically the for the first frame for every pixel how it's going to move in the second frame. So it calculates kind
+
+80
+00:42:02,000 --> 00:43:14,000
+the velocity for points within the frames and kind of provides an estimation of where the points could be in the in the next frame sequence. For example, in this in this case like for frame t and t plus one basically this flow field right here are two two dimensions and tells uh whether where each pixel will move in the next frame. So fxy is equals to dxdy and then the uh i t + 1 x + uh dx that's where uh you know the the pixel in the last frame is equal to you know ix ity uh in the current frame. So it's trying to measure
+
+81
+00:42:38,000 --> 00:43:35,000
+uh a way to measure explicitly measure motion of the pixels. Right? So there are many papers actually on doing research and also how to actually compute object flow uh given a pair of frames. There there are ways to make different types of assumptions like some some work assume the object flow uh just assumes uh brightly stays constant as things move and then trying to propose some techniques to compute this object flow. But once you get it, it basically captures the motion information for two adjacent frames. And also you can
+
+82
+00:43:07,000 --> 00:44:00,000
+because there are two dimensions, right? Because it's trying to uh capture how pixels move horizontally and vertically. So you can actually also visualize it separately. You can visualize it the horizontal motion horizontal flow dx and also you can visualize the vertical flow dy. You can see that there capture some you know horizontal motion and the vertical motion. Uh so we capture this kind of low-level motion cues. So once you have a way to capture this kind of motion cues as optical flow uh then
+
+83
+00:43:33,000 --> 00:44:30,000
+people trying to you know propose a two-stream networks to se uh to train a motion classifier and appearance classifier. So this is a famous twostream network for action recognition. So basically it has a one single frame uh model that that's doing appearance classification to tell what action it is and then you have a separate uh stream that's the temporal stream come that takes this uh uh multi-frame optic flow for two for every two adjacent frames it computes the optical flow map and also uh it
+
+84
+00:44:02,000 --> 00:44:55,000
+separately traits the horizontal uh motion optical flow and the vertical vertical flow and stack them together and then they process them using a temporal stream convolution neuronet network and doing make a prediction and then they aggregate the prediction results uh for both the motion stream and the appearance stream to get a final prediction. So that's the idea of this two-stream network and it actually works pretty pretty good. Uh it's it's on another data set called UCF 101. It's
+
+85
+00:44:27,000 --> 00:45:27,000
+there are 121 100 101 action categories in this data set. So you can see that uh one surprising thing you can see that is that using only motion actually works very well surprisingly well right uh you can you see the performance of 3D cycle network and the spatial only that's only the appearance uh stream and the temporal only that's a motion stream you can see that motion stream actually is uh works uh much better compared to this the spatial only stream right the the appearance string so my hypothesis is
+
+86
+00:44:57,000 --> 00:46:00,000
+that uh uh it's less easier to overfit because you Uh for the motion uh there are a lot of like background information which may be not important for for the background uh for for the action classification but uh but but for the motion stream it actually contains the queue the very the the key information right the movements which are less easier to overfeit actually you can get better results on this data set. So so far uh uh we have been talking about uh short-term structures uh in in videos.
+
+87
+00:45:29,000 --> 00:46:38,000
+So um and also we have uh earlier I think uh the uh folks asking about uh you know how where how many fra how many frame we should use actually to doing the classification right so definitely it's very important uh to modeling the long-term uh temporal uh structure uh to to recognize more more distant in in time right so uh we already know actually we already have the tools we have to handle sequences uh to you know to use rec uh recurrent networks right to process a sequence of words to doing
+
+88
+00:46:03,000 --> 00:47:10,000
+some you know uh uh it's like caption tasks and some some some prediction tasks right so we can also use similar like tools right just recurrent new networks uh we just have a convolutional networks right we can uh not no matter whether it's a single frame convolution networks to get a 2D feature vector or uh use a 3D convolution network to get a feature vector from a clip but if you have a much longer video. We can get a feature vector and then we just use like uh the RNs or LSTMs we have talked about
+
+89
+00:46:38,000 --> 00:47:43,000
+to model the long-term temporal structure, right? We just process uh the local features using this recurrent networks uh and uh uh make maybe make a final prediction uh at the last time step, right? We want to do a single video level classification. Uh we just doing a many to one mapping, right? one uh output at the end of the video or we can also do like uh one to one mapping uh like we talked about right uh so for each uh for each frame we can make a prediction maybe there are some predictions we can want to make for each
+
+90
+00:47:10,000 --> 00:48:26,000
+video frame and we can also get this output for uh from like LSTM or recurren new network and uh uh actually this kind of idea is is already has already been explored in 20 2011 11 actually that's kind of way ahead of it time right because Alex that was introduced in uh 2012 right so but it's more popularized by this 2015 paper so uh you can also if you want to train this kind of recurring architectures for for modeling long-term temporal structure uh you can often only back propagate through this RN layer right
+
+91
+00:47:48,000 --> 00:48:47,000
+you can fuse the CNS you can pretend them on maybe on some clips on some image classification and you just uh otherwise you have a huge network recurrent part is a convolution part then it's it's very hard to kind of train them uh in end to end so you can just use this in C3D as like feature extractor and train this recurrent new networks so and we have already seen two approaches right uh to model the temporal structure right how about we can combine uh this kind of two two approaches right this convolution
+
+92
+00:48:17,000 --> 00:49:11,000
+networks and this recurrent new network both of them has some uh advantages we can maybe just combine them in a single kind of architecture to process the kind of video data, right? So indeed we can take some inspiration from this multi-layer recurrent new networks we have talked about right so each time stamp can takes this previous hidden time stamp from the same layer and also the output from uh the same time stamp from the previous layer right that's basically the idea of this multi-layer
+
+93
+00:48:44,000 --> 00:49:49,000
+RN but similarly we can just do do it for videos now we introduce you can introduce use this recurrent convolution neuronet networks right uh it's it's very similar um it's just like now we build this grid of features right where Each one is kind of a three dimension vector like two are spatial dimension and one is a channel dimension. Uh so each uh d so each feature vector uh it's uh uh like uh of dimension c * h * w. So each depends on two inputs for each vector for each feature map it depends
+
+94
+00:49:17,000 --> 00:50:21,000
+on the feature map from the same layer by the previous time stamp but it also depends on the feature map from the previous layer by the same time stamp. Right? Uh so if we record in 2D convolution network right where we uh we just map this feature map from some input feature to a output feature right but here for this recurrent convolution network uh we can just use as input this two 3D tensors right one from the previous layer and uh previous uh same layer and previous time stamp and one from the
+
+95
+00:49:49,000 --> 00:50:59,000
+previous layer and the same time stamp. So you recall a recurrent uh uh network it has this uh form uh form of like it has some hidden uh hidden layer uh feature map HT minus one. It takes input of this current time stamp, right? It have some uh some function with some parameter W and then process new state uh feature vector HT, right? That's basically R the the key of RN. So now instead we just change this vectors forms of RN. We just replace all this matrix multiplication in this uh in recurrent new networks with 2D
+
+96
+00:50:24,000 --> 00:51:22,000
+convolutions. Right? Now we get this recurrent convolution networks. So you have the feature map you do 2D convolution instead of have this matrix multiplication we get another feature map right and uh for also for features from uh the previous layer the same time stamp we also do this and then we use uh uh after doing this 2D convolution we add them together use another 10h layer and we get the picture map for for for the current uh uh hidden uh hidden layer so that's basically the the idea of
+
+97
+00:50:53,000 --> 00:51:59,000
+recurrent convolution network we com combine convolution operations and recurrent operations and we can also actually do this for any kind kind of recurren network of coal variants like GRUs and LSTMs. Maybe you have already learned from previous class and uh so now we can successfully combine the benefits of the two right we have this uh both spatial and temporal fusion uh inside this recurrent convolution new network. So but this model is not uh was not used too much and because uh there's
+
+98
+00:51:26,000 --> 00:52:27,000
+one uh large downside of recurrent neural networks which you have already learned that iron unit are very slow right for processing non-sequence and videos are usually very very very long and you have to pro you have to be processing in parallel but irons are very hard to to to be paralyzed but there's uh another thing another uh important model you have learned like uh I think in the previous lectures right what we can We can also use uh uh operations like the self attention right to uh process videos right for self
+
+99
+00:51:57,000 --> 00:53:00,000
+attention you have this kind of key queries keys and values and you uh and you you can you can use self attention here as a standalone kind of operation to process images here we can also do it for videos right and and one one very large advantage of self attention is highly paralyzerable right and all the alignment and this attention scores for all the inputs can be done completely in parallel. So indeed people are trying to you know use self attention also in videos right so they just pause self attention directly to 3D
+
+100
+00:52:29,000 --> 00:53:27,000
+right maybe you have some 3D convolutional network you get some feature map like c * t * h * w and then you can similarly you can you want to get some query query feature maps right you can use some 1* 1 * 1 3D convolutions to uh change the channel dimension to map them to query feature map that is c prime* t * h * w similarly for keys you get this feature map for values you get this feature maps and Then you want to get some tension weights, right? Basically, you're doing some transpose of this feature map from
+
+101
+00:52:56,000 --> 00:53:58,000
+queries and you're doing this uh uh uh vector wise uh multiplication. You get a attention score for each query and key uh feature uh kind of pair and then you can get this attention map and then use it to you know condition the values, right? And you can uh them to you can get another value kind of feature feature map and then you can map them you do another one times one time one convolution to map them back to you know the same dimension C so that you can be concatenated with the original feature
+
+102
+00:53:28,000 --> 00:54:27,000
+input. So that is a resid connection. So in total you can see that it's very similar to the self attention uh uh operations but now we move things to 3D and this is some one block that is very you know independent it can stand on its own right you can so that's so in this uh paper it's called looo neuronet network it introduces kind of block and call local block you can use it as uh a kind of building block for uh processing videos to do video understanding for example you can just add this unknown
+
+103
+00:53:57,000 --> 00:55:04,000
+local blocks uh into existing 3D convolutional network architectures and uh to you know to have some 3DC and have non-local block and another and another block of 3DC and add non-local block and each non-local block basically has is very powerful to fuse across both space and time and finally you do into this classification. So but one thing we haven't talked about is what is this 3D convolutional networks right what what what what we should use here. So uh another very kind of u interesting idea that people have
+
+104
+00:54:31,000 --> 00:55:37,000
+explored in the past that is can we reuse the 2D convolution neural network many successful architecture we have we have been we have talked about or have learned right directly to 3D right we can we just doing some inflation of this 2D networks so we can you know then we can get a 3D convolution new networks so for this work uh it's called I 3D architecture the idea is that uh they just take a two 2D say and architecture they replace each 2D uh convo pool uh layer uh the layer that originates of
+
+105
+00:55:03,000 --> 00:56:25,000
+dimension kh * kw but now we would we we replace with a 3D version that is a kt* kh* kw right they just inflate it basically and they use it uh on top of the inception block uh uh and then the after they doing this inflation uh bas uh then you you have architecture uh for processing videos right directly just reuse the existing architectures and uh al we now we can transfer the architecture that works pretty well in 2D to work uh also in 3D right but what one taking one step further people also
+
+106
+00:55:46,000 --> 00:56:38,000
+have been uh uh trying trying things that not only we can transfer the architectures but actually also we can transfer the weights right because we have already trained pre-trained a lot of architectures models on image data sets right maybe we can actually use the weights we have learned there there are some maybe some good prior information so they so one thing you can do is that you can just initialize uh uh the inflated CN with weights train on images for example you have maybe from from from for for from for from for for from
+
+107
+00:56:14,000 --> 00:57:19,000
+for from for from for from for from for from for for one originally uh uh you have you have this 2D common kernel right uh you just uh copy the kernel by KT times and you divide it by KT and you just uh now you originally takes one single image as input now you take this video of three times KT* H* W as input because we have divided them by KT if you just use this inflated version and use a copy the weights by copy the weights by uh KT times and then you you'll get the same output if you just
+
+108
+00:56:45,000 --> 00:57:51,000
+uh input a single frame or like a video of constant uh frames. So now we have a way to recycle this kind of existing 2D image based on this architecture uh and weights from uh 2D uh image understanding. So and actually it works uh pretty well. So if you look at the performance if you inflate them uh compared to this two stream convolution network actually has better performance and you can also inflate actually not only in the appearance stream frame you can also inflate the you know motion motion stream. So you actually get gets
+
+109
+00:57:18,000 --> 00:58:21,000
+uh some further improvements. Basically this is just like a technique you can do to reuse this kind of independent from the 3D convolutional networks. Those are you can you can you can build this kind of long local blocks and but this part I'm what I'm trying to say is that uh we can we have a lot of 2D convolutional networks uh the weights successful people have have you know shown that they are very successful and if we want to reuse them people have shown that that they can actually copy the weights
+
+110
+00:57:49,000 --> 00:58:49,000
+and reuse them reuse their weights so directly oper uh use them to operate on on videos so So that basically that's the kind of highlight idea and you just you can you can after you're doing this initialization you can still fine-tune right on the video data but you have uh the pre-trained weights from images. So then we can give you some good initialization for training the video models. So this is this idea of this I3D network basically is trying to copy the weights and doing the inflation.
+
+111
+00:58:19,000 --> 00:59:27,000
+Uh okay. Uh so there this is also just a one example of this video understanding uh net uh model and there are also a many other video transfer model proposed for for video understanding that is uh uh for example there are some uh this work uh space-time attention is trying to doing more factorized attention to transpose uh space and time and also there are some other method trying to be more efficient in terms of this transformer architecture or have some mask autoenccoder you heard about to doing more efficient scalable video
+
+112
+00:58:54,000 --> 00:59:45,000
+uh level kind of pre-training uh to doing video understanding. So I'm not going to talk uh them uh here in the class but if you are interested you can check out our papers because there are also a lot many progress has been made to have better you know video understanding models and if you look at the performance of progress that we I think we start here from like single frame model 62.2 two for on this uh on this this is another data set kinetics 400 it's a large video data set and then
+
+113
+00:59:19,000 --> 01:00:35,000
+you can see that for this video muscle encoder now it already gets to 90% uh accuracy so there are some other uh new transformer model has been proposed so so we are doing uh very well on classifying the the videos uh and similar to the image classification uh in the last class we can also use similar tricks for visualizing uh video models. So we can taking this uh two stream network uh as an examples we can randomly initialize the appearance image and the flow image uh doing a we doing a forward pass and then compute the the
+
+114
+00:59:57,000 --> 01:00:58,000
+score and then we can back propagate with with respect to the score of a particular class and you gradient ascent to you know maximize the classification score just just like we were doing the visualization for for the image based model right so if you then it's through this way that if you can we can visualize you know doing some visualization interpretation of what has been earned right so this is uh the left is the optimized image for appearance stream maybe it's hard to you know to guess what is maybe happening uh in the
+
+115
+01:00:27,000 --> 01:01:32,000
+in the video stream on the right uh it's uh it's optimized image for the flow stream one has like some temporal constraints to you know to pre prevent the temporal stream to change too too fast so there's so you can capture slow motion and the other is capture 's right motion. So you can guess what the action it is. Uh maybe this in this case is pretty clear. So what action is this? So this is a uh weak lifting. You can see that the maybe the single the middle one is doing some bar shaking, right?
+
+116
+01:01:00,000 --> 01:02:15,000
+And the the right one is doing some uh pushing uh overhead the the motion, right? So it's indeed actually you can see that this uh video models action models uh are learning something about this motion. Okay. So uh so so far uh I have been talking about uh how we can classify the short clips right uh the swimming running uh uh but another very important thing is that how we can other task is that uh this is called temporal action localization is that uh not only we want to you know just doing clip level or
+
+117
+01:01:38,000 --> 01:02:34,000
+classification sometimes we want to localize just we want to doing object detection right now we want to localize where in the video the action is happening right maybe sometimes the person is running sometimes is jumping so this is another there's another task this is another class called temporal action localization it's a uh you can also use similar maybe ideas from like fast RN right you can just generate some temporal proposals and then doing the classification and uh also there you can also do both
+
+118
+01:02:06,000 --> 01:03:14,000
+right this is a spatial temporal detection basically you can uh local you want to localize not only in space but also in time where the action is happening in space where the hashing is happening temporally. So this is another task called spatial temporal uh detection. Okay. Uh so so far uh I have been uh talking about you know the temporal stream and uh uh how architectures we can use to you know doing 3DC and twostream neuronet network spatial temporal self attention and uh we have already talked about some tools uh to do
+
+119
+01:02:39,000 --> 01:03:39,000
+that but yeah uh maybe in the final 10 minutes let's just uh revisit I hope to yeah finish uh in time uh let's revisit example that we started today right we we We I showed you a video, right? But that's still uh maybe not the full picture, right? >> So looking at video, we are doing video understanding there's another very important dimension that we have never covered till now, right? That is this. There's sound, there's audio, there's another modalities in videos, right? If
+
+120
+01:03:22,000 --> 01:04:17,000
+we we miss that ingredient, you not lose a lot of fun, right? There's emotions you can perceive. There's another you know interactions you can do if you combine this visual and motion. So if we have this audio in mind and we have this vision stream then people also have proposed many other interesting tasks and also we have explored other tasks to doing video understanding. Here's another example that maybe uh you in videos that maybe there are some multi multiple objects multiple speakers and
+
+121
+01:03:49,000 --> 01:04:38,000
+you can actually one task example task uh that I I also personally have explored in the past that we only guided audio source separation and you can actually understand trying to process things visually and acoustically you can use a visual information to guide the source separation you want to separate the sound components right because originally maybe there's a mixture you want to use a visual information to separate into some sound components this is called visually guided also separation ation to just to give you an
+
+122
+01:04:14,000 --> 01:05:02,000
+example for this task. For example, here is a speech mixture. Maybe sometimes we want to hear the sounds for each person individually, right? Then we can use their visual information, audio information to process them together to separate their sounds. So here is a what we can do. We can separate the voice for the live speakers. So only we can do this for for people for speech right when we have to process audio and speech and visual strength. But we also have do this for other types of you know sound
+
+123
+01:04:38,000 --> 01:05:32,000
+like muted instruments. Here's another example. We can even do music instruments separation by analyze the motion the object central information with the audio stream and doing the separation. Yeah. So this is another example for this task and also there have been since since once we introduce this new modality of audio we just want to do video understanding classification we can audio can also be useful cues right so there are indeed there are other work audio visual video understanding work proposed from
+
+124
+01:05:05,000 --> 01:06:14,000
+transformer attention based models trying to not only we want to map images to patches but also we map those audio spectrum to patches and use some transformer architectures to doing the classification or even we want to we can do some uh um mask autoenccoder style. We want to predict the patches for the images and also spectrograms doing video understanding. Uh so and and also another aspect people have been uh exploring is how to do efficient video understanding. So I will just quickly give some examples. So here uh uh
+
+125
+01:05:39,000 --> 01:06:30,000
+throughout this class I think many focus on clip clip level classification right just giving a clip how to doing this uh classification and after we classify a lot of clips and we want to aggregate information to get a video level predictions right that's action recognition in non videos so so for for efficient video understanding why we want to do efficient video understanding because you know videos are very long we don't we cannot afford to process every clip one by one right so there we're
+
+126
+01:06:04,000 --> 01:07:06,000
+trying to increase the the efficiency for a single uh clip just building like this X3D is trying to build better 3D convolution your network but also they are trying to you know this like this uh SD sampler trying to you know predict which which which clips are the most senior most useful and then you can com uh combine the predictions only run your clip classifier on those important clips and also they were trying to doing policy learning trying to you know predict which which modality we to use
+
+127
+01:06:36,000 --> 01:07:40,000
+in order to doing this uh action classification. We can select oh whether we want to use video, how many videos, how many video clips or whether want to use audio or other sensory data. Um so here's one example that yeah we we can also use audio trying to as a preview mechanism we can uh to to predict or which which uh where are the important uh moments and then we use that uh as a guiding crew to process the clips and to average the results. Um so that's about the efficient video understanding. So
+
+128
+01:07:07,000 --> 01:07:59,000
+that's also uh one area of research. So and also nowadays there people are moving to VR and AR right the smart glasses right and uh for this and also now in the future I'm I'm guessing there are a lot of like egocentric video streams that's another aspect of video understanding so not only you have this egocentric videos but you have also have this multi multi microphone microphone array multi- channelannel audios so then you can so how to doing better on video understanding from this egocentric
+
+129
+01:07:34,000 --> 01:08:36,000
+multimodal egocentric stream video streams is also a hot topic maybe uh we I've explored that uh we can do like use process this video streams the audio multi channel audio and the vision information to doing you know to predict who is speaking to whom and who is listening to whom imagine whe in the future you wear this smart glasses you want to to use it to help you to understand this different type of social interactions right so that's a ego egocentric video understanding so my final slide yeah definitely for LMS
+
+130
+01:08:04,000 --> 01:09:02,000
+right now uh there also a lot of ongoing work trying to build video level foundation models, right? How to connect the video understanding to Loom. So there indeed there are works trying to you know just map the videos to some tokenize them and map them to the LM embedding space and use maybe you can ask prompt the video uh foundation model you know where the person is uh what the person is doing in the in the video and then you output some you know uh uh text to you know uh to describe the videos.
+
+131
+01:08:34,000 --> 01:08:47,000
+So there are many work trying to connect video understanding LMS. So that's also a hot topic right now.
+

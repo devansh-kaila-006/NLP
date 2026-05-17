@@ -1,0 +1,424 @@
+1
+00:00:06,000 --> 00:01:33,000
+Last time on on Tuesday this week, we had a lecture on GPUs and how to train and how to use them and how to use multiple GPUs for training larger scale scaling your trainings and so on. an exciting um a new topic that we've added to this uh class this this year which is I think timely and very important with the increase of model sizes and and applications uh that you see the AI models have these days. And [sighs] before that we talked about we covered all of the key tasks in computer vision from classification,
+
+2
+00:00:51,000 --> 00:02:11,000
+semantic segmentation, object detection, instance segmentation and so on. And uh we're going to revisit some of these topics, some of the results of the models we talked about today. But so that's that's those tasks are uh still quite important. And then we talked about visualizing and understanding the models and and seeing what the models are learning. One of the things that we've discussed was for example using just in the in the early sessions we talked about nearest neighbor and and in the
+
+3
+00:01:30,000 --> 00:02:55,000
+pixel space and how we can actually do find the class of um we can find the class of images based on only pixel space distances and we discussed how it's actually not efficient and one of the things that we talked about was if we use the embedding layers or the feature space feature layers, what one of those fully connected layers in the the feature maps there from a convolutional neural network or any other network architecture that we use there that could actually be a good representation of images. And we talked
+
+4
+00:02:12,000 --> 00:03:36,000
+about the L2 distance if if we use that as the metric for nearest neighbor in the feature space feature of these models. Right? So these uh this means that these features are quite meaningful for the specific task that we had at hand. And this means that specifically okay if we run a neural network a CNN a resnet or even uh the transformer models and look at the representations the learned representations in different context you may uh see these as uh referred to with with different names large
+
+5
+00:02:55,000 --> 00:04:23,000
+representations features embeddings uh latent space and so on but These learned representations or features are very good representatives of the images. And if we can if we have a way to to extract those, we can always get the class labels out of those features as well by a simple linear model as you can see at the end here. But the major challenge that exists is training or building these networks at large scale is always um challenging and can you tell me why there's a challenge here? So the thing is that at large scale we
+
+6
+00:03:41,000 --> 00:04:56,000
+need a lot of labeled data because this network is trained starting from an image and at the end we have class labels. If we train this network, yes, these features are going to be very useful for getting those uh class labels out, right? But at scale, we need a lot of manual labeling efforts uh to to sit down and label the images one by one. If the task is segmentation, you have to label the pixels one by one in every image. And that is going to be very challenging. So the question is is there a way we can
+
+7
+00:04:19,000 --> 00:05:58,000
+train neural networks without the need for huge manually labeled data sets. So these manual labels are um the the challenge and we want to see if we can bypass them in a way to train any neuron network that gets us very good features. And with that the topic of self-supervised learning uh comes in light and that's what we are going to cover today. So having a a large data set of say images without any labels our hypothesis is that we can train a neural network using an objective function a pretext task that gets us
+
+8
+00:05:08,000 --> 00:06:44,000
+good features from images. And then when it comes to learning on a specific data set with a smaller uh set of data points which have labels, we we can basically train uh we can transfer this trained encoder and use that to extract features for a downstream task or downstream objective. So here we want to define a pretext task, a task that is general enough to be able to uh learn some good features from the images and then use that encoder. Let's call it encoder to uh to to solve another problem what we
+
+9
+00:05:57,000 --> 00:07:09,000
+call downstream task downstream objective which is the application that you care about. Like for example, we have a lot of natural images downloaded from in the internet. We can we can train something out of it and then we have a small data set of for example one of these industrial applications or medical applications that we have few labeled images on and we can now use that transfer of knowledge to extract features and then classify or or perform the task that we are interested in. So we want to delve into this topic and
+
+10
+00:06:33,000 --> 00:08:06,000
+go a little bit deeper in uh understanding the different components. In a nutshell, what self revised learning is, as I said, defining this preex task on the data set with no labels. encoder often uh gets us some learned representations and then another module of the the same neural network generates or or does um transfer the learned representations into the output space which could be labels or outputs that automatically are generated from the data. They are not manual annotations. So if we can do this
+
+11
+00:07:18,000 --> 00:08:37,000
+then um we have an an objective function a loss function and a neural network uh to be trained with that loss function. I'm as as you can see here we call the second part sometimes decoder a classifier a regressor depending on how we define our pre-text task. I will give you some examples but there are this could be any form of framework but when when it's encoder and then a decoder this is more of an autoenccoding framework that I'll I'll talk briefly about okay so after we we do this uh training with
+
+12
+00:07:58,000 --> 00:09:17,000
+the pretext task now we can um use the encoder and the learn representations for a downstream task which we just need to add uh one layer or even a fully connected neural network, a linear function or a fully connected neural network that you that predicts the labels and these labels are coming now from the data set. So that's that's the major that's the main concept of self-supervised learning that the pretext version of it portion of it doesn't require any labeled data to do the training. But how
+
+13
+00:08:38,000 --> 00:10:06,000
+to define the pretext task itself is not that uh straightforward. There are many different ways of defining those. For example, just keep in mind that we want to define um the pretext task in a way that it's first general enough that can get us good features and doesn't require manual labeling. So the labels should come from the data itself, right? So one one example would be image completion where we mask half of the image or parts of the image and we define a task to given the parts that are unmasked predict the
+
+14
+00:09:22,000 --> 00:10:44,000
+parts that are masked. Or for example, we rotate the image with a specific u angle and the task is to take the image as input and predict what's the rotation angle that it's gone through. And the other one could be a jigsaw puzzle where we have patches of the image that are not ordered but the the the the task is to output the correct order of these patches. and colorization is one of the popular ones that these are the four that we'll be covering uh very quickly today. But uh given the um blackout and
+
+15
+00:10:03,000 --> 00:11:25,000
+white version of the image predict the colors for each of the uh pixels. So solving the pretext task allows the model to learn good features. That's what we wanted. And we can automatically generate labels for the pretext task. So the two points that I mentioned we we need for a task that could be qualified as a good pretext task for self-supervised learning. Some uh quick considerations to to always keep in mind how to evaluate a self-supervised learning framework. There are many different pieces and and areas that you
+
+16
+00:10:44,000 --> 00:12:02,000
+can actually look into the pretext task itself because we are generating the labels and so on. It gives us the power to do some evaluation of how good the model is able to solve that pretext task. So that's one of the uh factors. Then representation quality itself is sometimes very important looking at um for example only representations without any fine-tuning or anything that I'll I'll be talking about or even clustering the the representations to see do we see a pattern in the representations and
+
+17
+00:11:24,000 --> 00:12:38,000
+sometimes there are some good dimensionality reduction algorithms uh I'm I'm referring to TSN testing here which we didn't very much talk about but this is a dimensionality reduction framework that you can reduce the dimensionality of the lens representations and then visualize it in 2D or 3D and see if there is a pattern that you can find in your representations. So robustness, generalization and computational efficiency I these are all quite important but the most important thing the most important um aspect that we are
+
+18
+00:12:00,000 --> 00:13:22,000
+after is the performance on the downstream task because we are doing the entire self-supervised learning and and define the tasks pre text tasks and so on to be able to improve results for a task of interest or something that we are we care about. Let's see some quick examples of how this could be done. Um this is an example of let's rotate the images and then predict the degree of rotation in as the output. So we can train this in a self-supervised manner without the need for labels of the
+
+19
+00:12:41,000 --> 00:14:03,000
+objects in the in the image. And we have a bunch of convolution layers in this example and then a fully connected uh neural network at the end to do this either regression or classification task. And this means that this is giving us some sort of uh a set of good features uh good feature extractor which we can at the end remove this these task pretext task specific parts the FC layers and puts one layer or in some cases multiple layers uh to to classify the features into the object label. So this time we
+
+20
+00:13:23,000 --> 00:14:58,000
+use the object labels to do the prediction and train these uh this linear uh function itself. So we often look for a shallow network because if the features are good enough then we don't need to um do a lot of training um on um on on getting the class labels out. So this is self-supervised learning in in general and um although we are talking about um the computer vision applications but this this paradigm of self-supervised learning was actually what enabled all of these large language models uh GPT4 and all of these
+
+21
+00:14:09,000 --> 00:15:36,000
+frameworks are trained with mostly raw data without any manual ual labeling and um not just in language models in speech and these days quite a lot in robot and um robotics and reinforcement learning because when we don't need any labeling data, we can start capturing data raw data without any manual labeling and use those for training. And that's why you see so many self-driving uh cars in the Bay Area collecting data because that's that's getting them the data and they don't have to really annotate the
+
+22
+00:14:53,000 --> 00:16:26,000
+data but they can still train models based on. So with that um today's agenda we'll we'll cover some of these pre-text tasks from image transformations and then I will talk a little bit about a set of algorithms that are around contrastive representation learning that um are slightly different from these image transformation based pre-text tasks but have shown promise. So let's start with the with the first part and there we will cover the tasks one by one. So I talked quite uh a lot about
+
+23
+00:15:40,000 --> 00:17:19,000
+rotation predicting rotations. Let's see if we can actually u rotate the images with random or or arbitrary degrees and predict the rotation uh angle with with a model. And our hypothesis here is that the model a model could recognize the correct rotation of an object only if it has the common sense visual common sense of what the object should look like u unperturbed. So these models mostly uh are are designed around this concept of uh visual common sense and um and then if if the model is able to to capture that
+
+24
+00:16:29,000 --> 00:18:06,000
+it means that it is also able to summarize the image the entire image into a a useful um set of features good features. This paper published in 2018 um implemented this with with just exploring four different angles of 0, 19, 90, 180 and uh 270. rotating th those into with with one of these rotating images with one of these angles and then using the convolutional neural network to basically predict what which which of these rotations the output is. And because they only created four different outputs, this is a
+
+25
+00:17:18,000 --> 00:18:58,000
+classification task because it only has four different cases, right? It doesn't have to predict the exact value of the angle the degrees but it's um it's actually um just predicting one of these four uh classes of 0 1 2 or three why 0 1 2 [sighs] or three. So with that um the authors were able to learn good representations and um with those representations they they started training the neural network at a downstream application basically fine-tuning the neural network based on um fine-tuning the encoders and
+
+26
+00:18:08,000 --> 00:19:37,000
+also the um the and the classifier actually we in this case they they froze first and second layers and then they fine-tuned uh the last convolution layer and the linear layer. So it's not entirely um fine-tuning the entire network but [clears throat] they were able to get very good results. This is on C410 data set, one of the data sets that we've talked about earlier. You see that when when the model is pre-trained, it starts with a good accuracy to start with. So it means that it it it already is in a
+
+27
+00:18:52,000 --> 00:19:58,000
+good shape and it's it's having a good understanding of the the objects even in the very uh first iterations. But if the task is simple enough, CR10 is actually not too hard to um to train a model for. If the task is simple enough, the supervised version, the fully supervised version and the one that starts with pre-training often converge to the same number, same same accuracy. But again, if the task is simple enough in a very hard application, much harder applications, often the supervised
+
+28
+00:19:26,000 --> 00:20:55,000
+learning frameworks, if we don't do any pre-training, larger scale pre-training, we don't get as good results. Okay. Um [sighs] so um they've they've done also some uh applica some some um experiments on this POS Pascal VOCC 2017 data set which involves a number of tasks including classification, detection and uh segmentation. And these all these three uh sets of tasks they've used different setups of just pre-train just training a few fully connected layers or all of the layers
+
+29
+00:20:12,000 --> 00:21:37,000
+for for the classification detection and segmentation tasks. If you look at the imageet labels like if we have a huge labeled data set and we pre-train on that uh data set we already get a very high accuracy but but again have this in mind that this is imageet with all of the labels involved for for the pre-training but if we don't do any supervised pre-training and the pre-training is all based on self-supervised it's it's showing that this rot ation uh framework is doing a much better job than many of the other
+
+30
+00:20:54,000 --> 00:22:14,000
+counterparts any of the other examples that are um other other methods that's we don't actually go into many of the detail of many of those but the it's showing efficacy for this rotation pretext task and see how it's different how much better it is if you start with a random um initialization of the weights. So the random initialization versus um pre-training with rotation um pretext task the the difference is huge and the the this rotation pretext task is not equal but it's close to pre-training on
+
+31
+00:21:34,000 --> 00:22:46,000
+the entire imageet. So one of the thing that they've they've looked into in this paper was looking at the features and how um how how the learned features are meaningful. I mentioned earlier that one of the ways of evaluating the pretext tasks generally self-supervised learning frameworks is to look at the features right and and you can always go from the features from the fully connected layers. We talked about grat cam and all of those other attention based frameworks how we can go from the
+
+32
+00:22:10,000 --> 00:23:18,000
+features back to the image space. So this evaluation involves projecting those into the image space and seeing what the model is looking at. If you look at the attention maps for the supervised model often the supervised model has more focused uh maps because it's it's only trying to solve one single task of classification. So if I if it captures the eye and and the shape around it doesn't care about the other other parts very much. But in cases of self-supervised learning often more
+
+33
+00:22:44,000 --> 00:24:00,000
+features more areas are covered because it has to have a more holistic understanding of the image because we don't know what the downstream task is. But it's that the the goal is to perform equally well in many of those. So that's one of the tasks. Um, if you do have any questions, skip it. I'll I'll stop after uh going over some of the tasks and if your answer your question was not answered, then I would be happy to to answer that. Okay. Um another one another popular um pretext
+
+34
+00:23:22,000 --> 00:24:48,000
+task was to to basically create this 3x3 grid and then use networks to predict the location of each of the given patches with respect to the sensor patch. So for for this patch which is around here the output should be three because we only have um uh eight this is 3x3 and the center patch is the the reference. So this also turns out to be an eightway classification task. It's getting any of these patches and yeah, it's trying to output what the location of that given patch it is with respect
+
+35
+00:24:06,000 --> 00:25:36,000
+to the input uh with respect to the sensor [clears throat] patch. Sorry. So uh so this is this was another another example but the um this other follow-up paper paper publication which uh turned this into a jigsaw puzzle framework was instead of saying to to uh asking the model to just predict which of these eight patches it is it tried to predict the exact permutation the right permutation. So what they've done was they used the same 3x3 um grid took all of the patches shuffled them randomly
+
+36
+00:24:50,000 --> 00:26:13,000
+and then ask the neural network to say which of the correct permuta which one should be the correct permutation. So they they basically predict the the correct permutations. Can you tell me what is the number of permutations you can you can have for um this setup? Say again. >> Nine factorial. Yes, exactly. So, it's it's a huge number, right? 300,000 something, I think. Uh but what they've done was they've they've created this lookup table with only four 64 um plausible possible uh rotation uh sorry
+
+37
+00:25:32,000 --> 00:26:56,000
+uh permutations and then only only they consider 64 permutations and when when they're shuffling shuffling that they do the shuffling based on one of these 64 and then the output will also be just a 6064 uh sized vector. So again, this turns out to be a just a simple classification task with 64 output classes and they've shown this is also a great idea for um solving to to define as a pretext task and on the same data set with similar type of tasks that I talked about and and how the supervision is is done. they've
+
+38
+00:26:14,000 --> 00:27:47,000
+shown their method was um outperforming some of the more uh previous models, previous frameworks and uh again remember that this is this was published in 2016. So next pretext task is just in painting predicting what is missing. So [clears throat] what they uh have done here was a simple masking strategy. You mask parts of the image and then you ask the model to impose those parts that are masked. So how it was done simple masking um on the input image but because we have the all of the images we
+
+39
+00:27:00,000 --> 00:28:30,000
+actually have the desired output. So an encoder turns this into a feature space and then that feature space is also there are some uh fully connected layers in the middle and then there is a decoder that decodes the parts that is missing and the loss function is comparing the output with what um the ground truth was. And this is basically learning to reconstruct the missing pixels. Again, um we've talked about autoenccoders a couple of times before. And um and this is also some form of an autoenccoder that it encodes the input
+
+40
+00:27:45,000 --> 00:29:18,000
+image um into a representation that you want to decode the output. But this autoenccoder is trained with a masking strategy. masking uh objective. So [sighs] just to show you some examples, the impainting evaluations um are a little bit interesting and tricky because when you want to impsing this this image, right? And it's um we can't say it's it's it's it's there are there is just one um output to to do um in this case here reconstructionbased frameworks earlier reconstruction based frameworks we're
+
+41
+00:28:31,000 --> 00:30:00,000
+actually creating a lot of uh fuzzy uh and and very um a smooth outputs And that's why this this paper that I'm uh referring to here was actually using an an additional adversarial objective function which I'm not going to go into details because this is a topic of discussion for the next lecture generative models. But generally how um these uh frameworks work, we have a reconstruction loss and the reconstruction loss is basically calculating the difference between the patch uh between the image X and the
+
+42
+00:29:17,000 --> 00:30:53,000
+image after it's passed through the uh the encoder. So um and then uh these this is element wise multiplication and we also have this mask here because we want to only calculate the loss function the objective function only on the masked area. So we do an element wise mask um multiplication with the mask as well. And this basically gives us the reconstruction loss for that part of the mask that um we had. So as I said the it's also supplemented with an adversarial objective adversarial learning uh loss function which
+
+43
+00:30:06,000 --> 00:31:45,000
+ensures the images that are generated are real looking right. So with with that um they have been able to improve the the parts that are uh reconstructed to look a little bit uh better but again details will be um discussed in the next lecture. So this reconstruction uh framework was actually able to again provide and this ours is the same provide additional benefits when it's run on the same classification detection and segmentation task on uh same set of data sets. I will come back to this reconstruction
+
+44
+00:30:56,000 --> 00:32:22,000
+based frameworks and and masking in a bit because it's one of the most uh used models or pretext tasks that these days are used for for pre-training. Uh so I'll I'll I'll come back to this but before that let me introduce this this um other pretext task of image coloring. And this is another very simple framework setup that we turn a colored image because our data set is mostly colored colored images, right? We turn that colored image into its components or channels that that separate the
+
+45
+00:31:39,000 --> 00:33:03,000
+lightness, the illumination from the color itself. There are several color spaces. If you've taken uh courses like computer graphics or CS131 other uh computer vision class, you know that there are so many different color spaces. Mostly in computer vision we use RGB. But if you want to separate lightness illumination from color, there are some other color spaces. For example, lab color space L A B is one of those color spaces that separates lightness from color. So we have one channel for lightness and two channels for defining
+
+46
+00:32:20,000 --> 00:33:46,000
+the the actual color. And if we add these two all together, L A and B all three channels together we can actually get the colored image. So the pretext task here is simple. Given the L channel, predict the A and B channels. Right? So again, we don't need to do any manual annotation. It's already in the data. [snorts] And this was extended into uh other frameworks. Why why should we only look at like given L predict A and B? We can also do the reverse, right? And that um led us to split something that we call a
+
+47
+00:33:04,000 --> 00:34:21,000
+split brain autoenccoder where the input image is split um is basically turned into one the the L channel lightness channel and the color channels uh these two images. This is one channel. This is two channels of color. And we train two functions, two neural networks, sets of layers to predict the other one. And then at the end in order to calculate the loss function uh and um back prop we just merge these two to generate the actual image and a loss uh an L2 loss any distance function can help with
+
+48
+00:33:42,000 --> 00:35:08,000
+training this neural network in a more generic uh framework um or or formulation. The idea is given one channel or a set of channels, predict the others and do the same uh for X2. So sets of channels X1, sets of channels X2. So given one, we can predict the other one. And these are the neural networks for those. Merging them, we'll get u the value the image and then loss function would be simple. So if we have such a framework, we can run it on everything, not just u color and illumination,
+
+49
+00:34:25,000 --> 00:35:55,000
+right? We can have um data from some of these RGBD sensors, those that have um RGB channels and and depth channels like for example connect and and other sensors that they use in robotics. And given the RGB channel, predict the depth and vice versa. And this was a very successful downstream task that was used for different applications. And as you can see this this uh this model and uh this paper that I just um the split brain and uh the papers that um the the model that predicts colorizes the images is those
+
+50
+00:35:11,000 --> 00:36:41,000
+those features themselves. they do have actually a very good level of accuracy for um predicting the class labels and you can see there are many different other frameworks that are used also um in terms of uh comparisons again this is not as good as supervised learning because there is no label involved uh here and and it's just based on the the learned features with concatenated features out of f_sub_1 and f_sub_2. Okay, so uh the image coloring pre-text tax was actually very interesting because now we could um not only use it
+
+51
+00:35:56,000 --> 00:37:19,000
+for pre-training neural networks, but it was also itself useful somehow because now we could colorize images that we don't have a colored version. So we could colorize images that and then videos that we don't have a colored version of those. And not only that, uh one of the other interesting results that they they they've shown in the paper was uh this image of yuseimmed and the halfdme that um they colorized. The interesting thing that is is seen in this image is the consistency between the actual object the halfd dome
+
+52
+00:36:37,000 --> 00:37:58,000
+or trees or the bridge and its reflection in the in the water. So the model was was also able to understand that this reflection should also somehow preserve uh the color based on how it was trained on vast amounts of data. Again, keep in mind that these models are all pre-large language large vision models and they have been trained on specific tasks. So they're not trained for solving everything. So this could be actually extended into video settings because now if we have a video, we can have a reference frame
+
+53
+00:37:18,000 --> 00:38:48,000
+that has the color and do the coloring for the follow-up frames. And how this is done. This is very simple because uh with with uh I mean this is also very useful because with uh colorizing future frames in the video what we are doing is we basically try to uh track pixels and objects in the video and the model implicitly learns how these uh tracks should be formed. So the hypothesis is learning to color video frames should allow model to learn to track regions or objects without labels. Um and learning to color videos because
+
+54
+00:38:02,000 --> 00:39:13,000
+there are a lot of correspondences is an interesting task by itself. I would um suggest taking a look at the the details. I'll um very briefly talk to them talk about them. So if we have a reference frame, what we need to do is for coloring the input frame, we need to find the pointers of where that uh specific object or pixel is and then based on that see what the color is and copy what the color is u as as the color for that pixel as the output at the as the target color. And how this is done
+
+55
+00:38:38,000 --> 00:40:00,000
+is very much similar to the same topic of attention uh that we talked about. So it's it's about forming attention uh for each of the pixels for each input frame sorry reference frame and target frame. We often run a CNN to see what features around those pixels should be used. And using those fe features now we can calculate for each of the target pixels we can calculate the attention or the distance to all of the frames all of the pixels in the reference frame. And then after defining this attention with
+
+56
+00:39:18,000 --> 00:40:43,000
+respect to the uh the the pixel of interest in the in the target frame with all of the frame all of the pixels in the reference frame. Now we can do an average color um of all of based on those attention modules. So attention is basically just similarity between the the two. So anyways with that um what we can do is we can just get the output color as an average with with that tension and then ultimately um calculate the loss function because we have the the the values of the colors the right colors of those pixels in our
+
+57
+00:40:04,000 --> 00:41:23,000
+data [clears throat] and this was able to with this reference frame colorize the images. You see how consistent this this becomes in terms of uh coloring if we color them separately without this consistency over time. You often uh see like for example the person uh person's shirts or or clothing changes color because uh because there's no uh constraint to keep it consistent. And then there has been also very interesting um applications because now that you're calculating attention to a
+
+58
+00:40:43,000 --> 00:42:20,000
+reference frame, you're actually able to track objects, track segments in in videos and even identify key points in the videos. That's a good question. You're you're asking the qu your your question is about this slide basically and and how the encoder knows about the data to begin with and um gets us good learned representations. So all of these tasks that I presented and and defined are trying to do something here either decoding uh classifying or using regression to generate some outputs to be able to
+
+59
+00:41:32,000 --> 00:42:36,000
+train this encoder. So if your original images, if these are all natural images taken off of internet or imageet or whatever, then you are learning an encoder that can extract features from those types of images, right? With the pretext task and then when you remove the enc decoder and add this this classifier to the end, you only need to uh train this this part because this encoder was already trained with all of these pre-training tasks that I just uh talked about. You're asking if the labels are coming
+
+60
+00:42:04,000 --> 00:43:19,000
+from the decoder for pre-training the encoder. And the the answer to that is yes. That's that's why we define the pre-text tasks because we want to have some sort of labels, some outputs, right? And then based on those outputs, we try to um train this entire network and the on on the way of predicting the right labels. This this encoder is also trained. Good question. You're asking if encoder and decoder of one big neural network or there's differences in different um papers in different works.
+
+61
+00:42:41,000 --> 00:43:48,000
+It has uh been completely different in some cases your encoder and not just decoder that's why I'm calling it classifier in the example that I showed you about um predicting the degree. This is just a simple neural network right the decoder is these FC layers. So this could be one entire network and then you you're replacing it with something for your downstream task. But in some cases, for example, when I talked about autoenccoding, encoding an image and then decoding another image, you have you often have
+
+62
+00:43:15,000 --> 00:44:31,000
+two neural networks that are trained end to end because you have you want to make use of that representation space in the middle. And in the next um thing that I want to talk about mascato encoders even there is no symmetry between encoders and decoders. They can be just two different um frameworks two different neural networks even without any symmetry to um to to train the task. So this this is very much task dependent pretext task dependent but they could be belonging to the same architecture that we we know
+
+63
+00:43:52,000 --> 00:45:17,000
+about say CNN or ResNet or they could be two different architectures even without any symmetry. Remember that these are the very first um methods for self-supervised learning. So they're not supposed to be solving everything. Uh that's just a a quick disclaimer but the idea is the hypothesis here is if the model is able to say this is 90° rotated it means that implicitly it's understanding the right rotation right sorry right uh right uh orientation and direction right and then u it will be able to if if given a right
+
+64
+00:44:35,000 --> 00:45:49,000
+um an an unrotated image it's able to recognize what it is in it Right. So, but this is a limited task by itself. I agree with that. The question that you have is why why here they use 64. Right. Um that's a good question but that's also an arbitrary choice almost arbitrary choice. As I said there are many different types of different number of uh permutations here 9 factorial. So it's a very big number. it doesn't make sense for us to be predicting all of those. What the authors did here, they
+
+65
+00:45:12,000 --> 00:46:41,000
+decided to select a few of those perurbations that there is enough variation because many of those uh perturbations is just like one uh patch like switched only, right? So they selected 64 of those that they have the largest difference between them and they just selected 64 because they wanted to solve a classification problem instead of um other types of tasks. Okay. So I've been talking about these um frameworks that often do some transport transformation on uh the image or the videos and so on. And this brings us to
+
+66
+00:45:57,000 --> 00:47:20,000
+this newer framework which is um published in 2021 and then there has been so many uh follow-ups on this and um it's been a great framework for pre-training for many tasks even if uh these days when we want to pre-train on a um data set uh on raw data sets we often use this uh MAE framework it's called masked out encoders it is also a reconstruction-based framework similar to that masking strategy in painting that I mentioned but this is far more um uh detailed and as you can see this uh
+
+67
+00:46:39,000 --> 00:48:10,000
+framework is is not just selecting one mask. There are so many different uh patches and and places that they do masking with even more aggressive um sampling rates. 50% masking or 75 uh masking rates and ratios. And through training in large scale, they have shown that not only they are able to reconstruct all of those masked areas, they are also getting very good encoders that can summarize the images into good features. And how this was done was through defining a dec encoder and a decoder. And that's one of the examples that I
+
+68
+00:47:24,000 --> 00:48:47,000
+said this is not these are not symmetric and encoders and decoder. So a large portion of the input masks uh input uh patches are masked and the ones that are not masked they are um given to the encoder to encode in to features that are then passed through the coder to generate the the complete image. But let's let's go a little bit into details of uh what this means. I do have some of the details and and and how these models are trained here. But um I um very briefly just explain to you
+
+69
+00:48:05,000 --> 00:49:42,000
+how these models often work. The encoder um here is very much similar to vit all of the them are are based on transformers. The vit that we've talked about uh similar to the vits the images are uh split into patches. The patches are then uh sampled. So uniform sampling is what they've done in and they've shown 75% sampling is um was was quite efficient in in uh the experiments and um they use a mask a high masking ratio and then this makes the prediction task very challenging and challenging in the set of pre uh pretext
+
+70
+00:48:54,000 --> 00:50:05,000
+for pretext tasks in self-supervised learning means the task is meaningful, the task is is very good because the the model has to learn uh good features to be able to reconstruct it. So uh with that high sampling um high ratio of sampling what what it uh it can do is they can actually augment the data by a lot too because each time you mask 75% of the data. So you can reuse the same image multiple and multiple times during training. So you you will have so much of data to train this uh encoder for
+
+71
+00:49:29,000 --> 00:51:04,000
+with and then that's why they use a huge encoder a large um vit in as as their encoder. So this encoder uh itself only sees 25% of the samples the the patches embeds those two with a first linear projection to some embedding spaces then positional embeddings are um added exactly same as what uh what we mentioned for vits and all of these are transformer blocks and um the encoder is is very large that's what uh I just mentioned and then when it comes to the decoding uh part. So we have the embeddings of all of those
+
+72
+00:50:16,000 --> 00:51:41,000
+patches that were present for the patches that were masked or or were missing for those. There is a trainable uh parameter very much similar to that class token that we had a shared masked mask token that is um basically in some sort of average uh we can consider that as as an average patch an average representation that is put for the ones that that are missing are masked and then the decoder has to transfer those them to the uh image patches of the entire image. And then the entire last one the entire image is the the target
+
+73
+00:50:59,000 --> 00:52:32,000
+the is the output target is the output. So how we train this this is a simple MSE based uh mean squared uh error loss function for um the between the image and the reconstructed image. The loss function is only computed for the masked patches similar to the the previous one that I I just talked about. And then what it has is um when we do the training, they've shown in the paper that you can do either linear probing or full fine-tuning to train your uh to to to to use it for your downstream tasks for any of the
+
+74
+00:51:46,000 --> 00:52:58,000
+applications that you have in mind. And um in linear probing what happens is you often have your encoder frozen and then use the learn representations and only learn a linear function for the for [snorts] the final task. And this this mark is it's it means that it's being trained. But in full fine tuning in fine-tuning the pre-trained encoders are also fine-tuned either either all of them or just few um transformer blocks. And that's uh that's the fine-tuning uh framework. The linear probing provides a
+
+75
+00:52:22,000 --> 00:53:43,000
+measure of representation quality. How the those representations features are um and fine-tuning always exploits models near potential to adopt for new tasks. Okay. So uh I if you're interested in this topic and if you're planning to use this this paper I highly advise looking at the paper in his follow-ups. There are so many uh discussions around different aspects model choices hyperparameters masking ratio is one thing they've they've shown with the masking ratio that the 75% is actually giving is
+
+76
+00:53:02,000 --> 00:54:13,000
+giving them a very high accuracy. So 75% that's that's the reason that it was chosen uh decoder depth decoder width um mask tokens uh reconstruction targets data augmentation how it's it's u helpful and mask sampling method I'm I'm showing the results here again mask sampling method is uh mostly around should should they use um some uh random masking blocks or grid type of masking you see the examples here and they've they've um came to the conclusion that this random masking was was the best uh
+
+77
+00:53:38,000 --> 00:55:11,000
+choice and um finally they've been able to to show that MAE is um doing a much better job compared to many of the other methods that were used. So some of the other state-of-the-art methods were actually Dynino and Moco V3. If you have time, I will briefly go over them. But um this framework was actually outperforming those that are more um [clears throat] um at the time advanced frameworks of contrastive learning. [clears throat] So uh I'll stop for a few questions if you have any after. Let me just
+
+78
+00:54:24,000 --> 00:55:41,000
+summarize the the what we've talked about. pretext tasks uh were actually very important and as as I said their focus is on understanding the visual common sense and um one of the things that also related to some of the questions that were asked we can see is coming up with an individual pretext task is often challenging because the learn representations may not be general enough because of the type of task that you you define Right? Uh for example, um if you're using completion rotation
+
+79
+00:55:05,000 --> 00:56:24,000
+prediction or or jigsaw puzzle or colorization, your learn representations are good for solving those specific tasks and they may not be very good for uh general pretext um tasks. So the question is in split brain autoenccoder how does the model knows know um how to predict the other channel given the for example L channel the illumination channel lightness channel so your question let me ask answer your question with a question when you're training a model to predict classes of objects in the image
+
+80
+00:55:44,000 --> 00:57:00,000
+how does the encoder know what features to extract to predict them the um the class of models labeled data because you have what you're doing is you're back propagating a loss value that is calculated around those labels. Right? It's the same story here. We define a network that takes the one of the channels and outputs the other channel. How this was trained was by back propagating what the output should be. The output was the other other channel. we do have the other channel in the data. So instead of defining the
+
+81
+00:56:22,000 --> 00:57:43,000
+task being a classification of predicting the class of the objects here we define the task to be predicting the color of the pixels and the color of the pixels we already have them in the data set. So the loss function still can be calculated and back propagated. So the question is how they these outputs are used as input to the decoder. So this is again a vit transformer uh style uh framework the encoder that turns every uh every input to a token at the as the output that is representation of that specific uh input
+
+82
+00:57:02,000 --> 00:58:17,000
+patch. Right? So we've talked about this but then we know that this is not this is not the list of all patches. There are some of the patches that are masked. for those that are masked. We also train this encoder outputs um shared mask token. A token that is basically an an average token for example. It's it's a learnable parameter. We can't necessarily interpret it, but we can say just it's probably something that is similar to mask like an average token. So that that shared mask token is put in
+
+83
+00:57:40,000 --> 00:59:18,000
+the place of those that are missing and then this long vector long long sequence is created. Decoder another transformer framework takes these long this long uh set of tokens and outputs those that are projected as the output pixel value. Perfect. So, we only have 15 minutes and um and a lot of things to cover. But, uh I think what I wanted to to to get out of this uh this um session was for you to understand what pretext tasks are and how we define them. and and one of the most um used frameworks right now
+
+84
+00:58:30,000 --> 00:59:54,000
+is the masked autoenccoder which we actually covered um uh to some good extent. But anyways um I was here that um we we did look at these transformations and then we know that all of these transformations are representing are actually the same object as the original image just in a different uh form. Right? But then we also have the knowledge that in the data set we have other objects that look completely different right. So if I define a task that can say these that belong to the same object, same pixel,
+
+85
+00:59:12,000 --> 01:00:35,000
+try to bring them close in the representation space. Basically attract them to each other in the representation space and those that are not um the that they do not belong to the same object uh kind of put them try to maximize the distance between them in the latent space. basically repel the representation of of these two images. Then this is another task that is often referred to as contrastive learning, contrastive representation learning. And there are quite a number of very uh interesting methods to look at. We have
+
+86
+00:59:53,000 --> 01:01:30,000
+sampled there are so many papers um uh in this space especially around uh 2018s to 2020s u and uh and so on in around those those years Sinclair Moco CPC and then ultimately Dino which is actually borrows concepts from contrastive learning but it's not necessarily contrastive learning framework um and uh what we do there is in order to define, attract and repel functions u characteristics or or uh regularize the model based on those. We define the reference image as X and then all of those that are transformations of the
+
+87
+01:00:41,000 --> 01:02:02,000
+same as positive samples and all of the other objects in the data set or in the batch as negative samples. And these positive and negative samples will basically define a way for us to calculate the loss function. How can we do that? Assume we have a scoring function. We want to get a scoring function that says the score for the reference image encoded version features of the reference image and the features of a positive sample should be larger than the score that is comparing the reference image and the
+
+88
+01:01:22,000 --> 01:02:57,000
+uh negative samples. So with this type of um scoring function if we uh so basically to define uh this type of scoring function we define a loss function based on that after training the scoring function uh s you can see this s is the same as a score in the previous slide. Um so if we have that scoring function now in order to attract and repel we can use this uh framework of uh turn them the softmax uh setup with the exp that turn those scores into probability values and then in the denominator you
+
+89
+01:02:10,000 --> 01:03:32,000
+see all of the other negative samples that are um used um are are considered are are In order to implement actually we use this we use the batch learning framework. All of the other negative samples that belong to other objects in um in the batch are are taken as negative samples and one of the transformers as as the positive sample. So we define the loss function like this and um a score for the positive pair score for all of the other negative pairs. And this function is very similar to what we've actually discussed before.
+
+90
+01:02:50,000 --> 01:04:09,000
+Any ideas? This is the cross entropy for multiclasses. So if we have n samples, sorry, n um uh samples. Yes. Then um in this case we have n samples. So the softmax is if you have multiple classes, if you have 10 classes as the output, it wants to maximize the score for one of those 10 and minimize for the rest of it. Right? It's the same story here. We want to maximize this score but kind of minimize the score between negative and reference. Right? So it's it's the same concept that we discussed about
+
+91
+01:03:30,000 --> 01:04:52,000
+multiclass uh classification but put in the form of um formulation of contrastive uh for this loss function as contra contrastive learning. This function is called info NCE or the information noise contrastive estimation loss which was proposed in uh this paper and there are a lot of theoretical uh discussions in in in the paper that this uh objective this loss function measures the dependencies uh sorry that uh it's it's a lower bound on mutual uh information and what in mutual Mutual information is uh when you
+
+92
+01:04:11,000 --> 01:05:26,000
+have two images and you calculate the mutual information between them, it's basically measuring the dependencies or shared information between these two images. Right? So what we want to do is we want to maximize shared information between X and X plus but minimize the shared information for X and X minuses. Right? So the paper says um and again this will itself take half an hour to to go into. So you should definitely take a look at uh the paper if you're interested that this the negative of this loss function
+
+93
+01:04:48,000 --> 01:06:12,000
+influenc is a lower bound on mutual information between X and X plus. So a lower bound on mutual information if um the negative of it is a lower bound on mutual information if I minimize the influenc I'm basically maximizing the mutual information between X and X plus. So this is what I really want. So that's why we take this as a as the loss function and start minimizing the uh that value. There is also another theoretical aspect in the info inc paper that says the larger this this the
+
+94
+01:05:31,000 --> 01:06:56,000
+number of negative samples the tighter the bound. So they it tightens the bound based on the number of negative samples. So that's why for training a loss function neural network with this type of loss function we need a huge batch size. ute a larger number of negative samples we'll get better um and more much faster training convergence and then this loss function was used in a number of different frameworks and in the next few minutes I'm just going to tell you what those u frameworks are for
+
+95
+01:06:12,000 --> 01:07:39,000
+example Sinclair is a simple uh framework for contrastive learning learning is basically taking each image do the two transformation of the same image transfer it into the representation space and what it does is it calculates the the cosine similarity between um embeddings representations but before doing that it does a linear or nonlinear projection into a set of features Z that calculates the the uh the distance between those in this space. And um this is this is the way that they uh they do this generating
+
+96
+01:06:56,000 --> 01:08:28,000
+this positive samples and uh for generating positive samples all sorts of transformations would uh make sense. The details are are basically uh covered here. Uh generate a a positive pair by sampling data uh augmentation functions. So we sample a few of those then we calculate the info NC loss on uh the pairs and this is what we iterate because each each sample has two n uh to multiply by n uh samples that we have created. So what happens is we take a list of um images in the in the mini batch in the
+
+97
+01:07:42,000 --> 01:08:57,000
+batch that we have and um pass them through encoder for both variations of the same image. So each of the images basically will have a version of it transformed version of it next. So we have two n um subject two n samples in the batch now. And then this means that for each of the samples the next one these two are positive samples and everything else is negative. So for the first one the second uh image is positive everything is else is negative. For the second one the first is positive and everything
+
+98
+01:08:20,000 --> 01:09:45,000
+else is negative. And this repeats for all of the samples there. So this is a highle implement uh high level definition of Sinclair. Please note that we have in assignment three a question related to Sinclair that you will be uh exploring this framework a little bit more but be careful that the definition is slightly different from what the standard definition that I presented here and and make sure you follow the instructions in the assignment. So Sinclair was actually very successful. it was able to without
+
+99
+01:09:01,000 --> 01:10:31,000
+the use of labels or or um and then training a linear classifier on top of the features. It was able to to surpass all of the previous works and even be as uh basically generate results comparable to the supervised learning fully supervised uh learning frameworks. Although we need a larger neural network because now we are learning more generic features but in terms of accuracies it was not as uh it was comparable to what we had for supervised learning. So um the interesting thing um with Sinclair and and u some of the results
+
+100
+01:09:47,000 --> 01:11:10,000
+around it was um that there are a few choices actually let me uh spend time on on the the main main choices. You may have this question of why did we project the features into a new variable instead of using the same representations. So this this was a design choice that they made in Sinclair because they rightly so assumed that when we have an objective function that does this contrast between samples, you often lose some more information, some extra information that do not help with the contrastive learning framework. Right?
+
+101
+01:10:29,000 --> 01:11:49,000
+So in order to preserve all of those uh extra features representations are defined as edge but then there is this linear or nonlinear projection in their paper they use nonlinear projection to to get the uh z values that they can calculate influency on. So that's one important uh design choice and the other one is I mentioned earlier large batch sizes. You need huge batch sizes, larger batch sizes to be able to get better Sinclair performance. And we talked about it how and and why this is the case. But we
+
+102
+01:11:09,000 --> 01:12:45,000
+can't always do large batch sizes for many of the tasks that we have at hand because um of constraints in memory and so on. And that was why a number of follow-ups for example Moco was um proposed momentum contrastive learning instead of using the samples all of the negative samples in the batch. What it does it it creates a queue and and keeps a history of the negative samples across patches over time in the model. So it doesn't only depend on the negative samples in the batch. It has a separate queue that is
+
+103
+01:11:56,000 --> 01:13:20,000
+defined and and um keeps a number of negative samples and changes it updates it over time to train the u to to do the info uh loss with the contrastive loss here. But because we have this Q, we cannot back propagate because those samples are not in the batch anymore. Right? So we cannot back propagate for the negative uh samples. And that's why it had to separate the encoder for positive samples which are now called query and the negative samples which are now called key in this um architecture. So
+
+104
+01:12:39,000 --> 01:14:11,000
+the training only impacts encoder and over time the [clears throat] Q encoder using a momentum m it updates the key encoder the momentum encoder right so this is a framework that is actually been very successful in terms of implementation and and followup versions of it there is a lot of uh interest interesting results But then what they've done was basically uh tried hybrid versions of using some nonlinear projection heads and data augmentation from Sinclair and using this mini batch style the the decoupling
+
+105
+01:13:25,000 --> 01:15:02,000
+of the mini batch and negative samples from Moco. And they've shown that actually if you if you do this together version moco version two it um improves the performance by a lot. So I will uh stop here but there was some notions of CPC the contrastive predictive coding uh as another example that you can look at in the slides and then a better version of Moco Moo version 3 and Dino is also one of the widely used frameworks which actually has a similar type of architecture as uh as Moco but it's not necessarily uh
+
+106
+01:14:14,000 --> 01:15:01,000
+contrastive learning because now we have student and teacher networks. So I'll leave that for a separate discussion and if if uh if uh you're interested we can discuss maybe in the future uh slides in future lectures. But anyways uh this is also one of the widely used frameworks for extracting features from images and also videos sometimes.
+

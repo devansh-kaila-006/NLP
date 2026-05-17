@@ -1,0 +1,568 @@
+1
+00:00:05,000 --> 00:01:05,000
+so I am tongima this quarter we are going to have two instructors you know me and Chris I I'm tonyma I work on machine learning machine learning theory um including the theory for different topics machine learning reinforcement learning representation learning supervised learning so and so forth um I guess I would like Chris to say uh say something about him whatever he wants to say yeah I'm Chris also the machine learning group I'm really interested in how systems we build are changing with machine learning uh it's
+
+2
+00:00:36,000 --> 00:01:21,000
+been a really interesting time for the last 10 years started a lot on optimization how we scale up these big models that was when machine learning had very few applications in our in our lives around you over the last couple of years have built things that hopefully some of you in this room have used my students contributed to things like search and Gmail and assistance and other places there and more recently really interested in how to make these models robust and we'll have a great new lecture that tangyu is going to give
+
+3
+00:00:59,000 --> 00:01:50,000
+about what are called Foundation models or these large self-supervised models that are kind of all the rage Percy and a course about them last term and this course is really exciting because it's giving you kind of that absolutely foundational layer of machine learning that all that stuff is built on so this is a great time to study it because it's no longer abstract like you get to use machine learning products in every day and hopefully you'll get some insight into how they actually work and and why
+
+4
+00:01:24,000 --> 00:02:24,000
+there's still so much research to do so really excited and looking forward to lecturing with you folks great uh I guess you'll see me and Chris alternate um for every few weeks you know next next lecture will decrease and then after two or three weeks you can see me um so to this lecture I guess I'm going to um okay I guess the first thing the second thing is that let me introduce the teaching team so uh we're gonna have um 12 like fantastic Tas and the one high ta and of course coordinator so
+
+5
+00:01:54,000 --> 00:02:49,000
+what is the high ta and it's gonna be the course coordinator they will be probably uh doing most of the works behind the scenes you know you probably don't necessarily have to interact with them very often so they are organizing the whole ta team and we have like 12 currently 12 Tas I guess probably we're gonna have more if we have more enrollments um and I guess um I didn't ask the kids to show up in the first lecture just because I guess they also have to wear masks and and maybe the pictures you
+
+6
+00:02:22,000 --> 00:03:29,000
+know serve the same need but I guess you'll see them you know pretty often in office hours and and different uh scenarios um cool so um okay so I guess the um this lecture I think I'm going to spend first probably 20 minutes on some of the logistics some of the the basic kind of like uh the structure of the course and so forth and then I'm going to introduce um the incredible at the high level the topics that covered that is covered by this course so I guess um we tried very hard to make
+
+7
+00:02:55,000 --> 00:03:56,000
+everything available online like in a single dock I guess on a single website so we have this course website which has links to a few different Google Docs um one of them is about all the logistical stuff and the other is about the syllabus and the the final one is about um also there's the links to the lecture notes and there's links to um some kind of like guidelines on the final project so in theory I think all the informations I presented today you know will be subside of what you can
+
+8
+00:03:25,000 --> 00:04:21,000
+found on the on the website and it's actually a very small subset um so I do encourage you to kind of like read through the the documents you know to some extent you know especially when you have some questions you know maybe first go to see whether the documents answer those questions and and then feel free to ask questions to us so um I guess the first thing I'm going to talk about is the prerequisite um so this course you know as you'll see will be you know at least the sum of the
+
+9
+00:03:54,000 --> 00:04:55,000
+students in the past say this course is challenging of course some students say it's on the easier side no um there are different kind of backgrounds you know um so I think that's why we do this is my first slice right because um I think it's important for you to have some kind of like a backgrounds to be able to achieve your your goals in this course so I think the most important prerequisite is probably some knowledge about probability on the level Flex cs109 or size 116 now for example you probably should be
+
+10
+00:04:24,000 --> 00:05:28,000
+at least you should have heard of this these terms like distribution random variables you know expectation conditional probability violence density so and so forth right you don't necessarily have to know exactly all of them like off the top of your head but this probably should be something you have seen in one of the previous courses another thing is linear algebra major specification eigenvectors I guess linear algebra was offered in mathml4 113 205 actually there's a longer list of kind of relevant courses in the
+
+11
+00:04:56,000 --> 00:05:59,000
+logistic doc which you know taught linear algebra and the most important thing I think we need is measure specification and eigenvectors and we also require some basic knowledge of programming especially in Python and numpy so um I think if you only know python but not numpy I think that's probably pretty much fine because numpy is really just some basic you know numerical operations but if you don't know Python and numpy but you know for example C plus plus I think that's still probably pretty fun
+
+12
+00:05:28,000 --> 00:06:23,000
+um because you know I think migrating from C to python is is pretty relatively easy in my opinion but you know um I think they have similar kind of you just have to change the syntax but if you know nothing about programming I think that's probably going to be difficult because a lot of homework you know they have some math part and they have some programming part and one of them the most challenging thing I've seen in my past about homeworks is that when you write a piece of code and something goes
+
+13
+00:05:56,000 --> 00:06:48,000
+wrong which happens all the time and even when I write code you know there's something that seems to be wrong and you don't know whether it's about the syntax or it's about math right so these two things kind of sometimes entangled together so so you saw that I did I derived the wrong you know equations but actually probably you didn't use numpy in the right way so we're going to kind of cover python numpy in some of the TA lectures um just to kind of give you some refreshment or kind of like if you
+
+14
+00:06:22,000 --> 00:07:23,000
+didn't know them you can learn something from the te lectures um um so but but I think you need to have some basic programming knowledge um yeah so um the tea lectures you know we also have materials for the tea lecture so you can um like we're gonna have three lectures on each of these topics um programming in the algebra and and probability to kind of review some of the backgrounds for you um I guess you know this is a mathematical intense course you know at least according to you know of course
+
+15
+00:06:53,000 --> 00:07:54,000
+depending on your backgrounds but kind of like a good portion of students found that uh this course is mathematically intense um so it's kind of a heads up so so it's probably good for you to have at least you know at least 12 out of these three two like among the three things probably you need to know at least two of them um relatively well so that you don't get kind of credit entangles kind of like issues when you do the homeworks so um yeah but that's kind of why this is exciting and rewarding as Chris has said
+
+16
+00:07:24,000 --> 00:08:21,000
+the goal of this course is to give you the foundations of machine learning this is the foundational layer um so so this is a simultaneously introduction course to machine learning we don't require you to have taken a machine in the course to take this right um so so it's an introductory course but on the other hand we hope that after you take this course you feel somewhat comfortable that you know like enough basics of machine learning so that you can apply machine learning to some of the applications of course if you really
+
+17
+00:07:52,000 --> 00:08:51,000
+want to kind of be an expert in some of the applications like nlpm Vision you probably have to take those courses but this course probably will set up the foundations for the most learning component of some of the the general kind of like AI or other applications of AI right so so that's why we're kind of like this course is actually covers a diverse set of topics and and does involve some mathematics we don't have um mathematical proofs you know probably we have a little bit proofs but very
+
+18
+00:08:22,000 --> 00:09:25,000
+little proofs but we do have a lot of like mathematical derivations right you probably have to follow um like a do some kind of mass derivations in the homeworks and we are going to do the revisions in the in the lectures as well right um by the way if you have any questions just feel free to stop me um um I'm happy to answer any questions yes the lectures are recorded and you can find the recording on canvas I guess right so the second important thing that I want to say is the owner code it's
+
+19
+00:08:57,000 --> 00:09:50,000
+probably a little kind of awkward to say this you know um so early and I think the reason is that in the past unfortunately we do have some kind of there are some issues with let's be frank there's some kind of issues with the owner code violations you know I I don't want to see them you know it's very you know side for me to to see the to report to have to report students you know with designer code violation but that's what's you know that happened in the past so so that's why I want to kind
+
+20
+00:09:24,000 --> 00:10:28,000
+of like put this up front um you know if you don't intentionally write Honor Code um I don't think there's anything you should worry about like um but anyway let me briefly say you know this is actually a subset of like uh things that we have on the uh the course website but I think these are the important thing so um for example you know on one side you know we do encourage you to have study groups so you can um collaborate with other people on homeworks or on on like uh homework questions like um so but
+
+21
+00:09:56,000 --> 00:11:05,000
+um um but the thing is that you can own you cannot okay so you can discuss works on homework problems in groups but you have to write down Solutions independently and you also have to write down the names of people with whom you discuss the homework and I guess this is I'm copying this from the logistic doc which is a little bit longer you probably should read that piece of text you know in the dock as well so it's all the code violation to copy refer to or look at written or coding solutions from a previous year
+
+22
+00:10:30,000 --> 00:11:36,000
+including not limited to official solutions from a previous year Solutions posted online Solutions you or someone else may have written up in previous year solution for related problems you know anyway it should be fine um but as long as you don't intentionally kind of like do anything bad I think you know don't be stressed out about it but on the other hand they were kind of like reporting of final violations in the past so we do kind of like check the code um like like using some some kind of
+
+23
+00:11:03,000 --> 00:12:06,000
+softwares and also we we do we'll we'll have Tas to kind of like deal with this kind of honor code violations too much stress about this but I don't want to kind of like put it up front here um okay so um one another component I would like to kind of like um besides homework and homework is kind of like obvious where we have to have homeworks another component of the course is the course project so we encourage you to form groups of one to three people and um so you do a project with three people
+
+24
+00:11:36,000 --> 00:12:36,000
+for example and it's the same Criterion for either one people or two or three people so and there are more informations on the course web on a website um and typically you you apply machine learning to some kind of like um applications you know or some kind of topics you are interested in right so um this is actually one thing that I really like about this course eventually you know after every year every quarter we got like probably 100 submissions from the the projects and we see all kind of topics you know
+
+25
+00:12:06,000 --> 00:13:07,000
+um um or like all kind of applications of machine learning like these are just a list of topics we have you know see in the past and you are welcome to you know even work on other topics right so of course you can also work on just the pure algorithms for machine learning that's also fun but many people have actually also work on applications of machine learning uh to other kind of topics like music you know Finance which are kind of interesting um okay great so and we have homeworks you know we have four homeworks you know
+
+26
+00:12:37,000 --> 00:13:42,000
+you'll see um you know uh and we also we are also going to have a meter there is no final um uh exam so the um so midterm cost project and homework those are the main things for the course um and another component of the course is the TA lectures um so these are optional uh you don't have to attend them if you don't find them to be useful and also there are actually two sets of ta lectures so one type of tea lecture is the so-called Friday the lecture of Friday section so um so we're gonna have problematicus six
+
+27
+00:13:10,000 --> 00:14:12,000
+to seven weeks of these lectures the first three weeks will be about reviewing some of the basics um and especially the part of the basic kind of concepts related to machine learning and then the other weeks about more advanced topics um which are not required for the course but maybe interesting for some subset of you and we also have the discussion sections the goal of this is to have some interactive sessions our course is pretty big right so you know you can feel free to ask questions but I I guess
+
+28
+00:13:41,000 --> 00:14:41,000
+you know after bullet you know like it's a bit less interactive per person compared to other courses um so we're gonna have this uh small sessions led by Tas which the goal is to kind of like imitate more traditional classroom settings and also work on kind of like a um more kind of like Bridging the Gap between the lectures and the homeworks right so um so basically the Tas will largely work through problems that are very similar to the homeworks or even sometimes simpler than homeworks so that
+
+29
+00:14:11,000 --> 00:15:25,000
+if you um if you need it if you need them you know they will help you to kind of like uh make it easier to solve homework questions right so and I mean terms so um and this kind of sessions will be more interactive like the Tas probably will let you to do some questions live and and maybe present your Solutions and discuss with other students so and so forth um and the exact time and format will be you can find them on the on the the dock um the Google Doc about the logistics oops Okay so yeah so there are some you know many
+
+30
+00:14:53,000 --> 00:16:01,000
+other informations on the course website on the Google Doc the dock is actually 15 pages now um it's pretty comprehensive um so for example recordings they can be found on canvas um there's a course calendar on canvas there's a syllabus page which will link to the lecture notes um and um and we're gonna have like the the ad the platform for question answering um we do encourage you to use that to communicate with us um if that makes sense like a like almost in all situations I think you
+
+31
+00:15:27,000 --> 00:16:33,000
+probably should use ads to communicate with us you can have private posts or another's post um different type of posts depending on what you need um and if you don't have access to that then you probably have to email some of us I guess you can email the uh the ITA too um to add you to the to that to give you access to add um and there's grid scope which is used to submit homeworks and there are some late take policies which you can find in the the dock as well so I guess one thing that I need to mention here just
+
+32
+00:16:01,000 --> 00:16:57,000
+uh as a heads up is that we don't allow late days for the final project and this the reason is just that especially for spring quarter the grading deadline is very tight so it's pretty much just a few days after the the final the exam week so especially because some of the students have to graduate and they have and it's the timeline is very very strict so um and we don't want to kind of like make the course project deadline the final project like very early right because then that would kind of conflict
+
+33
+00:16:29,000 --> 00:17:36,000
+with the homework deadlines so and so forth so so the final project I've done I think is on the I think it's on Monday of the the finals week uh double check that but but it's it's we try to put it as late as possible but on the other hand because the the final greeting deadline we don't allow later is for the final project uh and there are some other IFA cues you know in the Google Doc as well any other questions before I move on to the topics the more kind of like the scientific topics
+
+34
+00:17:06,000 --> 00:18:13,000
+foreign we have two uh Tas uh offering two discussion sessions I think we will try to make sure that the materials in the two sessions are pretty much the same and the times are kind of like somewhat kind of I think we haven't decided time yet um so you can feel free to choose any uh sessions you want to go um probably is the best for you to consistently go to one session maybe the Tas knows you better you know um but you don't necessarily have to and then this is also optional you don't
+
+35
+00:17:50,000 --> 00:18:53,000
+have to really say go to all of them depending on your needs yeah other questions okay uh okay sounds great so I guess then I will move on to the more scientific part of the course so as I said um the main goal of this course is to set up you for the foundations of machine learning um and we're going to cover a pretty diverse set of topics immersion learning with the you know some kind of mathematical way so let me start by um some definitions of machine learning what is machine learning right as you can imagine you
+
+36
+00:18:30,000 --> 00:19:25,000
+know when you are speaking about you know such a kind of like hot topic that is kind of like um that people are constantly researching on right so there's probably not unique definition right so that can fit uh everything right but I'm trying to find out some kind of like historical definitions of machine learning which I think describes the field um pretty well so in 1959 I think this is probably the first time machine learning the word the phrase machine learning was introduced on by author
+
+37
+00:18:58,000 --> 00:20:11,000
+Samuel um he says that machine learning is the field of study that gives the computer the ability to learn without being explicitly programmed so I guess without being explicit program it's probably um something pretty important for example suppose I guess this is in the paper titled some studies in machine learning using the games of checkers recent progress I don't exactly know what the game of hackers is so don't ask me about what the rules of the the game but the point is that if you explicitly
+
+38
+00:19:34,000 --> 00:20:30,000
+write a piece of code that play the Checker right that doesn't really mean that you are using machine learning right so if you just say I have this fixed strategy I know which is actually very good for checkered the first step would be this and the Second Step would be that move right I just explicit code that uh in my in my computer and with some branching algorithms right so um that probably doesn't count towards machine learning right so uh if you use machine learning you have to like the
+
+39
+00:20:02,000 --> 00:21:14,000
+computer to learn without being explicitly programmed so you shouldn't have explicit programming so but how do you learn right how do you give the computer the ability to learn I think in the second definition of machine learning by Tom Mitchell it's kind of like describes more context or more kind of like a um like a context about you know how do you really let the program to learn uh without being explicit programmed I think it says that a computer program is set to learn from experiences e with
+
+40
+00:20:38,000 --> 00:22:08,000
+respect to some class of tasks T and performance measure P if its performance at tasks in t as measured by P improves The Experience e the the rhythm is kind of nice um so um so I guess there are several important Concepts in this passage so one thing is that The Experience e right so so I guess let's still use this example of the game of Checker so the experience in this case could mean for example the data so data basically means that this policy could be games played by the program with itself it could mean games played
+
+41
+00:21:23,000 --> 00:22:27,000
+by humans in the past it could mean you know other kind of like a data you collected from other you know source of information maybe you collect some data from I don't know like uh in this case maybe um um you know you can collect data from other sorts of information maybe here mostly just on collecting data by playing itself or playing by humans so so experiences mostly means data and there's a concept called performance performance measure which is kind of important in machine learning of course
+
+42
+00:21:55,000 --> 00:22:56,000
+there's no unique performance measure for different tasks you have different measures of performance but but the metric performance is the this metric the performance measure is pretty important in here you can call it um the performance measure could be the winning rate it could be the the winning rate Plus for example the the number of steps you played right you probably want to win as fast as possible in some other cases the performance measure that could be How likely You can predict something
+
+43
+00:22:25,000 --> 00:23:32,000
+very accurately right so you can Define many performance measures and um I guess actually you know immersion learning you know if you look at the research you know some papers about you know understanding what's the right performance measure what's the right way to formulate our problem and some of the papers are about that given the performance measure how do you make the performance you know as best as possible so um and there is so and also there is this um last sentence where it says that if it's
+
+44
+00:22:58,000 --> 00:24:00,000
+performance at the task in t as measured by P improves with experience what does improves with experience E I think it means that if you have more experiences if you have more data then your algorithm should have better performance so so that in some sense is a kind of like a a kind of like a evidence for you to learn something from the experiences right if you have more and more experiences you your performance is not improved maybe that doesn't really mean that you learn something right that
+
+45
+00:23:30,000 --> 00:24:28,000
+could probably just means that you are you just progress you just program some kind of like explicit program some strategy and that strategy probably wouldn't improve as you have more experiences right so so in some sense this last few words indicates that you are learning uh from the experiences all right so I guess you know the final thing is that the tasks right so here the tasks is really winning um is this kind of context of playing the game right so um and we're gonna see actually a many
+
+46
+00:24:02,000 --> 00:25:03,000
+different type of tasks uh actually just in this lecture right so there are tasks about predicting um the the labels of predicting something given the the input or the task could be finding out certain structures in the data or the tasks could be something like this where you want you want to kind of make decisions about you know how do you play the game in any case feel free to stop me just with your hand then I'm happy to answer any questions um this lecture is supposed to be very high level so
+
+47
+00:24:35,000 --> 00:25:48,000
+um feel free to ask any questions so uh I guess um speaking of tasks right so this is um a pretty simplistic view based on tasks you know how do you have a taxonomy of machine learning right so I don't think everyone agrees with this 100 um um but it's a it's a reasonable Baseline you know as a as a kind of like a high level kind of like taxonomy so I think surprise learning and surprise learning and reinforcement I'm going to introduce uh this um uh separately but it's not like these tasks are completely
+
+48
+00:25:11,000 --> 00:26:07,000
+uh separated right so probably the real figure would be like this right so there's some overlaps right so in reinforced learning problem you have to use supervised learning as a component and and as I said like many machine Learners where people are trying to figure out what's the right way to formulate the question to solve the applications right so maybe for some applications you have to use two of this together so um they are not necessarily only tasks but sometimes there also kind of can be
+
+49
+00:25:39,000 --> 00:26:52,000
+viewed as you know tools or methods to solve your question right so maybe some questions requires you know using for requires a formulation that involves both of these three ingredients in some way um but as a first other bet you can think of them as three separate or roughly separate kind of type of tasks so I'm going to introduce supervised learning first so um surprise learning I guess um we are actually in the lecture we are going to use this um uh house price prediction uh as a kind of a running
+
+50
+00:26:17,000 --> 00:27:23,000
+example so the kind of idea is that I'm going to have a relatively abstract way to introduce this but you can use this you can think of the the house price prediction as the kind of application so what you are given is a data set that contains n samples and what are these n samples it's n samples are in pairs um of you know numbers or empires of like vectors where X could be a vector or a number let's say x is a number and Y is also number so you have n pairs of X Y numbers and you can actually draw
+
+51
+00:26:51,000 --> 00:28:07,000
+these numbers you know um here you know have a Sketcher plot right so every you know cross is really just One X by pair and the X could mean um so ask means the hot I guess this as shown here in the in the caption or um so the square feet is X and the Y is the price right so basically for every example it's a pair of square feet and price you are trying to use the square feet X to predict the price y That's the task and and this data set is called you know using Tom Mitchell's language this data
+
+52
+00:27:29,000 --> 00:28:40,000
+set is the experience in a problem more more than language we call this data set of data so so basically our goal is to learn from the data set how to predict the price given uh the square feet of the house and so so basically if x is 800 then what is y and 8 this x you know might not be seen in the data set right if you ask is already you know show up already shows up in the data setting it's easy you can just read it off but X could be something that you haven't seen in the data set so and you know one of the way that you
+
+53
+00:28:05,000 --> 00:29:07,000
+probably have seen this you know in some of the other lectures or other courses where you can do a linear regression you fit a linear line and then when you predict you just read off the corresponding number on this linear line what is the corresponding Y where X is 800. so and of course you can do um other things for example you can try to fade a quadratic line right so which actually in this case in this example uh this artificial example I I created you know a quadratic line problem with fill
+
+54
+00:28:36,000 --> 00:29:42,000
+the data better um and in lecture two and three I think our goal would be um to discuss you know how do you fit a linear model and all you how to create a quadratic model for the data to predict the house price of course you know the house price prediction is only your application you can imagine you know many other applications where you are giving a data set of X by Pairs and your goal is to predict y given X for example you know um we can even we can just simply make the house price prediction problem a
+
+55
+00:29:08,000 --> 00:30:15,000
+little more complicated right so we said that in the previous lecture in the previous slide we use the the size to predict the price but actually you know probably more about the house right so and you know for example the lot size and maybe you know other things right then for example suppose you also know the lot size then your goal could be to predict the price using size and loss size and we call this kind of like input different dimensions of the input X features right so size is one feature
+
+56
+00:29:42,000 --> 00:30:48,000
+and loss size is another feature so now you have two features of the the particular house and you want to predict the price based on the two features and now your data if you draw them um and then there will be three dimensional X1 X2 and Y and then you can kind of plot them in these three dimensional graph um and as I said you know the um the the kind of the the things you know in the class time right the size and loss size is called features or input and in this case this features is two-dimensional and typically people
+
+57
+00:30:16,000 --> 00:31:18,000
+call the price label or output and you are trying to find a function which Maps the input to the output um so actually another heads up is that in machine learning almost every concept has more than one terms for them so you're gonna see that you know some people call this feature some called people call this inputs and in some other cases probably you have other names for for digital things we'll try to be kind of um uh comprehensive like I'm gonna tell you what are the different names but
+
+58
+00:30:48,000 --> 00:31:48,000
+we're going to use one of them I think in the lectures mostly we probably we're going to use input because input and output is a little bit less ambiguous actually features sometimes could mean other things as well um and again now everything is the same in terms of the mathematical notations the only difference is that now your ex is a two-dimensional thing let me explain the notation here a little bit which will be used consistently in the lecture so the superscript here denotes the which example uh you're talking
+
+59
+00:31:19,000 --> 00:32:27,000
+about whether it's the index for the example and the subscript here denotes the demand the coordinates of the of the data so x superscript i is a two-dimensional vector and the X superscript I sub 1 is the first coordinate of the two-dimensional vector yeah and also sometimes like a website that the price the Y is called labels and outputs and sometimes they also because they're also called supervicious or generally if you say supervisions that means the set of labels right that's why this is called
+
+60
+00:31:56,000 --> 00:33:09,000
+supervised learning because you do observe uh some um labels um in the in the in the in the data set and also the data set you know sometimes people call it tuning data set um or data set um or training examples you know there are multiple names um for the for it any questions and you can also have like high dimensional features like before we only have two Dimensions but actually in many cases you know if you have a house listed on online right for sale then you probably know a lot more about the house and then
+
+61
+00:32:43,000 --> 00:33:47,000
+you can have a high dimensional Vector uh say d dimensional vector and each Dimension means something right maybe the number of floors the condition the ZIP code so and so forth and you use this High dimensional Vector to predict the Y um the label that you are trying to predict and in lecture six and seven we are going to talk about you know infinite dimensional features actually so in some cases you can uh have like you know uh you can combine these features into not a lot of more other features where you
+
+62
+00:33:14,000 --> 00:34:13,000
+can say I don't use X Y as my features but I actually use X1 times X2 as my features right leaving size times a lot of size I don't think that makes a lot of sense for this application but in some other cases maybe you can kind of like take the product of your two um raw features right two dimension of the input you have and use that as a as a new feature right so and we're going to talk about how do you deal with infant dimensional features as well um and in some of the other lectures
+
+63
+00:33:44,000 --> 00:34:38,000
+we're going to talk about you know how to select features Based on data um so maybe not all of these features are useful if you use all of these features then maybe you can overfit which is the concept we're going to talk uh talk about you may kind of like be confused if there are too many informations um available so you may select something that is most important right so maybe um I don't know like all of this seems to be important but maybe there's other features that are not important for
+
+64
+00:34:11,000 --> 00:35:29,000
+price prediction right and there's another concept that I'm going to introduce in the in the first lecture we'll talk about this um later as well so um typically there are two typos two types of supervised problems so based on this distinction is based on what kind of labels uh you have right so um one type is called regression problem so these are problems where your label y is um is a real number so you are predicting for example something like a price right so this is a continuous variable
+
+65
+00:34:50,000 --> 00:35:53,000
+and there's another type of questions which is called classification and these are cases where the labels is a discrete variable what does that mean that means that your labels are probably like you have two labels yes and no right so you just have like this label that is just a discrete set with two choices yes and no um for example like in this case you can change the question like you know if you're given the size and lost size you can ask you know whether this house what's the type of this horse or this
+
+66
+00:35:21,000 --> 00:36:28,000
+residence right is it a house or townhouse right so it's not a continuous prediction problem it's really just the predicting one of the two choices and you can make this problem more complicated for example you can have much more choices here um not only just two choices and then in this case you know the way that we can kind of like um kind of plot the data set um one way to product is the following so now you have a two-dimensional uh graph where uh the x is the size and the Y is the the Lost size
+
+67
+00:35:54,000 --> 00:37:00,000
+and then for every dot you have a you know if it's a triangle it means it's house and if it's a circle it means a townhouse and that's how you kind of like visualize the at least one way of how to visualize a classification data set where the labels are discrete you just use the triangle and circle um to to indicate the label of this example and and and then you know the kind of questions you want to solve sorry my animation the question you want to solve is that now if you give me a house which
+
+68
+00:36:32,000 --> 00:37:35,000
+is a two-dimensional Vector with the size and loss size given as it as the input and you're asking what's the type of this uh house um so whether it's a house or town house and one of the way to do it is that you say you okay now I see okay so you can fade a linear classifier that distinguish these two type of dots and then your answer here would be naturally house because it sounds like it's on the right side of the this correct this side of the the line so it's probably should be
+
+69
+00:37:06,000 --> 00:38:10,000
+consistent with all the other uh examples on the same side of the line so I guess lecture three and four will be about classification problems and the next few slides I'm going to talk about some broader applications of machine learning which we don't necessarily will cover I think image classification I think probably we're going to have one homework questions on image classification so the kind of the type of question is that you are given all of these images and every image has a label which describes the content of
+
+70
+00:37:44,000 --> 00:38:44,000
+this uh the main object in this image of course you know in other cases you know you may have multiple objects in the same image but here let's say let's focus on a simple setting where every image has a single important object and then your label is basically describing what this object is and you're giving this data set this is actually a real data set you know created by Stanford people like by Professor Philistine so which is called imagenet this is a very important data set that you probably
+
+71
+00:38:14,000 --> 00:39:24,000
+should remember the name of it because this is pretty much the data set that in some sense make deep learning take off in the last five to ten years um like before after the creation of this data set and some of the new um deep learning algorithms with new artworks I think in the last five to ten years we saw um like machine learning took off and are able to kind of we were able to make a lot of progress because of the data set and speak of the data set here I'm only trying to say what's the format or
+
+72
+00:38:49,000 --> 00:40:00,000
+what's kind of the task right so basically your ex is some raw pixels of the images where you just represent this image as a sequence of numbers actually here's a matrix of numbers and then um your Y is the the main object of the of the image so and you can have other kind of tasks in vision for example object localization or detection right so give an image you can ask you know how do I localize you know um find out each of the important objects right with the bounding box we're not going to cover anything like
+
+73
+00:39:24,000 --> 00:40:29,000
+this because these are more specific to the vision applications and right so so here I guess the the thing is that your why becomes like a a bounding box right so so how do you present this box um you know you don't have to know this but you know if you are interested the way to present the box is to present a box by uh the the coordinate here and the coordinate here and these two coordinates four numbers by two points four numbers will describe the box so basically a y will become four numbers
+
+74
+00:40:01,000 --> 00:41:16,000
+uh instead of just one number and actually you can have actually more complex labels or y's in other applications for example in natural language processing which is the area to deal with you know language problems so for example machine translation you can have this problem where you you want to translate um for example English to Chinese uh and your ex is I don't know what happens with my pointer okay so your X is the the English sentence and your Y is the um is the uh the Chinese sentence right all
+
+75
+00:40:41,000 --> 00:41:42,000
+sentences in other languages and now you can see that the Y even though Y is a discrete set the the family of y's is the family of all possible sentences um in uh in Chinese right but so so why looks like this quiz but Y is much more complicated than the house versus townhouse application right so you have so many choices of why like almost like exponential or even number of choices so then you have to deal with them in some different ways I think we're going to cover a little bit about machine
+
+76
+00:41:12,000 --> 00:42:04,000
+translation or this kind of questions uh in one of the lectures that we uh added on this year um I guess Chris mentioned that like we're going to talk a little bit about like a large language models uh for language applications but on the other hand you know this course only covers the basics of the foundational techniques of surprise learning so we're going to talk about language applications but if you really care about the particular applications how to solve them the best way then you
+
+77
+00:41:38,000 --> 00:42:54,000
+probably would have to take some other uh more kind of like a specific courses um for those particular applications okay so before I move on to unspressed learning any questions about surprise learning so would you say it's a regression problem or classification problem I think I would say it's a classification problem because why the formula of Y is still technically discrete right because you still have like a a finite number of possible y's because um I assume you can say the number of
+
+78
+00:42:26,000 --> 00:43:30,000
+sentences um Chinese let's say the name of Chinese sentences is finance right even though the number is very large but this is a good question because you know you cannot choose this as a simple as a you have to treat it in some slightly different way differently from the the most vanilla classification problems because if you view this as the vanilla classification problems then you're going to get into other issues right so um just because the set of wires is too big when you use infant dimensional features
+
+79
+00:43:05,000 --> 00:44:15,000
+so um I think I might not have a very clear answer right now because this does depends on a little bit on some of the other things we're going to teach but I think generally basically sometimes you don't know what so basically okay first of all how do you create infinite number of features right like so you you have to create them from X right so for example I guess I I think I alluded to this a little bit at some point so for example suppose you have this number of features right maybe D is a hundred
+
+80
+00:43:39,000 --> 00:44:41,000
+so now you have 100 features how do you create more features you're going to use combinations of the existing features right so um and you can come up with a lot of different combinations um so you can have like for example x d to the power of K right and K could be any integer right so that's how you create infinite number of features and why you want to use them sometimes it's because you don't know which one is the best so you just say I'm going to create all the possible features I can think of and I'm
+
+81
+00:44:11,000 --> 00:45:00,000
+going to like the machine learning model to decide which feature is the most useful or how do you combine these features so that's why we use info-dimensional features in most of the cases in reality you don't have to literally with infinite dimensional features after you run the algorithm you found out that some features are more important than others but before you run an algorithm we don't know which one is useful so you like the algorithm the machine learning algorithm to figure out
+
+82
+00:44:34,000 --> 00:45:39,000
+which one is the most useful and actually one of the interesting is that even the dimension of the features is infinite it doesn't really mean that your runtime has to be infinite so there are some tricks to reduce the actual runtime so even though you are implicitly learning with infinimental features actually your algorithm or runtime and memory all of these are actually finite and and actually sometimes they could be pretty fast in some in some cases so these are great questions yeah thanks
+
+83
+00:45:08,000 --> 00:46:26,000
+for all the questions any other questions okay so the the second part of the um the course will be about Enterprise Learning I think Chris will probably um give about five lectures on and space learning so and space learning the if you still use the host um house prediction kind of data set as an example the basic idea is that you know you are only given a data set without labels you only see the access but not wise right so you don't know how this house is you know in a data set are sold um in in the past
+
+84
+00:45:55,000 --> 00:47:03,000
+so so what happens is you know it's you still using this townhouse versus house example right so if you are supervised and you have this triangles and and and circles here to indicate what what are the labels but you guys should stand here so but uh um if it's answered you just don't have this this part of the information right you just see kind of like a this this bunch of dogs here in the in the scatter plot but as as you will see right even you just see this right as a human if once you see this you somehow
+
+85
+00:46:32,000 --> 00:47:35,000
+tell that okay this bunch of points here is very different from this bunch of points here so maybe there are two type of residents here uh going on even as a human right even though you don't see the the triangle and circle you still kind of are able to tell there's something going on there right so that's the kind of the the nature of science learning we want to be able to discover interesting structure in the data without uh knowledge about the the labels right so you want to figure out
+
+86
+00:47:03,000 --> 00:48:03,000
+the structure hidden in the data so to find some interest instructional data so for example in this case you know what you can do is that you can try to Cluster um cluster these points into groups right you want to divide these points into groups and what you want to say that each group probably have some kind of like a similar structure right so this probably doesn't sound like a very good clustering because um at least as a human being you probably wouldn't cast it like this but maybe you you like a good algorithm
+
+87
+00:47:33,000 --> 00:48:34,000
+problem would produce this right so if you produce this then essentially you figure out and there are two type of residents and this data set even though you don't know the the name of these two happy presidents right because the algorithm wouldn't know townhouse or house is two words but the algorithms knows there are two type of things going on here in the in the data set um and in lecture 12 and 13 we are going to talk about a few different kind of algorithms for discovering the structures okay means classroom and
+
+88
+00:48:04,000 --> 00:49:24,000
+mixture of gaussians um and there are other kind of applications uh for example um I think this is a paper by um Daphne Collins group who is a Adjunct professor here at Stanford so so here the kind of applications about Gene clustering so I think the idea is that you have a lot of individuals and for this particular part of the genes you know you can group uh the genes of individuals into different groups so and and you can see that um um I guess even basically you can kind of see I'm not sure what's going on with my
+
+89
+00:48:48,000 --> 00:49:52,000
+foreign you can see that there are some kind of clusters here and it turns out that each of these clusters you know corresponds to how the individuals would react to a certain kind of medicine right so and once you kind of like can group people you know into groups then you can probably apply the right type of kind of like um treatment on to each type of people um now here is another example which is probably a little more kind of easier to understand you know like uh so so the the the the type of kind of question is
+
+90
+00:49:23,000 --> 00:50:30,000
+called latency meta-analysis which I don't expect you to understand what each of these means you know it's just a kind of like a name iOS a so the idea is that you kind of like look at a bunch of documents and every document has a lot of words right so and you look at which word show up in which document for how many types so each entry here supposed to pick one entry it means how how often the word power shows up in this corresponding column the document 16 is it document document six there right so
+
+91
+00:49:56,000 --> 00:51:00,000
+every answer is how often the word shows up in the in the in the document and if you see this you know it then sounds like there's any pattern here right so what's the structure it's unclear but if you use the right machine learning algorithm what happens is that you can reorder or regroup this kind of words and documents in the following way you see the video is working right so basically you permute the documents and words and and then you see this kind of like interesting and sometimes block diagonal structure not
+
+92
+00:50:38,000 --> 00:51:47,000
+very prominently but still kind of interesting enough and now you can see each of these blocks has some particular interesting meaning for example here this group of documents and words has this it's clearly about something about space kind of like shuttles right so shuttle space launch booster these are all about kind of like a like um um like a like a space traveling kind of things right so and so basically you know that this kind of four words have similar meanings and these four documents or three documents are about
+
+93
+00:51:12,000 --> 00:52:15,000
+this this topic so by doing this you in some sense you know at least in this application you can figure out the kind of the topics of uh in in your data set right so you can figure out probably here there's one topic two one two three four five topics and each topic is more likely to associate to a certain type of words and every document is most likely about one topic and sometimes it's about two topics and then what you what happens is that once you figure out these kind of topics and then you can
+
+94
+00:51:44,000 --> 00:52:45,000
+use some humans to kind of like interpret each of these topics what each of these topics are and then give a new document you can figure out you know what topic this new document is about and this actually is very popular um tool in many of the social science because in Social guys actually even myself you know was involved in some of the projects in my PhD so the social scientists they have some texts right they maybe have like a lot of like a maybe blog posts about politics right and they want to
+
+95
+00:52:14,000 --> 00:53:02,000
+understand you know what each for example what trends happens you know in the blog post that so suppose you want to understand that and then you have to know you know what are the kind of topics about each of the blog posts where you don't want to kind of like label them each one by one because they maybe they have like a million blog posts right so they use this to kind of group the blog post in certain ways and then they can do statistics to understand what happens with all of these blog posts and this kind of
+
+96
+00:52:38,000 --> 00:53:46,000
+applies to other kind of things Beyond politics you can have like actually you can even apply this to I think many things like you know history um what else you know um like psychologists so and so forth right so um and this was actually an algorithm discovered probably 20 years ago or even maybe earlier than that maybe 30 years ago and it was pretty uh popular still like a um in in social science of course there are even more advanced you know algorithms they stay single Beyond this um um which we're also going to discuss
+
+97
+00:53:12,000 --> 00:54:22,000
+right so this is actually one of the the more recent kind of advancement I think this was like a around 2013 2014 about seven eight years ago so what happens here is that um you have a very very large unlabeled data set which is the which is called Wikipedia um so um so you just download all the documents from Wikipedia there's no other human labeling right they are just just raw documents and what you do is that you learn from these documents using some algorithms and what you can eventually produce is the so-called word
+
+98
+00:53:46,000 --> 00:54:52,000
+embeddings so you can represent all the Every Word by a corresponding vector and why you want to do that the reason is that these vectors has um basically a kind of like the the numerical representations of the of the discrete word and and there are some nice properties about these factors that captures the semantic meanings of the words so so what happens is that similar words will have similar vectors and and also the that's that's what I mean by like a the word is encoding the vector
+
+99
+00:54:20,000 --> 00:55:18,000
+so similar word would have similar vectors and also the relationship between words will be encoded in the directions of the vectors this sounds a little bit abstract maybe it's easier with this figure so um actually this kind of happens in reality right so if you look at the vectors each point is the vector for that word right so Italy has a vector and the vector let's say is this point and France has the vector and Germany has a vector so you'll find out that the vectors for all the countries they are
+
+100
+00:54:49,000 --> 00:55:50,000
+somewhat kind of similar in similar directions right so they are so for example suppose you have another country USA then you probably would find out the the point somewhere here like nearby right so all the country uh has vectors that are similar in similar that are that are in similar directions and all the capitals are also in similar directions so this is what I mean by the um the the vectors kind of encode some kind of semantic um uh like a similarity between the words and also interestingly the
+
+101
+00:55:19,000 --> 00:56:27,000
+directions also encode some kind of uh relationship so here what happens is that if you look at the difference of the um uh between Italy and Rome right so you kind of this this direction right this is the difference between Italy and Rome and you also do the same thing for Paris and France and Berlin Germany you'll see that the three directions they are very uh similar to each other they are kind of like in these parallel positions so um so in so um at least one application of this is that if you want to know
+
+102
+00:55:53,000 --> 00:56:51,000
+um suppose you are given let's say us right so which is a vector here right and you want to know what is the capital of U.S where is the capital of U.S you probably should you go along this direction to search for points and that's likely to be the capital maybe you'll find DC or Washington I guess you'll find DC there um because I think Washington is ambiguous which is a little trickier um I guess that's why I don't have the actually this is an interesting thing right so uh if you have the the
+
+103
+00:56:22,000 --> 00:57:27,000
+Washington director uh would be tricky right it's not clear where the the vector for Washington will be not clear where it will be because Washington has multiple meanings right so it's a state it's a it's a person is you know um so so actually this is a sometimes you know you have this ambiguity and and then you can have this kind of like more kind of complex clusterance of the words so for example I think um so here I guess what happens is that you know you can also use these vectors to
+
+104
+00:56:55,000 --> 00:57:56,000
+Cluster the words into groups um so for example uh you have this kind of groups kind of these words you know like scientific words some of which which some of which I don't even know and then you can use the the casting algorithms for the vectors to figure out what they uh what kind of topics or what kind of like scientific areas they belongs to right and and you can also have hierarchical clusterings uh to deal with kind of certain kind of overlaps because for example mathematical physics probably would be
+
+105
+00:57:25,000 --> 00:58:32,000
+closer to the physics vectors and math factors on both right some somewhere in the middle of the math and physics vectors so um um so so so there are this kind of like an interesting many kind of different interesting structures in in all of these word vectors which you can uh leverage to solve your tasks I'm a little conflict here just because you know to exactly do all of this it requires a little bit more uh uh things you know um that we haven't you know discussing but we will discuss some of this in
+
+106
+00:57:58,000 --> 00:59:08,000
+later lectures so and and most recently um in the last two or three years there's a new um kind of like uh say Trend or kind of like there's a new breakthrough in machine learning which is um these large language models I think many of us are very excited about it you know Chris has mentioned about that um and and I stand for new health actually um a lot of people you know working on these large language models um and roughly speaking these are machine learning models for language and they are learned on very large scale
+
+107
+00:58:39,000 --> 00:59:46,000
+data sets you know for example Wikipedia I say um discussed before or sometimes even bigger than Wikipedia so you can download you know um a trillion you know words or maybe like a like a like a 10 trillion words you know on on online because there are so many kind of like online documents and you collect all of this um documents and you learn a gigantic model on top of it you know these are gonna be very very costly even tuning the single model would probably cost you like a 10 million dollars you know
+
+108
+00:59:12,000 --> 01:00:07,000
+um so just for one time so they are they are very costly but they are very powerful because they can be used for many different purposes and in particularly here I'm talking about this breakthrough called gpt3 you're gonna heard this name probably pretty often uh not very often like in the lecture um uh like pretty often in general like a um in the next few years I think uh or you probably already heard of it in the in the lecture we're going to talk about this like in one lecture so GPD three is
+
+109
+00:59:40,000 --> 01:01:07,000
+this gigantic model and they can do a lot of things so I'm downloading this is a example of from there on blog post so you can use this gpt3 to generate uh stories I think here what happens is that you you give human some person writes this paragraph about you know something right so like some I guess mountains or valleys and then um the model the Machinery model can just generate some story and some kind of like very coherent and meaningful text afterwards and you cannot probably if you don't tell you these are
+
+110
+01:00:24,000 --> 01:01:26,000
+generated by machines you probably wouldn't know that they are generated by machines you probably guess this is written by um on some some authors so that's one application you can one use one way to use this model to generate stories and you can also use this model to answer questions right so here um you you give you give this model this long paragraph and then you can ask um it's kind of like a SAT I'm not sure like this is kind of like GRE questions I'm not sure whether all of you know GRE
+
+111
+01:00:55,000 --> 01:01:55,000
+but like um so like these are kind of like just basic questions answering about the past passage right you can ask you know what's what is the most popular uh um politics in uh in Finland and and this will this is this is the information you can find in a document and and they would answer the right thing um so that's another application and you can also use this to do other things for example you can say you can just just write in the text say please unscramble the letters into a word and write that
+
+112
+01:01:24,000 --> 01:02:27,000
+word and then you give this to the model and the model will just change the uh the orders of the letters to to make it a meaningful word and you can ask you know for example this is not like a simple numerical questions what is 95 times 45 and it gives you the right answer and all of this are not like so so what's the amazing about this is not because it can solve all of these tasks just each of these tasks the amazing thing is that you learn on this unlimited site this gigantic and enabled
+
+113
+01:01:56,000 --> 01:03:00,000
+set you didn't specify what tasks you want to solve right the only thing you see is this gigantic data and then the single model can be used to solve multiple tasks just by interacting it with different things right if you want to solve this task you just write it in the human interpretable language 95 times 44 45 and if you want to solve another task you just do something else a slightly different kind of like phrasing um then they can be used to solve multiple tasks and that's that's why we
+
+114
+01:02:28,000 --> 01:03:50,000
+call them Foundation models um at least you know your paper in a white paper written by Stanford people um so um so in some sense there are kind of Foundations uh for uh they can be used for a wide range of applications uh without um further and sometimes without a lot of like further uh changes right so the model itself can be can do a lot of work um for many tasks okay so I guess I'm supposed to stop like for 30 wait 445 right yeah sorry like uh um okay so I still have some time any questions
+
+115
+01:03:13,000 --> 01:04:23,000
+sorry um like a um right so I guess um maybe one if I understand the question correctly so one concern is that whether this 95 times 45 already show up in the Corpus but maybe you just memorize it that's one possibility but I think that's that's not the case so of course some of the numerical um problems like some of these multiplication problems show up in the Corpus christ you will find one document online about you know what is 12 times 35 but you wouldn't find I think you wouldn't find the uh documents about all
+
+116
+01:04:19,000 --> 01:05:22,000
+pairs of like multiplications um so like multiplications of pairs of like two digits numbers I don't think you'll find all of them um so so there's some kind of extrapolations where you see some of course you have to see something right so that you can learn from them right so you probably have seen a lot of kind of like a numerical um uh operations like all kind of like mathematics the formulas in the document but then you can in the in the tuning Corpus and then you kind of extrapolate
+
+117
+01:04:49,000 --> 01:06:02,000
+to other uh other instances right like so you learn from um some basic stuff and then you learn like then you can use the model to Output multiplication so for example longer uh digits does it make sense does that answer the question right so how do you make sure that the like uh by pollution I guess you mean that how do you make sure that in the tuning Corpus they are not all pairs of double digits right so I think they do run some tests to check that so of course you cannot make sure I guess is that what you mean by
+
+118
+01:05:35,000 --> 01:06:40,000
+pollution or you mean by pollution you mean like something wrong about the false information right right okay right so that's a great question right so I think abstract is speaking the question is about you know how do you make sure your training corpers don't doesn't have wrong information for you all right so I think we you know I think they definitely they are wrong information in the Corpus right I think what happens is that they are probably more correct information than raw information and and you somehow kind of
+
+119
+01:06:10,000 --> 01:07:08,000
+reconcile between them and you kind of pick the right thing um so that's largely what's going on but of course you know if you are very specific about you know so this this area called Data poisoning so you can actually specifically change your tuning data in some special way actually you just change a small number of training data so that your model learns something completely wrong so that's that's actually possible so but that requires a kind of adversarial change of the tuning
+
+120
+01:06:38,000 --> 01:07:44,000
+Corpus so so on one side this is a very bad thing because you know if someone do something out of a serial online and you use those kind of documents to train your model that's that's a huge risk on the other hand you have because you have to right so at least right now like uh like the it's not it's like a this kind of like a adversary Point thing is not happening very often just because it's not very easy to achieve them thank you okay any other questions okay cool yeah these are all great
+
+121
+01:07:14,000 --> 01:08:23,000
+questions like I like to have more questions uh that's great so um okay so the last part is about reinforcement learning um this will consist of probably two or three lectures at the end of the um at the end of the course so the main idea of reinforcement is that here the tasks roughly speaking about learning to make sequential decisions so I think there are two things right one thing is that you are making decisions so before in both Superstar and express learning in some sense you are making predictions
+
+122
+01:07:49,000 --> 01:08:46,000
+right at least in supervisoring it's pretty clear you are predicting wise but here you are talking about decisions and what's the difference between predicting decisions and like the decisions and and predictions the decisions has uh long-term consequences right so for example if you play chess right so you you make some move and that move will affect your future uh like it affect the future right so so you have to to think about long-term ramifications and also this is a sequential decision so so
+
+123
+01:08:17,000 --> 01:09:11,000
+you're going to take a a sequence of steps right so when you take the first step you have to consider you know what this step will change my game and what happens in the future so so that's why you can see that you know this kind of like reinforcement algorithms are mostly trying to solve these kind of questions where you have to make a sequence of decisions so for example when you self-go right you probably heard of alphago and another example is like for example you want to learn a robot so if
+
+124
+01:08:44,000 --> 01:09:46,000
+you want to control the robot you have to take a sequence of decisions right how do you change the joints you know how do you kind of like a control uh like actually there are always multiple kind of like uh things you can control for a robot and how do you control all of them in a sequential way so here I'm I'm showing this in a simulation environment so this is a so-called humanoid which is kind of a robot that imitates a human so and the goal is to you can control a lot of joints um in this in this robot and your goal
+
+125
+01:09:15,000 --> 01:10:12,000
+is that you want to make this robot be able to walk to the right as fast as possible and and this is what happens uh how the kind of what happens with the reinforcement algorithm learning here so it's kind of like trials and errors to some extent so what you do is you say you first try some actions right you first try to kind of like do something like this and and then you figure out that this didn't work well right it's false and then you go back to say I'm going to change my strategy in some way
+
+126
+01:09:44,000 --> 01:10:39,000
+right so I know that some strategy is not going to work I'm going to try some other strategies and maybe I know some strategies is actually partially working because at least the robot the humanoid is is doing something right it does walk to to the right for one step it just didn't keep the balance you know some part is good some part is bad and then you try to go back to change your strategy and then you probably can walk a little further something like this right and then I guess I'm going to fast
+
+127
+01:10:11,000 --> 01:11:17,000
+forward to iteration 80 I think 80 works I forgot whether I have an oh actually 80 still doesn't work perfectly you can see it's working in a weird way um yeah so and I think at iteration 210 I think it's it can keep working but still it sounds that it sounds very natural but this is a problem like you shouldn't expect that the humanoid work as natural as humans um partly because they are different there are many different things right so like maybe for the robot this is optimal
+
+128
+01:10:48,000 --> 01:11:51,000
+strategy you know that's possible but of course I don't think it's the optimal strategy but it's possible that optimal strategy for the robot is not the same as the option strategy for for us so and generally as I alluded to so the kind of like the the very high level idea of reinforcement algorithm is that you have this kind of like Loop um between training and data collection so so the algorithm so before in Supersonic and Einstein we always have a data set where someone give you a data
+
+129
+01:11:19,000 --> 01:12:24,000
+set and that's all you have right you cannot say okay give more examples of the house uh house prices right so you have to work with what we are given but here uh in the reinforcement formulation you often can collect data interactively I see some questions it's a question sorry okay um okay so so here you often can collect data interactively so meaning that you try like for example in the humanoid example you try some strategy and you see that humanoid false then that's the data you see
+
+130
+01:11:52,000 --> 01:12:55,000
+additionally right so then you can incorporate new data back to your training algorithm and then change your strategy right so you have this kind of loop where you in one one side you try the strategy and collect feedbacks and the other side you improve your strategy based on new feedback so in some sense you have a data set that is growing over time the the longer you try the more data points you're gonna see and and that will help you to learn um I'm better and better so I guess so um
+
+131
+01:12:23,000 --> 01:13:39,000
+Okay so I guess that's my last slice about reinforced learning any questions [Music] oh oh sorry oh uh or after like an empty like the information is completely right right so is the feedback uh uh seen after each type of decision or is it after something else right so so there are many different formulations this is a great question so so the most typical way typical formulation is that you see the feedback right after the decision you make um but that sometimes it's not realistic for example let me see what are the
+
+132
+01:13:10,000 --> 01:14:12,000
+examples so um I I think okay maybe I'm blanking on what are what are the best examples to show but in some cases you don't have the feedback right right after and sometimes even you have the feedback right after the decision you cannot change your strategy right after decision so um just because for example there is a computational limit or you have to really do something physical to change your strategy on a humanoid right or maybe there's some communication constraints so uh so there are multiple
+
+133
+01:13:42,000 --> 01:14:43,000
+kind of different formulations reinforcement learning I think if you have delayed reward I think that's called the delayed reward problem and sometimes you also have this so-called deployment wronged in the sense that um so this notion of number of deployment means that you can only update your strategy for for example five types right so you cannot just constantly change your strategy and then you can ask this question what's the best way to to do this for example I guess one example is that
+
+134
+01:14:12,000 --> 01:15:09,000
+um you suppose you are using reinforcement to control a nuclear plant right so you probably don't want to say that you just keep telling you you run algorithm like a um like you run algorithm and the algorithm keep telling the nuclear plant to change their strategy to control them right like every day that sounds like risky and and also kind of like inefficient you know there are many problems with it right so probably you're gonna say that I have to do some experiments you know for a little bit
+
+135
+01:14:40,000 --> 01:15:40,000
+for six months and then I figured one strategy that I almost guarantee um uh I can guarantee that this new strategy is working better than the old one and then I deploy it and then collect some new feedback quite so and also I guess maybe another thing this is a great question and another thing um I I would like to mention is that in many of these problems you know there are multiple uh Criterion for example for reinforcement if you want to control the nuclear plant there's a safety concern right so then you have to have
+
+136
+01:15:10,000 --> 01:16:02,000
+to care about whether your strategy is safe or not right for the human noise probably it's fine for the human not to fall down you know to some extent but still you cannot really let it fall down so often because it will hurt your Hardware right so it is frustrating the other constraints for example there are constraints about you know how how long is the tuning type right that's the typical metric and there is also a constraint about how kind of like a powerful or how kind of multi-purpose on
+
+137
+01:15:36,000 --> 01:16:42,000
+these models are right How likely they can solve multiple tasks So So eventually like uh this is a very um like especially if you look at a research Community there are different people care about different metrics um just because all of these metrics you know have their own applications right so um so so this so it's the the real kind of scenario is much more complicated than this in some sense okay so I guess um in um there are a few other lectures about other topics in the course um which are actually in between some of
+
+138
+01:16:14,000 --> 01:17:19,000
+these um big topics so one of the topics we are going to spend two lectures on is deep learning Basics so deep learning if you heard of the word so maybe some of you have heard of it so deep learning is um the technique of using the so-called new neural networks uh is your model parametrization so um so this is this can be used together with um all of these tasks right it's kind of like a technique that can be used in reinforcement that can use in Surprise learning and express learning and in
+
+139
+01:16:46,000 --> 01:17:48,000
+many other situations so and this is something that um um is very important because you know because of deep learning uh took off around 2014 2013 in the last seven years we see this tremendous progress of machine learning because of these techniques a lot of things you know are enabled by this different techniques so uh and we're gonna also discuss a little bit about learning theory uh just for one or two lectures um so in some sense actually we don't really talk that much about the the the
+
+140
+01:17:17,000 --> 01:18:21,000
+core theory in some sense the goal here is to um uh understand uh some of the kind of like trade-offs of some of the decisions that you should do when you train the algorithms right so what's the best way to select features what's the best way to make your test error as small as possible and also we're going to have a lecture on how do you really use some of these insights to tune um an ml model in practice you know what kind of decisions um I as though as the machine learning as a the as the algorithm implementer
+
+141
+01:17:50,000 --> 01:18:52,000
+you know what compositions you have to pay attention to so and so forth so um I guess we're gonna have a guest lecture on on the broader aspects of machine learning especially robustness and fairness um I guess machine learning has a lot of societal impact especially because machine learning Now is working you can really use it you know in practice and it will create some kind of societal issues actually a lot of societal issues um and and these are things that we should pay attention to I'm not an
+
+142
+01:18:21,000 --> 01:18:53,000
+expert in this area we're going to have a guest lecture James though who work a lot on this to talk about fairness and robustness of machine learning models okay I guess this is uh um all I want to say for today
+

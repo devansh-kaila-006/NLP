@@ -1,0 +1,504 @@
+1
+00:00:05,000 --> 00:00:54,000
+so hello uh welcome to 229 uh so we're starting a block of three lectures that I get the privilege of of spending some time with you and kind of walking you through the building blocks and Basics before I get into the plan for those three lectures I want to make sure we understand a couple of logistics so I I posted something on Ed that kind of explained why I was setting up lecture in the way I am you are not obligated to read that but if you're interested go ahead and read it super happy to take
+
+2
+00:00:30,000 --> 00:01:24,000
+feedback and discuss any of that one of the things that I liked about the pandemic was that more people were asking questions during class and I think part of that was because people were you know using the anonymous feature on Zoom quite a bit and I and I wish we still had that we don't in this class for various reasons so what we're going to do instead is we're going to have this Ed thread that I just set up that says lecture two 330 in class question thread and feel free to fire away questions on there I may not take
+
+3
+00:00:57,000 --> 00:01:47,000
+all them I reserve the right to skip them Tas May jump in and answer some um and I'll try to follow up on anything that's there but it's really helpful to me that that you ask questions and happy to talk about whatever you want uh really be relevant to the class is helpful but like pretty much whatever you want um second thing there are a couple of downloads that I put up before my lectures I put up two things one is a handwritten note of what I'm going to talk about which are the same notes that
+
+4
+00:01:22,000 --> 00:02:10,000
+I use I modify them a little bit and then also a template in case you want to follow along again you don't need any of this stuff you can just sit watch it on video watch it here ask questions do whatever you want but it's just so that you know the material that's there and that you know things like data that I want to show you and look real I can cut and paste that in and you can have it in front of you while I go through it okay all right so that's the logistics I will use I'm going to try and use the iPad I
+
+5
+00:01:46,000 --> 00:02:36,000
+like using the Whiteboard feel so this is a good compromise because it slows me down if I get excited I'll start talking all kinds of nonsense so this will focus me a little bit more on the class and you'll see how long I last all right so what we're going to do in this first three sections of the class first three lectures is kind of build up uh increasingly sophisticated machine learning models and your what you're going to see is that they are very very similar to a model that you probably
+
+6
+00:02:11,000 --> 00:02:55,000
+already know and love which is linear regression if you don't know linear regression don't worry today's lecture is effectively going to be talking about linear regression with slightly fancier notation and you know some little bits around the algorithm but it's basically just fitting a line okay it's it's really hopefully going to be something that you've seen and you can grab onto and then what we'll do in the next lecture is we'll generalize this from regression which is the kind of
+
+7
+00:02:33,000 --> 00:03:20,000
+traditional fitting align to classification now I have a couple of twists we choose our notation a little bit carefully and what that allows us to do is show that that way that we're looking at classification and we'll talk about what classification really is allows us to do a much larger class of models which are called these exponential family of models and they're going to kind of rear their head throughout the course so we're going to see a precise definition that allows us to have a huge
+
+8
+00:02:56,000 --> 00:03:40,000
+number of statistical models and kind of treat them in one way so we don't have to understand the details of every little model we have an abstraction of how to find its parameters how to do inference on it let's get a prediction out of it and kind of understand it and kind of understand these algorithms I'll try to highlight for you as we go through there which of these pieces actually carry over to what I would call kind of modern or industrial machine learning feel free to ask questions
+
+9
+00:03:18,000 --> 00:04:10,000
+effectively the way we solve these algorithms or what we solve these underlying optimization problems is exactly the way we run everything from how images are detected to how you know search works in various different corners of it to natural language processing to translation weirdly enough this abstraction kind of carries over for all of that and the underlying Workhorse algorithm which we'll see is called stochastic gradient descent and so we'll try and introduce it in that absolutely simplest setting okay and so
+
+10
+00:03:44,000 --> 00:04:28,000
+that's the idea it's going to be building parallel structure for the next kind of three so linear regression classification and then we're going to go through this generalized exponential family and they will have a very parallel structure if you go back to the notes you'll be able to pull out like oh this is the solving part this is the model part and what we're going to do there all right then tangyu takes over teaches you a bunch of awesome stuff neural nets all the rest of that stuff kernels then
+
+11
+00:04:06,000 --> 00:04:55,000
+I come back and teach you unsupervised and there again is a different structure there but it's very very similar and graphical models and the rest make it make an appearance there okay so today our plan is to get through first just some very basic definitions um we'll be a little bit pedantic there but that doesn't mean you shouldn't ask questions means if you don't understand something you should and I haven't done my job so just fire off a question in any form you like then we're going to
+
+12
+00:04:31,000 --> 00:05:17,000
+talk about linear regression which as I said is is fitting a line except we'll be fitting High dimensional lines eventually so we're going to want to abstract that away we'll talk about batch and stochastic gradient descent which are two algorithms and machine learning as tangyu talked about we're not great with terminology this algorithm is called incremental gradient descent in the 60s it's been around forever our incremental gradient methods actually it wasn't even it's not even a
+
+13
+00:04:53,000 --> 00:05:43,000
+descent method formally doesn't matter the point is these are old things that people have been using for a long time and weirdly enough it's what we use every day like it's as I said this is like a Workhorse algorithm that you're going to see and then I'll very briefly cover the normal equation because I think it's a curse on your homeworks um you know and it's like you know also gives you some practice with Vector derivative so you do need to know the vector derivatives stuff to make your
+
+14
+00:05:18,000 --> 00:06:06,000
+life easier in this class you'll have to compute occasionally compute a gradient or compute a derivative and this is a place where you kind of know what the right answer is so when you compute these derivatives like you know it's an easy place to check yourself but I wouldn't say that like normal equations are like the most important thing you'll learn in this class it's just you know it's all you should know what they are it's not hard okay all right great so let's talk about supervised learning
+
+15
+00:05:42,000 --> 00:06:36,000
+all right so this next section as I mentioned is going to be all supervised learning and it'll all follow kind of the same general schema right and what I mean is we're going to try and have some what we call prediction function and basically all that's going to be is a function H which will use this notation consistently that goes from some set X to some set y okay before defining this formally let me just give you a couple of examples so one idea is that X could be the set some set of
+
+16
+00:06:13,000 --> 00:07:05,000
+images right so we can look at in images a bunch of images and we could ask does it contain a cat right that was actually like a very important machine learning problem at kind of one point in time people still work on that right you know what's the object that's in this image that would be a prediction right we are wise here would be a set of labels that say things like cat dog things like that all right it could also be text right so we could look at text here and we could ask questions you know that you
+
+17
+00:06:39,000 --> 00:07:39,000
+know maybe we arguably should be better on in machine learning like is it hate speech all right right and so we ask here you know this x here these are all examples of data types that we want to work on and these are all labels or y's that we're talking about okay now we'll look at as tangyu showed in his lecture we'll look at house data now historically house data has been one of the most common machine learning and statistical uh tasks it's in like every stats 101 course so you may have seen this before
+
+18
+00:07:08,000 --> 00:07:54,000
+I kind of hoped you have um and when we look through it we're gonna I'm gonna point out the real data that you can use to try this out in a competition like kaggle there's a kaggle where you can download house prices from Ames Iowa and try and guess how much they you know how much they should sell for things like that right people actually make money on that by the way right not everybody sometimes hard if you followed the news right Zillow tried to sell houses and estimate them and
+
+19
+00:07:32,000 --> 00:08:20,000
+flip them and they lost a bunch of money Blackstone if you care about private Equity I managed to make money doing that right they bought houses and they were able to predict how much they were going to sell them at so this may be trivial as it seems um is there actually problems that people care about okay anyway so we need an abstraction so we have this X and we have this y we need something else to make this a supervised problem and we talked about it yesterday we're given a training set
+
+20
+00:07:56,000 --> 00:09:15,000
+okay so what is a training set well formally it's just going to be a set of pairs this is just introducing notation you have an X1 and a y1 okay now comma all the way x n to y n all right all right now x i here is going to live in x it's summing coding of an image maybe it's the bits that are in the image that would be a reasonable encoding maybe it's RGB values that's in there if it's text maybe it's the ASCII characters or Unicode characters that are in there it's some bag of bits okay now we're
+
+21
+00:08:35,000 --> 00:09:43,000
+later going to abstract this away and almost always work in a vector space we'll talk about where those Vector spaces come from but that that's kind of where the the data actually lives and y i is going to live in some set those are going to be our labels oops right so now our do given that information is we have to find a good age X to Y okay and we'll call often we call it h because it's a hypothesis all right all right now that notion of good is going to occupy a fair amount of what we worry about over
+
+22
+00:09:18,000 --> 00:10:03,000
+the next couple of lectures what does it mean to be good right in some intuitive sense because I have these examples of x's and y's one reasonable thing I should expect is I I kind of get them more often right than random chance right that's like kind of a very basic idea of what would be good you show me an image it has a cat in it I get most of the cats right now you've used enough machine learning to know like we don't get it right all the time right and it's still useful so we'll have statistical
+
+23
+00:09:41,000 --> 00:10:29,000
+Notions we'll try to get it right kind of uh you know on average now more advanced things like just recency biased because Tatsu was talking about it in the class before on the board you could also worry about how well you do on some groups versus other groups some groups you know you're predicting really well on but other groups have qualities and you're not predicting as well on them you could worry about that and say I want to do my prediction I only care about is being you know as well as I do
+
+24
+00:10:05,000 --> 00:10:49,000
+on any one of these predefined groups okay so you could have multiple Notions of good we're going to stick with the simplest and basic which is like how accurate am I at the task in this okay but this mathematical framework can accommodate all of those like when you actually write it down the tweaks that I just mentioned to come up with those uh different what they're called loss functions is really really kind of straightforward mathematically they'll kind of go through the same thing okay
+
+25
+00:10:27,000 --> 00:11:21,000
+so all I want you to take away from this is we have a training set that's what's provided to us these y eyes are going to be supervision they're in some set our goal will be to find a good h among all the possible functions and by the way the class of functions from like one space to another is enormous right so we're going to have to restrict that in some way and that's kind of the setup for supervised learning okay right now this here we will often refer to as the training set or the training
+
+26
+00:10:53,000 --> 00:11:39,000
+data that's there and what we're really interested by the way in which is probably a little bit counterintuitive the first time you hear it is we're not doing strictly machine Learners we're not doing strictly what's called interpolation we're not just trying to predict back on the X and Y pairs that we have we're going to try and worry about how well we're going to do on a new X and a new y so why does that make sense imagine someone shows up with an image odds of that like you know they just
+
+27
+00:11:17,000 --> 00:11:59,000
+took it with their phone right my phone is just littered with pictures of my daughters okay so if I take a new picture of my daughter and probably the label should be the same as the last thousand pictures I took but it's going to look a little different right so when I show that that picture I don't care how well I did on the last picture that I took over I care how well I did on this picture right on that on those X and Y Pairs and that's a little bit weird and that means that implicitly
+
+28
+00:11:38,000 --> 00:12:29,000
+what we're going to assume here is that these x's and y's you should think about is drawn from a large population of images right that are out there and we want to do not we were sampling some piece of it and we want to do well on those images that are going to come in the future that's why we think about it as a prediction so it may not be great to just return the label of every X and Y we've ever seen right we have to in some way kind of generalize is the technical term to those new images okay
+
+29
+00:12:03,000 --> 00:12:52,000
+all right so the reason we call this a prediction is we care about new X's that are not in our training set right now if you look at that and you're mathematically minded you're like how the heck did you say anything about that and hopefully you got a clue there if you don't if it doesn't make sense yet don't worry we're going to make some assumption like we randomly sampled from all of the images and how well do I do on another randomly chosed image okay that's what we're going to do
+
+30
+00:12:32,000 --> 00:13:15,000
+in some way the set you train on though better be like the set that you evaluate on that you take your predictions on or you're out of luck if you train your model on pictures of my daughter and ask to know about cars I don't know how it's going to do right so there's clearly some link here okay now weirdly enough although I say that one of the big trends in machine learning that's going on right now in fact of course that I co-taught with Tatsu and Percy last quarter was about
+
+31
+00:12:54,000 --> 00:13:41,000
+these large models that we just trained to predict kind of everything that's on the web and they seem to do pretty well on things okay so just want to highlight like it's there's a really strange notion of good you spend your whole life trying to think what good is if you're a machine learner okay a couple more things as I said I'm just going to go off on tangents if no one stops me all right so if Y is discrete this is just terminology so it's a discrete space we think about
+
+32
+00:13:18,000 --> 00:14:13,000
+this as classification okay that's the terminology you could think the simplest version is yes or no does it contain a cat yes or no binary classification you could also have a bunch of different classes is it a car a plane a truck what model of car is it those are classifications they're enumerated sets the other thing which you're probably familiar with from you know calculus and we'll talk a little bit about today is when Y is continuous and this is called regression so this is an example of something
+
+33
+00:13:52,000 --> 00:14:49,000
+that's discrete this cat yeah and the house price this is going to be an example of regression and that's what we're going to look at today in lecture three we switch and we start to look at classification which has some subtle differences okay awesome all right let's look at some data any questions about the setup or or kind of higher level questions about what it is what goes on here all right sounds good okay so let's look at some some real data here I'll try and get it all on the
+
+34
+00:14:23,000 --> 00:15:16,000
+screen so I'm going to look at this house price data as I mentioned this is the Ames data set which follows a very famous data set just for historical reasons of Boston house prices that you can go look at and download you can download in one line into pandas if you want happy to put uh you know information online about how to do that this is real data of real houses and Ames and so what I'm showing here is like these are their real IDs I just randomly selected some to kind of make the picture pretty right just be honest
+
+35
+00:14:49,000 --> 00:15:37,000
+and then here's their sale price right so this is their actual sale price and the data and this is their lot area this is kind of like some notion of square feet that's actually present this data set I think has something like 93 or columns inside of it I've just selected a small set of them we'll come back to that in a second now one of the things that I did here is like the first thing you should do when you're encountering a new set of data and I cannot emphasize this enough is
+
+36
+00:15:13,000 --> 00:15:51,000
+look at it the number of times that like people especially engineers in Industry like take their data and like start running fancy stuff on it I'm like well did you did you look I still remember when I was running a machine learning team at an unnamed large company and they're like why are you sitting in the cafe just like labeling data just like looking at data sets for like days it's like I don't know what's going on I want to figure out what's actually what people are actually doing on this data
+
+37
+00:15:32,000 --> 00:16:16,000
+set and it's it's really important okay so when you're doing your projects like first plot it so here's a plot right x-axis square feet y-axis price and clearly there's some like General upward trajectory Trend here we're going to be more precise about that in the next slide right you get bigger houses they cost maybe as you can think about it you're like that's not quite true like if it's in a really desirable neighborhood um like you know costs more and if it's
+
+38
+00:15:55,000 --> 00:16:34,000
+in a less desirable neighborhood maybe it costs less so they're clearly other factors those are gonna be called features in a minute but this is our first model okay so let's look at one other feature so we can also look at the number of bedrooms right so you see here a plot these are categorical values that's why I put them in there I mean they're kind of continuous in some way you can still treat them as numbers so that's fine you see there's some spread you know among
+
+39
+00:16:14,000 --> 00:17:12,000
+three bedrooms and among four bedrooms and the price is the waxes so what do we want here going back up for a second what do we want actually we want to get a function what's our hypothesis go from it goes from lot area and it predicts price okay that's just notation okay this is what we're after okay so you show me this data and my goal is to produce some age okay now they talked about there are lots of functions that could take in you know a lot areas and return sale prices it could scramble it it could do whatever
+
+40
+00:16:47,000 --> 00:17:33,000
+it wanted it could you know go look up from an oracle whatever I wanted to do there are tons and tons of functions we're going to look at a simple restricted class of functions in just a second okay but I just want to put that in your hand like this is actually a pretty hard problem so we need some some representation for H okay so how do we represent that age now we're going to look at a class of models which is called linear although if you're a stickler you'll realize right away that they're affine I'll
+
+41
+00:17:10,000 --> 00:18:23,000
+explain why I allow myself to cheat like that in a second okay so here's a here's a model that we could use okay okay so the idea here is you give me the variable right X1 which in this case would be like the square footage or of whatever you have and then I will multiply it by some Theta and this Theta is going to be a weight we'll call it or a parameter of the model and this is how I'm going to form my regression okay looks like a line right so far so good right now let's see if I can show you a line
+
+42
+00:17:46,000 --> 00:18:51,000
+there's a line that does it okay okay this is that's basically that line through the data that we just looked at okay now I want to actually come one in one more second how does this actually map onto this oops scroll down sorry for the bad scrolling here I'm going to go to zero remember my H is going to look like x equals Theta 0 plus Theta 1 X1 well what does it look like just so you make sure the picture is clear this here is Theta 0 right it's where I am it's a response at zero and then this gives me the slope
+
+43
+00:18:18,000 --> 00:19:14,000
+right this is the of slope Theta 1. okay and then when I go to predict what do I do I grab a point let's grab this one I project its value onto the X and this is where I predict its price would be right this is the price of this one does that make sense okay all right awesome okay so this looks like a relatively simple model but if you look at it like you know at this scale not so bad honestly right there's some kind of linear Trend there there's some errors or what we call residuals in a second
+
+44
+00:18:47,000 --> 00:19:48,000
+we'll try and minimize those these errors but this is this is like our first predictive model okay and as I said it's something that you're hopefully quite familiar with just in kind of fancier notation for the moment all right awesome okay so now I'm going to go sorry for the skipping I'm going to go and say okay how do we generalize this right so imagine we had our data set we had X1 X2 so on and we have a bunch of features and I'm going to use my features for my notes but hopefully this
+
+45
+00:19:19,000 --> 00:20:24,000
+doesn't cause you any panic I have size I have bedroom lot size and as I mentioned in the actual real data set there's like 80 90 of these things and have price okay okay and remember price is my Target this is my why and these are my x's so this is uh you know I'm just going to put numbers here don't worry about them I don't know why I wrote These in my notes but these are the ones I used just for the sake of consistency so write these 45k 30k 400 900 doesn't matter too much okay the
+
+46
+00:19:55,000 --> 00:20:51,000
+thing that I that I care about is that this is my notation for the first data point in the second data point and this is X11 this is X12 this is the second feature okay right now I called this a linear model right but if you're a stickler and you took a bunch of things you're like no it's an affine model you have this you know Theta 0 hanging out there the way that we get around that is we're going to assume that Theta 0 for every model x0 for every model is identically one okay
+
+47
+00:20:23,000 --> 00:21:28,000
+so that's just a convention don't stub your toe on it that is x i zero equals one and I claim you should convince yourself for one second that means that what is linear in this new set of features is my old affine models right and I just put I'm just putting a one here every place okay all right that allows me to just simplify my notation okay so what's my what's what's the model the class of models that I'm looking at here well they're linear models again with that terminology and they're going to
+
+48
+00:20:55,000 --> 00:22:23,000
+look at Theta zero times you know x0 which we know is one plus Theta 1 times X1 Plus data and I'm going to call it D times XD okay and this equals sum J goes from zero to D Theta J times x j all right and remember I'm just going to write it again x0 equals one and NB means you know no well none okay all right now this allows me now I have a very high dimensional problem now High Dimensions don't work like low Dimensions I won't go into a whole thing about it but High dimensions are very fun and interesting
+
+49
+00:21:39,000 --> 00:22:24,000
+spaces okay you can you can build really interesting machine learning models by taking your data doing what's called embedding it and then training a linear model on top and that actually in some areas is actually state of the art of what we know how to do so those models have potentially you know hundreds of features that are underneath the covers for us these features right now are going to be all human interpretable they're going to come from the table so when you give me a the row X1 I fill in
+
+50
+00:22:01,000 --> 00:23:18,000
+the value this value here with 2104 I fill in this you know the X2 value and so on and as I go okay so I just fill in the values as I go that's how I form my prediction okay a little bit more notation right now if you don't remember I'm just going to introduce Vector notation here these are column vectors they're going to look like this and this is just going to save me time and space and you know fill the things okay X1 is going to be a vector 2. with X11 X2 X12 so on oop sorry
+
+51
+00:22:42,000 --> 00:23:53,000
+about that I wanted to start at zero x 1 0 x 1 1 and so on and remember this thing is one which we've said many times and this is whatever the value is up there 2104 okay in general this is going to be the size feature the bedrooms feature and so on clear enough right these are the parameters and these are the features all right so why be so pedantic about this piece it's because we're going to use this in several different guises these parameters are going to mean different things as we change the
+
+52
+00:23:27,000 --> 00:24:28,000
+hypothesis function over time and we just want to make sure the mapping is clear so just make sure the mapping is super crystal clear in your head of how I take a data point that looks like this and map it into a feature Vector that looks like that that's all that I care that you get out of this and then we have some different vectors and y i is going to be the price in our example is price okay now recall this notion wasn't we didn't pick this by accident this was a training example this pair x
+
+53
+00:23:58,000 --> 00:25:18,000
+i y i is a training example this is the ice training example right just the iPhone and the set okay so far so good now I'm going to create a matrix here capital X that's going to have one row for every example oops so on X so there are n of those characters by my notation and so where does this Matrix live well there are n rows and recall because of my convention that I added a extra Dimension which I always made one it's D plus one and I'm just highlighting this and being pedanta because I don't want
+
+54
+00:24:52,000 --> 00:25:43,000
+it to bite you when you realize like why they have D plus 1 where did it come from it's the one and this is someone who say this you taught this course many times someone's going to get bitten by it I'll say it many times okay it's uncomfortable when it happens okay so this is now I can think about my training data as a matrix awesome okay so now we have a bunch of notation I've basically bored you to death with a hundred different ways to write down your data set but I haven't answered the
+
+55
+00:25:19,000 --> 00:26:13,000
+question that we actually cared about which is how do I find something that's good right how do I find an example of something that's good all right so now let's look at here so why do we think this line is good you remember this from how you fit it you think it's good because it makes small errors right like if it were all lying on the line right on top of the line the distance from any point to the line would be zero and we think the line was pretty good if we could kind of minimize those errors
+
+56
+00:25:46,000 --> 00:26:35,000
+okay and this is the error this is the residual now for computational reasons and historical reasons we'll look at the squares of those residuals in just a second okay don't worry too much about that you can do everything I'm telling you with the absolute value of the things right you don't want to do the signed value of them because what does a negative error mean right you should pay a penalty is the intuition whenever you make an error all right so let's look at this all right so we're
+
+57
+00:26:11,000 --> 00:27:17,000
+going to look at our H and I'm now going to write it sub Theta J goes from 0 to D Theta J of x j okay so now picking a good model I can actually make some sense for what do I want well I want somehow that h of theta X is approximately equal to the Y when X and Y are paired right if X and Y come from a new example you show me a new image it's a kazak cat or not that label may be opaque to me but it exists I want my prediction to be close to that y on average or for house prices you give me a new
+
+58
+00:26:45,000 --> 00:27:44,000
+house I predict its price is as close as possible I may not get the exact dollar but it should be penalized a lot if I'm off by a million dollars maybe but not if I'm off by ten dollars right that's kind of the the intuition here right so how do I write that down the idea is I'm going to look at this function J which we're going to come to a couple of different times and it's this is that one half is just normalization I'm going to look at my data and I'm going to say take my prediction
+
+59
+00:27:15,000 --> 00:28:13,000
+on the ice element y i and square it okay now this is our first example of a cost function and I wrote it in a really weird way but I want to come back to why I'm doing it this way okay this is also called least Square so you've probably seen this a bunch of times and that's okay and if not don't worry we'll go through it there's nothing there's nothing mysterious okay so let's unpack it so this thing here is the prediction it says you give me a point x i what's my prediction on x i some Y and
+
+60
+00:27:44,000 --> 00:28:35,000
+that says it should be close to whatever the training set said why I was remember what we're given we're given x i and y i pairs that are together image cat house information all of its description and the price we should be close okay we're penalized more for errors that are far away I could give you a big song and dance about why this is appropriate and indeed there are lots of statistical song and dances about it but really we're doing it because it's easy to compute everything that I'm going to do
+
+61
+00:28:10,000 --> 00:29:04,000
+you just want something that's kind of sensible right like you should be penalized more the more wrong your guess is Right roughly speaking in this example okay now what does it mean to pick a good model well our model is now determined solely by those those Theta J's right if we knew the Theta J is our model would be completely determined that was the trick I pulled on you and I said oh we're gonna how are we going to represent our hypothesis we're going to represent it in this class that means
+
+62
+00:28:37,000 --> 00:29:30,000
+now we reduce from all the crazy functions that you could have ever dreamed up any computer program that you could ever have written that was functional to the class of functions that are represented by these weights the wild thing is there's a lot of function you can represent that way okay and we'll see that over the over the course of the class okay especially when you start to get really high Dimensions Okay cool so which one am I going to pick yeah please do constantly awesome question yeah very
+
+63
+00:29:16,000 --> 00:30:03,000
+Advanced question so the question is hey you wrote this one half there it seems unnecessarily and potentially confusing why would you pay the cost to do it and the reason is when I take the derivative in a minute it will cancel out make my life easier okay but there's no and the other point that you made is and I love the way you said it this is exactly right we don't care I wouldn't call it that we care only about the gradient but we only care about the minimizer for the loss function so if your loss function
+
+64
+00:29:39,000 --> 00:30:29,000
+costs 10 or cost 100 doesn't matter what you care about is what Theta minimizes it you got that concept exactly right so I hope that makes sense when we're setting up the cost function in some ways sometimes we give it an interpretation almost a debug it to understand what it's doing but really all we care about is what is the Theta when we minimize over all the thetas of J Theta this is what we're solving for right so we we basically want to solve this J Theta now as we'll see in a
+
+65
+00:30:05,000 --> 00:30:56,000
+second for linear functions we can do this for more complicated sets of functions it's not always clear that they're even you know it exists a minimizer that we can that we can reasonably find okay right so there could be these wild functions that take bumps and everything so I'll draw one for you in a minute right when we talk about solving it but for linear functions what's amazing and why we teach the normal things you can prove what H Theta is in this example wonderful Point okay but that's the
+
+66
+00:30:31,000 --> 00:31:27,000
+central thing we're going to set up these costs so that we get a model out we've restricted the class of what we're looking at to something that's relatively small where we can fit the parameters then we just have to minimize okay awesome right this is this this is what I mean by optimization by the way just solving this equation okay I haven't told you how we're going to solve it yet but hopefully this is good now just for leading a little bit ahead for the and also to kind of stall
+
+67
+00:30:58,000 --> 00:31:44,000
+in case anyone wants to ask a question what we're eventually going to do is we're going to replace this J with increasingly complicated potentially functions that we're going to look at one for classification one for other statistical models but we're going to do almost everything that comes after this part to all of those models so once we kind of get it in this form where it's like a prediction and some penalty for how how poorly it's doing we may use different cost functions everything that
+
+68
+00:31:22,000 --> 00:32:18,000
+comes next we'll be able to do for all of them okay that's why we set up all this kind of kind of elaborate notation for like fitting a line it is still by the way boggles my mind how much machine learning you can do by just fitting lines like just higher and higher dimensional lines but we can talk about that some other time okay awesome okay all right so how are we going to solve this now there are many ways to solve this if you've taken a linear algebra course you're like oh I compute the normal
+
+69
+00:31:50,000 --> 00:32:35,000
+equations and then I'm done least Square so your Matlab or numpy person you're like oh I do you know least Square solve or whatever it is backslash whatever you want to do we're going to solve it in a way that sets us up for the rest of machine learning because machine learning will deal in functions that aren't quite as nice as linear regression quite a bit and in fact the trend has been when I like first got into machine learning and Antiquity we were all about what were called convex
+
+70
+00:32:12,000 --> 00:32:54,000
+or bowl shaped functions just roughly we were really obsessed were we getting the right Theta right we're like statisticians like at Large Scale can we get the right Theta is there one individual Theta modern machine learning done care we don't even know if we get the right answer we don't even know how there's a paper I was reading from deepmind this morning that was like oh you should run your models longer no one noticed right how do we not know when to run the models longer we don't that's
+
+71
+00:32:33,000 --> 00:33:27,000
+the world we live in so how does this work so imagine we want to we want to this is our cost function okay now just as an aside I want to say the linear function doesn't look like that so don't think about the linear function looks nice and bowl shaped Okay the reason that's important as I was just saying is a local minimum this is a local minimum so is this so is this roughly speaking is global when you're convex that doesn't make sense to you don't worry about it okay four convex we'll come back to that
+
+72
+00:33:00,000 --> 00:33:54,000
+point later in the course but I just want to say like don't think of this function I'm drawing here as what happens with least squares we're just optimizing A J for right now okay all right so how are we going to do it we're going to use a very simple algorithm we're going to start with a guess which is going to be Theta 0. how did we pick this gas felt good randomly set it to zero all reasonable things to do their entire machine learning papers by the way written I've even written
+
+73
+00:33:27,000 --> 00:34:18,000
+some which I'm not sure if I should be embarrassed or proud of that talk about how you initialize various different parts of the model okay for us though it won't matter for our least squares and some of the other models we're studying because we'll be able to get to the right solution all right so now imagine for the moment I found you a model I found your initial model well it's clearly from looking around imagine I'm just looking I'm the point and I'm looking clearly I can go down from here
+
+74
+00:33:51,000 --> 00:34:46,000
+right so the natural greedy heuristic is compute the gradient what does the gradient look like here it looks like this oops I can make it do this fancier okay you see that good I compute the gradient and then I I walk downhill sound good right tells me to go downhill from here right I'm at whatever shape I'm at this gradient will also tell me what to do now there's some problems right just as an aside what if I were right here oh it doesn't tell me what to do but don't worry about that it's a
+
+75
+00:34:22,000 --> 00:35:45,000
+local maximum I'd be toast but here tells me to go downhill okay now once I go downhill how far do I go again feels good I pick a value it's called a step size so my next value is going to look like this t plus 1 is going to be defined to be 5T minus some Alpha Theta J Theta T now my notation is a little bit weird here imagine it's one dimensional for the second okay compute the gradient go in the opposite direction that's all that's going on this thing here is called a learning rate
+
+76
+00:35:05,000 --> 00:35:46,000
+embarrassingly I think I've won awards for papers that are about learning rights but they are not very well set so you just kind of pick a value for deep learning people now have all kinds of what they call adaptive optimizers if you look in the literature about how to set these values for you um you don't want to set it too big or too small there is a theory about how to do it for linear things but don't worry for you you just kind of pick a value okay just imagine like what could go
+
+77
+00:35:26,000 --> 00:36:21,000
+wrong what happens if you pick it too big well then you kind of shoot off over here right you pick it too small then you make little bumps like this right you don't make enough progress it's not too hard to think about what what should happen here and then what happens well I get a new point this is my Theta 1 and as suggestively done here I iterate I compute the gradient and I bounce down and then hopefully I get closer oh sorry that is just a this is my notation uh for the gradient with
+
+78
+00:35:55,000 --> 00:37:09,000
+respect to Theta this is a partial derivative with respect to Theta right so imagine it's one dimensional and I'm just setting up for the fact that I'm going to use multiple Dimensions it's literally just a gradient with respect to Theta the derivative in this case now now what I'll do is I'll compute that J for all zero to D characters and that gives me my high dimensional rule okay please uh yeah so right now I've just shown it I've just shown J as an abstract function I haven't decomposed it as a
+
+79
+00:36:35,000 --> 00:37:33,000
+sum that's a great Point let's come back to that in one minute exactly what happens when we have a data point it's going to be my next next line other questions okay is it clear so I did actually a fair amount of work there and tricked you just so you're clear I went from one dimension to D plus one Dimensions by just changing the sub index and did them all by themselves so make sure that that sits okay with you right please yeah so how can we understand it on a graph what do you mean by on a graph
+
+80
+00:37:12,000 --> 00:38:03,000
+like on this graph in particular awesome yeah yeah so just imagine that so the one-dimensional case carries what you need to deal with so you're in a particular basis right meaning you have like Theta 1 Theta 2. so imagine I'm standing in two dimensional space I can look down one axis and then I have a one-dimensional function then I have a gradient there that gives me the vector in this direction then imagine I turn 90 degrees orthogonally I look 90 degrees there I get another one dimensional
+
+81
+00:37:38,000 --> 00:38:29,000
+function I compute its gradient now the gradient is actually if you look at the derivative it's actually the all those vectors put together one after the other in component but that's exactly right yeah so yeah but you're asking exactly the right questions right so just picture it as the tangent to the curve if that helps you in high Dimensions if not don't wonderful questions okay so what do I hope that you understand here's some rule you have the intuition that what it's going to do is it's going to bounce
+
+82
+00:38:06,000 --> 00:38:46,000
+slowly downhill okay now if you start to think about high dimensions and I think this is why the question came starts to get a little weird what does it mean in high Dimensions you can imagine like something that looks like a saddle if you know like a saddle then you're like oh gosh what's going to happen when I get to the top of the saddle clearly I can go off the sides and get a little bit smaller right that would be good maybe it goes down and stops but I can get stuck on the top of the saddle too
+
+83
+00:38:27,000 --> 00:39:24,000
+and weirdly enough it's called the saddle point don't don't worry okay sound good right we're not worrying about convergence right notice this algorithm has a very clear error mode here we found what looks like the global minimum but what if we started here we would go bounce bounce bounce and we'd find this one now how do you stop this algorithm you stop the algorithm when it's stop when this update becomes too small okay and you set that tolerance maybe you set it to What's called the machine Precision
+
+84
+00:38:56,000 --> 00:39:46,000
+like 10 to the minus 6 16 where you set it to you know 10 to the minus eight or you want a quick solution you know 10 to the minus three or something the point is no matter what you do you're going to get stuck here with a with a descent method because it's going to go downhill and get stuck here and you're going to miss this much better solution that won't happen for linear regression we won't talk about why at this exact moment we can prove it in a little bit but for things that are bowl shaped
+
+85
+00:39:21,000 --> 00:40:25,000
+every local minimum is a global uh minimum then we're in good shape that's why we cared so much about these things 10 12 years ago we care about them you know occasionally now less than we used to okay all right so let's compute some of those some of some of those derivatives getting back to the earlier asked question which was hey what does this mean for a sum okay all right so remember RJ had a very specular form so we're going to compute the partial derivative with respect to
+
+86
+00:39:52,000 --> 00:41:07,000
+some sub J of J Theta okay so this is the the derivative here oops the derivative with respect to the jth component okay now we take the sum I goes from 1 to n I'm going to put the one-half inside because I can and then this is linear and we'll come back to what that means in one second okay I just did a little bit of work here not much I just rewrote the definition of j which is this sum and then I took the the partial derivative and I pushed it inside because it's linear okay we should know
+
+87
+00:40:31,000 --> 00:41:42,000
+that gradients are linear okay now when I do that I get something actually fairly intuitive and this makes my uh you know heart sing times partial derivative Theta J of x okay now this is I cancel the 2 with the one half back to the question about kind of the cooking show preparation and that is standard by the way now look what I have here which is kind of nice this thing is basically the error but it's signed tells me which way I'm making a mistake you know kind of too high or too low right that's all that
+
+88
+00:41:11,000 --> 00:42:15,000
+thing is this is the the misprediction or the error okay now I have the derivative with respect to the underlying function class now why did I bother to write it out this way clearly I could have skipped the step of doing this and jumped right to the end but this is this is going to be general for almost all the models we care about that's why I did this okay so what is it in a specific situation we'll recall h of theta of X was equal to Theta 0 x 0 plus Theta 1 x 1 plus you know Theta 2 x 2
+
+89
+00:41:46,000 --> 00:43:07,000
+plus Computing the derivative of this pretty easy it's just oops Theta j h Theta of X is x j right please superscript over X on the right here on the right here yes oh this should have a superscript oh I'm so sorry great catch this is at that data point wonderful catch thank you I generalizable because your H is normal equation or some trigonometry it could be whatever you want all I care about is this is the error times the derivative with respect to that underlying model this is a very basic version of like
+
+90
+00:42:44,000 --> 00:43:26,000
+what looks like a chain kind of rule and we're going to use that like nobody's business so if you didn't know the chain rule before this class you will definitely know it by the end because we use it Non-Stop but yeah this is just set up for that that's why it's generalizable it's the error which is totally generalizable for any model that has to do with prediction times how you compute the derivative like what's the change of the underlying model we'll be able to generalize that and in this case
+
+91
+00:43:05,000 --> 00:44:17,000
+it's just XJ all right so now right getting back to this what is our whole rule it looks like this Theta J Theta J T minus Alpha sum over all the data answering the earlier question at this point we're doing what's called batch gradient which we'll come back to in one second minus y i times x i j now notice I'm going to try and do some highlighting here I hope this is okay for people to see and I apologize if you're colorblind and this doesn't doesn't help you too much but these are
+
+92
+00:43:45,000 --> 00:45:02,000
+the same okay hopefully these are distinguishable colors these J's and then the i's are the other index that's going on and these are the data points themselves okay so I look at every data point and I'm doing the jth component of each one right now by the magic of vector notation here's what I can do I just write this as this H Theta x i this doesn't change this is a vector equation okay so this is basically looping over all the J indices at once if you're unfamiliar with Vector
+
+93
+00:44:36,000 --> 00:45:38,000
+notations one of the reasons I'm doing this quickly is I will do it second hand throughout the course it's not deep it's not like it requires a lot of stuff just requires a little bit of reps kind of repeat on that please same brand for a wonderful question so Alpha you will typically set for the for an iteration right when you take a step you typically you can change it across steps so one thing is here I've said Alpha does not depend on uh on T the iteration step but in general it usually does you usually
+
+94
+00:45:09,000 --> 00:45:58,000
+Decay The Learning rate over time so that's just what's done in practice that's done for really good things what you don't typically do is have Alpha depend on the data points itself because then it's kind of almost functioning like a free parameter at least in classical machine learning but in both optimizers one of which was invented by our own John duchy and other folks you actually do change the alphas for every different coordinate which was you know I think his first paper was at a grad
+
+95
+00:45:34,000 --> 00:46:21,000
+and then out of Delta so people do things like that that are a little bit more sophisticated and why they do those I'm happy to explain offline but right now just think of alpha as a constant like it's small enough that it's not going to lead you too far astray like if it were too big you jump too far and maybe you could do a little bit better but you know maybe not too much in fact there's a very very basic rule which is called with gradient descent rule is is actually very widely used very very
+
+96
+00:45:57,000 --> 00:46:42,000
+widely used with just one alpha wonderful question and those are the right questions to ask like how does this parameter depend on what's around it start thinking like that as you go through the course that's really really helpful to understand okay so far so good so at this point we know how to fit a line which doesn't feel like a huge accomplishment maybe but I think it's pretty cool um and we fit it in this kind of obfuscated General way that's going to allow us to do more models I claim but
+
+97
+00:46:22,000 --> 00:47:33,000
+I'll verify that in two classes this vector equation here is just showing you like all the things that we computed this is specific to the earlier point to the line right this is this gradient here is this guy those are the same that's why this model popped out we'll come back to that in a minute okay now a topic that is practically quite important for machine learning is and it was hinted at earlier is and I'll copy this equation is what do we you know do in practice so one thing that we may not like about
+
+98
+00:47:02,000 --> 00:47:56,000
+this equation is this thing is huge in modern machine learning we'll often look at data sets that have millions or billions of points right well it's not uncommon to run models where you're like every sentence that has been emitted on the web in the last 10 years is a training example or every token right every every word and would be just enormous right at that point it'd just be a huge thing so even doing one pass over your data is potentially too much okay that's a really extreme and crazy version of that
+
+99
+00:47:30,000 --> 00:48:25,000
+uh that's a really extreme and crazy version of that but you can also Imagine situations where you're looking at hundreds or thousands of images and you potentially want to look at fewer so we'll come to how we do that in a second sorry yeah oh it's t and t plus one it's the it's these are the steps remember we started at Theta zero so superscript uh zero was our initial guess here and then we moved from one to two to three to four and so this is just the recursive rule that takes you from Theta
+
+100
+00:47:59,000 --> 00:48:56,000
+T to Theta t plus one e is just whatever exactly so you just imagine it as a it's a it's a it's a you know kind of recursive way to specify where at particular T and here's how we evolve to t plus one exactly right you got it perfectly exactly right so Theta T when we go back to here oops sorry I hope that's not dizzy and I always throw a way to skip without making you sick is this Vector it's just a particular instantiation of those vectors one for every of the D plus one components
+
+101
+00:48:30,000 --> 00:49:25,000
+please stuff yeah so we will take steps as I said until we converge typically or we can take a fixed number of steps I'm eliding that because for this particular problem I can kind of give you a rule of thumb I can point you out a paper that tells you how to set Alpha in general for machine learning as I was kind of very obliquely referring to we don't actually know uh how to tell that we've converged and part of the reason is when if you knew your model was this nice bowl shaped then you could actually
+
+102
+00:48:57,000 --> 00:49:44,000
+prove that the closer you get to the optimum the smaller your gradient is getting and you can predict kind of how far away you're going to be basic for A Nice Class of functions for nastier functions and the ones that we're going to care about more you can't do that so it doesn't make sense to say that you found the right answer and so I don't emphasize that for these models I can give you a beautiful story happy to type it up online and tell you but but in general for machine learning honestly we
+
+103
+00:49:21,000 --> 00:50:06,000
+just like run it till it feels good like oh the curve stopped it stopped getting better and that was this deep mine paper that said hey for these really large 280 billion parameter models so their their Theta has 280 billion parameters in it they're like we didn't run it long enough if we kept running it it was better and like everyone who works in machine learning for long enough in the last five years has a situation where they forgot they were training a model hopefully like you're not paying for it
+
+104
+00:49:43,000 --> 00:50:39,000
+on you know AWS or gcp or something and then you come back like a week later and it's doing better than you thought and that is a very strange situation so I don't have a great rule for this for your projects it will be clearer I'm telling you the real stuff though [Music] so we will only use it in the forward direction of going T to t plus one but you know you could imagine that it's reversible if you wanted oh wonderful question yeah yeah so in the sense that like if you shoot past
+
+105
+00:50:14,000 --> 00:50:58,000
+let's go back here so if you're here and you shoot past your step is kind of too big for the gradient you kind of trust it too much then in the next iteration the gradient will point in this direction right and so you'll step back so it will actually have kind of this ping pong and that's actually a you actually want that to happen it turns out the optimal rate I mean I can bore you with this for days the optimal rate is actually when you're doing that skipping for for whatever
+
+106
+00:50:36,000 --> 00:51:35,000
+reason yeah but it's more intuitive for people to roll down the hill yeah wonderful point you got it exactly right please uh so is it possible for the update to be zero even if H Theta of x i is not necessarily yeah so um so it's not possible for it to be exactly zero everywhere but it's possible to have gradients that are not giving you any information wonderful question absolutely wonderful question it's because it's a linear system right so that's not full rank for the linear algebra nerds wonderful
+
+107
+00:51:06,000 --> 00:52:07,000
+question say you have like um or something right but you flip it so Theta zero is equal to zero but on the other side when you only get the local minimum over there and not the actual like exactly right yeah and that's what I'm saying like uh we used to worry about that quite a bit now we just say it's good I wish I could tell you something better than that but we'll get into why that's true but yeah when your function is in a good class and good here formally means like convex and bounded in some way then
+
+108
+00:51:37,000 --> 00:52:20,000
+you will provably get to the right solution we'll talk about those conditions later I'm just the reason I de-emphasize them now is because modern machine learning actually works on functions that look like this not on the other class of functions and so that's less important uh for students and then you know you would rightly say like you told me all this stuff I memorized all these conditions and then I got into the workforce I'm like none of them worked and no one uses them like yeah that's
+
+109
+00:51:58,000 --> 00:52:44,000
+true but it's you're exactly right and so people worry about initialization where do you start so that you're kind of guaranteed to get a good model in fact there were a couple of awesome Theory results and one from my group one from 10 news that said for certain class of these nasty non-convex models if you initialize in a particular way you would be guaranteed to get the right answer actually I'll show you one in week 11 a simple version of that where if you initialize cleverly there's not a unique
+
+110
+00:52:22,000 --> 00:53:16,000
+answer but you'll get the right one every time yeah or sorry class 11 not week 11. yeah yeah people try random initialization the problem is this model the trend is for models to be really expensive so you run huge models so any one run could cost a couple million dollars like I was looking at the Amazon's gpt3 service they cost like six million dollars a month to run so like you know do you want to try to run it multiple times like if you got money go ahead but you kind of want to try and do other tricks
+
+111
+00:52:51,000 --> 00:53:43,000
+people used to do a lot more random restarting now we've kind of it's really sad to say this is the state but we've kind of absolved like flexonomies like like if you train these models you kind of know uh you know what are the right parameters and what is everybody else using and not everyone tries and explores everything let alone how long you tune it you know what optimizers you use we kind of all use the same stuff um but we don't have great formal justification for it maybe I'm exposing
+
+112
+00:53:17,000 --> 00:54:02,000
+too much it's not as bad as it sounds it there's like there actually are principles in this area I'm just like telling you the plates that are broken because they're more interesting to me and we're going to come back to that so the the solution is like do I wanna there's a phenomenon that a lot of people know about in machine learning which is if I take my uh my model and I exactly fit my training data maybe it won't generalize well like it'll be it'll fit to some
+
+113
+00:53:46,000 --> 00:54:31,000
+error some noise in the data and this is roughly overfitting we cover that in lecture 10. in lecture 10 at least when I taught it last I also talked about something which is in modern machine learning we realized that actually sometimes that concern is overstated for some models there's a wonderful paper by Misha Belkin that said you can actually interpolate perfectly fit your data and optimally generalize for some classes and models so that trade-off isn't as clear for modern models as it was for
+
+114
+00:54:09,000 --> 00:54:56,000
+old models may I just stop telling you about this stuff but yes in general overfitting is a problem you can overfit a model and believe your training data too much but it's this area is fascinating I can obviously rant about it for for weeks so wonderful questions yeah yeah this is absolutely great okay so what do I want to tell you so I don't want to tell you normal equations I thought that was pretty clear from the from the beginning so you can read about those if you want I'll type up notes
+
+115
+00:54:32,000 --> 00:55:31,000
+Andrew's notes are great on this point but I do want to tell you this one little bit with my last couple of minutes about batch versus stochastic mini batch because this is it actually is is relevant and useful okay so when we last left off we were looking at this equation and when you notice this problem that n was really big and I just hopefully told you like n is really big and so is D the number of parameters is really big so this is expensive I wouldn't want to look at all of my training Data before I took my
+
+116
+00:55:01,000 --> 00:55:51,000
+first step because probably my initial guess is not that good that's why I'm training a model like if my if randomly initializing the model which is something people try to do gave me good predictions I just used that so obviously I want to take as many steps as I can so here's what I'll do I use mini batches so what does mini batching do okay I won't get too formal but basically what I'll do is I'll select sum B let's say at random okay I'm being vague here what random
+
+117
+00:55:26,000 --> 00:56:31,000
+means I wrote a bunch of papers about this you can either pick uh you know randomly select them or you can Shuffle the order and in conventional machine learning we Shuffle the order for a variety of reasons and then I pick B items so B is going to be much smaller than n okay all right and then I update I'll call it I'm going to call it this because this made me make it more clear I equals one and or actually I'm going to write it a little bit Strangely I apologize for this notation notation is
+
+118
+00:56:04,000 --> 00:57:12,000
+better in my notes but I want to write it this way because it's easier to say x i y i that makes it more clear what's going on I hope okay what's going on so I select a bunch of indexes B and then I just compute my estimate of the gradient over them okay I could even pick B to be size one just pick a single point if someone was alluding to earlier and take a step now what are the obvious trade-offs here on one hand if I pick a step that step is really fast right if I pick a single element it's super fast to compute
+
+119
+00:56:41,000 --> 00:57:29,000
+relative to looking at the entire data set but it's going to be noisy it's going to have low quality I may not have enough information to step in the direction I want to go on the other hand if I look at the whole data set it's going to be super accurate about what the gradient is in fact I'll compute it exactly up to numerical issues but it's super slow now what people do is they tend to pick batches that are on the smaller side right and you pick them kind of as big as you can tolerate and I won't go into
+
+120
+00:57:05,000 --> 00:58:02,000
+the reasons for this underlying Hardware happy to answer questions about it but basically you pick batches that are kind of as many as you can get for free Modern Hardware Works kind of in parallel so you'll grab and look at like 128 examples there's not much you know more expensive than looking at one okay on a modern kind of platform now I'm using these noisy kinds of proxies and you may think am I still guaranteed to converge and the answer is effectively yes and under really really
+
+121
+00:57:33,000 --> 00:58:21,000
+uh harsh conditions in fact yeah I'm very proud of something that my first PhD student I and and collaborators Ben Rector and Steve Wright wrote about this paper called Hog Wild which is very stupid has an exclamation point but also got a 10-year test of time award for saying that you can basically run these things in the craziest possible ways and they still converge these kind of stochastic sampling regimes okay I won't go into details about that my point is like this thing is actually fairly
+
+122
+00:57:57,000 --> 00:58:55,000
+robust this kind of take a bunch of error estimates and step them and in fact almost all modern machine learning is geared towards what's called mini batching if you download pytorch or jacks or tensorflow or whatever you're using odds are it has native support to give you mini batches okay and that is basically just taking in oops taking an estimate this piece here and using that noisy estimate and why might that make sense well imagine your data set contains a bunch of near copies if your data set contained all copies
+
+123
+00:58:26,000 --> 00:59:17,000
+then you would just be reading the same example and getting no information right If instead you are sampling that same example you would go you know potentially unboundedly faster and if you think about like what we're looking at when I told you images like the images on my phone for my daughter there are a lot of pictures of my daughters a lot okay I'm a regular dad I take lots of pictures so that means there's a lot of density and so machine learning operates in these regimes where you have
+
+124
+00:58:51,000 --> 00:59:46,000
+huge dense repeated amounts of data okay all right so this is going to come back we're going to see this next time we're going to see it in particular when we start to look at various different um um loss functions we're going to generalize How We Do prediction to classification next time and then to a huge class of statistical models called exponential family models to go back to the top I skipped just to make sure you know what's here and what I skipped we went through the basic definitions we
+
+125
+00:59:19,000 --> 01:00:05,000
+saw how to fit a line we went through batch and stochastic gradient Descent of how to solve the underlying model we set up a bunch of notation this is going to be one of the drier classes where I'm just like writing out all the bits of notation and we saw how to solve them those will all carry over to our next brand of models the normal equations if you run into problems blame me I'm happy to take a look through them they're relatively straightforward and the notes are pretty good but I'll look at Ed if
+
+126
+00:59:43,000 --> 00:59:57,000
+you run into any problems there and happy to answer questions with that thank you so much time for your time and tension and I hope to see some of you on Monday
+

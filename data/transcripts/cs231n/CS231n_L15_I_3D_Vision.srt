@@ -1,0 +1,636 @@
+1
+00:00:06,000 --> 00:01:11,000
+I'm really happy to announce uh our next guest speaker for the course uh professor Jajun Wu. So Jajun is an assistant professor here at Stanford uh in the department of computer science and he's a faculty member of the Stanford vision and uh sorry vision and learning lab. Um his research focuses on scene understanding uh with an emphasis on multimodal perception uh robotics and embodied AI, visual generation and reasoning and uh 3D understanding which is the topic of today's lecture. Um and
+
+2
+00:00:38,000 --> 00:01:34,000
+so I'll now turn it over to Jajun to begin today's lecture. >> Okay. Yeah. So I'm Jun. I'm an assistant professor here and I think a few years ago I used to teach this class code teach. So I heard this year it's the 10th year anniversary right. So we have guest speakers from different places. Okay. Um so today we're going to talk about 3D vision. Uh so it might be kind of different from a lot of things you um you you learned before because I think in the past few weeks we talked about
+
+3
+00:01:07,000 --> 00:01:57,000
+like conversion new networks and transformers and maybe vision language models and generator models as well for justing right. Okay. Yeah. So here for 3D I think I'm going to first introduce a little bit on what are the 3D representations you know. So it's more like it's pretty distant from all the deep learning stuff. But then we're going to talk about how deep learning or AI has changed 3D vision and how they can be integrated in different ways, you know, and we look into a few different
+
+4
+00:01:32,000 --> 00:02:30,000
+applications about 3D generation, reconstruction and stuff like that. Okay. So let's begin by looking into what are the possible ways to represent objects in in 3D because in 2D is so so straightforward. It looks like I just have pixels, right? I have a I loading a file of a PNG file or JPEG file. It's like 200 by 200 pixels. But how can we represent 3D objects? I think that's the first thing you want to look into. And uh 3D objects, you know, they can be diverse. Uh they can be at different
+
+5
+00:02:01,000 --> 00:03:01,000
+scales. It can be like huge large buildings and trees, complex structures. And if you zoom in, you know, you can also see all the fine details. So what are the best 3D representations to represent all these different types of 3D objects at different scales with different features and unlike images where everyone just use pixels you know so we have 200 by 200 500 by 500 um the way to represent 3D objects in ter you know objects are also like you have geometry you have textures you have materials but let's
+
+6
+00:02:31,000 --> 00:03:29,000
+just maybe start by looking at geometry and even just for 3D object geometry there are so many different ways to represent them you know we can basically categorize them into two different categories. One is called explicit representations. So where you can you can in some sense they're directly I would say explicitly representing part of the objects. This includes uh things like point clouds. If you have a cloud of 3D points or a polygon mesh or subdivisions which we're going to talk about it and others and there's a
+
+7
+00:03:00,000 --> 00:03:45,000
+different categories of object shape representations which are often called implicit. So we're going to talk about them as well. So I'm going to explain them in a little bit detail later including level sets, algebraic surfaces, distance functions. So they're basically representing 3D objects or their geometries as functions which it is not directly know it's not as in some sense intuitive as oh it's just a collection of points but as we'll see later they also have their own
+
+8
+00:03:22,000 --> 00:04:15,000
+advantages and weaknesses uh using implicit representations. So every choice they have their you know suitable task and type of geometry in particular in the context deep learning you know they may also have their own strengths and weakness when you want to apply a deep learning method on top of it. So when do we choose representation? You know we want we have to store them. So pixels are easy to store because it's just a matrix. But then 3D point clouds are kind of more irregular and also you
+
+9
+00:03:49,000 --> 00:04:41,000
+know if especially if you use some implicit representations like representing object as a function how would you how would you store that in a in a computer and how does it support you know creating a new shapes um and especially now let's say maybe the input is a picture or the input is a language descriptions and different type of operations you have a 3D objects then how can you edit it simplify it smooth it filter it repair it right so you can have to do a lot more you know for for images sometimes you want to do that too
+
+10
+00:04:15,000 --> 00:05:10,000
+you want to edit it. You want to add it using language. You want to edit it using stroke. And how can you edit or perform any type of operations on 3D objects and rendering? How can you turn that 3D objects render into computer v uh into 2D pixels? In some sense, you can 3D vision is is to invert a process, right? How can you go from 2D images to reconstruct the 3D objects? So, how does support all these different things including NN animations especially if you are modeling let's say 3D humans or
+
+11
+00:04:42,000 --> 00:05:38,000
+animals and you want to animate them. So all these factors need to be considered and something else of course it is sort of connect through all these is also their integration with different deep learning methods for let's say shape editing rendering inverse rendering animation as well. So very quickly we can go through some of these representations like point clouds. Um so point cloud is probably the simplest representations uh only has 3D points. It doesn't have connectivity. So it doesn't capture how these points are
+
+12
+00:05:10,000 --> 00:06:12,000
+connected. So you basically just have a instead of having a n byn matrix uh which is about the pixel values of all the pixels in a picture now you have a 3xn matrix where three is xyz coordinates of these individual points and you have a number of points. So sometimes you can represent the surface normals of the point as well so that you have not only where the point is in the 3D space but also uh which uh to which direction is facing. So you have the surface normals which give you a bit more information and sometimes
+
+13
+00:05:41,000 --> 00:06:33,000
+people call them surf which is points uh with orientations and yeah so why do you need surface normals? Because if you want to render them, you want to see like how the object look like you know if you then that means you have to often specify a lighting source right where's the lighting coming from and but you know to make the rendering look realistic you have to consider how the lighting you know coming from a certain direction is going to interact with the point and this is where the surface norms normals
+
+14
+00:06:07,000 --> 00:07:03,000
+is used to help you to make the rendering look realistic like you can see here. So how can you get points? Um you know a benefit of the point cloud it is it is often a raw format that you will get from a lot of the 3D sensors. Um you know including these kind of depth sensors including some 3D scanners and you know nowadays I think if you can even use your iPhone and I think they have a AR kit or these kind of software allow to scan 3D objects but but the raw output of those sensors they're still
+
+15
+00:06:35,000 --> 00:07:35,000
+kind of 3D point clouds. Now of course after that you have to process them and fuse them to make it like maybe objects with textures. Um so yeah they often results of from scanners they can potentially be very noisy and there are things like this and you want to fuse them merge them repair them um and this in this part you know you have to consider how these different pictures can be registered uh to give you the shared point cloud and um they can they're very flexible so you can because you can move points here
+
+16
+00:07:05,000 --> 00:07:57,000
+and there so you can use them to represent basically any type of object geometry you're not constrained by the topology or stuff like uh it's kind of useful for large data sets because sometimes you have to consider a very diverse set of objects. Um but you know because points are already in some you consider to have pre being pres right so you know if you have a lot of points if if you're representing objects and but your points are sampled in uneven way in the sense that you have a lot of points let's say
+
+17
+00:07:31,000 --> 00:08:21,000
+on the on the head of the rabbit but you have very very few points on the tail of the rabbit then it will be actually hard to draw samples from these inner sample regions. So sometimes when people consider you know sampling points you have to design algorithm to make sure you sample them roughly evenly you know across different parts of the objects and other limitations or you know it's not obvious how we can directly perform sometimes the very useful operations like simplification or subdivisions on
+
+18
+00:07:56,000 --> 00:08:50,000
+these objects. Uh it doesn't directly allow you to do smooth rendering. There's no topological information. Right? So for example here, you know, if I give you a collection of points, then you can't even tell, you know, if this is like a Taurus or this is like these kind of ring-l like shapes, right? Because it doesn't tell you how these points are connected. So it's kind of a a partial information about what object is if you just have the point clouds. So naturally people will say, okay, how can
+
+19
+00:08:24,000 --> 00:09:19,000
+I actually capture, you know, more information so that I can distinguish between these two different objects? Then naturally that goes to the polygonal meshes right. So it represent the object that still has a collection of points but then also how these points are connected. So now you have not only the points but also the faces the surfaces and this is arguably like uh I would say the most widely used representations for 3D objects in all these graphics engines and in computer games and stuff like
+
+20
+00:08:52,000 --> 00:09:41,000
+that. You know basically it is all represented as polygon meshes. Uh but you can see that you know to represent faces it is more complex because often you have to consider um you know especially if you're looking at raw meshes then every face may have a different number of points some have three points some have four points have five points and how you can represent them especially given their irregularity how you can integrate them with neuronet networks you know especially in early stage when people start with like
+
+21
+00:09:16,000 --> 00:10:06,000
+commercial neuron networks okay they always assume a fixed resolution but here you have you know not I would say a variable uh dimension of these raw information how does that integrate with deep learning that's been some big challenge that's why you know deep learning with 3D vision kind of started kind of late because people are thinking about how we can adapt all these deep learning method to deal with all these um uh complex representations for objects which are not as unified as uh
+
+22
+00:09:41,000 --> 00:10:43,000
+images but meshes are really widely used and they can be you know very complex meshes that capture all the details you know for example you have scanners you get points and then you fuse them and you apply some algorithm you can get you know very arch mesh. This one has like 56 uh million triangles and 28 million uh vertices uh to represent a sculpture. And you can have even larger ones. You know, let's say from Google Earth, they have trillions of triangles try to represent basically all all the
+
+23
+00:10:11,000 --> 00:11:06,000
+buildings on Earth. The nice thing about meshes, it supports a lot of operations like subdivisions. Oh, I want to have more details and how can I have more use more meshes to capture more details of the shape. Um and you can do simplification as well. Sometimes you want to process things very fast. So I don't need that many meshes. I just want to simplify it and so I can there are existing algorithms allows you to do that as well. And regularization you know if you get irregular mesh and sometimes you want to
+
+24
+00:10:39,000 --> 00:11:33,000
+regularize them so that every phase is a triangle they always connect three vertices. they have roughly uh the same uh size and so that it's easier for processing and they have uh more say good properties that supports future processing of different graphics algorithms and matches you know there have been people who develop these algorithms as well so that you have you can ensure that you know basically points at different regions they're roughly evenly sampled so that it won't be the case that okay let's say the head
+
+25
+00:11:06,000 --> 00:11:55,000
+of the tail or the head of the rabbit is much more densely sampled than the tail and these kind of things okay so this is kind one type of shape representations and there are other type of shape representations. For example, uh parametric representations because objects are not just totally irregular. It's not just often a collection of points and meshes. They're very general. But sometimes you lose a lot of information if you look at let's say your chairs or the tables, you know, you
+
+26
+00:11:31,000 --> 00:12:18,000
+have all these kind of straight lines, right? So how can you represent these kind of straight lines? And when people design them, you know, they often use some of these parametric representations, you know, so you can represent shapes as a function, right? As I think about it, you know, so when I design them, I can, you know, it's really if I want to represent a surface or represent a curve, right? The underlying dimen degree of freedom is actually lower. You know, often if I have a curve, you know, there's only
+
+27
+00:11:54,000 --> 00:12:52,000
+only one underlying degree of freedom. That's why I can represent a curve using a function f ofx, right? Just varied x and get a value of y. So you can use basically all these different types of functions in 2D, but also more often in 3D, right? to map I know a certain number of variables the underlying intrinsic dimensionality of the objects which are often let's say two or even one uh and then map it into the 3D space and then this allows you to represent a 3D objects in a parametric representations using basically a set of
+
+28
+00:12:23,000 --> 00:13:18,000
+functions right you can do that for curves no let's say in circles right basically if you want to represent a circle you know you don't really need to you know one way is you simple number of points right or you can even connect them uh like a meshes you using the lines Another way is you just represent the curve uh the the circle as this function right basically there's a sign function and cosine function uh and you just vary one variable which is t you can think about it as the degrees or the angles
+
+29
+00:12:51,000 --> 00:13:50,000
+and it will map it to all the points on the circles right so here now you can use a function to represent a parametric representations for a curves in 2D and of course you can do that uh in 3D as well if you want to represent a sphere all you need is just like two degrees of freedoms um UMV and then you can go through these functions so that you can map them to every point in the 3D space for this sphere right so people have designed I'm not going to detail here but more complex parametric representations like basic curves and
+
+30
+00:13:20,000 --> 00:14:21,000
+basier surfaces which allows you to represent like these kind of pretty flexible and smooth surfaces in 3D using basically a few control points um so you basically use these basia functions to capture the underlying lower dimensionalities of these surfaces and then you can map these underlying low dimensionality into these kind of flexible shapes and they also allow you to do things like subdivisions. So you can you know trying to get more details uh into the surfaces and to make it more fine grain
+
+31
+00:13:51,000 --> 00:14:49,000
+and stuff like that. Okay, so that would be the second category of shape representations. You know, you can represent 3D objects in a nonparametric way like a collection of unordered points or their connections as meshes or you can represent them in a parametric way where you have a function basically and you by varying a few parameters that are underlying the true degree of freedoms of the object geometry you can map them into more complex shapes. So basically everything here as I said has been you know if you remember at the
+
+32
+00:14:20,000 --> 00:15:16,000
+very beginning we said there are two types of ways to represent object geometry. one is explicit there's more implicit and all of them they fall into this category of being quite explicit right so it's like I have a points and points are just directly points you on objects and for the surfaces or for parametric curves as well you know they directly map it right to the points on the on on the on objects um so their explicit representations they have a lot of benefits you know for first they have
+
+33
+00:14:47,000 --> 00:15:44,000
+you map all the points uh directly um so you can get all these points in general eneral you know you can you know every point I have let's say I sample I have a basia surface representations I can basically sample two points and UV in this underlying low dimensional space and then going through that function I map it to a point in the 3D space right so I directly get a point on the 3D surf in a 3D space so all points are given in some sense you can say directly I can directly get all the points so it's very
+
+34
+00:15:16,000 --> 00:16:09,000
+easy for us to sample points right so let's say I have this Taurus and I have represented using this f function So now my question is can you just sample some points on the surface of the object for me? This is so easy because I will just you know randomly put in some UMV values. I just randomly sample those UMV values and then let them go through this function and it will just you know compute and give me some of the 3D points which are guaranteed to be on this surface of the object. Right? So
+
+35
+00:15:42,000 --> 00:16:43,000
+sampling is much easier. The what is hard about these explicit representations? The hard thing is it's very hard in some sense you know to test whether a point is inside or outside the objects. Similarly, you know, if I represent a sphere as this function and it's easy for me to sample points on a sphere, but it is hard for me to say, you know, now I have a different, you know, I have a query, right? I say this point 3 over 4, one over two, one over four, I have this point in 3D space, is it inside object
+
+36
+00:16:13,000 --> 00:17:07,000
+or is it outside object, right, right? You know, I think we can maybe actually I'm not even sure about that. Um so it is actually kind of hard to test you know whether this certain point is inside or outside object. So you can see that explicit representations um is you know it's all these representations they have their own strengths and weaknesses and for explicit representations it's actually pretty easy to sample points which are very useful because sometimes you want to convert them into let's say a
+
+37
+00:16:41,000 --> 00:17:25,000
+collection of points you know and then you want to apply whatever your point neuron networks on it but it's hard to test if a certain point is inside outside object which may have some issues you know for example let's say if you want to use a uh newer rendering methods and nowadays a lot of these newer rendering methods requires a lot of these kind of queries about whether a point is inside object, outside object, what will be the geometry or density of object at a particular point, what will
+
+38
+00:17:03,000 --> 00:17:53,000
+be the material or what will be the radiance or color of the object at a particular point. Right? So explicit representations are not very um supportive of it's not easy to run these operations on these explicit representations. So naturally people thought okay maybe we can come up with a different type of ways to represent geometry and here I say implicit representational geometry but as you can see later you know a lot of these newer rendering methods or deep learning methods they just extend these
+
+39
+00:17:28,000 --> 00:18:26,000
+implicit representations for not only geometry but also for colors and appearance of objects in 3D. So idea of these implicit representations is now that I want to uh classify these points. So I assume you know uh if the points are on the objects they're on the surface of objects then they satisfy some certain relationship. So for example you know for a sphere what will be the points on a sphere on a unit sphere you know the the the constraint they satisfy is you know square of x and square of y and square z you know when
+
+40
+00:17:57,000 --> 00:18:53,000
+they sum them up when you sum them up they equal to one right so this is constraint they satisfy for all the points um uh on the sphere. All right. So more generally you know you can write it down as you know the constraint will be some function of x and y and z equals zero. Right. So in this case fx and y the function will be x2 + y square 2 + z 2 - 1 right? So that would be the function here. But more generally you can think about it is you know for even for complex shapes you can represent sometimes you know these functions can
+
+41
+00:18:25,000 --> 00:19:15,000
+be so complex that you don't even have a closed form you know. So how can I represent f I don't know I I just write it as a neuronet network. My hope is a neuron network will be able to represent it. But in general the idea is you know you have some function um or some constraints that the points on a certain object will satisfy and this is the way you will represent an object. This is called implicit representations which started with geometry but as I said you now use it in all these different ways
+
+42
+00:18:50,000 --> 00:19:42,000
+representing textures materials appearance and all these things. So the good thing about implicit representation oh sorry let's start with the bad thing the bad thing about implicit representation is now it's actually much harder to sample points right I tell you okay this is a constraint let's say this tora satisfy right okay um know every x and y and z you know if I put into this function and the output is zero then yeah they must be on the surface of this object but then how can I get a couple
+
+43
+00:19:15,000 --> 00:20:06,000
+of these xyz you know tupless that would be very hard because they're required to solve this function and this function is maybe not too hard to solve you Maybe you can still solve that using some high school math. Uh but uh you know when the function gets really complex you know for arbitrary shapes it becomes much harder to solve these functions. So it's not easy to actually now sample points on the surface of the objects if you are representing objects implicitly. But benefit the strength of that is now it's
+
+44
+00:19:41,000 --> 00:20:36,000
+actually pretty easy to test whether a point is inside object outside object because you know if I want to do testing I just have a query then this is so easy because is it inside outside I just send it into that function I'll get a value or the value is okay minus one / 8 okay this more than zero so you know because I assume you know the object is represented by this function and all the surface point on object they satisfy that function equals zero anything that's no I would say lower than zero
+
+45
+00:20:08,000 --> 00:21:05,000
+that's negative The output value is negative then the point must be inside object and if the output value is positive then the point must be outside object right so now it becomes much easier to test whether a certain point is inside outside object although it becomes much harder to sample a number of points on the surface of object so you can see now there's a clear trade-off between this implicit and explicit representations here we again we talk about geometry and but this distinction and the contrast between
+
+46
+00:20:36,000 --> 00:21:29,000
+explicit implicit representations is I I think is very important and fundamental is behind development of deep neuron deep neuronet networks when they apply to 3D uh data in general as we'll see later. Okay. So before we mean 25 minutes so I promise I spend another more no more than five minutes and then we're going to talk about deep learning. So before we talk about how deep learning can be applied to 3D representations in general, you know, a little bit more on implicit representations is uh some other
+
+47
+00:21:03,000 --> 00:21:51,000
+features of implicit representations. The good things about them is it's easy uh to compose them, right? So sometimes you feel like oh if I have to represent everything with a function uh that seems uh great you know if I have a closed form but also seem very constrained because every closed form I can write it out you know the the geometries look very very regular. So if I want to represent the shape of a cow, you know, how would I represent that? What would be the function I can write for the
+
+48
+00:21:27,000 --> 00:22:10,000
+shape of a cow? It's just not obvious. But nice thing about implicit representation is you don't have to write everything in one shot because it's so easy to compose them, right? You can actually perform logical operations on these implicit functions. Let's say you have two objects and you find the unions or intersections or differences. You know, you can again they're just values, right? So you put XYZ onto this function, you get a value. You put XYZ onto that function, you get a value. You
+
+49
+00:21:48,000 --> 00:22:46,000
+can just do you know arithmetic operations on top of these values and that allows you to compute the unions or intersections or differences between these objects and eventually you can compose them to uh develop pretty complex shapes and this is actually you know behind uh support a lot of these industrial designs when people are designing you know complex parts uh for you know I would say uh I don't know I mean when you're doing manufacturing on a on you have a you have to fabricate some complex shapes a lot of these
+
+50
+00:22:18,000 --> 00:23:13,000
+designs are done by these kind of cat models, computer AD designs and they're composing these implicit functions using simple logical operations and you know you can also do things that beyond just logical you can even add things up especially if you have a distance function where every point is sort of like oh um the positive value and the negative value the values actually have meanings because they indicate how far you are to the surface of object. So you can even add them up and this allows you to just smoothly
+
+51
+00:22:45,000 --> 00:23:32,000
+blend the shapes. Right? So you can see that here you know if I have a distance function and here I just want to represent a vertical line. Okay this is here and then anything that's minus zero is to the left of the line anything that is positive is to the right of the line and then you have another line represented using different function you know. So what happens if you add them up? You know, if you add them up, then it naturally becomes an interpolation between these two shapes, right? This is
+
+52
+00:23:09,000 --> 00:24:03,000
+example of doing things in 1D. But you can imagine, you know, you can even similar doing things in 3D in a sense. Okay, now you can actually even blend the these different shapes and these distance functions can be arbitrary composed and allow you to create actually pretty complex worlds like this. And this is not easy but you can even you know think about you know con you can construct really complex with all the details worlds uh by just simply not simply by difficulty but compose these different functions but they are
+
+53
+00:23:36,000 --> 00:24:30,000
+actually very expressive if you're very good at it. Okay. Um so we said okay we have parametric representation that can be explicit that directly give you points on 3D surface or we can have parametric representations like these functions but they're implicit right? So they're just like okay now you can only try to verify if the point is inside and outside an object but then you can also compose them to build more complex shapes and is that possible for us to also have implicit repetition and nonparametric
+
+54
+00:24:03,000 --> 00:24:49,000
+like like point style but then you also querying functions or sometimes they actually do have things like that and this eventually goes to methods like level set methods right so implicit surfaces are very nice because as we said it's easy to merge them it's easy to split them but sometimes you know it's hard to describe as we said a complex shapes in closed forms Right? You have a cow. How would you represent it? Okay, you can compose them. But you know if every time I have to query
+
+55
+00:24:26,000 --> 00:25:20,000
+whether whether a certain point is inside a cow, you have to have hundreds of functions and you perform all these add and or plus minus operations, then it takes a long time. So what if I just pre-query, right? So I have I have a I have a 3D space and I just sample let's say a 100 by 100 by 100 grid, right? So any I have now a million points pre-sampled and for these 1 million points I just premputee whether they're inside the objects or outside the objects. What is the distance of these 1
+
+56
+00:24:53,000 --> 00:25:55,000
+million points to the surfaces for complex shapes? So you can premputee them and then you can store all the values in a matrix. This is in 2D but you can this is for visualization but in practice is in 3D right? So you have a you have a 3D matrix that store all these precomputed values of the distance functions. So now you're sort of in some you still have implicit representations but be because you have pre-qui them you you turn it into a nonparametric representations and even if you just look at this matrix right in 2D you can
+
+57
+00:25:24,000 --> 00:26:21,000
+now still find okay where the boundaries are so where are the boundaries they're just basically where you know you have two adjacent values one is positive and one is negative right so that means there must be somewhere in between that uh the point here they satisfy the function fx equals z which means means the point must be on the surface. Right? So in that sense you're sort of turning an parametric representation which are implicit into a nonparametric representations by pre-quaring a lot of
+
+58
+00:25:52,000 --> 00:26:48,000
+these points using the functions and this allows you to have actually more explicit controls because you know you can now visualize them. You can say I have this matrix and I can visualize them based on their values. And this is used a lot in things like uh uh CTS and MRIs and all these like medical data. And a related thing is people may say okay what if I don't care about all these distance values you know I can pre-query what's going on at all these points but then I compute all the values. Let's say plus five minus five
+
+59
+00:26:21,000 --> 00:27:10,000
+but all I care about is whether this is inside object or outside object. Right? So if it's positive I'll just treat them as one. If it's negative which means they're inside object treat them as zero. Let's say so if you binarize them then this give you a final representations which is arguably the easiest to to understand this is called called voxels right so you know you can pre-query where the implicit functions are uh and then you have all these kind of you know density sample grid and but
+
+60
+00:26:46,000 --> 00:27:40,000
+now instead of storing you know their distance functions how far they are from the surface by going through the functions and give you plus five minus 5 you just binarize it you only care about whether a certain point is inside objects or outside objects then you have a voxel representation which is again like a 3D matrix can be 100 by 100 by 100 but for every point you have go through this function and query whether it's inside and outside objects you have one or zero and you can represent
+
+61
+00:27:13,000 --> 00:28:08,000
+objects in a binarized way right so this gives you the final representations I'm going to talk about for objects in 3D so I have introduced voxels in a kind of complex way but from a different perspective people may say this is actually very easy to understand because in some sense voxels actually have a lot of analogy as pixel because pixels are like 2D matrices and now you have a 3D matrices and voxels is basically just a 3D matrix right so um although you can see that they have connections with all
+
+62
+00:27:41,000 --> 00:28:31,000
+the other ways that we can represent shapes and the way I'm introducing it this way is you know actually when when deep learning come in right so first deep learning when when did it started right 2010 you know deep learning has been there for a long time but the more than deep learning thing is 2010 people started Jeff Hinton started doing that on speech recognition And then 2012 they have Alex net which is run on image net. So you've learned all these and they're all in 2D. Okay. Now people say okay
+
+63
+00:28:06,000 --> 00:28:57,000
+what if I want to do in 3D right? This is a very natural thought. So I want to go from 2D commercial networks. 2012 there's no transformer right? There's a so how can I apply a 2D commercial network on 3D data and everyone knows we have all these different 3D representations. But which one to begin with? Right? And it turns out that people say, "Okay, yeah, you know, the people who started doing uh deep learning on your data, they're the computer vision people. They're not like the graphics people.
+
+64
+00:28:32,000 --> 00:29:14,000
+They're like, I've been working with pixels and maybe the easiest thing I can do is just to, you know, scale up and instead of working on 2D matrices, I just make it work on 3D matrices." So that would be the simplest thing I can do. Instead of having a 2D convolution in your network, I have a volumetric convolution in your network. Then which of these representations allow you or support a volumetric convolution? Right? It turned out to be this box of representation. This is this is
+
+65
+00:28:53,000 --> 00:29:36,000
+basically the the easiest you can imagine, right? So, but the graphics people do not agree with that because the graphics people are like, "Oh, this box representation is really bad because it's uh it's very slow to compute as you as we talked about. We have to pre-sample all these values and there you know you can look at the quality right is so bad compared with meshes or point clouds." So, people like you know why do you want to start with that? But the reason that people started doing
+
+66
+00:29:14,000 --> 00:30:02,000
+deep learning on 3D data with voxels because I think it's like you just it's so easy to draw an analogy between pixels and voxels and and you just have to change one type of code that is instead of doing 2D convolution now do 3D convolution right so that's sort of in some sense how things get started okay but before I talk about the different methods for 3D uh data another aspect that's very important is the data uh sorry for 3D yeah so beyond methods data sets are also very important you
+
+67
+00:29:38,000 --> 00:30:32,000
+know image net really prompted annex and stuff like that so for 3D similarly you know, we have to collect a lot of data as well. So, preDep learning, um, the common data set, the popular data set people often use is this thing called Princeton data shape benchmark, which has 1,800 models, 180 categories. So, you can see they actually have quite a lot of categories, 180 categories, but there are only 1,800 models, which means there are like basically 10 models per hydrator, which is so small, but back
+
+68
+00:30:05,000 --> 00:30:58,000
+then it was considered pretty large, and people feel like, oh, this is already enough to do because we can't really make any of things really work well on them. Um and there was very little machine learning there. Um so prior to 2014 you know all these data sets are kind of more or less small. You know they may have a certain number of models even up to 10,000 9,000 10,000 but you know they also divided into so many different classes and so each class you only have like 10 models each or less
+
+69
+00:30:31,000 --> 00:31:26,000
+than 100 I would say. Um so after that people started by saying okay if we have image net we also have the 3D data sets for shapes. So this is uh behind efforts of a few concurrent work but really I think eventually they sort of consolidated into this thing called shapenet which is a lot of them are actually led by Stanford you know there's Leo Gibbus and Sylvio Sarasi um so they led this kind of large data sets called shapenet which has three million models and so but in practice just like
+
+70
+00:30:59,000 --> 00:31:46,000
+image net you have this large image and there's a smaller data set that people often use. So shapeet similarly you have a shapeet core data set which is what people typically use as 50 basically 50,000 models in 55 categories now you can see for every category you have 1,000 models on average but in practice it's not that balanced so for chairs you have actually a lot more so that's why you know people say oh now I have finally I have thousands of models on chairs I can train some deep networks on
+
+71
+00:31:22,000 --> 00:32:16,000
+it right before it just you have 10 models you can't do anything so that is how things started and uh so there has been a few years where a lot of these advances and all the results are just present on chairs and cars because these are like the largest categories in shapeet and people feel like okay that's great but then that's not enough so we should uh move you know even bigger so in the past few years uh this is work at AI2 the island institute from Seattle where what they did is they collected
+
+72
+00:31:49,000 --> 00:32:47,000
+much larger data sets called obverse and objiverse extra large that you have roughly 1 million or 10 million uh models uh for different 3D assets you can see they have much more categories uh and they also have these models on average also are have higher quality also with textures. So these are entire data sets but also there are real data sets that are being produced including you know some some of them are from like 3D scans you know you just take uh 3D scanners back in 2016 people have been working on it this is a
+
+73
+00:32:18,000 --> 00:33:14,000
+data set uh called I think the redwood data set or something so you have like 10,000 scans of real world objects and more recently you know people have been building larger data sets where they also encourage people I think this is effort collab by Meta and Oxford heard. Um, so they encourage people to take data for them. Uh, they also pay people to take data for them. So people just use it on iPhone. You you have an object, you put it on a table, you use an iPhone, you take a 360 video around objects and then you get $1 or something
+
+74
+00:32:46,000 --> 00:33:37,000
+like that. Um, so they encourage people to take data for them. This is the first version. They have 19,000 videos of objects. Now these are like real objects, right? Because capturing real objects is much harder and the object version and all the things I talked about before it was like synced objects, but these are like real objects. And then uh also because of a lot of the development in 3D vision algorithms, you can actually take these 360 videos and trying to reconstruct uh the 3D objects. So now you have paired data of the
+
+75
+00:33:12,000 --> 00:34:07,000
+videos or images of objects as well as their 3D geometries and textures. This is their first version. I think they have a more recent version V2 or maybe even V3 right now which is supposed to be a little larger but still it's kind of hard to scale up. Think about it right now you have like 90,000 videos or basically 19,000 objects and I think they're scaling it up but I don't think it's over 100,000. So basically you can think about it as for real objects you have like 100,000 models and
+
+76
+00:33:49,000 --> 00:34:40,000
+but if you look at what's the data set size of the images right so it's like I know line on 5B or whatever that's like 5 billion images and Google and open must have much larger data sets so there's still kind of a huge gap between number of data points that you can have for 2D images or videos versus you can have for 3D objects so I think that's a kind of a big challenge you know how we can move forward with 3D vision and people have different ideas uh but still you know this is much larger than what
+
+77
+00:34:15,000 --> 00:35:10,000
+we had before at least you can you know it's possible that you can still more or less train some deep learning models on these data sets now and quickly there are also other data sets of people being built on parts and this is also from Stanford where they try to annotate a little bit of object parts and their correspondence and hierarchies um and you know their uh and also uh there's this this data set called partnet where they want to annotate not only the parts and their semantics but
+
+78
+00:34:42,000 --> 00:35:34,000
+also how they may move also a little bit of mo mobility information of different parts like laptop you can open and close it and there also data sets for 3D scenes so not only just objects and parts but they're also the the rooms um so they're having things like the scan data sets like you know um this are people actually just go inside your home or go inside to actually to our office as well this come and then they just have a 3D scanner they scan home and then they have some annotations so you
+
+79
+00:35:08,000 --> 00:36:04,000
+know here know and more recently again you can use you can do that even with your iPhone right now but still um these kind of data sets are much smaller right so here this one the first version of scanner you have 1,500 I think they have a plus+ the second version which is roughly the same size maybe 2,000 or 3,000 rooms so the amount of data you have for 3D data uh for 3D scenes in particular is also you know even much smaller than the amount of data you have for 3D objects um so I I think it's not obvious that
+
+80
+00:35:36,000 --> 00:36:39,000
+how can we go beyond that constraints because if you have to scan it yourself you're always bounded by how much time you have and how much people you Um anyway, but you know there there are attempts being made in trying to collect data okay and finally uh if want to apply deep learning on to 3D vision so what are the tasks we care about right so there are generative modeling just like in generative just like what Justin said you can generate 2D images or videos um you can also generate 3D shapes you can
+
+81
+00:36:07,000 --> 00:37:00,000
+generate 3D scenes you can make them condition right the condition can be condition on language conditional image. You have an input image and how can you reconstruct the 3D objects and you have to learn the shape priors. You have to do shape generation completion. Sometimes you have a partial objects and you want to you know repair it. You want to fix it. So there's geometry data processing as well. Other tasks including discriminative uh models for example you have a 3D shape. How can you
+
+82
+00:36:33,000 --> 00:37:22,000
+classify what's the category of objects it belongs to? Is it a chair or a table? and a lot of them and now actually done them by rendering them into pixels right because you have very good you know image recognition models like GPT or something right so you just take a 3D object you can render them into a picture you can upload a picture to GPT and they can do it for you right so that's in some sense one way of solving these discriminative problems uh but there are also more specific things that
+
+83
+00:36:58,000 --> 00:37:47,000
+is not very easy to solve you know for example you have a different type of cell and you have the 3D scans and how can you classify the cell and all these kind of more specialized domains where you don't have that much data So how can you solve these discriminative problems and uh join modeling of 2D and 3D data which is becoming more and more important because the 2D data we have so much more we have so many images and videos we have very good foundation models that got trained on them. So how
+
+84
+00:37:22,000 --> 00:38:11,000
+can we leverage the priors in our 2D foundation models like what an image look like? How to make an image look like look realistic? How to make a video look realistic? How can we use that information to help our 3D reconstruction to be more realistic? Right? So joint modeling and 2D and 3D data because there are so many large scale 2D data sets and very good training models and also there has been a lot of advances in uh neural rendering or differential rendering methods that basically connect 3D world and 2D world
+
+85
+00:37:47,000 --> 00:38:37,000
+because you have 3D world you have 3D model you can render them into 2D the rendering process you know can be made differentiable or can be even approximated with neuronet networks then now you can connect all these data in different modalities through differentable neural networks allows you to bridge the prior you have in 2D data or 2D foundation models into the 3D world. Yeah. And then you know sometimes you want to even do some joint multim model beyond visual data including textile data but sometimes you have other data.
+
+86
+00:38:12,000 --> 00:39:01,000
+Let's say in robotics you often have tactile data. So how to fuse them as well? And sometimes for autonomous driving you know maybe you have lighter data or depth data. How can you fuse them as well? So we want to use deep learning on 3D data to solve all these different problems. So we spend all the time talking about representation. So how do we begin with? So as I suggested you know people who are initially doing that is the computer vision people do they work on pixels they work on images.
+
+87
+00:38:37,000 --> 00:39:27,000
+So naturally they say why don't we start with voxels but even before that they say okay this is the old idea and this is the very first idea that people tried in applying deep learning to 3D vision and now in some sense it's coming back but the very first idea they tried is you know let's don't even worry about voxels let's just say you have a 3D shape you know it's a mesh it's a voxel whatever you know I want to uh learn to recognize what an object is right what is the object here is a chair but what
+
+88
+00:39:02,000 --> 00:39:55,000
+if the input is 3D data how can we process that before we have a 3D deep learning methods. What if I just render into images because I have very good image models. I'll just you know render I just take the 3D objects. I would just put camera at different places. I can render all these images the objects from different views and then now this becomes a 2D problem. I would just apply a commercial neuron network you know on each of these views and I have some ways of fuse them right. So I have some
+
+89
+00:39:28,000 --> 00:40:17,000
+pooling whatever uh and then I just do an image classification you know. So this becomes an image classification problem while the only difference being now you have multiple views right so this is like in some one of the very first idea people apply to 3D vision they just use 2D networks and why do you want to use 2D networks because back then they're approaching on image net and they're very good um so they have image net is much larger than 3D data sets so any model that approaching on
+
+90
+00:39:53,000 --> 00:40:42,000
+image net they have very good performance so the easiest way to solve your 3D recognition problem is to first render into 2D later people sort of move away from it because people like oh you know we have more 3D data we should try to do 3D native come up with 3D native methods and people also you know come up with ideas about connecting 3D and 2D through like newer rendering but now I feel like this trend is coming back because you know all these image and video models are getting so great I don't know many
+
+91
+00:40:17,000 --> 00:41:10,000
+of you may have seen like the V3 whatever was released yesterday right so if they're so great you know maybe we should just rely a bit more on the image and video foundation models again because they they just train on you know a thousand times or tens of thousands times or even more than and maybe a million times more data than 3D data. So how can we incorporate that? But I anyway coming back now this is the very first methods in some sense people try to apply deep learning on 3D data just
+
+92
+00:40:43,000 --> 00:41:39,000
+by converting them into 2D and they do very well in image shape classification you have shapes and you want to classify them into different categories and they have very good performance. Um and yeah so you can leverage you know a lot of literatures on 2D image models. Um, but the issue is you need some projections. Um, but sometimes, you know, the input can be very noisy. People like, what if my input is too noisy? The point clouds or whatever, they're just not very good. If I render them, they look kind of bad.
+
+93
+00:41:12,000 --> 00:42:22,000
+Um, so is that possible for us to come up with more 3D native methods? So later people tried a number of 3D native methods uh that just apply deep learning directly on 3D data. As I said, the easiest way to do this is just to apply your uh pixel connection network. So this is actually a deep belief network which is generated network. Uh but still you know you have some 3D convolutional uh features and this is in 2015 uh by Princeton and you can see that they learn gen model that can actually synthesize 3D shapes in
+
+94
+00:41:46,000 --> 00:42:51,000
+form of in the form of 3D box at relatively lower resolution. Uh but you know this is 10 years ago now. So back then this is considered kind of pretty impressive and you can do all these condition generations condition on uh semantic labels at bats and a desk and tables. You can singleize these different shapes and because this is a generative network you can also use it for classification. Um so you can do image shape classification as well. And later um something that actually we did is you know what if we just applied
+
+95
+00:42:19,000 --> 00:43:27,000
+against this generative server. Now you can use scans to generate 2D pixels. There's no reason you cannot use GANs to generate 3D box. So we just this this very simple thing and that is apply again to 3D box and actually give you a pretty good generation of uh 3D objects. This is eight nine years ago. Yeah. Yeah. Okay. And um later uh with Chyen from CMU we also did an extension that is you can use GANs to not only generate 3D shapes but also you can render them into 2D you can project them into 2D surfaces u so
+
+96
+00:42:53,000 --> 00:43:45,000
+that you can get the depth map of the 2D objects you 3D objects you generated and then you can use a cycle GAN uh to convert this depth map into a color um color image. Now you can have adversary losses not only on 3D shapes but also on 2D pictures, right? You want the 3D shapes to look realistic so that they can be indisting indistinguishable from the 3D object data you have. You also want the 2D images to look realistic so that they're indistinguishable from images of real cars. Um so then you can
+
+97
+00:43:19,000 --> 00:44:26,000
+do 3D generation as well as 2D generation at the same time. And because you have you know different latent vectors for the shapes for the viewpoints and for the textures you also have some level of controllability like you can change the viewpoint you can change the textures you can do interpolation and you can you know uh transfer the texture of one car onto the shape of another car you know this is 2018 so people tried applying deep networks like neural networks gener networks on 3D voxels instead of 2D pixels
+
+98
+00:43:53,000 --> 00:44:42,000
+And can we do a little bit better with box holes? Because one thing that people have complained about vox holes is they're just like really slow, right? You have to presample them and there are a lot of wasted effort because a lot of sample points just like empty space or they're inside object and g give you no information. So naturally people thought okay can we actually make it better? So there are improvements to voxels like octtop trees. The idea of octtop trees is you still have explicit
+
+99
+00:44:17,000 --> 00:45:14,000
+representations. Um sorry in some sense you can argue it's implicit representation but it's like nonparametric implicit representations. Uh but then instead of representing every spa uh every point in the space at a at a at a uniform scale right you actually you know um assuming uh the voxels or yeah basically the voxels can be of different sizes you know I just divide the space into like different regions and I spin a lot more when I feel like I'm really close to the surface objects I just represent objects
+
+100
+00:44:46,000 --> 00:45:41,000
+in a much finer scale and when I'm like in this empty space or inside objects where I really don't care too much about what's going on I just I can have like huge voxels in some sense, right? So you can recursively partition the space and you can have, you know, different sizes of voxels at different space and this allows you to really scale up. Um, so you can see that compared with just directly using voxels, you know, this is 2019ish. You know, people say, okay, octave trees are great because allows me
+
+101
+00:45:13,000 --> 00:46:06,000
+to go from lower resolution. That's how much you can fit into GPU memory, right? You can do 64 x 64 with voxels, but with oct trees, you can do 256, right? So, and you can even use that for generation as well. You can generate objects also, you know, they look like voxels, but they're kind of higher resolution because you're more efficient in representing the space. So, these are like the very early attempts in applying deep learning to each space and they're like, okay, why don't we just try
+
+102
+00:45:40,000 --> 00:46:32,000
+voxels? Then this is the moment where people have get a bit more interest into like, oh, now what if you know uh um the graphics people feel like, you know, you're just doing all this wrong, right? Because why do why do you want to use these kind of pretty inefficient ugly looking representations like voxels or octtop trees? Now we have all these good representations point clouds meshes splines you know why are we not using these representations but as we said the challenge is you know point here and
+
+103
+00:46:06,000 --> 00:47:04,000
+there right how can you even apply convolution on points and stuff like that it's not just not very obvious but people start to look into it so naturally people move into you know applying or developing new deep learning methods that directly work on uh not only just 3D data but also different type of 3D representations like point clouds so in point I think this is an important work also from Stanford uh from Leo's team. Um what's going on here is they develop a new type of deep network that direct work with 3D point
+
+104
+00:46:34,000 --> 00:47:31,000
+clouds. So it's called pointet. Um so the idea is you know for points you have to be permutationally invariant right because you know if I have point one and point 2 okay like 0.1 is here and point 2 is here okay now I have a you know different input I would say 0.1 here and point two there right so then you know whatever your network should be environment to these different two types of input which means you know no matter I ne I name this one is 0.1 that one's point 2 or I name this one's point 2 one
+
+105
+00:47:04,000 --> 00:48:01,000
+this that one's point 2 your output should be the Right? Because there's no the points they're like kind of unordered. There's no guaranteed ordering in the sense our top left is one one bottom right is 100 100. Right? So if there's unorder if the points are unordered you have to be permutitional environment. So how can we do that and second is you have to be also sampling environment. Um so you know sometimes you sample like say uh 10 points on the on the head of the b the bunny or a rabbit and five points on the
+
+106
+00:47:32,000 --> 00:48:25,000
+tail of the rabbit and sometimes you sample 10 points on the tail of the rabbit only five points on the head of of the rabbit right so how can also be invarant to that right because there's no guarantee on how you sample points so they're kind of a bit of a issue here and there um but the one idea they they imply they they used uh and I think it's basically probably the most important point at is they just you know I just apply It's also so simple. I just apply a symmetric function on the embeddings
+
+107
+00:47:58,000 --> 00:48:52,000
+of the points. So basically, you know, for all the points, you know, I first compute some embeddings for them just like you will compute uh embings for different regions or different windows of image and I compute the features for each point and then I just have to fuse them. But because I want them to be permutational environment, right? So I I just use a symmetric function in a sense that for example, it can be just a max function and then I take the maximum soft max. It can also be a sum function.
+
+108
+00:48:25,000 --> 00:49:17,000
+I just add them up, you know. So that's what's going on. This is so simple. You have a you have a number of points 1 2 3 1 and then you have computer embeddings for them. And they just aggregate them. You can say you compute the max for each dimension. You can sum them up or stuff like that. And yeah, and then you have this aggregated embeddings for all the points and then you go through maybe a few layers of fully connected networks or stuff like that. and then you use it to uh classify you know oh are these
+
+109
+00:48:51,000 --> 00:49:47,000
+points really representing a chair or a table so that's basically what's going on and uh it turned out to be quite powerful and of course there have been a lot of the uh I would say improvements on top of that people have been coming up with new methods that improve on point they have they have point plus and there are things like people have been trying to do is like graph neuron networks because you can easily translate points into nodes of a graph and then the the neighborhood you know the proximity
+
+110
+00:49:19,000 --> 00:50:10,000
+whether two point points are close to each other as the edges connecting these points. So there have been like graph neural networks and all these other methods that have been developed for these uh point point cloud processing but you know the original idea in the uh point paper is kind of so simple and turned out to be also very powerful. Something else you want to consider is you also want to measure you know for pixels it's easy I have an output image I have the ground truth image I just
+
+111
+00:49:45,000 --> 00:50:33,000
+compute differences between the two I have out two loss or whatever for points how would you compare the output point cloud and input point cloud right especially if you care about generation task if you do a classification that's fine you have input point cloud and output is uh you know chair table whatever you have a cross entropy loss that's that's all you need but if you output if if you're doing a generation task you have a box it's also easy right just do a cross entropy loss of the you
+
+112
+00:50:08,000 --> 00:50:59,000
+know 100 by 100 by 100 voxal grid but if your output is a point 100 points and how would you compare uh the output point cloud versus the ground truth point cloud you have to also design distance metrics so the common the two common distance metrics that people did use one is called the chamfer distance a chamfer distance is easy to understand that is you have two set of points and for each point on each side or each set you just basically find the nearest neighbor right so you have a collection
+
+113
+00:50:34,000 --> 00:51:21,000
+of red points you have a collection of blue points And for the red point, for each of the red point, you just find its nearest neighbor in the blue set. And for each of the blue points, you just find the nearest neighbor in the red set. And you want to minimize the distance, you know, minimize the distance of each point to its nearest neighbor in the other set. And the second idea loss function that people may use is called earth move distance. And here you do a bipartite matching between the two set of points. And you
+
+114
+00:50:57,000 --> 00:51:47,000
+have a onetoone paired matching between these points. And you want to minimize distance uh among all these pairs. So these are the two common metrics that people use when they're comparing the distance between the point clouds and they can be made differentiable which means you can now computer gradients and use it to op optimize your neuron network so that hopefully they you know output better point clouds if you're caring about a point cloud generation problem. Um so we have moved from uh vauels to
+
+115
+00:51:22,000 --> 00:52:12,000
+point clouds and then people are like okay this is great and now I can process the points I can output points but we also have other you know beautiful repartitions like uh splines you know they're very good at capturing the surfaces of objects if if you use any kind of neuron network to generate voxels or generate point clouds they always look very ugly right so they don't have smooth surfaces and stuff like that so how can we have a neuronet network that can output or understand objects but also represent the beautiful
+
+116
+00:51:47,000 --> 00:52:50,000
+surfaces So people go a bit forward and think about how I can integrate neural networks with things like splines or functions like that. And a notable example here is the thing called atlet. So what's going on here is they try to use deep learning uh but then instead of you know directly outputting a set of 3D point clouds right. So I learn a transformation function. You know I have a latent shape representations and then you know if you remember right when we say you have these parametric representation of object shapes you're
+
+117
+00:52:18,000 --> 00:53:13,000
+basically transforming let's say a 2D space of U and V into a 3D space like a sphere. So and you know for simple things like sphere it's easy you can write it down right what is that function uh and s cosine whatever uh but for complex objects it is very hard to write a function and often there's no closed form. So the idea here is okay if there's no closed form then why don't we just use a neuron network to represent that right so here you can see this neuron network which is repres
+
+118
+00:52:45,000 --> 00:53:46,000
+implemented as MLP just learns that function f right you can take the two values u and v as the input to the function f and the neuronet networks is performing the computation of that function f and u and v and output a point in the 3D space so it's basically learning how we are able to transform this comput space into the 3D case and it might be too hard uh to represent the entire object using a single transformation. So people thought okay we can use a couple of small neuron networks. So think about it as now you
+
+119
+00:53:16,000 --> 00:54:11,000
+have a piece of paper you can fold it in different ways and you can fold it multiple times and all these things get put together uh to form the final shapes you care about right so this is you can see the differences between these two three different representations you have input image and if you want to represent a reconstruct using voxels you can see it's it's doing something but you're really bounded by limited resolution voxels and for point clouds you know yeah you're no longer bounded by the
+
+120
+00:53:43,000 --> 00:54:33,000
+resolutions and it give maybe a bit more details but points are really unordered. you cannot really get any smooth surfaces out of the point clouds and for this thing called island net which is basically learning transform pieces you can see that they have actually smoother surfaces right so using new and to represent how you can map a parametric representations from lower dimensional space to a higher dimension higher dimensional space and you learn multiple of these mappings and when they're
+
+121
+00:54:08,000 --> 00:55:16,000
+combined that give you the final output geometries conditional 2D images okay Uh so finally you know uh no in some sense we can put it this way right so what is um what is deep network doing when they're doing image classification right they're basically learning a very complex functions that map uh input images in the form of pixels into a final category label is it a cat or a dog or person or whatever that function is really complex and output Output space is really small. Output space is
+
+122
+00:54:49,000 --> 00:55:38,000
+like, you know, 1,000 dimensions, right? So it's like, okay, it's a cat or dog. You have 1,000 with classification. Output space is so small. Input space is much larger because you have, you know, 500 by 500 pixels. So it's that's 250,000 or something, right? The input space is much larger. Output space is really small. The function is really hard to to to write. You know, I how can you can you is it possible for me to write down some formulas so that I can classify the input image uh by computing
+
+123
+00:55:14,000 --> 00:56:03,000
+whatever some specific values and output if this is a cat or a dog? I cannot do that right a function is so hard to write there's no closed form that's why you need a deep network input space is large output space is small so if you really think about deep networks that way and think about what they are doing then you realize you know a lot of the things that we have doing with deep networks on 3D shapes it doesn't seem to map that you know map into that you know I would say equation right so it doesn't
+
+124
+00:55:38,000 --> 00:56:35,000
+map that well and what are the representations that really map them map it the best right what's the optimal representations that seems to really fit into the paradigm And if we think more carefully I think around 2019 and people realize oh yeah you know in some sense deep network is implicit function and why don't we just use it to represent an implicit function for object 3D geometry right so instead of representing the kind of voxels because now you're just doing you know you you turn it into pixels and you but
+
+125
+00:56:06,000 --> 00:56:57,000
+then you just scale up into 3D and you apply 3D convolution okay but you know fundamentally voxil is really about you know whether this thing is inside and outside object so instead of just directly pre-quing the space and get the voxels and apply convolution on top of it. what if I just directly using deep network to perform that query for me so that I don't have to run 3D conversion or anything you know I just query a space in 3D and deep network should tell me you know if in the output can just be
+
+126
+00:56:32,000 --> 00:57:30,000
+one dimensional you know inside and outside right whether that point is inside a sweet shape or outside the 3D shape so finally I think people move that leap you know take the leap to go from uh explicit representations on point cows or splines into implicit repetitions but not directly working on voxels but instead that you know think about it as a level set or or or some implicit functions that use deep number to represent you know that's the final step right going from this uh atlas now whatever you're learning that trans
+
+127
+00:57:00,000 --> 00:57:53,000
+transformation from a from a 2D space to the 3D space but now I can directly do implicit query using the deep networks so that goes through deep implicit functions where which is kind of interesting because around that time in 2019 there are like four papers that are doing almost exactly the same thing you know they all argue that before we have been using voxels and point calls and matches or whatever they have their own strengths or weakness but really the right thing to do is I should just send
+
+128
+00:57:27,000 --> 00:58:20,000
+you know the query into deep network so deep what it should do is it should take the input let's say xyz coordinate and output whether that point is inside and outside object you know and that will be in some sense the the final I would say one of the final and that's the kind of idea that has been that was proposed in 2019 and even right now 2025 right a lot of people has been still using this kind of same idea that is I'll just use deep network to tell me whether a point is inside
+
+129
+00:57:53,000 --> 00:58:43,000
+outside object and not only you can go a little bit beyond than just like a binary classification of inside outside because you can also say oh maybe I care a bit more I say what will be the sign distance function how far the point is from the from the surface of the object or what will be the density values of the of the point or later what will be the color what will be the radiance values of of the point right but here starting from 2019 people really start to you know apply deep network in a way
+
+130
+00:58:19,000 --> 00:59:20,000
+that is in something similar to classification that is I take points in 3D space and use it as implicit function to query you know some properties of the points in the 3D space and you know people have tried to use it as you know represent a collection of implicit functions not just like how pieces are deforming into the 3D space to get different pieces of papers in 3D but really representing implicit parts of the objects using small neural networks and they can form a complex shapes uh and you know If you can rent
+
+131
+00:58:49,000 --> 00:59:41,000
+represent objects in 3D uh using implicit functions uh you can do that not only for geometry you can query not only the inside whether a point is inside outside objects whether how far the point is from the surface of the object you can also query what will be the radiance what will be the color of object and then I go there actually one year later this is maybe one or two year later no people come up with this thing called nerf right so where they used differences here is now say oh I I I should use deep network knowledge to
+
+132
+00:59:15,000 --> 01:00:15,000
+query what will be uh the sign distance function or density of the objects but also quering the radiance. Um so here you can see what's going on is you query nerf about xyz coordinate in the 3D space. In addition to that, because you're trying to model the appearance as well, you also query the viewing directions, right? The camera viewing directions and the output of the neuron network is not just like one or zero inside outside. It is uh the density values in addition to the color values,
+
+133
+00:59:44,000 --> 01:00:33,000
+right? The radiance and you know if you directly train uh implicit functions on 3D shapes and then you require 3D supervision, right? So you know if you have a collection of 3D objects you can use them as a supervision that give you okay you know ground you know you have the ground truth about whether a point is inside outside a 3D object but here you know uh you want to train on 2D images that's what's going on with nerf so they also put that together with a newer rendering uh volume rendering
+
+134
+01:00:10,000 --> 01:01:08,000
+function and they made this volume rendering function differentiable in the sense that you can have a rendering model uh you can query all these different points in a 3D space you can get their colors and also their densities and appearances And then you can compute in how much light is blocked along the way. Right? So this is basically volume rendering as in computer graphics. Uh there's there's very minimally changed made because you can see even directly from the volume rendering equations that
+
+135
+01:00:38,000 --> 01:01:31,000
+everything here is you know this is approximation but with the approximation everything here is sort of differentiable. So you can compute you know how much light you know if you have if the neural network gives you the density which is basically you can think about as opacity of the point in 3D space and also give you the color then you can compute you know how much light has been blocked by the points I sampled ahead of that ahead of that point and along the ray and you can compute also you know how much light is there
+
+136
+01:01:04,000 --> 01:01:59,000
+contributing to what I'm going to see in this ray from any particular point right so now you have a few things you have new number to represent implicit functions for colors or radians and and densities and then you have this volume rendering equations which is made differentiable so that you can learn directly from 2D images. So these are the two things I have changed and one is I no longer have to train on 3D shapes I can train on 2D images with this volume render equations and the second is
+
+137
+01:01:32,000 --> 01:02:28,000
+instead of just looking into geometry or density of objects in the 3D I also look into their radiance or appearance in 3D right so these two changes lead to this kind of big jump uh behind you know from nerf or implic from implicit functions deep SDF and all these earlier methods to nerf so a lot of people feel like okay yeah nerf has been great and seems out of nowhere. That's really not the case because, you know, they're very much inspired if you look at the articles they later wrote themselves.
+
+138
+01:02:00,000 --> 01:03:08,000
+Um, you know, they're very much inspired by all these advances in deep in functions. Although they focus only on geometry, but now I do both geometry and appearance and I do learning from 2D images instead of 3D shapes. Um, so yeah, here are some results of Nerf. Uh, this you may have seen many times. Um okay so if you remember we said you know in the past we have been working on something like generating a 3D shapes and then uh also generating their 2D appearances. Uh here at the very beginning we use the representations
+
+139
+01:02:36,000 --> 01:03:33,000
+that is voxels. Um but now as we said yeah nerf is great and if we have implicit representations there's no need to really represent it as a voxels. What if we just replace that with a with a with a radiance fields right? So we also did that as well. So we have a neuron network that capture the implicit radiance fields and densities but it is generative neuron network and then you can even still apply the same GAN rendering framework so that you can render objects in 3D as well as their 2D uh pictures and then you can also do the
+
+140
+01:03:05,000 --> 01:03:55,000
+same as controllability and you know you can you can change the you can change the camera viewpoint you can change object identity but then you can keep the viewpoint you can do all these things as we can do before but now with nerf you can learn directly from images. uh so you don't have to restrict yourself to the categories of cars or chairs where you have a lot of 3D 3D data because you can learn directly from images and yeah so you can see that now the output becomes much more realistic
+
+141
+01:03:30,000 --> 01:04:29,000
+so this is the thing we did called pyan with uh Eric Chen as a first author and also with uh mostly people from Gordon's group okay and finally you know nerf is great but then Nerf has this issue do that is you know you have to sample a lot of points in 3D you know you you're no longer pre-sampling them and then applying a volumetric convolution but still just like a level set right you have to sample all the points and current neon all the time and now you can do it learning from 2D uh you can do
+
+142
+01:04:03,000 --> 01:04:52,000
+all these great things but because you still have to do all these sampling but it's very slow so people thought it a bit more again from the graphics people they're like okay I have this good idea about points and meshes and the nice thing about them is they're free in space they're very efficient uh so it's possible for us to integrate it to can I have implicit representations but maybe I don't have to have a fixed sampling grid I don't have to sample all the at times because they take so much time so
+
+143
+01:04:27,000 --> 01:05:22,000
+maybe I really should put them together right so you can argue that nip nerf try to parameterize densities uh sorry parameterize the scenes very very densely you have to sample all the points densely in 3D um a lot of points are wasted just like in voxels you know you have all the points that are representing empty space you don't want that in nerf a lot of samplings a All the queries are also querying empty space and network may give you like density of zero or something like that but it's taking a
+
+144
+01:04:54,000 --> 01:05:47,000
+lot of time so how can we address that um you know what if I just try to sample things more sparsely right I still have this implicit representations but instead of you know uh you know sampling empty spaces all the time I only sample at places where I know there are stuff but how can I know that you know if I what if I have a point representations so this is the idea behind this thing called Gaussian spats which you may have heard of. So it still has the same implicitive functions, you're acquiring
+
+145
+01:05:21,000 --> 01:06:12,000
+new network for densities and for appearance and stuff like that, but instead of quiring new network all the time, I have a point representation. I have these 3D Gaussian blobs in the 3D space, which I think sometimes you can think about them as point clouds, but the points are not like a single point. They're they're like a blob. They're like some regions. uh and uh because you know where these blobs are, you know, when you're sending out array from your camera to the 3D space and sample
+
+146
+01:05:47,000 --> 01:06:44,000
+points, you don't have to sample all the time. You just look at all where these blobs are and then you can know based on their um the the radius of these different galaxies. You will only sample at regions where you know there's some stuff. Uh so this makes rendering much more efficient. And uh so here are some of the reconstruction results using 3D gossian spats. And you can see that you know in terms of quality right they're actually you know not that you know they're comparable I would say they're
+
+147
+01:06:21,000 --> 01:07:07,000
+comparable to nerves uh this is like different matrix PS and SSM they're like rendering qualities and I think the x-axis the sorry the y- axis is it doesn't start from zero so this is a little misleading but basically you can see these numbers are really close so in terms of quality rendering quality gaussian spats and nerves are similar at least when They're first proposed, but Gaussian splats are just much more efficient, right? So this is FPS, frame per second, right? You can render 150
+
+148
+01:06:44,000 --> 01:07:40,000
+pictures per second. Well, for Nerf, you know, it takes you like maybe um 20 seconds to render just a single picture, right? So now you this thing is now made 1,000 times faster. At least that's what they argued. So because you don't you you no longer waste all your computing power on simply simply empty space and querying nerve quering your networks all the time on these uh about these points that are in the empty space. Okay. Yeah. So that is basically how deep learning has been integrated on 3D
+
+149
+01:07:16,000 --> 01:08:06,000
+data in all these different representations how they got started how they have involved and it connection with all these uh different shape representations. And one thing we didn't talk about I just use two minutes to quickly cover it is uh you know there has been also interesting things about object geometry that is not only about the element geometry the specific details about the parts but also the structures you know because often there could be you know the shares are symmetric right so we talked a little
+
+150
+01:07:40,000 --> 01:08:34,000
+bit about it where like there's a parametric surface and you can parameterize part of a surface using like a sphere or stuff like that using these kind of closed form equations and that give you a little bit of symmetry but there has been also more systematic studies about uh the regularities or structures within object geometry including their repetitions including their symmetries and people also come up with different representations for it as well you know so you know so how can we really represent you know in some sense
+
+151
+01:08:07,000 --> 01:09:03,000
+you can argue that point clouds meshes inclive functions they're really representing geometric details maybe for the individual parts none of none of them is directly capturing things like regularities like symmetry or repetition so how can we capture that a few other attempts that people have been exploring mostly from the graphics community is you know I can represent objects just basically as a collection of these sample geometric parts uh like a part set but I can and there has been methods
+
+152
+01:08:35,000 --> 01:09:28,000
+that apply deep learnings on it you know representing uh using deep to represent different parts of object using simple geometry primitives and then compose them or you know using implicit functions and compose them as we talked about before but you know there has also been attempts to do a bit more right So not just like representing objects as a collection of parts without considering their relationships but also modeling the relationships between these parts. U this is you know even more so the case
+
+153
+01:09:01,000 --> 01:09:52,000
+for for scenes let's say a bed or bed is usually next to the wall chairs is usually next to a tables and stuff like that. So you not only want to represent them as a you know unrelated collection of parts or objects you want to capture their relationships as well in the hierarchies. you know when you are constructing when you're building uh you're doing some constructions you're architecture uh you're architecting design your building um then you of course you know you're not like just
+
+154
+01:09:27,000 --> 01:10:13,000
+like representing objects or their relationships you have to consider hierarchies what you build first uh there's a classroom and the classroom has you know there's some tables and chairs in it and chairs has parts there's basically like a kind of level hierarchy and how this can be used and integrated with neuronet networks as well as you know you have not only hierarchy but also you can you can compose hierarchies and relationships Right? So you have a hierarchal graph where let's say for chairs you know you
+
+155
+01:09:50,000 --> 01:10:35,000
+have different level hierarchy for bases for seats for backs and the bases may have you know different legs but then also the legs themselves are related right the left leg of the chair and the right leg of the chair they're supposed to be symmetric and they have they should have the identical shape you there are constraints on where these legs are they have to be you know really aligned otherwise the chair is going to fall. So there are all these constraints that are sort of you know pretty useful
+
+156
+01:10:12,000 --> 01:11:10,000
+and how could we represent them and people come up with all these different representations and for each of them there are also you know a lot of neuronet networks you know deep learning method designed to learn and to capture and to generate objects that satisfy all these constraints. Uh for example like you can see this is a kind of hierarchical graph encoders and decoders that try to uh represent and generate 3D chairs that satisfy all these constraints while maintaining their hierarchies. Right? So I think this is
+
+157
+01:10:40,000 --> 01:11:38,000
+also from the ODUS group from 2019 and you know sometimes we can even represent shapes using some form of programs right because there's repetitions and for loops and how this can be incorporated into using neuronet networks to generate programs that synthesize object shapes and synize their uh relations between these object parts. uh and that's also an important topic and most recently I'll say let me end it this by saying I think there has been a new trend just in the past one year or two that the
+
+158
+01:11:10,000 --> 01:11:59,000
+deep networks or large language models are doing so well and they understand things so well that people are exploring is it possible for us to just use large language models like GPT to output these programs right because they understand semantics and what the tier should be like what are the constraints the chair should satisfy so is that possible for me to use a large language model the output programs but then maybe I can use some implicitive functions or whatever right to capture the specific geometric
+
+159
+01:11:35,000 --> 01:11:55,000
+details of the parts of the objects like the chairs so there's some kind of new emerging trend of research that is happening right now in these days okay I think that's all I have thank
+

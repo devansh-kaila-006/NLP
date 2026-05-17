@@ -1,0 +1,576 @@
+1
+00:00:05,000 --> 00:00:57,000
+hello so welcome to lecture three this is going to be about classification and regression this moves us from our first task which we were doing last time which was It was kind of regression how we fit a line into a class that into a task that will look really really similar at first but we'll have a couple of subtle differences and we'll go through that which is classification remember we talked about classification was for discrete objects like is it what's the animal on this photo is it a cat a pig a
+
+2
+00:00:32,000 --> 00:01:24,000
+horse something like that those are the types of problems that are pretty prevalent in machine learning and so we'll talk through kind of those basic issues today what we're going to do though is we're first going to start with this probabilistic view of linear regression and the reason we're going to do this is we're going to walk through again in that sitting where it's hopefully relatively familiar what's going on how we give a generative model is the the term for it for this underlying kind of
+
+3
+00:00:58,000 --> 00:01:47,000
+optimization class for linear regression so we're going to interpret it probabilistically and that interpretation we're going to be able to use for classification and then again on Wednesday for a much richer class of models which are all these exponential family models okay and I will assert at a high level like to try and keep in your head these things all look the same we're trying to get to this an abstraction that lets us solve them do inference with them and kind of Reason about them in a similar way so this is
+
+4
+00:01:22,000 --> 00:02:09,000
+one key building block so we'll start with that probabilistic view of linear regression okay then we're going to talk about classification and at first blush classification is going to look just like something we could solve with linear regression so I just want to make sure it's really clear in your mind when we use classification when we use linear regression and kind of what the little problems are challenges are as you go through actually doing that then we're going to introduce the
+
+5
+00:01:46,000 --> 00:02:34,000
+Workhorse of machine learning logistic regression this is something that you know I probably use every day in some form or another it has different names and deep learning now and the way people use it sometimes called like the linear layer and soft max if you're a deep learning Aficionado don't don't worry about it but this is the kind of the standard Workhorse and we can say a ton about how linear how logistic regression works and it was not invented by Machine learning people this is a an old and
+
+6
+00:02:10,000 --> 00:02:53,000
+classical algorithm that our statistical friends invented we use it in slightly different ways than maybe they originally intended and I can get into those in a little bit now as I mentioned there's going to be parallel structures so we're going to talk about logistic regression we're going to talk about for why not linguistic regression I mean sorry linear regression then we'll talk about logistic regression which is confusingly enough a classification algorithm although it says regression in
+
+7
+00:02:32,000 --> 00:03:21,000
+there don't blame us blame the stats people and then once we do that we're going to parallel exactly as we did in the last lecture and talk about how to solve it okay and when we solve it you're going to be introduced to a method called Newton's method which maybe you've seen if you took a kind of a stats course at some point or a calculus course and we'll reintroduce a way to solve it and Newton's method when it's applicable is really really fast meaning it converges very quickly but
+
+8
+00:02:56,000 --> 00:03:42,000
+each step of that algorithm we'll see is quite expensive and so it's not really appropriate for a lot of the places that machine learning people care to use it okay so the messages from this lecture if you get is kind of what is classification why does it differ from regression what is the Workhorse model and logistic regression and then a method to solve it and then we're going to come back at the end and kind of compare and contrast the different ways that people solve these different things
+
+9
+00:03:19,000 --> 00:04:15,000
+right as last time there is a thread that started online if you feel more comfortable asking your questions anonymously last time we had a bunch of great questions I'd love to keep that going super happy to to talk with you about anything that's there but I will keep the lecture three question thread up on Ed if you want it okay awesome let's get started so we're going to start again with our friendly squares right so just to give you kind of the format you should think about these tasks you're given something
+
+10
+00:03:47,000 --> 00:05:04,000
+and your goal is to do something with it so we're given some x i and y i right for I equals 1 to n and recall this is the training set and right and in this case x i oops x i lives in some r d or Rd plus 1 as our convention is D plus one recall because we had that convention that there was a bias term where every every single entry had a one appended to it if you remember that from last time if not don't worry just remember like why is there D plus one there it's by convention and we had a Target variable Y and this
+
+11
+00:04:28,000 --> 00:06:03,000
+target variable which I'll I'll highlight in purple this target variable was a real valued number right so this is picture picture align for the moment okay and our goal was that we wanted to find some Theta element of also r d plus one such that Theta was the argument or very very close to it because remember ARG man we can't really solve these exactly even though we like it over Theta of sum I equals 1 to n y i minus h of theta X of I squared where h of theta X of I equals Theta dot X actually I'm just
+
+12
+00:05:18,000 --> 00:06:11,000
+going to remove the x i because I don't care true for any example okay I'll put transpose here just to make sure it's clear we I have a DOT there but awesome okay now I'm using this slightly more General notation this h of theta and that looks like a little bit of overkill for a DOT product but we're going to use that in several ways through the next couple of lectures so apologies for that if you remember here we had this the way we Define this Theta is we said oh it minimizes the losses or
+
+13
+00:05:46,000 --> 00:06:35,000
+the residuals squared we didn't give any justification for this and what we want to do is go in this next part go kind of one level deeper and ask this kind of why question why did we pick to minimize the sum of squares now this will introduce us to one of our favorite friends in this course which is the gaussian distribution and we'll talk about why that's a plausible thing to do right you could ask why the gaussian distribution and I can wax with you philosophical I'll give you a sense of
+
+14
+00:06:11,000 --> 00:07:19,000
+it but we'll come back to that in one second so our goal is okay we have this equation but kind of where did it come from and by thinking about where does it come from that's going to tell us how to generalize it right that's the that's the plan for what we're up to all right so this is our first model in the class really like generative model we're going to assume that y i looks as follows it's going to equal Theta t x i I'm going to unpack this in one second plus some Epsilon I and this character
+
+15
+00:06:44,000 --> 00:07:35,000
+here this is an error or a noise term okay all right so let's unpack this because the first time we're seeing one of these things okay so this thing here maybe this makes sense to you you're like oh there exists some true Theta that's out there that's what this is saying this model is saying there's some Theta maybe I'll call it Theta star just to make sure it's clear there's some Theta star that's out there some you know one that's hidden from us but all of my data was generated by the
+
+16
+00:07:11,000 --> 00:08:01,000
+taking that parameter with the features and generating the Y okay this would be a situation where all of your data laid perfectly on a line right because it's just saying that like you know given the features I know exactly what y's value is now what we're saying is something that's not quite that strong that's that would be a noiseless situation we're adding in a little bit of noise and when machine Learners or statisticians say noise what they mean is like stuff we can't really explain that's the kind of
+
+17
+00:07:36,000 --> 00:08:24,000
+thing to think about it we're modeling it up to this okay and maybe we know a little bit about the noise and we'll talk about what we might expect from noise in a second but like we expect that there's some kind of random gyration maybe this accounts for in kind of physical settings some measurement error right some classical Jitter that's underneath the covers maybe there's something where you know if you're more kind of sophisticated Bayesian you think it's you know subject to your
+
+18
+00:08:00,000 --> 00:08:51,000
+information I only know the features X and there's some unmodeled piece that's in the noise and I'm willing to kind of minimize that okay so what are the properties you would want of this error okay so this is a forward model by the way it tells me I don't know Theta but I know how my data is generated right that's what I mean when I say generative models like I know if you give me an x i and presumably knew how to construct Epsilon you could get a y i value okay now we don't get to see Epsilon I by the way it
+
+19
+00:08:26,000 --> 00:09:23,000
+doesn't appear in the training set it's just a mental model for how the data are actually linked together okay and that's going to be fairly important when we start to generalize these models right they have certain kinds of Errors we can characterize Okay so what are the properties that we would expect of Epsilon I okay so first notice that it's Epsilon super I that is that noise is different per Tuple it's not like there's some noise offset that was just added to all our data and shifted every single point
+
+20
+00:08:54,000 --> 00:09:59,000
+if you like we're going to have a random model you get a random sample from that noise okay and that's what determines what the y i is okay right so what would you expect from that well it's random we probably want something where the expected value over all the Epsilon I's over over that random process is zero this is sometimes mean it's unbiased okay now this is on one hand like a deep philosophical statement and other hand kind of a trivial statement the Deep philosophical statement is we're kind of
+
+21
+00:09:27,000 --> 00:10:15,000
+saying that these errors if you think about it's kind of unreasonable like if I average over infinitely many of them they're not going to appreciably change what the true y value is right they don't have any information that's inside the model that's really what it's saying I may still get a sample where Epsilon I is 0.1 or 0.2 or negative point one whatever their value is but on average I'm just making a statement of the population like I don't care about this value it's going to be averaged away to
+
+22
+00:09:50,000 --> 00:10:42,000
+zero in a precise sense okay now on the other hand if it were not a zero value that would be kind of a strange thing because we have a bias term suggests that you could actually just kind of incorporate that standing bias in the Theta star okay so I don't want to go too far down that path but like operationally this is not an unreasonable thing to say and I want you to think about it as kind of a statement of information like I modeled all the features in the X's right those are all my my features the house price remember
+
+23
+00:10:16,000 --> 00:11:13,000
+the the lot size all that stuff and there's some thing I haven't modeled maybe the house looks a little bit nicer maybe it reminds people of where they grew grew up as children maybe it was you know that there's like a famous house or something that probably doesn't count for noise but there's something about it that's unmodeled as a statement of information okay the second thing is a little bit more subtle the second thing is that the errors are independent okay now we don't always make this
+
+24
+00:10:45,000 --> 00:11:40,000
+but this is going to allow us to do some pretty healthy mathematics and let's talk about why what would happen if it failed and what this means formally is I'm going to write down a strong form it says that these two things equal the expected value of Epsilon I and I mean it in a very strong sense if you know about various different Notions of Independence and uncorrelation don't worry okay all right this is for I not equal to J that's what that little little piece is here let me write it bigger so
+
+25
+00:11:15,000 --> 00:12:04,000
+you see it 4i not equal to J okay what does this mean okay so if you remember your notion of Independence what we're saying here is that they're statistically independent and I mean in a really strong sense like knowing the error for one Tuple doesn't tell me anything about the error for another Tuple this is consistent with my earlier kind of interpretation of Errors like how much information I know about it if I did know something about that error and I could model it then I'd have to
+
+26
+00:11:40,000 --> 00:12:37,000
+have a kind of a more complicated model here okay all right any questions about this so far all right awesome okay now with this setup there's one other thing so so far I made two assumptions at this stage I hope you think they're like plausible to make progress and that's one of the things by the way about machine learning that I think people kind of get uncomfortable about I certainly was when I first started in kind of statistical modeling that like you're like well is that really true ah kind of not the right
+
+27
+00:12:08,000 --> 00:12:51,000
+question to ask it's like is it a useful assumption to make to make progress like what am I giving up by making it which is a much harder thing to assess it's not ever true like if you look at real errors they're very infrequently gaussian distributed right that's kind of terrifying why do we use it everywhere well it still works pretty well because we're not assuming too much about the underlying data now if you know something about that data we'll come back in the next lecture and tell
+
+28
+00:12:30,000 --> 00:13:27,000
+you how to put more information about the error but I just want you to get a sense like okay these are kind of strange modeling constructs now one thing that we'll care about which is a function of this is how noisy is it we need a measure of noise and so a natural thing to assume is that and we we can relax this assumption let's imagine that they're all kind of a uniform background of Noise Okay so everyone has the same variance this is a standard variance assumption okay the sigma squared so
+
+29
+00:13:00,000 --> 00:13:50,000
+there's noise we don't know anything about it we know it's unbiased and we know that it has about the same magnitude it's not wildly different on some piece of our data versus others and again it's kind of like a statement of you know if you want to be really philosophical like an ignorance prior like we don't know anything so how would we know that this part of our data has more noise than the other okay it's just an assumption to make progress please [Music] until like the expected value of that
+
+30
+00:13:25,000 --> 00:14:15,000
+square oh because it's oh yeah so this the variance here the variance formally is Epsilon squared minus the MU so normally we have a variance but I've alighted that because the the uh this first term is zero so it is actually the variance I just wrote it as the square there so it is Epsilon minus the MU the MU is just zero wonderful question thank you so much for that please so the error here is a sample from a value so it's actually a discrete value that's underneath the covers so it's
+
+31
+00:13:54,000 --> 00:14:41,000
+like the way to picture it is like imagine I don't know I hate invoking deities but like imagine there's God and she's got her table right and then you got the value of all the x's and she has her Theta zero and she produces a y then for whatever reason she adds a little error to it that error is a specific specific scalar that changed y from 0.2 to 0.4 and I'm just saying that's the piece that we want to model and the reason we want to model that is because what we're coming to
+
+32
+00:14:17,000 --> 00:15:04,000
+so does that make sense the types check it's a it's a scale or not not a function there the the reason we want to get to that is we're going to solve this problem kind of up to noise and we're going to worry a lot in the theory we won't do it too much in this lecture but we worry a lot in the theory of like could we solve it up to the noise floor like if you're making decisions that depend on how like noisy it is and your data is you know has a sigma squared of one and you're
+
+33
+00:14:40,000 --> 00:15:26,000
+trying to make decisions where your values are like 0.1 apart intuitively something should be wrong there you're kind of reading into the noise so we'll worry a lot about how our procedure scale with the noise so you can kind of think about this as saying like there's some average noise and you know it's noisier or not if it were zero then our data is perfectly clean okay that's the way to think about it for now and if my explanations about like scaling and other stuff seem like
+
+34
+00:15:03,000 --> 00:15:53,000
+obtuse and weird please don't worry about it we'll come back to a picture of the gaussian and it'll be hopefully a little bit clearer in a second okay other questions all right now here's the remarkable thing here's how the gaussian comes up it comes up for a really interesting reason which is if I tell you that I want a distribution such that uh it's unbiased and it has this Sigma squared I know it's variance and I assume nothing else about it right the bayesians used to
+
+35
+00:15:31,000 --> 00:16:23,000
+make a lot of a lot of noise about this then that distribution is uniquely the gaussian okay so you don't have to know that in some fundamental sense but it leads you to this conclusion that is a distribution that has these two properties and you're not assuming things about how it's like third and fourth moments like if you wrote a three or a four there I don't have to assume what they are right they're they're just given okay okay so let's see um if I can skip to it okay
+
+36
+00:15:57,000 --> 00:16:47,000
+so it turns out this is the unique distribution this is unique in some sense that doesn't really matter too much that's more like philosophical of the above and I've been a little bit too imprecise to really appreciate that but that you should kind of take away okay so this is our our friend the gaussian let's go through the notation first of what we mean so this Epsilon I here getting to the great question earlier is what it what it says is Epsilon I is drawn this is what the twiddle means drawn
+
+37
+00:16:21,000 --> 00:17:19,000
+distributed to n of mu Sigma squared and I'm going to draw that in a second this is a normal distribution means this is the mean this is the mean of that normal distribution and this is the variance okay and here's a picture of it we'll get to it in one second okay right this is the mean right here and this is kind of how the distribution looks and so Epsilon the way it's picked is I will sample with probability proportional to the height of this curve right here maybe I pick a value here and
+
+38
+00:16:51,000 --> 00:17:43,000
+that's how I get the Epsilon I and I'm repeatedly drawing from this underlying distribution okay that's what that's the mental model I have of Epsilon now is that actually what's going on I don't know don't know God don't know how that works but it's our model of how the world is going okay sound good all right now as we go through this a couple things this distribution is actually fairly peaked um so maybe you've seen this like a central limit theorem or something
+
+39
+00:17:18,000 --> 00:18:03,000
+before in earlier classes at some point you've seen this idea that if I take a bunch of things and add them together they kind of converge to this distribution I won't make that statement precise but there's a reason this thing kind of comes up if you have a bunch of additive errors they end up looking when you average over all of them they end up looking gaussian okay so if you have a lot of little tiny additive errors they end up looking gaussian there's too much Philosophy for why this thing shows up
+
+40
+00:17:41,000 --> 00:18:40,000
+if none of that matters to you don't worry it shows up and we're going to use it okay all right so just to make sure you understand this function and what it looks like here's the mean value of it if you see the sigma version so this is the square root of that Sigma squared you see that within one Sigma you have um here 63 percent of the or 69 percent of the mass these are by the way these notes you can go download the templates and they will have those things and this picture is from Wikipedia so you can
+
+41
+00:18:10,000 --> 00:18:59,000
+also just look there please uh we will do a lot with population statistics we will not do things with sampling until a couple of key points and the difference between those two will be kind of immaterial when we do the actual salts but it's a great question yeah and if that doesn't make sense to you don't worry yeah so in our setting before when we had Epsilon I that's exactly right I should have written this for us great call this should be zero for our Epsilon I in general this is the notation so mu
+
+42
+00:18:42,000 --> 00:19:43,000
+is equal to zero mu equals zero great point okay awesome all right another thing is this is the function right here that we're looking at now when you look at this you start to see why least squares may come up there's this quadratic looking thing in here okay there's a one-half and there's a sigma squared and whatever this is the normalizing constant that's just if I integrate the entire area under this curve this function that just makes sure that it's one that's a PDF
+
+43
+00:19:13,000 --> 00:20:01,000
+okay that's all that thing is you'll see it a bunch of times in various different guises here okay but this is the function okay now let me unpack this notation for you you may not have seen this before this is not conditional we'll come back to this I'll hammer on this a couple of times this says the probability distribution density of Z and then this semicolon is not conditional formally it means these are the parameters of the distribution you don't condition on the parameters this may be a little bit
+
+44
+00:19:37,000 --> 00:20:28,000
+pedantic but we will stick to this in the class you have mu and sigma Square those are like things you plug in right so why does this matter when we reason about the the normal distribution we're going to have these parameters the mean and the sigma squared we just plug them in and then it gives us a distribution okay and that's going to come back in one second when we get to what's called a likelihood function okay these are our parameters let me write that on here these are our parameters
+
+45
+00:20:02,000 --> 00:21:02,000
+okay is the notation clear if you're familiar with conditioning this is not conditioning you can still condition you can write it in a bar and we'll do that in one or two steps you should be familiar with conditional probability for this class not the most advanced versions of it but you know basically what it does okay awesome all right so now let's write something that's conditional so what is the probability of y i given x i and as we said I'll write here Theta who or right here
+
+46
+00:20:36,000 --> 00:22:03,000
+Theta which is our underlying parameter well it's going to equal what 1 over square root 2 pi that's the normalizing bit I'm going to move this down sorry X of and then here it's y i minus Theta x i squared over 2 Sigma Square okay so far so good okay so this is the probability distribution what does this it says given that I saw x i I saw the feature what is the probability distribution over the y i what value should I expect okay to come out of this right and that I have this Theta model which
+
+47
+00:21:23,000 --> 00:22:36,000
+is our parameter here okay so our parameter okay we could put Sigma squared in there too okay now we'll write this in a more compact form x i okay this is the bar okay so this is now the conditional probability okay it says given that I saw x i condition on all the probability distributions under Theta this is the probability distribution over y i and I'll often write that this is this conditional distribution is n of theta t x I Sigma squared so this mouthful is the same as this mouthful does that make
+
+48
+00:22:04,000 --> 00:22:58,000
+sense this is just notation at this point and hopefully the fact that it's a generative model kind of adds up go ahead foreign yeah so great question so here what I'm saying is I'm basically asserting by Fiat that because the only random variable is Epsilon I that x i here like so this really is there's a the difference between these characters right here is Epsilon I right that was by Fiat in the model when I did it earlier right I said oops sorry to scroll I I really wish it didn't look so
+
+49
+00:22:35,000 --> 00:23:37,000
+nauseating but it does so because of this model I could substitute in here so this value here is nothing more than Epsilon super I and just a different guys which tells me all these pieces but it has to be conditioned on x i because I saw that like I saw that variable when I had to add it in right so that's how I get a distribution over y i wonderful questions are there more yeah yeah oh yeah so someone asked on the thing is e-i-e-i the the product of the two and the answer is yes thanks for the question
+
+50
+00:23:09,000 --> 00:23:58,000
+someone's asking if this is the product up here and yes this is the product these are just multiplied by one another there's no hidden operation there yeah sorry the graph paper makes sure that I write in a line otherwise like I'll end up writing all crazy but I can understand it's not awesome for rendering other questions foreign okay so why did we do all this maybe I just like torturing you with notation the truth is I really don't like notation but we're going to use this in
+
+51
+00:23:37,000 --> 00:24:35,000
+several different ways and so hopefully right now you can kind of piece it together and say like okay I kind of could see a model underneath here and what we're going to do is we're going to try and justify the optimization that we did for least squares by picking the most likely parameter so let me explain what we mean okay so before I do that notice here one fact that I've kind of hidden from you a little bit picking Theta picks a distribution let me make sure that claim is clear before I move on
+
+52
+00:24:06,000 --> 00:25:03,000
+okay what do I mean once you tell me Theta and I have the data fixed then all the distribution over the Y Eyes Are Fixed does that make sense so in some sense by picking a Theta right once I have the sigma squared fixed I'm picking a distribution now over all what the Y I should be and that's going to be interesting because what it means is as you pick a different Theta I can compare how well does it line up with my data so intuitively right if I pick a Theta all my data lies on a line and I pick the
+
+53
+00:24:35,000 --> 00:25:26,000
+Theta that exactly fits the line that should be much more likely than if I pick a different Theta where it's scattered my predictions are scattered all over the place and they're really far away so that the thin parts of this so let's come down and write that a little bit more precisely but that's the intuition of what's going on here okay so ask me ask me a question about that okay so for this we need a notion which will be very much used in this class which is the notion of likelihoods
+
+54
+00:25:00,000 --> 00:26:03,000
+and this allows us to pick among many distributions okay so at first that sounds pretty fancy like how are we going to pick among these distributions right it's a huge unmeasurable class if you know what that is all this nasty stuff but we just have to pick in our situation among the different thetas that could fit our data okay and we're going to pick the one that is most likely so let's write that down right now so what is the likelihood of theta okay it's going to be the probability of all the Y's given all
+
+55
+00:25:34,000 --> 00:26:24,000
+the X's given Theta right or can or with input Theta okay this just says How likely the date is and clearly as I vary Theta I'm going to get different scores here for How probabilistically likely all the Y's are let's break it apart if it doesn't make perfect sense what that statement means when I start to write it out mechanically hopefully you'll see how it decomposes and then please ask me a question I'm going to write something which at first may look actually I'm going to
+
+56
+00:25:59,000 --> 00:27:07,000
+write here a bit unmotivated I can break this down into many smaller assumptions or many smaller pieces okay why is this the case why can I take the big thing and turn it into a product of the Small Things what am I using exactly I'm using Independence and the strong form of Independence which I which I kept bringing up that told me that I could write this big product over all the vectors as this as this product among all of them okay and sometimes you'll hear this referred to as the IID assumption
+
+57
+00:26:34,000 --> 00:27:26,000
+independent and identically distributed okay all right cool please yeah so Theta there should be a zero and a sigma squared I'm being a little bit glib about what happens with the I could imagine a model this is a wonderful question thank you for letting me say this I could imagine a model where because the way I've specified the model it's implicit that mu is always zero but I haven't told you what Sigma squared is for right now imagine that Sigma squared is fixed I told it to you ahead of time
+
+58
+00:27:06,000 --> 00:27:45,000
+so I don't have to plug it in here I could also fit it right I could look at my data and see among all the thetas that are there and all the noise levels what's the most likely one and that's actually a slightly different model but here I'm imagining that Sigma squared is fixed but it should kind of go under this rubric and you're like why are you being so sloppy about that and the reason is because later we're going to be much sloppier about it because we're going to introduce notation that says
+
+59
+00:27:26,000 --> 00:28:16,000
+it's all the parameters in the problem okay but wonderful question you're exactly on on target for this look please foreign no no so here we have this probability because it's conditioned on X we've removed all the dependence on the data so like everyone gets to see all the data and now all that's left that's unspecified in the model is the epsilonize if they were all zeros you'd be able to get the Y eyes exactly but the only Randomness that's left is that Epsilon I that's what we're doing and
+
+60
+00:27:56,000 --> 00:28:52,000
+that's kind of what we cheated on here when we we said this guy is really Epsilon I as well wonderful questions you folks are really on top of this the other questions please [Music] no no so there's there's really not there's really not much to to say here all that there is is we went through this model where we said why eyes are of this form now that we've conditioned on x i we know this and we're plugging in Theta so you're giving me a particular Theta to evaluate and now Epsilon I is a
+
+61
+00:28:33,000 --> 00:29:19,000
+randomly is a random variable it has yet to be determined so there's a distribution over that the distribution of Epsilon I is given by this equation because this is exactly equal to Epsilon I and so this now gives me a say I don't know what Epsilon is but it has a distribution that looks like this so if I sampled it that's a weird statement I want to be clear that's a really weird statement it means that if I picked enough Epsilon I's I'd expect it's mean to be here whatever mu was in this case
+
+62
+00:28:56,000 --> 00:29:54,000
+zero and I'd expect kind of the scatter plot to look like it was inside here or like actually the histogram to look kind of like this like if I bend how many were in each thing and eventually converging to this distribution that's exactly what I mean awesome questions these are great okay oops all right oh man I even had it down here all written nicely sorry um we'll go back to my messy version okay so here we've gone from from this piece to this piece and then here all I'm doing is because these are the
+
+63
+00:29:25,000 --> 00:30:24,000
+Epsilon I's which I've we've assumed Independence in the strongest way I can move to a product okay we will do this throughout the course a lot of machine learning is based on IID because it's an okay assumption does that mean the errors are not correlated no no of course they're correlated but we're not modeling it that's all it means it's not true it's just a good model okay great now I substitute in one more thing equals product i1 to n and then I'm just going
+
+64
+00:29:54,000 --> 00:31:24,000
+to write out the distribution Sigma 2 pi times X of so y oh sorry what did I maybe forget a minus sign why I minus Theta x i Square over two Sigma Square okay why did I do this all right so I just wrote this whole thing out oops I just wrote this whole thing out right now the reason is we don't use this so minimizing this seems like a nightmare and so what we do instead is we use a simple transformation of this which will make it nice and additive which is called the log likelihood okay all right now I want to make sure
+
+65
+00:30:42,000 --> 00:31:55,000
+of one thing let me go back there should be a minus here I messed that up this has to be the it has to be a positive square otherwise it will spiral off to Infinity I'm sorry this isn't my lizard brain I messed that up okay clear enough they're Epsilon here right otherwise it's the wrong shape yeah please oh two questions one is there a negative in the original formula also yes period yeah I made a mistake one two three yes oh exponential function so it just means this this character here
+
+66
+00:31:22,000 --> 00:32:24,000
+sorry about this x of X it may be more familiar to you as e to the x there's no e to the power x and x is everything in the bracket everything in the bracket wait I thought the original function was appropriate because effectively we're competing a negative scene by doing the real minus the predicted rather no it's squared right so this character's School great point it's my mistake awesome okay is that clear I don't want to make sure that's clear it's a small detail
+
+67
+00:31:54,000 --> 00:32:54,000
+and it is in the notes maybe I don't know all right okay so far so good all right wonderful okay so we have this function with all of our with all of my bugs that I've introduced that we're catching on the Fly which is awesome we're going to introduce a new function it's going to be the log of our old function say why are you doing that and the reason is what is law what does log do for X functions well it brings the contents down right which is nice and it also uh separates out things that are
+
+68
+00:32:27,000 --> 00:34:00,000
+products so we have a big product we take a log we turn into a big sum that sum looks a little bit more like what we were expecting intuitively from our from our least squares let me write it here so it's sum I equals 1 to n right because we turn this product into a sum 1 over Sigma 2 pi minus y i minus Theta x i Square over 2 Sigma okay I just took the log of the exponential please [Music] oh log Sigma excellent point let me move this oops yeah it should be log Sigma you can see where their typos and things
+
+69
+00:33:18,000 --> 00:34:18,000
+I don't care about that term is going to disappear in a second but awesome awesome find yeah Okay cool so what do I care about here the thing I was just about to say is this term doesn't depend in any way on Theta right and so remember when we talked about minimizing the the loss function we're like oh if I added a constant it didn't matter and this is a constant the sigma squared that doesn't depend on my data anyway so I can just kind of toss it away in contrast this thing very much does depend on my
+
+70
+00:33:51,000 --> 00:35:26,000
+data and Theta right comes on data and Theta is that clear yeah please submission side is sort of a blue trip so think about it like this yeah sorry awesome questions yeah wonderful okay so now what does that mean if I want to find the most likely function that corresponds to doing what I claim it corresponds to Max over Theta L of theta why is that the case Well Log is a monotone transformation right so this original thing I wanted to maximize the probability log is monotone right looks like this and all the rest and so log of
+
+71
+00:34:42,000 --> 00:36:03,000
+theta is the same as as maximizing that then this term is just a constant we talked about how that doesn't really matter too much so I can drop that term and then I have a minus here so it's the same as minimizing over Theta 1 over 2 sum i1 to n y i minus Theta x i Square and then you say well what about that Sigma squared what happened to it well as we talked about last time it doesn't matter if you scale the loss by a constant it's still the same minimizer we don't care about the value and what
+
+72
+00:35:22,000 --> 00:36:15,000
+is this character that's least squares okay and we call this thing j Theta right this was J Theta in the last lecture okay so what was important here I walked through this fairly slowly um and what I the reason I wanted to walk through it like this and you should run through this is because we're going to run this same Playbook again and again we're going to talk about what the error is for these these kind of linear models then we're going to try and reduce them to this likelihood
+
+73
+00:35:49,000 --> 00:36:39,000
+computation oops this likelihood computation will almost always use the log because it turns it into an additive problem and remember stochastic gradient descent likes to work on additive problems this is of a nice form that we like to deal with and then we solve the underlying equation and so there'll be kind of this mapping that I give you a distribution and then out comes a loss function and that's going to be nearly automatic after this lecture in the next lecture to be able to do that for a
+
+74
+00:36:14,000 --> 00:37:14,000
+pretty wide class of models then how do we solve them it turns out we're going to solve them all the same way awesome okay so is that clear is the probabilistic interpretation of least squares or fitting a line clear please please go ahead foreign [Music] so if you had Sigma Square here I'm not going to show you how to fit this right now but there's another model where you have it this is called with known variance this is what I call fixed design with known variance uh linear regression if you also don't know the
+
+75
+00:36:52,000 --> 00:37:36,000
+sigma squared you have to learn that too and there's a parameter right Sigma comes out it doesn't come out quite nicely to the least squares formulation you have to do a little bit of extra work to estimate Sigma but you can do it and I think it may be a homework problem so I'm not going to tell you too much more about it but it's not it's not complicated yeah it shouldn't be complicated but great question for now we're assuming Sigma squared is given you do not need to make
+
+76
+00:37:14,000 --> 00:38:13,000
+that assumption please no either way all right all good all right so um at this point we've gone through that that interpretation let me make sure if there's anything else fantastic all right let's talk about classification little primer on classification this is where we are we're going to talk about how classification works why regression isn't the thing that we would necessarily want to do in this scenario and then we're going to run the same Playbook I assert to be able to solve
+
+77
+00:37:44,000 --> 00:38:47,000
+the model okay uh that is estimate the Theta underneath the covers all right so here what is classification what are we given we're given not surprisingly X I's and Y is no change so far 4 I equal one to n okay but y i we're going to work on binary classification in zero one okay and the values of zero and one aren't super critical you could have minus one and one I actually prefer that because it makes some of the math a little bit nicer that's not what we're doing in the
+
+78
+00:38:15,000 --> 00:39:19,000
+course you could have just categorical values there are discrete encodings of the variables okay now we often think in terminology why I also like the minus one we call this often the negative class this is just convention right there's no intrinsic meaning to these things this is our model and this the positive class okay so like a negative Class A positive class could be we found the tumor right there is a tumor in this image versus the negative classes there's no tumor or this is a cat this is not a cat right
+
+79
+00:38:50,000 --> 00:39:34,000
+we're doing binary right now you can do multi-class which we'll come to later which is you know there's a cat a dog a pig a horse right now we're just doing two okay okay great so you look at this data and you're like oh okay I plotted it you've told me there's zero one encoded so you could use basically so we can use linear algebra and Vector techniques and all the rest so zero one here's some data right and you're like oh why don't you just fit a line right like I should just
+
+80
+00:39:14,000 --> 00:40:02,000
+like you know kind of fit a line maybe the line kind of like I don't know goes through here or something like this and it's fine right and indeed for a lot of problems if you run linear regression and just kind of say like is it closer to Cloud to one than zero and round at the end like you can get out a classifier but it kind of feels a little bit weird especially because your data there's no reason it should be nicely clustered what if like there were a blue point all the way over here or over here or way
+
+81
+00:39:38,000 --> 00:40:33,000
+over here what's going to happen to your line well it's going to start because it's fitting those residuals to go crazier and crazier if you like in this direction right naturally it's going to skew more and more towards more of the data and so whatever decision boundary you kind of put there you're going to get into kind of stranger and stranger situations okay now that's just a motivation for why you want to treat something that's natively categorical so let's let's go through the function here maybe
+
+82
+00:40:06,000 --> 00:41:38,000
+you've seen this in a stats course already this is logistics or logistic regression so we're going to do one trick here over linear regression our hypothesis is going to generate something of X is going to live in 0 1. okay so this is a graph here of zero one uh that we're going to get to in one second and H of theta of x is going to be written as G of theta t x where which will equal uh 1 plus e to the minus Theta TX over 1. okay now this function here G of Z equals 1 over 1 plus e of Z
+
+83
+00:40:51,000 --> 00:41:34,000
+this is called a link function okay the terminology sometimes also called an inverse link function the literature goes back and forth doesn't really matter so you say why did you do this well our model is still going to be linear in our features but we're going to feed it through this non-linearity and that non-linearity is all of a sudden going to make sure that it kind of saturates when it gets too big and saturates when it gets too small so it's not going to have the behavior if we
+
+84
+00:41:16,000 --> 00:42:06,000
+looked at our old data right let's go back up to our old data it's going to kind of have a function that looks more like this does that make sense but at least at a high level okay so that's the intuition okay and this function here has a special name it's the sigmoid so you may see that if you use you know modern deep learning packages you'll see sigmoids or things floating around that's what they are they're just this function that kind of Smooths it over now you may ask like why
+
+85
+00:41:41,000 --> 00:42:37,000
+don't I use a different link function you could there are lots of different link functions to use this is by far the most popular for a variety of reasons one is that you can turn it into kind of what they call probabilistic estimates which we'll get to a little bit later please [Music] yeah let's get through great question how do we how do you do multi-class let's first get through how we actually do the binary class that's a great question you can think about a standard way to do multi-class is to do what's
+
+86
+00:42:09,000 --> 00:43:10,000
+called One versus all if it bothers you where you say am I in class one or any other class class two or any other class and you can kind of you can put them that way there are more sophisticated schemes there's a wonderful paper from 20 2004 that talks about how those more sophisticated schemes don't always pan out and it's written in a very aggressive style which I find interesting and entertaining Anyway by a guy from the media lab Okay cool so at first this looks kind of weirdly motivated but there's there's some
+
+87
+00:42:39,000 --> 00:43:26,000
+motivation for it which is just that it has this nice property and it's smooth and it kind of looks close to like a threshold function now the other thing when I say it's smooth is we could also Imagine the function that was like a step function that you could use that right that seems like a natural thing when you're below zero then you know return when you're when you're negative return uh you know zero when you're a positive return one right that would be a thing you could do in deep learning
+
+88
+00:43:03,000 --> 00:43:59,000
+these are sometimes called you know there's there's you know it's a sine function the problem is the derivatives would give you no information here right if they were flat so this is smooth so like it tells you like a kind of a nice smooth transition and that will work better with modern optimization that's one thing we want out of it please let's explain what h of X and G of Z are with this functions name uh remember recall this is the same notation we had earlier this is the hypothesis sub Theta this says
+
+89
+00:43:31,000 --> 00:44:14,000
+how do we do prediction so the way I do prediction in this model um in the logistic regression model is you've given me Theta which is some parameters that you have that chooses your model then you give me some X which recall is like your data point and then what I'm going to do is I'm going to produce a number between 0 and 1. and the way I'm going to produce it is I'm going to run I'm going to take their dot product as I was doing before and then I'm going to run it through this
+
+90
+00:43:52,000 --> 00:44:36,000
+function and I'll come to in one second how we interpret those scores but you can think about those scores as being closer to one means I'm confident it's in the class and closer to zero means I'm not confident in the class and what I was saying is this function looks like it was picked out of a hat and it really wasn't the reason it wasn't is it has a couple of properties it's smooth and it transitions nicely between zero and one and I was trying to explain why those
+
+91
+00:44:14,000 --> 00:45:16,000
+properties were important and so that's where H data links to this image does that make sense the key of beta transfers isn't actually equal to the thing to the right of it in the parentheses it is so so if you look G is this function here but Z is a scalar right and so it's just substituting in Theta TX for Z yeah I just wrote it this way so I'd have more room to write the numerator and then here I wrote it one over because that's the more standard way to write they're equivalent great questions
+
+92
+00:44:49,000 --> 00:45:38,000
+please oh yeah a link function is a general class of G that you could apply that's some kind of non-linearity one that you may have seen if you ever played with a deep learning package of something called relu or rectified linear it looks like this right so there are other link functions that are out there there's probits and logits and all kinds of things we're going to use this one but I want you to be aware of it because I think you have to to try one other link function on a homework and the phrase is used in the
+
+93
+00:45:18,000 --> 00:46:26,000
+literature and it's very mysterious if you don't hear it first very good questions sometimes it's also called an inverse link function that's a separate issue cool awesome all right so how do we interpret those scores now this is the twist that gets us into probabilistic modeling which we're going to generalize so we say the probability that y equals one according to the model is equal to H Theta of x now this is a testable statement okay now just to complete it also what's the
+
+94
+00:45:56,000 --> 00:46:59,000
+probability y equals zero this is going to be proportional to X Theta of one minus H Theta of X Y because probability is sum to one okay we only have two classes now this is actually testable if you took a bunch of data and put it through and looked at the probabilities and bend them right so you took all the predictions that were between 0.5 and 0.6 and 0.6 and 0.7 and you counted them up in every bucket how many were accurate this is testable you can see if the model is what's called calibrated okay
+
+95
+00:46:28,000 --> 00:47:15,000
+and that's very useful that like the errors are meaningful and so you can check that it's a it's more of a condition than they're right or wrong now in modern machine learning that's less important but you will hear people talk about like the probabilities or the scores that come out of these models and using those scores for something and this is what they mean they'll sometimes use the log of this which is called the logit okay but that's how we interpret what the model tells us that's why this link
+
+96
+00:46:52,000 --> 00:47:57,000
+function is important that it's between 0 and 1. cool it doesn't damage optimization it's not obvious but it doesn't damage optimization is the other major thing okay so let's use that information to write our likelihood function the probability of Y I'll emphasize that it's a vector this time x I don't really like that notation but it's okay is well why did we get here oops well this is again the independence assumption kind of rearing it's you know ugly or not head right we're able to go
+
+97
+00:47:35,000 --> 00:48:49,000
+from the entire data set to a product over all the terms nothing surprising there and then we'll write this in one form which hopefully makes a little bit of sense x i this seems like a cheat but it's actually okay 1 minus H Theta okay so why does this seem like a cheat it's a weird way to do it okay but it'll come become nice in a second so what I'm writing here is I'm saying the probability is the probability I said that it was true now what is y i when y i is 1 I select this term
+
+98
+00:48:12,000 --> 00:49:09,000
+because this term is zero right so think about when Y is one this character is one this character is zero so this goes to one and this is the only term that matters when the true label is is one it's exactly reversed okay when it's zero I should say when it's zero this term is one and then this term goes away does that make sense just think through like the cases y i zero or y i is one so far so good so it's kind of like encoding both simultaneously I get to see why I so really only one is present
+
+99
+00:48:40,000 --> 00:50:17,000
+but it just makes my arithmetic a little bit cleaner below does that encoding make sense cool right all right so let's take the log of L Theta we're doing exactly the same thing that we did before one to n now I'm going to write it write this out it's one i y I log H Theta x i plus 1 minus y i log and oops one minus H Theta x i okay so so far so good but now notice this is in exactly the form that I need for SGD to run that's pretty wild okay this is just a sum over everything
+
+100
+00:49:35,000 --> 00:50:39,000
+I can just write gradient descent or anything else I wanted in terms of the thetas and I'm all good these are these are functioned underneath the covers now one other thing which I won't arrive but you can see very easily from this okay so just just to be clear same recipe I want to write down what I mean by same recipe we have Theta t plus one equals Theta t minus Alpha Theta I J Theta now when we do this something oh so right now actually we're sorry we're gonna do gradient Ascent because where
+
+101
+00:50:15,000 --> 00:51:45,000
+this is still maximizing probability we haven't pulled out a negative term sorry about that but one interesting thing pops out so you should verify this we'll see if we can do it we won't do it in class but you should see if you can you can do this Theta J of come on of L Theta equals the sum I goes from 1 to n of y i minus H Theta x i times x i j okay so this is pretty miraculous if you look at this what it says is if I look actually at this underlying function and I take the derivative it comes out in
+
+102
+00:51:02,000 --> 00:51:55,000
+exactly the same form that we had when we were doing linear regression it's your prediction error times the X I now the prediction itself is different right before the prediction was just Theta dot x i now it's this this H function but this gives me something I'm like these models are very very similar right they're like how much error do I make then take a gradient step with respect to the data that that tries to minimize that error and so this is the sense in which I mean like these
+
+103
+00:51:29,000 --> 00:52:19,000
+models really all are kind of like all the same we're twisting these pieces at the edge for how we model things okay and so that means actually after you you pop all this stuff out you can use exactly the same Rule and this rule is extremely General okay and that's surprising like this rule of like I just take my predictor and then I do and I do the derivative like that's kind of shocking that like a large class of models and in fact that's what we're going to generalize in the
+
+104
+00:51:58,000 --> 00:53:05,000
+next lecture to make sure that we understand exactly the breadth of that any questions to this part of what we're talking about please oh right great question so remember the reason that we got this minus sign here sorry to go back oh the minus sign was our was our Nemesis the last time that popped out and so this turned our Max into a min right we didn't have a minus sign here and we were maximizing the the loss that we put in and I didn't I didn't oops I didn't change anything so when we were
+
+105
+00:52:36,000 --> 00:53:29,000
+we never had a minus sign pop out of here but when you actually go through and see it a minus sign does pop out you have to take my word for it or you just do the calculation see okay but here that's why we have gradient descent because we're maximizing the loss not minimizing the underlying function please oh this is XJ is the jth component so here I did this J's are the same so I was taking the derivative with respect to the jth component of theta and so that's the underlying derivative same
+
+106
+00:53:07,000 --> 00:54:11,000
+way if you remember in the linear regression we calculated the the derivative with respect to each component independently exactly right well if this is yeah this is the exactly right yeah I don't have anything to add now um yeah oh great great question why I is the label so and here that's what I was saying I said in an extremely confusing way for some reason so why I is fixed I know why I get to see why I it's a label so when I have y i is equal to zero then this term is zero so this thing is just
+
+107
+00:53:54,000 --> 00:54:49,000
+one and this is the term that's inside it's like a switch statement when y i is 1 which I get to see right for the values that it's one then only then this statement goes away and I and I have only this character if I could draw faster with colors that's a terrible color here we go does that make sense so it switches between both based on what Y is it's just a compact encoding of both cases that's why it's a little bit awkward yeah great question please so we compute it so the the thing here
+
+108
+00:54:24,000 --> 00:55:15,000
+is this derivative here this this log and I'll make sure this is clear we wanna like this I'm asserting I haven't shown you this but the way you compute it is you take the derivative you put it inside you say Okay y i doesn't depend on Theta this term does you compute the derivative of this character internally and then that is what I'm saying you can simplify it to down here but you you compute it like that's up to you to do once the model is in this form you just use the rules of calculus to compute it
+
+109
+00:54:59,000 --> 00:55:58,000
+yeah exactly this follows this notation I will use reflexively without thinking this is the log likelihood I mean change colors Yep this is the log likelihood and this is the likelihood likelihood okay this is on the probabilities this is on the logs of them great questions cool please so we'll almost always do gradient descent so one rule of the course or not rule but one thing is you typically use the log likelihoods for a variety of reasons but one is that they're nice for optimization and so that's what this
+
+110
+00:55:37,000 --> 00:56:31,000
+link is meant to show you very cool awesome all right I will pause a second all right so at this phase right now we've seen another model what we're going to see next lecture is we're going to generalize this with a little bit more math and so the thing is it's like you know maybe it's a terrible terrible metaphor but like you know a frog with boiling water or whatever but like you're you're getting more complexity and you're not noticing it right we started at lines like I know how to fit
+
+111
+00:56:08,000 --> 00:56:56,000
+a line then we had some probability distributions okay they came in and then we started these predictors that were actually instead of just giving you a value of regression they were actually giving you a probability we interpreted those as log likelihoods now we're going to make next lecture we're going to make the probabilities more complex and that's going to allow us to to generalize before we do that I want to show you one other thing which is the which is the Newton's method which is another
+
+112
+00:56:32,000 --> 00:57:27,000
+solution method so that we can compare and contrast with stochastic gradient descent and give you a chance to ask questions since we were a little rushed at the end of last lecture because I screwed up okay sound good all right okay so let's talk about Newton's method we're now talking about forget about your modeling side now we're talking about optimization right so Newton's method is the following we're going to be given some f from RD to D it's got to be a scalar out
+
+113
+00:57:02,000 --> 00:57:56,000
+okay at this point actually doesn't but and what we want to do is we want to find f of x equals to zero so it's root finding this is in general a hard and intractable problem sometimes it will work sometimes it won't work okay if it were really nasty function if it's continuous great so why does this have anything to do with what we care about just as an aside remember your your uh thinking here if you want to minimize say l Theta and it's convex or has a nice shape that's
+
+114
+00:57:29,000 --> 00:58:22,000
+the same as L Prime theta equals zero sorry if that's too small right so if I want to minimize something it's the same as finding or finding the roots of its derivative right assuming it's convex double shaped okay so they're related clearly all right so what how does this thing actually work so the idea here is and probably you've seen this method at some point maybe in a cowgirls class or somewhere and it's it's a good method but it's it has trouble with machine
+
+115
+00:57:57,000 --> 00:58:48,000
+learning and I want to talk about why okay so here we have Theta zero we take our guess F of theta zero and we compute the gradient okay remember the derivative in this case because it's one dimensional is the directional of maximal increase right that's the function of the way the function is increasing that's what the the derivative is actually giving us now what we're going to do is we're going to follow the derivative to where it crosses the axis okay so our guess is going to be
+
+116
+00:58:25,000 --> 00:59:19,000
+Theta 1. now you should kind of convince yourself it's not true everywhere but almost always if you think about picture of function in your head that crosses zero this is going to be a pretty interesting way to find the zeros and to get closer in fact this method is insanely fast for a large class of functions it's called what's called quadratically faster which I'll emphasize again but it means you get two you get twice the number of digits of precision as you run it's wildly fast okay when it runs in terms
+
+117
+00:58:52,000 --> 01:00:16,000
+of steps that it takes okay so this distance we want to call Delta so Theta 1 is going to be equal to Theta 0 minus Delta what is Delta how far do we step then we have an algorithm here right and then we'll repeat it right just to be clear we go up here we would compute another derivative and so on and we would we would zoom in on this this would be our Theta 1. or Theta 2. okay so we have to solve this key step so how big is this well if we look at it F of theta 0 equals F Prime of theta zero
+
+118
+00:59:34,000 --> 01:01:03,000
+times Delta okay it's just a triangle rise over run that's all I'm doing that's it okay that means Delta equals F Prime of theta 0 which I'll write in kind of an obfuscated way times F Theta of zero okay oops that is that looks terrible let me erase that there you go inverse okay so I have to do an inversion okay so this gives us the rule Theta t plus 1 equals Theta t minus F of theta t over F of theta T Prime okay this is our roof finding algorithm and as I said this thing converges crazy crazy fast
+
+119
+01:00:26,000 --> 01:01:21,000
+right so it like you know if you go to 0.1 then the next iteration will be 0.01 this is error going to be 0.0001 right this is the error this is what quadratic speed means that's insane you don't have that many digits on your uh you know on your device like it'll you know get to machine Precision very very quickly now this algorithm looks great like in one Dimensions it's quite good but there's a problem with it when we scale up to higher dimensions and the problem we scale up to higher Dimensions is right
+
+120
+01:00:54,000 --> 01:02:02,000
+here the way that you write the higher dimensional version of this rule is Theta t plus 1 equals Theta t minus and I'm going to write the the typical way we do this H inverse gradient and I'm going to put it in the way that we would use it okay so what have I done here let me let me unpack this it's a little bit obtuse okay so when we want to when we want to generalize to vectors so we want to generalize and use for minimization we get here so Theta is remember our front end Rd plus one
+
+121
+01:01:32,000 --> 01:02:49,000
+right L Theta becomes our our F Theta right as we were using it above right I've written it as a gradient with respect to this this thing here if you remember your your Calculus this is the Hessian how big is that thing well it's in D plus 1 cross D Plus 1. all right this thing is small this thing oh it's not small this thing is small it's in a this is an RD now one thing that is thing definitely by the way if you don't remember what the hestian is H I J equals in this case uh I'll write
+
+122
+01:02:19,000 --> 01:03:21,000
+it as L Theta is the Matrix of second partial derivatives all right okay so it's all the mixed partial derivatives okay if you remember this from your Calculus class if not don't worry I'm sure a brief refresher will be fine a couple things that are great about this algorithm first is notice there's nothing there there's no step size there's no Alpha this thing just runs okay this is a great algorithm in machine learning Antiquity like 2003 and 4 2006 people use this algorithm because
+
+123
+01:02:55,000 --> 01:03:44,000
+it carried over from statisticians this is how statisticians would solve logistic regression so like if you go into R I think up until very recently maybe even still and you say like solve logistic regression it will use this algorithm under the covers and the reason is it will get super super accurate right it'll get all that fill up all your digits and be very very efficient in terms of how many steps it takes but each one of those steps for a machine learning problem could blow out your memory
+
+124
+01:03:20,000 --> 01:04:22,000
+if you imagine you have a machine learning model that has a billion parameters a billion squared is a lot right it's huge it will blow out your system and so people have ways of relaxing this uh over time that they try to get more information in but it hasn't historically been worth it okay so does this algorithm make sense do you recall this algorithm happy to answer questions about it all right so let's do a rough comparison and if you want please ask questions about I mean anything I guess but you
+
+125
+01:03:50,000 --> 01:04:53,000
+know relevant's fine oh I think I have a chart for this okay okay so let's look back at the methods we've seen because I want to put them in context we saw this SGD algorithm pure SGD every iteration took one data point right we looked so I want to compare the methods so we're clear on the method name how much they cost per iteration that is every time I take a step and change the model that's what I mean by pre iteration how much compute do they do as a result of that per iteration and how many steps
+
+126
+01:04:22,000 --> 01:05:16,000
+do they take to the error to the air right this is kind of the conversion straight off so SGD has a pretty bad estimate of the underlying gradient but you can go super fast relative to the size of the model so you take many of them and you kind of make up for it in some situations so let's see this so to compute here this is proportional to D does not depend on the size of your data set there are situations where you can train these models you don't even see all of your data you only sample a small
+
+127
+01:04:49,000 --> 01:05:45,000
+actually there are models that people pay money for that they have huge huge collections of of data and they only ran on the first like 30 percent of it and they released the model there they're like hey we sampled from it it was fine right it was fast enough if you ran even a single episode of batch gradient descent batch batch grading descent you would have to look at all the data points which would potentially be much much slower okay so it takes time at least o-n-d put data's here although I don't
+
+128
+01:05:20,000 --> 01:06:11,000
+really mean them formally okay and then there's Newton's method Newton's method also looks at all data points it's extremely expensive we won't talk about how expensive you can get it slightly down from this but and I've written papers with other people and a lot of people have tried to improve this method but it literally like it's huge it has this D Squared is going to kill you okay you can try and get around it because you have to compute the interaction those those remember these
+
+129
+01:05:53,000 --> 01:06:43,000
+partial differentials here these are like the interactions between every pair of variables that you have that's a lot of information quadratically more okay so that's where their D Squared is okay now these things are super fast I'm gonna be a little bit glib here because I'm not going to State the true precise running time this thing is really fast if you want to get to Epsilon error you take log 1 over Epsilon steps right potentially a little bit less than that too but it's fine that's super fast okay
+
+130
+01:06:18,000 --> 01:07:12,000
+like you have an Epsilon of 10 to the minus 16 log of 10 to the minus 16 is like take a couple hundred steps and you're done that's wild SGD a couple hundred steps it's likely still spitting out random values okay in contrast at The Other Extreme this is like Epsilon to the minus two this is like Epsilon to the minus one approximately these are very vague Notions these are this is only under some considerations I just want to give you Engineers intuition of how well these work okay and the point is is that like there's a
+
+131
+01:06:45,000 --> 01:07:40,000
+clear trade-off here of how expensive each one of these points are versus how many steps you have to take so if like you had a Computing device that made it absolutely instantaneous to look at all end data points simultaneously then maybe batch gradient descent makes sense because you would just take steps really really fast if you had an oracle that could compute Hessians right which is what people tried to do for a while and compute them really really quickly then you would prefer this algorithm right so it's a
+
+132
+01:07:12,000 --> 01:08:04,000
+trade-off between size and speed now we tend to operate as machine Learners in situations increasingly whether it's a good idea or not I happen to like the idea of huge huge models trillions of parameters are the new like thing people care about it's wild Computing a trillion squared if you thought a billion squared was bigger trillion squared is bigger right but about a factor of a million it's huge so we can't run on those those kinds of models and we tend to train on data sets
+
+133
+01:07:38,000 --> 01:08:26,000
+that are much much larger over time now that how what much larger means changes every generation of Hardware like every two to four years what we mean by that changes but like you know we train on the web like all emissions or like all of the we still can't train on all the video right there's more video that's put out there than we can possibly train on we would like to be able to do that eventually Hardware will catch up and hopefully the same dumb algorithms will work that's our that's what we're praying
+
+134
+01:08:02,000 --> 01:09:06,000
+right now we have no we have no justification for that statement okay now the one thing that I highlighted last time is G the one thing I highlighted last time was there's a little character that squeezes in here called mini batch right we talked about this very briefly what minibatch does is instead of said electing one points it randomly selects B points now its estimate is somehow better than SGD but not not kind of theoretically doesn't change the curve the point is for modern machine learning you can do a
+
+135
+01:08:34,000 --> 01:09:18,000
+sample of B things in parallel in the same wall clock time that you can do one and that's what's kind of distorted us to use these batch methods really candidly there's a little bit of error reduction in the noise like you get a better estimate of the gradient but really it's because it's free for the compute device the way a GPU works or any of these kind of batch kind of parallel systems you put in D points they can do them all in parallel so that's the thing that's lurking under
+
+136
+01:08:57,000 --> 01:09:44,000
+the covers because after the election people ask me like well why would you prefer that you're still taking the same number of steps in batch gradient versus SGD and it's because of this parallelism that's underneath the covers we can we've built Big parallel machines Humanity right like your phone has an ungodly number of teraflops in it like super computer level teraflops some number of years ago and we'll continue on that thing so that you can get your photos tagged I mean I don't know that's
+
+137
+01:09:20,000 --> 01:10:19,000
+how it works anyway so those are why we do mini batch right okay so far so good all right any other questions all right so the last thing I'll just put on the on the thing here is in classical stats these were all things that people cared about classical stats D was really small and N was you know kind of moderate size like if you look at where if you talk to like your friends in the social scientists who are like you know maybe they're not doing the same thing now but for a while ago when they would solve
+
+138
+01:09:53,000 --> 01:10:50,000
+these models when they would solve these models D would be like a hundred right and they really cared what their responses were down to you know very very fine levels you have to run for a really long time to get that level of accuracy for SGD what machine learning is about in a really fundamental way is like taking these kind of bigger models and kind of solving them approximately and weirdly enough they end up pretty robust which is something kind of horrifying we don't understand it please
+
+139
+01:10:21,000 --> 01:11:19,000
+oh yeah so it means at least so I mean like the Big O style notation it means asymptotically it grows at least this fast it's a little bit slower but I don't want to kind of get into it wonderful question yeah please [Music] awesome question so one one access that you could also look on here is how how well do they handle kind of noise in the data and SGD turns out to be kind of remarkably robust and you know there's some versions where you can prove this so when you're optimizing so
+
+140
+01:10:54,000 --> 01:11:45,000
+there's folklore around this we'll talk a little bit about this but SGD because it's noisy some there's some belief that it doesn't get stuck in local Minima as frequently as some of the other algorithms do if you imagine this picture right right here imagine that it went back up all right then somehow like you're using all these second order information to race you down to the closest local Minima that's potentially not what you wanted the entire time so there's some folklore theory that says
+
+141
+01:11:19,000 --> 01:12:08,000
+SGD is a little bit better and I say folklore because we can only nail that down in some cases they're basically theorems that say of the form like if your data looks like this then this happens or for certain things I'll show you in a couple weeks this happens for like solving certain Matrix equations you can you can prove that it happens there so that's another access the other axis which you may think about if you're an Optimizer is how numerically stable is the underlying algorithm and here's
+
+142
+01:11:44,000 --> 01:12:33,000
+the thing that's pretty wild about machine learning the trend has been not to make more numerically stable things so if you care about how a computer works you have doubles inside double precisions floating Point numbers now you know if you saw nvidia's last announcement they're going down to fp8 which means instead of 64 bits for a number they're using only eight bits there are people right now training with integers those methods we really only know how to do over SGD because these methods you
+
+143
+01:12:08,000 --> 01:13:02,000
+you kind of Can't Get Enough meaningful information in there so there's another argument about how kind of statistically robust they are um and how numerically stable they are they're not very numerically stable there's a lot of tricks we're pretty primitive there compared to like you know the optimizers of the world but yeah wonderful questions awesome fantastic um any other questions okay great so we're going to end a little bit early today uh what we're going to do uh on the and and know like
+
+144
+01:12:37,000 --> 01:13:11,000
+in general like you have to stay at l445 but today we got through it um next time we're going to talk about our exponential models these are going to be models that have a more complex link function and allow us to model more of the world that's around us and kind of interesting noise things see you have fun I'll stick around for a couple questions
+

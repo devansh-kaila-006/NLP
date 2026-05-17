@@ -1,0 +1,588 @@
+1
+00:00:06,000 --> 00:01:06,000
+Thank you everyone for coming. Um we have another guest lecture. Uh and today we have Ranjay Krishna. Uh Ranjay Krishna is a assistant professor at the school of computer science and engineering at the University of Washington and he co-directs the Raven lab. Um he has taught previous iterations of CS231N in 2020 and 2021 and his research lies at the intersection of computer v uh computer vision natural language processing robotics and human computer interaction. In today's lecture he will discuss
+
+2
+00:00:36,000 --> 00:01:34,000
+multimodal foundation models and RJ the floor is yours. >> Thank you. Uh it's great to be back. The first time I ever taught this course uh here at Stanford, it was 2020 and we had about 3 weeks where we had to take all the material and move it online. Uh I'm yeah I'm every year after that has been much easier to teach. U it's great to be back. So today we're going to talk about uh multimodal foundation models. So a lot of the lectures in this class so far has really been focused on building
+
+3
+00:01:05,000 --> 00:01:54,000
+individual models for individual tasks. So these uh usually follow a few steps that you've seen over and over again in lectures. You collect a data set, usually a training set as well as a test set. Then you train a very specialized model for that purpose. So that could be an image classification model or image captioning model like the ones you've seen in your assignments as well. And then you finally sort of evaluate th those models on your test set. Now what's sort of been different uh in the
+
+4
+00:01:30,000 --> 00:02:26,000
+field so far uh in the last couple of years is this sort of shift away from these individual models into building these more foundation models. Um and the way to sort of think about foundation models is that it really is trying to pre-train models on a wide variety of skills, a wide variety of different tasks and then later on adapt those things for individual tasks uh depending on your needs. So for example, one very common uh foundation model that you all probably use in some form or the other
+
+5
+00:01:57,000 --> 00:02:47,000
+is GPT. And GPT was trained on a lot of common crawl data from the internet. And then you take that model that you get and then you fine-tune it for different purposes. So you fine-tune that model uh for math problems or symbolic reasoning or trivia questions. And all of these are individual tasks that this model can quickly adapt to. Now, what's nice about foundation models is that it allows you to sort of do that update step, that adaptation to new tasks with very minimal data. Meaning, you don't need to
+
+6
+00:02:23,000 --> 00:03:14,000
+collect a large amount of training data. You can usually get away with very, very little. Often times, you can even get away with collecting no training data at all. Um, and so when you think about foundation models, there's many different classes of foundation models that you might care about. Uh, in language, uh, you've got Elmo and BERT that really started this entire revolution. uh and then we now have GPT and T5 and variants of these models. Uh these are things we're not going to talk
+
+7
+00:02:49,000 --> 00:03:45,000
+about in this class since we're mostly going to be talking about multimodal models. What we will talk about is how do you build these same kind of foundation models for image classification and we'll go into uh examples like clip and cocoa today. Uh we'll also talk about how do you combine language models that that you might have seen already in class with these sort of vision foundation models to enable all kinds of new models, multimodal foundation models that can solve a wide variety of tasks. And then of course we
+
+8
+00:03:17,000 --> 00:04:12,000
+can do a lot more than just sort of solve tasks in language. Uh we'll talk about how you can build models that can output not just text but also uh masks uh or images uh that it might you might want to generate. And then finally, we'll talk about this idea of chaining where you take a bunch of foundation models and then combine them to do all kinds of new things together. Now, when we talk about foundation models, there's many different ways to classify them. Uh, and it's hard because the definition
+
+9
+00:03:43,000 --> 00:04:34,000
+is often sort of um disagreed upon, but what you typically will see in a foundation model is that it's robust and general uh to many different tasks. So, you can apply that same model for all different use cases, and I'll show you a ton of use cases today. Um, also something else that's common in a lot of these foundation models is that they have a lot of parameters. They have large numbers amounts of parameters, large amounts of training data, and usually they're trained with some sort
+
+10
+00:04:09,000 --> 00:05:02,000
+of self-supervised objective. Okay. Um, so of course we're not going to talk about the language stuff. What we will talk about are the ones in green today. And so let's get started with image classification. So how do we actually go about building an foundation model that can solve image classification for any sort of data set you might care about? Now, if you remember from a few lectures ago, we were talking about self-supervised learning. And in self-supervised learning, one of those uh methods that you saw was simple,
+
+11
+00:04:36,000 --> 00:05:37,000
+where you have this contrastive objective that contrasts against um dissimilar images and pulls closer representations of the same image that has been transformed in some way or the other. Now, this idea you can think of as pulling together similar concepts. different augmentations of a cat should result in representations that are similar to one another, but it should push away representations for other kinds of categories like dogs for example. Now, the the hope with training with these self-supervised learning
+
+12
+00:05:06,000 --> 00:06:04,000
+objectives is that these representations become general enough, right? So that when you see something new, maybe a sketch of a cat or a sketch of a dog, it still embeds those in the space so that it's easy to classify exactly what those concepts are. Now moving on to multimodal, we can take these same ideas, the same objective and then start thinking about what would happen if we added text to that representation space. So for example, if we could also embed a representation of the text that says a
+
+13
+00:05:35,000 --> 00:06:31,000
+cute fluffy cat and have that be close to the cat representations, that would be great because now we can sort of query things in both images as well as text. uh and similarly we if we can also embed uh the phrase my favorite dog is a golden retriever and ideally that representation would lie closer to golden retrievers than other kinds of dogs. So that's the general idea behind sort of adapting the self-supervised learning objectives we've been talking about in class so far to incorporate
+
+14
+00:06:03,000 --> 00:07:02,000
+text and other sort of multimodal uh inputs. So in simincere if you remember the main objective was that you want to pull together again uh transformations of the same image. So the cat should be closest to its other cat augmentation. So that green arrow right there sort of indicates two things that should be pulled together and it should be further away from all the other augmentations. So any other image of a dog or a monkey you want those representations to be far away. Now we can use that same idea and
+
+15
+00:06:32,000 --> 00:07:31,000
+now think about training a clip model. In clip what they do is they still have that same image encoder that you have on the left hand side but on the right hand side you now have a text encoder and this text encoder is embedding descriptions of those individual images. Okay. So your dog image will now hopefully learn that it should be closer to a representation of a text that says my favorite dog is a golden retriever and far away from all the other representations. Okay. And because this is the same formulation that you've seen
+
+16
+00:07:02,000 --> 00:07:54,000
+with Sinclair, the objective that you use to train a model like this is just by collecting a lot of image text pairs. Uh and then once you have those pairs, feed them into a model in a mini batch and then make sure that you have this contrastive objective uh that we used for SIM clear, but now we're applying them across images and text. So we're pulling together here in the numerator uh the representations uh of similar things and pulling apart the representations in the denominator for
+
+17
+00:07:28,000 --> 00:08:23,000
+everything else. Now, of course, we want that image to be closest to its corresponding text and far away from all the other text. But we also want the inverse to be true as well. So, we have a second objective as well that says every text should be closest to its image and further away from all the other image descriptions. Right? So, it's it's a complimentary symmetric loss that you have between the two different types of modalities that you're feeding into this uh learning objective.
+
+18
+00:07:56,000 --> 00:08:50,000
+Okay? So, of course, what's really nice about a clip-like model is that it can be trained with just associations of images and text. And there's a ton of this data on the internet. So, you have a lot of data of corresponding images and text that you can pull up from the internet. You can download and now you can train this model at a very very large scale. And this is exactly what OpenAI did a couple of years ago in 2021 when they released their clip model. So they collected a lot of that data and
+
+19
+00:08:23,000 --> 00:09:13,000
+then they trained it using this contrastive objective using all of the images and text pairs that they found from the internet and then once they were done training that you follow the same sort of two-step pipeline that you saw in the self-supervised learning object uh class where in step one you do that pre-training and then in step two you can take that image encoder and now you can adapt it to a new task. So once you have this pre-trained image encoder, you take it, you take its weights and
+
+20
+00:08:48,000 --> 00:09:47,000
+then you tag on an additional linear layer on top uh to adapt it to an image classification task or a detection task or you can put in something like a decoder and even decode out uh semantic segmentation maps. Right? So a ton of different tasks become possible just by initializing your model from this sort of pre-trained objective. What was really exciting when this paper came out is that linear uh addition of this one linear classifier on top of this clip encoder led to really large improvements
+
+21
+00:09:17,000 --> 00:10:08,000
+in performance. So here in this graph I'm showing you uh average performance across many different image classification data sets and the clip models the ones in red they're all the way at the top and you can see that as you sort of train on more and more images uh you end up getting better and better performance. Um, so it was very exciting because it seemed to indicate that there's this really nice pre-training objective that we've been able to unlock and there's an abundance
+
+22
+00:09:43,000 --> 00:10:37,000
+of image text data on the internet which means that we can train these to be very very large and very very performant. Um, of course that's not the end of the story. What we want to do ideally is not to have to adapt these features for something new. We would ideally want to be able to use a clip model out of the box. So in language models for example, you train a model to autocomplete usually. And this autocomp completion kind of works like this. You have a phrase that says I love and then your
+
+23
+00:10:10,000 --> 00:11:09,000
+model sort of fills in the next word. For example, cake. And then you train with this pre-training objective. And what you want to do during the second stage is to basically take that same model and adapt it to a new task. For language models, you never have to retrain that model. You never have to retrain it on a new downstream task. Every task is a language task. And so every task can be treated as this sort of autocomplete uh process. But with clip the problem is there is no autocomplete process. Right? So we've
+
+24
+00:10:40,000 --> 00:11:44,000
+trained this model on this contrastive objective. But to adapt it to a new task, we still need training data and we still need uh a linear layer on top that we need to train to adapt it to new tasks. So a lot of people started thinking about what what we can do to sort of adapt this uh model for uh you know to use it directly out of the box and there's this clever trick that people came up with and this clever trick is basically using the text encoder as a way of guiding the model uh to generalize to any downstream
+
+25
+00:11:12,000 --> 00:12:09,000
+classifiification task. And it works like this. Uh so let's say you want to classify what this image is using a clip model but you don't want to sort of retrain this model or adapt it for any downstream task. What you can do is you can take the text encoder and pass in a word through that text encoder to create a text vector and use nearest neighbors to figure out what is the right classification. So the way this works is you take all the categories in your new data set. So for example, let's say your
+
+26
+00:11:41,000 --> 00:12:43,000
+new data set contains the categories plane, dog, and bird. You're going to embed all of them in the text space to get a vector for plane, a vector for dog, and a vector for bird. And now when a new image comes in, all you have to do is embed that image using the image encoder and then find the closest neighbor. So in this case, you should find that this image has the highest sort of similarity with uh the correct class. uh in this case uh it should be the dog vector and you can see the dog vector does have the highest sort of
+
+27
+00:12:12,000 --> 00:13:16,000
+similarity score and so because of that you can now classify that image as a dog. Okay. Now you can think of this entire process as essentially building a one nearest neighbor algorithm. Right? So you're you have a bunch of centers that you've or embeddings that you've generated in the text space and now you can use them as your class category labels and you're doing one nearest neighbor to find uh the optimal classification for any new image that comes in. Now of course a uh single word might not
+
+28
+00:12:44,000 --> 00:13:39,000
+be sufficient to get a really good word vector. Um instead what you might want to do is a use a phrase. And the reason you might want to do this is because a lot of the internet data it it usually doesn't have words that occur by themselves. Clip was trained from just phrases that that were downloaded from the internet. And so ideally you want to pick the right phrase that gives you the best uh representation. So instead of just having the categories plane, dog, and bird, you might instead want to
+
+29
+00:13:11,000 --> 00:14:10,000
+embed a vector that represents a photo of a plane, a photo of a dog. And turns out if you do this one small change, uh, you suddenly get a large boost on imageet where you see an improvement of about 1.3%. Of course, picking that right phrase is also something that's very difficult to do. And so what people typically do is they don't just pick a single phrase. They pick many different phrases. Uh, so a photo of a dog, a drawing of a dog, or a bunch of different ideas for different phrases. And you want to create a many
+
+30
+00:13:41,000 --> 00:14:41,000
+many different vectors for all of those different phrases you might think of. And at the end, what you do is you just take the mean vector representation across all of your phrases for each category and use that as your mean dog vector, your mean uh plane vector, and your mean bird vector. Right? And then now you're back to where you started and you can do your same sort of one nearest neighbor uh algorithm on this. It probably has been trained on imageet. This is I think uh a point to show that
+
+31
+00:14:11,000 --> 00:15:08,000
+you can adapt it to a new task. But I will show you other examples of data sets where it's definitely not been trained on and it does sort of adapt to that as well. So you get a single vector out. Uh it depends on the architecture you're using. If you're using ResNet, you take the final vector representation. Uh if your text encoder is let's say a VIT or a transformer, then you usually take the CLS token uh of your transformer. Okay. Um so that's sort of it for clip. you could basically adapt this for a
+
+32
+00:14:40,000 --> 00:15:37,000
+wide variety of new image uh classification tasks and to your question right now uh of course it's not that big a deal uh that it performs just as well on imageet uh but it is still exciting that it does do well on imageet at all uh what's I think more interesting is that when you look at other data sets data sets that were collected after clip came out so a data set like object net which contains objects that people took photos of in very weird sort of places so they put a banana on the ground and took a photo of
+
+33
+00:15:09,000 --> 00:16:04,000
+it or they took a banana that was like really rotten and took a photo of it. Uh so things that are just not common. Uh and so in this data set uh if you train on imageet you don't do very well. Uh because imageet again contains most of these categories in its most typical form. Uh but if you take the clip model it performs just as well. uh and that was really really exciting for many people because this ability to generalize to a completely new data set that it hasn't seen before that's even
+
+34
+00:15:36,000 --> 00:16:31,000
+out of domain to some degree uh was really great. So why do you think this is why do you think clip generaliz is a lot better than training on imageet to paraphrase your response because I think it's the right response um is you know the text that you download from the internet it contains a lot more than the category labels it contains a lot more structural information contains information about shape about uh the colors of things and all of that adds uh to the representations and so these
+
+35
+00:16:04,000 --> 00:16:54,000
+models are able to adapt a lot better to something that maybe is slightly out of distribution or an object that looks slightly different because it does have all of these other things it's looking for as well. Uh and so those that additional supervision really helps quite a lot. Uh the other reason it helps quite a lot is the scale of data. Imageet is only about 1.3 million images or so whereas the internet contains millions and billions at at this point billions of image text pairs that we can
+
+36
+00:16:29,000 --> 00:17:27,000
+download very easily. And so these models have just seen so much more data uh that this adaptation becomes a lot easier. Um and so people started doing these experiments on a wide variety of uh generalization tasks. So they showed that you can generalize these models for uh not just natural images but also sketches that you can also do this on adversarial data sets as well. And performance across the board seem to indicate that these models are just really really good and robust to many different applications. Um and then here
+
+37
+00:16:59,000 --> 00:17:57,000
+I'm showing you the difference between zeroot and linear probe. And you can see that of course linear probe when you add that additional linear classifier and train it and adapt it a little bit it does improve performance in majority of uh the data sets the ones in green and but it's not always the case. In some cases the clip zero shot just performs really well out of the box. Um and so it just seemed to indicate that we finally unlocked this capability of being able to adapt um image encoders for a wide
+
+38
+00:17:27,000 --> 00:18:20,000
+variety of different downstream tasks. And this is why I think a lot of people talk about clip as the first sort of foundation model uh for images. So let's talk about what makes clip work so well. Uh of course there's no real labels as such with clip. We're just downloading any sort of text associated with images. What makes clip work so well is what I was saying it contained when it was first trained it was trained on about uh somewhere between um well the parameters were just gigantic. they sort of scaled
+
+39
+00:17:54,000 --> 00:18:51,000
+up the model and they changed the architecture from ResNet to a VIT and so you had this transformer architecture with 307 million parameters uh that was used to train this model and the second thing that helped was the amount of data right so instead of just 1.2 2 million images from imageet you suddenly had about 400 million image text pairs from the internet that they downloaded and used that to train. So that addition that scale both in terms of model size as well as the amount of data helped
+
+40
+00:18:22,000 --> 00:19:13,000
+improve performance quite a lot. So immediately after clip came out uh people started experimenting with this objective and there's many different var variants of uh clip that have come out over the years but one in particular that's really stood out came out in 2022. It's called Koka. And Koka took the clip model. Here you can see it's the same sort of objective here. You've got the image being encoded on one side. You've got the text being encoded on one side. And then you have that contrastive
+
+41
+00:18:48,000 --> 00:19:49,000
+loss between the two. But they added one additional thing. They added a decoder as well that took the image features from the image encoder and then they fed it in as through cost attention and caption that image. And turns out this captioning process also helps the model learn quite a lot of rich information. So the general motivation here is that it's it's not sufficient to just be able to say that this is an image of a cat versus a dog, but to describe that image in text requires a lot more information
+
+42
+00:19:18,000 --> 00:20:19,000
+to be learned by the model. And so it's a the hypothesis is that it's a stronger learning objective. And so because of that, it learns better features. And we found that to be true overall. Koka when you compare Koka to clip its performance improves quite a lot across all the different image net variants uh and overall there's like a 10% boost in performance across all of the data sets and I think this was the first time where these sort of foundation models actually beat all the models that we had
+
+43
+00:19:48,000 --> 00:20:44,000
+trained from supervised learning. So at this point we had many different models that people are putting out onto online leaderboards uh and in those leaderboards across the years um you can see the trend sort of going upwards as models are performing better and better and this is I think the turning point where people abandoned um supervised learning objectives for image encoders and instead focus solely on just pre-training objectives using these sort of self-supervised learning methods from the internet data. Okay, so let's talk
+
+44
+00:20:17,000 --> 00:21:11,000
+about some advantages of clip. Eclipse's got a lot of really fun things that you can do with it. Uh it's super easy to train, right? Cuz it's just a simple uh contrastive learning objective. It's also really fast in terms of inference. Um you can embed your entire data set into uh some representation and then all you have to do to classify is just do retrieval on that uh sort of embedded data set. So you can retrieve things very easily with clips representations which makes it really useful for not
+
+45
+00:20:44,000 --> 00:21:35,000
+just classification tasks but also search and retrieval tasks as well. Another thing that people really liked about clip is that it's open vocabulary. You can feed in any text description and it should be able to retrieve the right images for you. And so that also allows for its applicability across many different domains. Um and of course we're going to talk about this later. clip is really amendable to being um sort of chained with other models and this idea of chaining started becoming
+
+46
+00:21:09,000 --> 00:22:12,000
+really popular but hold off on that. We'll talk about that in uh a few minutes. Um of course I'm telling you all the good things. Turns out there's a lot of bad as well. Uh clip unfortunately can distinguish between these two images. So you have an image of a mug in grass and you have some grass in some mug and clip just does not know the difference between these two things. Okay. Um, the reason it doesn't know is because the clip's learning objective really depends on its batch
+
+47
+00:21:40,000 --> 00:22:32,000
+size. If your batch size is not large enough, then all of the other batch elements are unlikely to provide any useful supervisation uh for the model. If you're always comparing a cat versus a truck, you're not really going to learn a representation for a cat. Um, instead, what you get is some sort of representation that's kind of okay at some high level. Uh but if you increase the batch size, you're more likely to encounter other animals that are similar to the cat. And then you learn a much
+
+48
+00:22:06,000 --> 00:23:04,000
+better representation. And then of course if you increase your batch size to let's say 32,000 uh and you train it across many many GPUs, then suddenly you start learning really good representations. You can actually start identifying a Welsh corgi versus another corgi. And this only is possible when you have gigantic batch sizes because it requires you to have other negative examples in your batch that are close enough that are sort of hard negatives that forces the model to have to learn. Right? So that's very important for
+
+49
+00:22:35,000 --> 00:23:38,000
+getting these models to work well. Um but unfortunately regardless of how much people have tried, increasing this batch size doesn't guarantee that the model will learn a good representation for things. And so you're sort of at the mercy of the randomness of your training data. Um, so increasing the batch size does help with some amount of fine grain concepts, but of course it's still limited and training on 32,000 amounts of batch size is just too large for most labs to even consider doing. Um, people
+
+50
+00:23:07,000 --> 00:24:04,000
+have identified this error across many different benchmarks uh and sort of identified that clip just doesn't have this notion of comp compositionality. So this idea that uh the mug and the grass versus grass in the mug, it's really about composing different concepts like the mug and the grass and the the sort of relationship in all of those individual components are not composed well in your clip uh representations. And there's been a ton of different benchmarks like winterground or crepe or
+
+51
+00:23:35,000 --> 00:24:33,000
+arro and a lot of these benchmarks have actually come from my lab. um they just keep finding over and over again that clip has a ton of limitations and there's a ton of things that they are just unable to do. Now of course in reaction the community immediately started thinking about how do I handcraft my batch so that it contains the hard negatives you know so if I have one type of corgi that I should hopefully have another type of corgi in there so your model really is forced to learn good representations uh and so
+
+52
+00:24:04,000 --> 00:25:01,000
+this idea of training with hard negatives became really popular in the community for a whole one year until we released a follow-up paper that said that if you train with hard negatives you end up actually unlearning a a lot of things about semantics. Uh for whatever reason, and this is something that we still don't theoretically understand, we end up actually with much worse performance in generalization across different sort of uh environments and different kind of data sets. So there's a lot of work to be done still
+
+53
+00:24:32,000 --> 00:25:28,000
+in ter trying terms of figuring out the right way of constructing your data set, the right way of constructing your batches and training signal. Uh so we're still really far away from that but regardless people are still very excited about clip in general uh because it does give you some amount of uh supervision regardless. Of course again image level uh captions are again not enough. Um ideally what we want is more than just that right we want to be able to identify not just that there's a person crossing the
+
+54
+00:25:01,000 --> 00:25:57,000
+street but that the person is in this location the car is here the street is here. All of that information, that grounding information is completely missing in clip. And so ideally, you'd want also your data set to contain this kind of information and your model to also be able to reason about that kind of information. Also, uh the final thing that's a big disadvantage for clip is that regardless of how big your data set is, even if you collect upwards of let's say 5 billion images, it's still not
+
+55
+00:25:29,000 --> 00:26:20,000
+going to be enough to capture all the important things that you might care about. uh and so there's been a lot of efforts that we've been doing in data filtering. So how do you filter the internet to find the best training data for training these clip models? I won't go into that today. Uh but there are all of these sort of mechanisms that people are exploring. Uh that's now become the frontier of what today's research looks like in this field. Okay. So that's the first branch of foundation models we
+
+56
+00:25:55,000 --> 00:26:54,000
+talked about. It's about sort of generalizing classification to a whole host of tasks. Now let's talk about vision and language models. So there's a new class of foundation models uh which has become popular in the last 2 two and a half years and we often refer to them as multimodal language models. Uh and I'll start off with this discussion by focusing on lava which is arguably one of the first sort of multimodal language models that became very very popular. The motivation here is that language
+
+57
+00:26:24,000 --> 00:27:32,000
+models which do this next token prediction uh this autocomplete process that process is really useful for adapting to a lot of new tasks and so can we start thinking about even image models as well doing the same thing. Can we given an image also start doing different kinds of reasoning uh that's similar to this auto uh regressive process and that gave rise to this class of models called visual language models or multimodal models. Uh but of course this just to be historically correct this idea wasn't completely new uh in
+
+58
+00:26:57,000 --> 00:28:09,000
+2022. Uh in 2019 Vilbert actually introduced this idea. Uh there's a paper called Vilbert in 2019 that took these image models and language models and put them all together uh to accomplish a generaliz generalization across different tasks. Uh but they were all trained uh pre-transformers and also mostly use LSTMs instead. And so the rebirth of all of this is what's happening right now with uh Lava where a lot of these models switched over to a better architecture, switched over to a better set of objectives, and now aren't
+
+59
+00:27:34,000 --> 00:28:31,000
+just training on individual tasks, but are training on a foundation of a variety of different tasks using some sort of pre-training objective from the internet. So how does this work? How do how do you sort of think about Lava? So to sort of talk about lava, let's take a step back and think about uh the transformer model or self attention in particular. So when we think about language models, what they're doing is they're attending over the past. So you have a sequence of words that are coming
+
+60
+00:28:02,000 --> 00:28:57,000
+in. So for example, cats are so and then your model to generate the next word will attend over that historical context and then generate what it thinks the next word should be. So it might think that the the phrase should be cats are so cute. Um, and here's another way of sort of representing that same sort of objective. You've got the input text coming in at the bottom and your model will generate the next word which is cute. So when we think about vision language models, what people usually are
+
+61
+00:28:29,000 --> 00:29:35,000
+referring to is adding in additional context by grounding that conversation that we're having with some image that we care about. So we might care about tokenizing our image somehow and feeding those tokens into our language model along with the historical context of cats are so and then using that to autocomplete uh the rest of the description. So that's the basic idea behind llama uh is sort of feed in these image tokens along with the words that are being generated to continuously generate more words about that image. So
+
+62
+00:29:02,000 --> 00:30:06,000
+of course a question comes in which is how do you define these tokens? what should these tokens be in the first place? And Lava their solution was to use the clip image encoder. So they took the clip model, they took the image encoder and then they basically extracted tokens from that encoder. So the first thing you might think about doing is just using the CLS token. So here you've got uh let me see if my mouse works here. Oh, it does. Okay. So you've got the image coming in over here and then they're getting patched. Each
+
+63
+00:29:34,000 --> 00:30:28,000
+patch turns into a representation that's fed into your transformer architecture in clip. It goes through a bunch of layers of processing. And then at the end, you get a bunch of different tokens for each of the patches along with a representation for the CLS token. And so far, we've only been considering the CLS token. We've only been doing things with the CLS token for doing any sort of classification task, but there are all of these other tokens in there as well. Now, the problem with these other tokens
+
+64
+00:30:01,000 --> 00:30:59,000
+is that they're never supervised, right? Right? So the CLS token is supervised with this contrastive objective with text. But the other tokens are never used for any purpose. So they might not actually contain any useful information. And empirically people have shown that these features are not very useful. But what they have shown is that if you go one more layer back, the pen ultimate layer in your clip encoder, these features are actually very useful. Uh so these features are used to generate the
+
+65
+00:30:30,000 --> 00:31:41,000
+final clip embedding uh in the final layer and they contain a lot of spatial information about where objects are uh in your entire image. And so this is what people typically use when combining uh clip encoder with uh with a sort of uh transformer sort of LLM based model. Okay. So this is what the entire lava architecture looks like. You feed an image through uh your clip pre-trained clip encoder. You extract a bunch of features from it. You take those features and you pass it through a linear layer that you need to train. And
+
+66
+00:31:06,000 --> 00:32:08,000
+what this linear layer will train to do is convert your clip representations into something that the LLM can understand and make sense of. Okay. And once you have these tokens, you now basically pass in all of your tokens to your uh language model and it can now generate some uh conversations about that image itself. So Lava was one of the very first sort of popular models that were out there. And following up, Google quickly released Flamingo. Uh and in Flamingo, it followed very much the entire Lava
+
+67
+00:31:37,000 --> 00:32:38,000
+setup of being able to combine uh a vision encoder features with a large language model. But the the place where they innovated is how do you do that fusing of these different features. So in lava you had the features coming in um through a linear layer and fed in as part of the input. In Flamingo what they did instead was they basically took all the features coming out of your vision encoder and fed them into every layer of your LLM. Okay? So they had to make some they had to make some changes to the LLM
+
+68
+00:32:08,000 --> 00:33:03,000
+architecture itself. And this is how they made those changes. So, here's an example of what Flamingo's training data looks like. You've got images that are encoded. So, you you've got this dog and you've got this cat. They both get embedded and they're both going to be fed into every single layer of your LLM. And down here, you've got a data that's sort of describing every single starts uh with the image and describes that image, then the next image, describes the next image, and so on and so forth.
+
+69
+00:32:35,000 --> 00:33:39,000
+And they're sort of fed in as input to your LLM. And your output is going to be to autocomplete that last uh image. Okay, so you got one image followed by a description of the dog second image and you start the description and your model will be trained on autocompleting that description for that second image. So what did they do? What did they change to the model itself? They added this sort of gated X cross attention module to every single layer of your LLM. And they made one other change. They also
+
+70
+00:33:06,000 --> 00:34:07,000
+added this perceiver sampler right here uh that basically samples and downsamples your image representations. So there's smaller dimensions and a fixed number of tokens uh for every single layer. So let me go into some details with what they look like. Um so this is the full architecture overall. Most of the components are frozen. All the language model weights are frozen. All the vision model parts are frozen. The only parts that are trained are these perceiver sampler components and this cross attention layer that's sort
+
+71
+00:33:37,000 --> 00:34:42,000
+of added into every single uh layer of your LLM. So let's talk about what this cross attention module looks like. Uh this is me zooming into that cross attention module. So every single LLM layer right before the LLM layer you have this cross attention component and what its purpose is is to look at the image features and then decide what parts of the image features it wants to keep around and what it thinks to be useful for the language model to know about and they designed it as a set of uh components that you've already seen
+
+72
+00:34:09,000 --> 00:35:07,000
+so far. Uh so you attend over the image features using a cross attention layer and then following that cross attention they added this 10H nonlinear activation and this is basically deciding what parts of these components do I want to keep around which ones uh which parts of the image do I want to forget uh and then it goes through this fully connected layer where it adapts those representations a little bit and then again a tanh nonlinearity to decide again which parts it should keep and which parts it shouldn't. Once it goes
+
+73
+00:34:39,000 --> 00:35:38,000
+through those two components and each one has a residual connection across from it, uh it then goes to your normal language model processing and then continues to generate the word it needs to. Okay, so this additional layers are being added just as a way for the language to sort of incorporate and attend over the vision features at every single layer. Okay, so the actual modification itself, if you're interested in what this looks like in code, is just uh about two or three lines of code where uh they added this
+
+74
+00:35:08,000 --> 00:36:05,000
+cross attention layer and then this tanh nonlinearity in between. And that's really about it. So in terms of code, it's a very minimal change. Although for the model, it's a very gigantic change because now it can sort of choose what parts of the image to attend to at every single layer of its processing. So you give the model a lot of uh ability to decide when and how to attend over the vision features. Okay. So flamingo was very very exciting. Uh but training it was very difficult. Um and they had this really
+
+75
+00:35:37,000 --> 00:36:43,000
+ingenious way of training it that allowed our models to adapt to many different tasks. The way they trained it was through this concatenation of a bunch of different images together. So you didn't just have one image and one description. You had a description at the beginning that says here some cute pictures of my pets, end of sentence, beginning of image, and then a description of that first image, end of uh that first component, and then the second image, and a description of the second image. Okay, so you had the
+
+76
+00:36:10,000 --> 00:37:08,000
+training set up so that it looks like a long sequence of image text, image text, interled data. And of course when describing any single image, you don't want the model to look at the entire context. You want it to only look at that one particular image. And so they created a masking scheme where every single image when when generating only looks at that particular image features and not the other ones. Uh meaning that when you're generating the description for my puppy is sitting in the grass,
+
+77
+00:36:38,000 --> 00:37:35,000
+you're only looking at the features uh that correspond to the puppy only when generating those words. Similarly, when generating the the description for the cat, you're only looking at the cat image and not the other image. So, there is this sort of distinction where they created this handcraft and masking scheme uh to make sure your descriptions are always following and looking at only that particular image. Uh but when trained, the model does get to see the entire context of everything that it's
+
+78
+00:37:07,000 --> 00:38:05,000
+generating. So, why is that helpful? Why is this entire process helpful of being able to see all of this stuff together? Well, it's helpful because it allows you to do these kinds of applications. So, here is three different applications that Flamingo was able to showcase. The and they all center around having multiple conversations or dealing with multiple images. So, in the first case, you've got an image that's fed in uh and the flamingo model describes the image by saying that this is a picture of two
+
+79
+00:37:36,000 --> 00:38:29,000
+teddy bears on the moon. And then what it allows people to do is then ask another question. So people can ask what are they doing? And because it's already being uh it's training using an existing large language model, that large language model's reasoning capabilities are inherited. And now it can reason and answer this particular question. It it can now answer and say there the teddy bears are having a conversation. And then a user might ask what objects are they using? And again, Flamingo can say
+
+80
+00:38:02,000 --> 00:39:02,000
+that it looks like it's a computer and so on and so forth. So you can enable this multi-turn dialogue about an image simply by doing two things. You train by first pre-training the language model and then incorporating that language model into Flamingo and secondly allowing your model to see many different images and many different turns uh throughout its training data so it can adapt to longer sequences of text. You can also give it multiple images and ask what is a common thing about these images. And now the flamingo
+
+81
+00:38:32,000 --> 00:39:21,000
+model will look at each of those different components and sort of reason and say that they're all flamingos. Uh so you can start doing a lot of these kinds of really cool applications. People also showed that you can start doing in context learning. I don't know if this is something you've seen already with uh language models, but I'm sure you've used in context learning with GPT where you tell GPT here's an example of what I want. Give me more things like this. Uh, and you can do the same thing
+
+82
+00:38:56,000 --> 00:39:48,000
+with Flamingo where you can pass in an image and a description, an image and a description, and now when you pass in a new image, it'll give you a description. Or you can say, uh, uh, here's some image, here's a question and answer. Here's an image, question and answer. And then when you pass in a new image and just ask the question, it'll give you the answer. Right? So you're not training it to do these different kinds of tasks, but you're providing it with examples of behaviors that it should
+
+83
+00:39:22,000 --> 00:40:17,000
+have and it should just generalize to new kinds of behaviors uh that you might care about. Similarly, you might care about just classification and you can use flamingo to do classification as well. So you can give it an image and say this is underground, this is congress and then you can ask what is this right? Um, and you can also even teach it to do OCR and math where you give it an image and say, "Oh, this should correspond to 2 + 1= 3." And so eventually when you give it a new image,
+
+84
+00:39:50,000 --> 00:40:45,000
+it should be able to autocomplete and extract out 3 * 6 and then also give you the output by reasoning through this entire process. Yeah. So this would be an example of fshot learning where you give it some examples, a few examples of things and then you ask it uh what the new thing should be. uh if I were to throw away all the incontext examples, that would be zero shot learning. So, we're not concatenating them. Um we're technically passing the image tokens through this perceiver sampler into
+
+85
+00:40:17,000 --> 00:41:13,000
+every single layer of your LLM instead. And so, only the text is ever concatenated and fed as input to your flamingo model. And it chooses when to attend to which parts of the image. You give it to it once. H but behind the scenes, uh of course, this is the interface, right? the web interface but behind the scenes what they actually do is they cache the model assuming that the user will want to continue talking and so the model is cached and ready to accept more tokens. Yeah. But if they did not cache it then yes it would pass
+
+86
+00:40:45,000 --> 00:41:42,000
+in this entire conversation as uh as input. Yeah. Okay. So Flamingo was super cool because uh they have these really big tables in their paper that you can go check out. Um, but what was really cool about it is there were all of these tasks that were very difficult and you had to adapt clip to do them. Uh, but Flamingo was just able to do it with zero shot or few shot. Uh, and you started seeing these gigantic improvements across many different benchmarks. Uh, and this is when I think the field shifted from
+
+87
+00:41:14,000 --> 00:42:18,000
+reporting on a few classification benchmarks to reporting on any sort of understanding task at all. As long as you can frame it as a question answering process, you can build uh benchmarks for a wide variety of skills and we started seeing that become the norm in the last 2 years in the computer vision field. Okay. So this is where uh we were I think sometime last year and seeing the success of Lava a lot of companies started investing quite heavily on these models and so you started seeing a lot
+
+88
+00:41:44,000 --> 00:42:48,000
+of API models like GPT uh 40 GPT 4V uh Gemini 1.5 Pro Gemini 1.5 Flash a lot of these models started become being released and even Anthropic came into the picture with Claude 3 Opus and now of course Claude 4 Opus is out Um, and so you had a lot of these models come out and they were performing a lot better on a bunch of these benchmarks. So here I'm showing you the average performance across 11 of the more popular visual understanding benchmarks in the field and there's this gigantic difference, right? So the difference
+
+89
+00:42:17,000 --> 00:43:21,000
+between Lava, the model we talked about that's open source, that's down here at about 43% accuracy on average. Meanwhile, GPT and all of these other models are performing much much better at about somewhere like um 80s or high7s, right? So, big difference in performance between these two different kinds of models. Um, of course, immediately seeing this sort of difference, people started distilling GPT and Gemini into uh distilled variants and trying to release those models. Uh so, Alibaba, which is a
+
+90
+00:42:49,000 --> 00:43:49,000
+company in China, they released this model called Quinn. uh and then there's intern there's fi there's all of these different models that started coming out and all of them were distilled from GPT uh and if not GPT then Gemini now there that led to a big problem in the field uh a problem that's become a big part of what my own research agenda has been trying to sort of focus on which is we don't actually know as a research community how to build really performant vision language models the the tricks
+
+91
+00:43:19,000 --> 00:44:14,000
+behind how to build them they only the people in open AI I and Gemini in Google, those teams know how to build these kinds of models. But the open source community, they're down here. They're down here. This is where the research community was as of last year. U of course you can argue these are really nice open models, but they're not really open because they're distilled. We don't actually know how to reproduce these models, right? We we can only produce them but if GPT exists, but if
+
+92
+00:43:46,000 --> 00:44:47,000
+GPT doesn't exist, we don't know how to create these other models. And so what my own research agenda has been focused on over the last couple of years is figuring out how do you close this gap? How do you build really good uh multimodal language models and disseminate that sort of uh understanding to the entire community? And so um what we've done over the last uh 6 months or about a year now is we've created our own sort of uh class of models that we called Momo. And I'm showing you Momo's performance up at the
+
+93
+00:44:17,000 --> 00:45:09,000
+top. Uh, and what sort of sets Momo apart from all the other models out there is that it's completely open source, meaning it's open weights, so you can download the model. It's open data, meaning you can download the training set as well as the evaluation set. It's also open code, meaning you can basically train your own Momo in your own home, assuming you have enough GPUs. And uh you can also evaluate add on new evaluations adapt this model for all kinds of new things and of course
+
+94
+00:44:43,000 --> 00:45:43,000
+start using it for a wide variety of different contexts. Um now of course academic benchmarks are not enough right because what we care about at the end of the day is are people going to use these models? Will people want to use these models over GPT? And so to make sure we had that evaluation properly done, we released a playground with a Momo and we did a gigantic user study where we actually compared head-to-head outputs from our models versus outputs from all the other models. And our model has the
+
+95
+00:45:13,000 --> 00:46:18,000
+same ELO rating as GPT. It comes in second with uh a difference of one in ELO rating versus GPT 40. This is that same graph rotated uh so that I can show you some examples. Our this was a gigantic evaluation by the way. This was about 870 users that we uh showed these model outputs to and we did about 325,000 pair wise comparisons. We asked people which models output do you prefer. Our model, the MLM model ranked uh again like I said second uh more or less a coin flip between what people prefer between GPT and our model. Uh but
+
+96
+00:45:45,000 --> 00:46:46,000
+it already beat out Gemini 1.5 Pro and Cloud 3.5. Now the big difference is we are a small research lab and uh we're beating out Google's billions of dollars of investment into Gemini as well as Entropics billions of dollars of investment and already matching GPT. And so we were quite excited by this entire process. Uh but we also developed a 7 billion model that comes in right after those big models. And that 7 billion model is really uh exciting because you can put it on a single GPU. So you can
+
+97
+00:46:16,000 --> 00:47:08,000
+now have this model capable of doing a wide variety of vision tasks that works on a single GPU, meaning a lot of people can now use it and fine-tune it for all kinds of things. We released this model in September 25 and the community was very excited by it. Uh there's, you know, this is the first time a very performant uh multimodal vision language model was released and a ton of people started um talking and writing articles about all the ways they want to use it. One of the use cases that kept popping
+
+98
+00:46:42,000 --> 00:47:38,000
+up over and over again was this idea of using Malmo finally for robotics applications. And I I won't talk about robotics today because you're going to learn about it in the next class. Um but I do want to give you some examples of things that people were excited about with robotics. Um but a ton of people even like uh folks uh at NVIDIA started chatting about how this is, you know, you should never bet against open source regardless of how much model development you do in private. eventually the open
+
+99
+00:47:10,000 --> 00:48:14,000
+source community will catch up and we were catching up at that point. Um, and so seeing our model out, Meta quickly released in response their Llama uh 3.2 model and a lot of people did evaluations comparing Momo versus uh Meta's Lama model and again I'm very happy that we came up on top of Llama as well. So let me show you why Momo does so well. Momo was the sort of trick to getting these models to work very well. The trick was to ground its decision-m in the pixels itself. So usually when
+
+100
+00:47:42,000 --> 00:48:38,000
+you give a model a question like count how many boats there are, it'll give you some number and often times it hallucinates. But what sort of sets our model apart is that it actually points to all the things that it's counting. So it generates points to all the boats and then it outputs a final number. So its decision-m is grounded in the pixels itself. Uh, and this allowed us to essentially train a model that unlike Llama for Meta that was trained on about 6 billion image text pairs, our model
+
+101
+00:48:10,000 --> 00:49:09,000
+was trained on only 700,000 image text pairs. The big difference was that we handcurated the 700,000 image text pairs. Uh, and that was the biggest sort of difference between what we were able to do versus what these models uh that these companies were building were doing. So a lot of folks are trying to currently download these uh image text pairs from the internet, right? That's been the foundation of how a lot of people train these visual language models. You collect a lot of internet data uh of images with their associated
+
+102
+00:48:40,000 --> 00:49:37,000
+text. But the problem with internet data is that it's incidental. The text that's often associated with an image describes something subjective or something that the uploader felt about the image. It rarely actually talks about the contents of the image itself. And meanwhile, this is what our data looks like, right? So a for a single image, we have a dense description of the actual contents of that image. And we have things that people never talk about on the internet. There's a ton of task and knowledge
+
+103
+00:49:08,000 --> 00:49:58,000
+about the visual world that we just never speak about. I will never tell you that something is to the left of something else just because it's unnatural for us to do that. It's just so obvious that something is to the left of something. Why would you ever communicate that information? So that's the kind of information we started eliciting from people. We started talking about we started getting people to talk about how things have particular size like large or its shape like rectangular. We talked about material
+
+104
+00:49:33,000 --> 00:50:28,000
+like polished and rich and uh its positioning across the image like it spans uh the horizontal sort of plane of the image. So all of this information really is what makes these models more performant. Here's another example from the data set. Uh here's a very simple image of a phone screen or tablet screen and we connect we have information here that again is completely missing from the internet. Uh things that people would find helpful things like this is a tablet device. The time is this. The
+
+105
+00:50:00,000 --> 00:50:53,000
+amount of power left in your device is this. This is the kind of information that would help people use these models. But this is again the kind of information we never talk about on the internet. And so to get this kind of information we designed a lot of different questions. We spent two years doing different kinds of elicitation studies to figure out what are the right things or pieces of information that are missing from the internet and how do we elicit them them as effectively as possible. One thing that was very
+
+106
+00:50:27,000 --> 00:51:28,000
+important is we had all of our annotators not type descriptions but talk about descriptions. Talking automatically breaks a lot of stereotypes uh around grym maxims. Um, and so we by getting people to talk, we got them to speak about things that they would never usually type. Um, the model itself didn't look any different from Lava. We had the same sort of setup of a clip encoding coming in. You had a con connector that was just a linear layer and then you had a large language model that would take in all of these tokens
+
+107
+00:50:58,000 --> 00:51:50,000
+and then output any sort of thing that you care about. So the model itself looked very similar to existing models. The biggest difference was in the data and the quality and density of the data itself. Uh, and because of this sort of grounding capability where the model grounds its decision-m in the image itself, you could get Momo to do things that you can't do. You can't use any of the other models to do. Things like point to the menu. It actually tells you where that menu item is. Or you can tell
+
+108
+00:51:24,000 --> 00:52:15,000
+it uh to sort of point to where I can set my search options and it'll show you, okay, this is where you might want to set those options. Or point to where the midsize data sets are, and it'll tell you what option you need to move. Um, and I already showed you that you can point to count, but you can also point to do really fine grain things like being able to sort of ask what is the route number on this bus. MoMA doesn't just simply give you an answer. It actually points to where in the
+
+109
+00:51:49,000 --> 00:52:46,000
+image, in this case, there is this area right here that contains the bus number and then returns the bus number to you. Uh, you can ask it to reason about how many cars on the left versus how many cars are on the right. You can ask it to reason over depth images or overhead images or even really crowded scenes and sports uh areas. What's also really exciting and again we'll talk about this in a few minutes is this idea of chaining that keeps coming up all across multimodal models today. The idea of
+
+110
+00:52:17,000 --> 00:53:12,000
+chaining Momo to other models. Uh what you can do is chain the output of Momo to become the input of another model like SAM 2. And so you can tell Momo to point to the Cricut bat. And now you take that point, you feed it to a model like SAM 2 which does segmentation. And now you can do segmentation of that Cricut bat across time. And so you can start enabling all kinds of new applications. Here's one that we played around with in the office. Um, which again you're going to hopefully learn
+
+111
+00:52:45,000 --> 00:53:44,000
+about in the next lecture with when uh you hear about robotics. Uh but we asked uh Momo to point to where the water bottle is and then we moved the robot using simple motion planners to that water bottle. Next we ask it to go move that water bottle to where the dirty dishes are. It points to the dish uh to the sorry sink and then moves a robot there. And then we tell it to go point to where the uh free space is in the sink and put that bottle in that location. So again you can sort of combine all these capabilities together
+
+112
+00:53:15,000 --> 00:54:17,000
+now and chain them to even sort of automate a lot of robotics applications. Uh this has been a lot of focus in my group now is sort of adapting a lot of these vision language models and enabling a lot of generalization in the actual physical domain. Uh so the question is around um would these models be able to sort of point if you um were always sort of changing the resolution of the image to be a fixed resolution right. Um well turns out that you can actually adapt these models to be any resolution nowadays. There are these uh
+
+113
+00:53:45,000 --> 00:54:44,000
+mechanisms like flex vit uh that has introduced uh a way of allowing for any variable size image input and you can adapt them to sort of point in that new space instead. Um so your model's position embeddings basically change depending on how big your image size is. Uh and you're allow you your models you typically tend to generalize well. So that was sort of uh the conversation around adding vision and multimodal models together. In the last sort of 20 minutes that we have left, I want to
+
+114
+00:54:15,000 --> 00:55:10,000
+talk about generalizing these foundation models to not just deal with image classification and text but be able to sort of generalize to any sort of output space you might care about. Uh and one of those models that's become really popular in this space is this segment anything model. The segment anything model or SAM for short. uh what it tries to do is it tries to build a segmentation model that's a foundation model for all kinds of segmentation tasks. So really what they're trying to
+
+115
+00:54:42,000 --> 00:55:38,000
+do is allow anybody to sort of point to things that they care about in the image and then hopefully have that thing uh be something that they the model can sort of output a mask for. Uh so for example um you want a model that generalizes beyond just a fixed number of categories to any sort of category you might care about and you would ideally want these outputs to be masks for any sort of category that is of interest to the user. Right? So those are the two goals uh that we want to generalize to any
+
+116
+00:55:10,000 --> 00:56:05,000
+category a huge number of categories and we ideally want to be able to very specifically output something that the user really cares about. So they're both challenges. They're both challenges in figuring out how do you collect a large amount of data that spans a wide variety of categories as well as how do you design an architecture that really pinpoints what the user really cares about. Um now the re let's start with the second question first. Um it's really ambiguous when uh when we want a
+
+117
+00:55:38,000 --> 00:56:33,000
+mask for something. So imagine a scenario where you have two cats in an image and a user comes in and says hey I want a segmentation for the cat. But it's really not clear which cat they want a segmentation for. Ideally, again, if you had Momo's pointing capability, you could actually point to which cat you care about. And then depending on the point, you could create the masks uh that matter. Now, of course, these are not very good masks. And ideally, you want these masks to be very very good at
+
+118
+00:56:05,000 --> 00:57:04,000
+quality that can sort of support a wide variety of downstream applications like image editing or any kinds of other things you might uh think of. So to build this architecture that allows any user to be able to specify exactly what they care about, we needed to go beyond uh just simply typing in text what you care about. Right? So what the SAM architecture has is two components uh or three specifically. It's got the image encoder which is again uh it could be a clip encoder uh and it's got a prompt
+
+119
+00:56:35,000 --> 00:57:34,000
+encoder which is something special. This prompt encoder really tries to encode text or points or bounding boxes or any way that a user might want to specify what they care about. And then given these two things, it passes it through this really lightweight decoder that outputs a mask. And the decoder looks very similar to like the the segmentation decoders that you've already seen in this course. So overall, this is what uh the model looks like. Given an image, we encode that image using an image encoder. uh and then you
+
+120
+00:57:04,000 --> 00:58:00,000
+have a bunch of different prompts that are going through and um interacting with these image encoding uh through a decoder and you output a mask right so this is the overall architecture design now there's one big thing that is a problem with segmentation so let's say a user does point at this particular location and says hey I want a segmentation mask for this location now the problem with that segmentation mask is that it's still ambiguous even with a point it's still not sufficient because
+
+121
+00:57:32,000 --> 00:58:28,000
+that point might be referring to the entire um uh scissor. It might only be looking and referring to the parts that you can hold or it can be referring to one of the parts that you can hold. So this ambiguity is really difficult to sort of resolve for and you don't want to penalize the model for picking the wrong one. So what the SAM architecture does is instead of outputting one segmentation mask, it actually outputs three segmentation masks at different levels of granularity and then it picks
+
+122
+00:58:00,000 --> 00:58:55,000
+the one that is the closest matching to ground truth and then uses that to calculate the loss and therefore not penalizing the other ones. So the hope is that overall over time this model will learn to output all different kinds of masks and then the user gets to choose basically which one is the most appropriate for their use cases. Okay. Um, and if you put all of this together, the only thing you need now is data. You need a lot of data across many different categories to really make this model
+
+123
+00:58:27,000 --> 00:59:25,000
+possible. Now, the problem with data is that until this model came out in 2023, this was about a year and a half, maybe 2 years ago. When this model came out, u most of the segmentation data sets were extremely small. And what this the authors of this paper did is that they grew the amount of segmentation data sets that were out there, the amount of images by about 6x and the number of segmentation masks by about 400x. So they significantly grew uh and collected a lot of masks to make this model as
+
+124
+00:58:56,000 --> 00:59:54,000
+performant as possible. So again the message is very similar to the message we had with Flamingo, the message we had with Momo. And the message is you need really good highquality data uh to really get these models to be as performant as possible. And for a lot of vision tasks, the data is completely missing from the internet and you need to go out and find and collect that data uh to get these models to work very well. Okay. And so to make this data happen, they created this sort of in the loop process where they initially had
+
+125
+00:59:25,000 --> 01:00:21,000
+some amount of data annotated. Uh from that annotation, they created a training data set. They trained a model and they used that model to annotate more data and then they iteratively refined that model generated uh segments using users and continued this process. So uh they had this human in the loop model in the loop process of proposing segments and then fixing the segments using human annotators. This is what an example image looks like from their data set. You have quite a lot of categories. Each
+
+126
+00:59:53,000 --> 01:00:55,000
+individual uh vegetable here is annotated with its own mask. So they're quite expensive to collect. Uh and they did this across um a lot of images, millions of images. Here's another example where again all the single umbrellas are annotated. Uh again here's another one with underwater sea. Uh and of course paintings as well. They have segmentations of paintings. Uh and so all of this together is really what was foundational to making this foundation model for segmentation. Okay. Um so
+
+127
+01:00:24,000 --> 01:01:24,000
+that's for segment anything. And I want to use the last couple of uh minutes that I have left today to really focus on chaining, which is the last part of multimodal language models. The idea behind chaining is something you've already seen. I've given you hints already throughout this lecture. And the idea is to be able to combine different models together to enable things that a single model can't do alone. Here's a fun little exercise we can do as a class. So, I'm giving you four images
+
+128
+01:00:53,000 --> 01:01:46,000
+and I'm also giving you four categories, right? And these are potentially categories that some of you have never seen before. And they're also categories that Clip hasn't seen. And so, Clip actually fails at these categories cuz it doesn't have any idea which one's associated with what. Does anyone here know which one is what? Morima. Yeah, the second one is Mima. That's right. Yeah. Uh, there's one that's a little easy. The vioaduct, right? Yeah. I think a lot of you know
+
+129
+01:01:19,000 --> 01:02:21,000
+which one that is. Um, but yeah, which one's the the dog and which one's the bird? Um, what if I gave you these instead? So now I'm giving you descriptions of these things and it suddenly becomes very easy for you to associate each one with the right category, right? Uh and that's the basic idea behind chaining that even if clip has never seen these images chances are these these concepts have been talked about on the internet to some degree and it's likely that GPT might be able to describe it and if GPT
+
+130
+01:01:51,000 --> 01:02:41,000
+can create those descriptions now those descriptions become really good ways of classifying exactly which category is which one and that's the idea behind chaining is that you take the strengths of one model and you combine it with the capabilities of another and suddenly you get all kinds of new capabilities that you didn't have before. Uh and so you can take a ton of categories that have no training data uh in clip, but if you can describe all of them because clip has seen a lot of descriptions for
+
+131
+01:02:16,000 --> 01:03:14,000
+things, it can now start classifying all of them very well. And you can start getting Clip to generate classifications for individual flowers or individual cars or individual uh spaces or even different kinds of pets. And you start seeing these improvements on a bunch of different data sets that are about more fine grained specialized categories. And the only way it's able to do that is because GPT has ingested some ability to sort of describe those things. Um, and this idea of being able to generalize to
+
+132
+01:02:45,000 --> 01:03:48,000
+new capabilities is something that uh was extremely popular last year and it still remains very popular this year. uh and it's through this idea of chaining for any sort of question at all. uh so for example if I asked you how many are there three people in the boat um the way you might want to do this is by again asking a multimodal language model to answer this question or what you could do is use all of the hundreds of specialized vision models that we've been developing over the last few
+
+133
+01:03:17,000 --> 01:04:09,000
+decades. So there are object detection models that you learned about in class. If you use an object detector, you'd be able to get a detection for each of the three people and then you could just say, "Oh, they're three people." Because there are three detections, right? So that's a general idea is you can chain other models outputs together so that you can do new kinds of capabilities. Here's another example. Uh if I ask you how many total people there are uh is across these two boats, is it six? And
+
+134
+01:03:43,000 --> 01:04:44,000
+again, you can do the same thing. you can write a program that does object detection on image one and then object detection on image two and then adds up all of those components uh together. Right? So this is the basic idea behind um what we now call uh chaining and this was popularized by a paper that won the best paper award last year uh called Visprog. And in this Visprock paper, the visual programming paper, the idea was that you take any image or any sort of question and you generate a program. You
+
+135
+01:04:13,000 --> 01:05:10,000
+generate a program that says answer something about image one, answer something about image two and then return combine those answers together to give you the final answer. Right? So you write a function in Python and then in that Python function you have individual calls to other models uh that we've already seen in training. Right? So for example in when asking this particular question uh deciding if this statement is true or not the left and right image contains a total of six people and two
+
+136
+01:04:41,000 --> 01:05:40,000
+boats you can ask GPT to actually create a program that tries to answer this question and then you can take the answer uh from its uh program. Okay. And you can also get GPT to do in context examples where you give it examples of programs that it can generate using other functions. And we can see that it generalizes to new sort of questions and you start using all of the functionality that it has available. Of course, the one thing you need to do is give it the functions themselves. So you need to
+
+137
+01:05:11,000 --> 01:06:05,000
+tell it that hey you have these capabilities from other models that you can use. You can localize things using an object detector. You can localize faces using a face detector. uh and you can have all of these different capabilities uh across many different sort of other models that people have created and you can chain them together to do different kinds of tasks. Yeah. So there's two different ways of doing it. One is a static way of doing it where you want to give it as diverse examples as possible and then hopes that it
+
+138
+01:05:38,000 --> 01:06:36,000
+generalizes. Another one is to dynamically choose given this question what are the best in context examples I should use. And so you can treat that as another retrieval process where you retrieve the best examples and then you ask it to generate a program and that tends to perform a lot better but only if you have a good retrieval system. Uh yes it would require a lot of compute. So you there's compute in terms of uh calling GPT which you have to do through an API and then you have to load each of
+
+139
+01:06:07,000 --> 01:06:56,000
+these individual models into your memory and then run each of them sequentially. So it could actually be a lot more costly. And so what people are trying to do is figure out can we distill these capabilities into a single model. Uh and that's a big part of what research looks like today in 2025. Uh but of course uh people are also still trying to figure out how do you chain these things effectively. Very well. >> Yeah. You can think of it as like an agent. Yeah. So you have an agent that's
+
+140
+01:06:31,000 --> 01:07:28,000
+basically deciding hey given this question what are the other models I need help from and how do I sort of stitch them together to do new kinds of capabilities? Uh so that's what it looks like. Yeah. Uh here's another example where you might want to do image editing. You might care about replacing the sand, the desert with lush green grass. Uh of course, image uh editing models are still in its infancy. And so what you might want to do instead is call a segmentation model, identify the desert, and then only replace the desert
+
+141
+01:06:59,000 --> 01:08:01,000
+parts, those pixels with grass. And then you can sort of composite them together to make a new image. Okay, that's sort of um all of the things I wanted to talk about in terms of different capabilities. Uh so you've got um here some capabilities around how to think about foundation models. Uh it really is at the end of the day uh an ability to sort of train a model for a single task and then from that single sort of uh task generalized to many different downstream applications. And we talked about in classification
+
+142
+01:07:31,000 --> 01:08:24,000
+how you can create these models by just taking a lot of image text pairs from the internet um training them together to do different kinds of tasks. uh and that allows you to generalize to new kinds of data sets that might not even exist in the real world or have any labels for in the real world. Uh you can also combine them with language models and train them to do in context examples uh like captioning or counting or OCR. And these are again capabilities that enable many different applications. And
+
+143
+01:07:57,000 --> 01:08:53,000
+then of course the outputs don't always have to be language or categories. There can also be segmentation masks uh where you can take different kinds of masks uh depending on different user uh inputs and you can generalize this even further by combining many of these foundation models or even smaller models together through programs and do all kinds of new things. So hallucinations still happen all all across the board. Um what we're showing is that it seems like pointing does sort of reduce hallucinations quite
+
+144
+01:08:25,000 --> 01:09:14,000
+a bit uh because it does need to find some evidence for its generations. Uh but that being said, there's no guarantee that it's going to point to to the right thing at all. Um so there's many different ways of sort of fixing for this. One is uh of course collecting more data uh related to the kinds of reasoning that you want it to do. Uh but a better one is to even have verification methods that verify based on the points whether the output is something you should trust or not. So a
+
+145
+01:08:50,000 --> 01:09:43,000
+lot of the bigger models and bigger companies what they typically do uh when you use any of their models is they don't have a single model that's generating an output. you usually take that output and pass it through other sort of verifiers before it even gets to the user. Um and that mitigates some of these sort of problems. Uh but it is an active line of uh inquiry right now. How do you sort of reduce hallucinations and also improve these models actual accuracy? >> Yeah. So uh so repeating your question
+
+146
+01:09:16,000 --> 01:10:14,000
+um is it possible for these models to build new tools when uh capability requires a tool that it doesn't have? Uh yes uh it can. uh we have a few sort of uh preliminary experiments in those directions as well where you can tell a model here's a capability that I want and what you can build is a system that automatically tries to collect training data and builds a tool for specific use cases. Uh but that line of work is still again in its infancy. Uh it's one that we're actively working on. Uh but you
+
+147
+01:09:45,000 --> 01:09:53,000
+know a lot of folks are excited about that direction.
+

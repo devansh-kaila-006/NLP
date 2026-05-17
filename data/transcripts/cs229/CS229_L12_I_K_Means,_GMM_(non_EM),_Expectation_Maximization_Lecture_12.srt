@@ -1,0 +1,656 @@
+1
+00:00:05,000 --> 00:00:55,000
+hello so uh welcome to the the next section of cs229 so what we're going to talk about in the next series of about four lectures is the start of unsupervised and kind of less supervised learning and I'll make that concrete and kind of the plan is is what you're going to see is you're going to see a bunch of things that look like um various different ways of dealing with this fundamental problem of what do we do when we don't have labels right so we're first going to look at an
+
+2
+00:00:30,000 --> 00:01:21,000
+algorithm called k-means and then we're going to look at this algorithm called GMM this gaussian mixture model those will both happen today and we'll try and put those algorithms on kind of solid footing in the maximum likelihood framework okay we'll then see a couple of more algorithms that have to do with this unsupervised way of viewing the world one of them you're going to use in your homework called ICA it's actually the reason I teach it it's kind of a fun algorithm it's a weird bit of setup but
+
+3
+00:00:56,000 --> 00:01:49,000
+it's probably people's favorite homework problems when we look through the kind of feedback it's a fun problem if you remember the cocktail problem from the first day where you have people talk talking in a party you have microphones scattered around the edge and you want to know who said what you want to do what's called sometimes Source separation and understand the sources so we'll we'll do that in the in the ICA section and then we'll talk about a a more advanced topic called weak supervision
+
+4
+00:01:21,000 --> 00:02:11,000
+weak supervision is industrially used to create large training sets for big deep learning models which you've just come out of that but these are labels that are lower quality than the traditional supervised labels and then finally we'll talk about self-supervised learning which is really exciting and is one of the big Revolutions in machine learning where we train on something simple like predicting the next word and if we train on enough data we can use it for all these other sometimes called Downstream
+
+5
+00:01:47,000 --> 00:02:34,000
+tasks okay so that's kind of the program for the next four or five lectures and today we're going to start with with those Basics okay so we're going to start with the basics is unsupervised and work our way up to pretty modern stuff and I will say historically I would say five years ago I kind of didn't like teaching unsupervised because it felt kind of squishy and weird to be honest with you it didn't have the beautiful Theory or maybe even 10 years ago didn't have the beautiful
+
+6
+00:02:10,000 --> 00:03:01,000
+theory of supervised learning where you could say like this is the right model and we go find it in a lot of cases but that's been where almost all the research activity not only in my group but kind of from AI over the last three or four years has been in this unsupervised realm so we'll start with some of the classics and get our way to something really really exciting so the classic and probably an algorithm you already know or probably you can guess kind of how it works is this algorithm called k-means all right and
+
+7
+00:02:36,000 --> 00:03:29,000
+then we'll get to these other ones but this is the one we're going to start with first so what's the difference so in the supervised setting right we get points and the key issue is that the points come with labels you have labeled these plus and these minus as we were doing and we would draw a line or a boundary in between them that was the way we formalized a wide variety of learning tasks okay right and the point is is those pluses and minuses those are labels right and unsupervised started in this setting
+
+8
+00:03:04,000 --> 00:04:00,000
+I give you the points but I don't tell you any labels underneath the covers okay now there are many things on the spectrum between I give you the labels perfectly to I don't show you any information about the labels and I just show you the data points we're going to talk about that Spectrum but now we're going to start in the cleanest setting and unsupervised where we just see those points okay now the the thing that you should calibrate here is like what can we expect as an answer so in the supervised setting as I
+
+9
+00:03:33,000 --> 00:04:32,000
+said it was super clear what we wanted like we could talk about what this line is and we can go deeper and deeper into like why that's the right line right that's the right separating hyperplane and the unsupervised case it's necessarily squishing we'll talk about the ways in which it's squishy and what I mean by that is it's harder in some sense so unsupervised learning is harder and what I really mean by that than supervised what I really mean by that is we have to allow stronger assumptions
+
+10
+00:04:02,000 --> 00:04:48,000
+okay stronger assumptions right so one of the things that kind of passed by you without thinking about it too much in the supervised setting is you're like there's just some data and there exist a separator there exists some class that's pretty weak for what we had to assume about the data for unsupervised we're going to have to assume there's some kind of latent or hidden structure and a lot of the conversation is hey if that structure is there can I provably recover it that's
+
+11
+00:04:28,000 --> 00:05:27,000
+the kind of thing that we're going to do and we're going to trade off kind of assuming more about our data and trying to find it robustly okay and now compared to supervise we're also going to accept weaker guarantees okay so weaker guarantees so in supervised learning in many cases that we cared about I think your guarantees we would say like we got exactly the right answer right this was the right model we could say you know there were some Theta star out there that was just the right thing
+
+12
+00:04:57,000 --> 00:05:43,000
+we were looking at as we'll see and I'll come I'll show some examples in a second in this unsupervised world it's not super clear uh you know what the right answer should be all the time if I just show you this picture and say how many clusters are there some of you say well there's two clusters somebody said well why aren't there six there's six points why isn't each one in its own cluster and if we'll see in some examples it's not really clear what there is we have
+
+13
+00:05:21,000 --> 00:06:01,000
+to make some assumption or do some modeling to understand and kind of kind of get to the bottom of our data okay and so that's what I mean by weaker guarantees and stronger assumptions and we'll see those mathematically but just keep them in the back of your head we're going to be more comfortable saying like what if our data are generated this way that's going to be a stronger assumption and then we're going to say you know we can't recover something that's pretty good some of the time
+
+14
+00:05:40,000 --> 00:06:22,000
+all right this is less jarring to you than it was like historically honestly because historically we would teach the first part of supervised Learning Without things like neural Nets and all the rest and neural Nets you kind of got comfortable with the fact that like hey maybe it's Computing something useful maybe it's not we don't know we just run it for long enough okay this used to be a little bit more disturbing okay so if you look at the literature you'll you'll see that in it so let's start with our
+
+15
+00:06:01,000 --> 00:06:58,000
+with our first version of this all right so what we're going to be doing is we're going to be given some data oops it's not very doesn't look very nice this is our given data okay given and we have some points and this is basically me just introducing notation and copying what we had before all right we're also here as I mentioned that stronger structure we're going to also be given a parameter which says how many clusters we think there are so the game is going to be here I'm
+
+16
+00:06:30,000 --> 00:07:15,000
+going to write down you know K is equal to 2 and our goal is that what we want to do here is find a good clustering right and so our do is we want to use two I'll use colors here apologies hopefully it'll be obvious you don't need to know what the colors are but you know we'll we'll kind of find two colors like this say like in what sense is this kind of intuitively good okay this is the same thing we're doing in supervised learning right we're like this is an intuitively good thing we
+
+17
+00:06:53,000 --> 00:07:41,000
+talked about different loss functions you're kind of an old hat at that so you can kind of imagine what we're going to do like oh the the loss in some way from some object shouldn't be too far away okay now the K means is hinting at that object is going to be the mean or the center of that cluster you kind of want to minimize that Center cluster that's not obvious we'll come back to it okay so this is what we're given given data we're given this K parameter and our goal is to create some clustering that
+
+18
+00:07:17,000 --> 00:08:02,000
+we're going to talk about so we need a little bit more notation okay now this guy will call some point X1 we'll call this point say X3 and that's just the notation that's there I'm going to write the notation formally in a second okay but before I do that is it clear kind of what the setup is you give me some points you don't tell me any labels you'll also tell me how many clusters you're looking for and then it's my job to find them find those clusters and we'll talk about
+
+19
+00:07:39,000 --> 00:08:33,000
+how to make that precise and formal in a second awesome so I'll just write down some notation and if there are any questions please thanks I'll show you that notation in just one second so yeah let me write the notation down and I'll come back to what I'm calling there great question also on the Ed thread sorry that I forgot to do it earlier someone's asking what about the unknown K case we'll come back to how to select K later some of our algorithms as we'll see just to go ahead some of our
+
+20
+00:08:09,000 --> 00:08:55,000
+algorithms will actually have a natural test for K we'll be able to basically try all the different K's and pick one some of them will not and it will be a modeling decision and let's come back to that question for how K is unknown it's not by the way it's not super unrealistic that K isn't known you may know by looking at your data that roughly you think there are about three or four products or something that people are talking about or various different topics and those are the kinds
+
+21
+00:08:32,000 --> 00:09:37,000
+of situations you will need kind of k-means in but let's come back to it great question on the Ed thread all right so let me give you some proper notation so we can actually you know talk about this maybe a little bit more mathematically we won't be super heavy on that today okay so what we're given in general is sum X1 to xn that live in some some Vector space and here we're given some K which is the number of clusters okay [Music] we need one bit of notation to do this so how do we how am I going to make
+
+22
+00:09:07,000 --> 00:10:30,000
+these colors into notation well I'm going to introduce this thing we're going to find and assign oops find an assignment of points to clusters points to clusters okay so how do we do that to the K clusters so what we're going to have is we're going to have a map that's called CI equals J means point I to Cluster J okay so here I is going to run from 1 to n and Jay is going to be you know from 1 to K right these are the same this K and this K are the same okay so back to this I was drawing I got a
+
+23
+00:09:56,000 --> 00:10:54,000
+little ahead of myself I started to draw the notation before giving it this is just saying we can call this point X1 this point X3 I'm just noting down what the what the points themselves are and then what our goal is to find this map that I drew by by kind of this highlighted color and that's going to be this c i j character here so this is you know higher than yellow for reasons I'm not really sure why I picked yellow okay so for example c 3 equals 2 encodes this fact that C3 is in cluster
+
+24
+00:10:26,000 --> 00:11:33,000
+two and I made the green cluster 2. so 0.3 and cluster two okay okay this will sound kind of opaque at the moment but this is a hard assignment we're saying every Point belongs to exactly one cluster the reason I'm signaling that is in the end of the lecture we'll talk about a soft assignment where we we have a different version of this okay but that's what this is any anything that's uh you know obtuse about the setup all right let's see an algorithm all right so let me copy this piece
+
+25
+00:11:11,000 --> 00:12:12,000
+drag it over there all right get rid of these characters because we don't see them and this is our input okay so the question we want to ask is how do we find the Clusters find the Clusters now there are many ways to do this and if your complexity kind of nerd then you would say like you know is there a you know polynomial time you know algorithm for this and all the rest answer is no actually it turns out there's an MP hard problem so we're going to have to use a heuristic based algorithm to do this and let's see the
+
+26
+00:11:43,000 --> 00:12:40,000
+most natural kind of iterative approach here okay so how does it work okay so here's the idea we're going to start by randomly picking cluster centers and then what we're going to try and do is the way we're thinking about key means is we're going to try and find our clusters as two that are described by two cluster centers so intuitively let me just jump back sorry about this jump back we'll kind of try and find a point say like here and a point here that are good cluster centers and they're cluster
+
+27
+00:12:12,000 --> 00:13:01,000
+centers in the sense that all the points in their cluster are closer to the center than than they are to any other Center okay and that's how we're gonna that's how we're going to construct our cij so we'll start by picking these means the means we you know where are we going to pick if we knew where to pick them optimally like we'd be done so we just pick them randomly to start with so I'll pick the cluster Center for two up here and I'll pick the cluster Center for one
+
+28
+00:12:37,000 --> 00:13:29,000
+down here oops I'm going to use a different color for deep-seated reasons now for no reason I just like different colors okay sound good so I just picked those points maybe I want to move this one just to make my life a little bit easier I'm going to delete that and drag it over you say why are you dragging over because it's like a cooking show and I want to make it just look a little nicer when I draw the pictures yeah these were not list of points these are just two random initialized points on
+
+29
+00:13:07,000 --> 00:13:58,000
+the plane I just randomly picked them in Rd we'll talk about a smarter way to initialize them in a second but just for the moment they're just random points they are not points they do not have to be points in that you're given yeah we'll talk about how to initialize them later and you may not exactly want to do that but you want to do something similar okay so okay so let's see how the algorithm runs so the first thing is what would the clustering be if these were the sent if these were the centroids these were
+
+30
+00:13:32,000 --> 00:14:24,000
+the center points oh go ahead means sorry yeah I wrote above it this is called Kings great question please so for the moment K is going to be given to us as input we'll come back as I talked about about how to select K in a minute but let's run through the algorithm once and see how it works then we'll talk about kind of what goes wrong and and how to extend it these are wonderful questions really great questions are there others awesome okay we'll come back to that and please both questions please come back
+
+31
+00:14:09,000 --> 00:15:25,000
+to those as I said all right so the first thing is we have these randomly centered cluster points okay so this is our first step of the algorithm is that we're randomly initializing cluster points randomly initialize uh mu1 and mu2 copy paste oops got more than I bargained for boom uh and this one based okay so we just randomly initialize where those characters live okay two we then assign each point to a cluster okay and the way we do it is which point are you closest to so I think you know
+
+32
+00:14:52,000 --> 00:16:29,000
+if my drawing is okay those are all you know closer to Mu one and maybe this one and and these couple are closer to Mewtwo okay because you're clear enough what I've done this this is the cluster assignment and I can write it kind of mathematically in one second if you'd like I'll actually I'll vamp a little bit and say how I did this more precisely X over J 1 to K oh sorry I'm in all right Max argument uh C or mu let me write this clear going on mu J minus X I okay I'm going to put a square there
+
+33
+00:15:41,000 --> 00:16:40,000
+just because I I like squares because we do it not really too problematic so and they're the same distance so this says CI where I'm mapping the ith Point well I just find the closest mu J to it my current mu J okay that's the way I'm doing the assignment every Point goes to its closest neighbor and I'm like arbitrarily saying this guy's closer than Mewtwo all right now I have to improve my clustering because remember it's iterative so what do I do I'm going to copy it so you can so I
+
+34
+00:16:11,000 --> 00:17:18,000
+don't have to overwrite it what happens well what do you think I should do I should probably take the points that I have and compute a new center my new guess at the center of the Clusters so what I do is I compute new cluster centers what does that mean cluster centers so I'm going to move I look at mu here what's the new cluster Center for that boom boom well it looks like it should be somewhere here right this is where mu1 goes and where should mu2 go well probably somewhere right here right
+
+35
+00:16:47,000 --> 00:17:51,000
+that's kind of the mean of them okay now you can compute these things precisely but I'm just drawing them just so you get an intuition okay and I'll write this notation because there's more notation so now I have new cluster centers now what's the next step I repeat so I go back and I assign every set that's closer to Mu 1 or mu 2. so now I have these characters and I have these characters there okay that's what that's now doing step two again I repeat step three
+
+36
+00:17:21,000 --> 00:18:28,000
+what's gonna happen they're gonna jump to the spot in the middle and the spot in the middle new One's Gonna Be there mu2 and then there's gonna be no more change if I were to continue running the algorithm forever so let me write that out mathematically while you digest that statement that's the entire algorithm okay so what does this mean mu J is going to equal 1 over Sigma J it's going to be some average over all the points in Sigma J x i such that Sigma J is is just the set of
+
+37
+00:17:53,000 --> 00:18:57,000
+points uh I such that CI equals J okay this is just some notation that says these are all the points that are close to closest to the center J and then I average over all of them I just compute their mean hence K means okay I iterate this thing and I repeat until no until no assignments change until nothing changes basically repeat until nothing changes notice that if the labels don't change in step two then the mean is not going to change because it's a function of the labels right it's a function of like what I
+
+38
+00:18:27,000 --> 00:19:16,000
+guessed was in each cluster it's always their mean any questions about that nothing changes please in many many in different ways so let's let's talk about a couple of things that go right and then we'll talk about what goes wrong so the first way it could go wrong is does it terminate right so if you imagine it was in some you know it's not obvious like I'm doing this kind of jumping around it could oscillate wildly right like there's nothing that like prevents it at least at a high level
+
+39
+00:18:57,000 --> 00:20:09,000
+when you're thinking about this of going like oh one switch from wet red to blue then it switched back from Blue to red and then the cluster centers are like jumping around and there's in some unstable kind of equilibrium so that's something that potentially could be bad that happens so that's the first question does it terminate does it terminate all right and it turns out this is great yes does now why does it the reason is that this functional underneath the covers one to n x i minus mu CI
+
+40
+00:19:34,000 --> 00:20:31,000
+that is the distance between a point and its cluster Center is actually monotonically decreasing it's not increasing so that that oscillation can't happen basically and you can you can basically view the algorithm underneath this K means if you really want to be kind of super abstract you can view it as basically doing gradient descent on this object in a particular way see the notes for actually the convergence so it converges to something okay now an unsupervised learning that converges to something is about as is
+
+41
+00:20:03,000 --> 00:21:04,000
+kind of what we can hope for in particular you may also ask okay it converts to something does it converge to a global minimizer does it converge to Global minimizer and if I did my job setting this up your intuition should say no no not necessarily now you may look at this and say well not necessarily maybe there's a better algorithm out there that given this setup of problem you just you know why did you pick this algorithm it's a bad algorithm you should show me a better one there isn't a better one because
+
+42
+00:20:34,000 --> 00:21:20,000
+it's actually MP hard if you don't know what that means don't worry there's no hardness proofs in this class does not really matter it just means we don't know like Humanity does not know a better algorithm for this that runs in polynomial time okay and we have reason to suspect there isn't one okay all right so this is this algorithm as I said like it's going to run but sometimes it can end up doing things that are like you know quite bad in particular gets stuck by like getting a
+
+43
+00:20:57,000 --> 00:21:52,000
+cluster over in a region where it should have never been and if it like had you know more carefully searched potentially could have gotten a lower cost solution all right clear enough clear enough on its properties now this this is going to be a Hallmark of what we do over the next couple of lectures almost everything we do with the exception of one algorithm that we'll talk about has this property that it doesn't necessarily converge to a global optimized solution and as I said this used to be much more
+
+44
+00:21:25,000 --> 00:22:17,000
+disturbing to people but now most of AI is in that mode so people don't seem to care as much okay used to be quite disturbing when I started it was quite disturbing now no one cares you guys you folks are old hats at this go ahead so this is what happens the next situation so you can imagine situations for example imagine there are points that are really far away and then some other cluster of points here and that really there's enough kind of things in the middle that the optimal is actually closer to the to
+
+45
+00:21:56,000 --> 00:22:42,000
+the line then what you'll see is that if you could you could end up with some kind of some kind of local minimum where you pick a center way way over here and a center in the middle of this but you should have there was a kind of a better one closer so that's very hand wavy I can post some examples where you can actually run through and convince yourself all that I really care to get across in this lecture and I couldn't think of how to like get good examples to look up there is that this is a
+
+46
+00:22:19,000 --> 00:23:09,000
+possibility you shouldn't expect it to get you a global minimizer and we have some theoretical reason why we don't believe such an algorithm could exist even in this simple case yeah wonderful okay now a couple of side notes so these questions already came up so these are really great so they're not even side notes they're just responding they're being responsive but I was going to talk about them no matter what the question was asked how did you initialize right how did you pick these
+
+47
+00:22:44,000 --> 00:23:32,000
+points and from my argument as I just talked about even very intuitively and informally the initialization matters quite a bit right if you initialize way way in crazy ways then you force came in to kind of jump back and maybe there's only one point like imagine there's a cluster of point and you throw one of your centers way across the room it's gonna you know potentially pick off nothing and then it's going to have to you know kind of crawl its way back in some sense so the point that I care
+
+48
+00:23:07,000 --> 00:24:08,000
+about you getting is how does the um how does initialization you know matter and I won't go into too much detail but I want to tell you that there's one algorithm that was developed by smart Stanford students a while ago maybe 12 years ago I don't know 12 15 years ago maybe even called k-means plus plus and I'll just you know tell you or what what they did from great Stanford students and basically what they decided to do is that they where they compute kind of a density estimation and then they they
+
+49
+00:23:40,000 --> 00:24:27,000
+Place their centers with respect to the density to kind of spread them out in a in a nice way and k-means plus plus and without going too much into the details what ends up happening is they get an improved approximation ratio so if you don't care about this kind of theory stuff don't worry but they're able to show that if you initialize in this way even though it's MP hard to find the exact solution they can find kind of a low cost approximate algorithm to it provably so this is actually when we
+
+50
+00:24:04,000 --> 00:24:49,000
+were talking about what could go wrong this is something that can go wrong and what people do in k-means is they used to just kind of run it many times but if you run with this initialization it's still a random initialization but if you run it a couple of times you're going to get a pretty good solution and because you're already kind of looking for an ill-defined kind of objective that turns out to be about okay now weirdly enough like I used to as I said I didn't really like this stuff but
+
+51
+00:24:26,000 --> 00:25:21,000
+I wrote a paper about using some of it inside some of making these machine learning models robust maybe a year or two ago so it is something that like you know I've actually used and care about like it does work and and you use it as a way to inspect your data off it like you don't you look at your data set you kind of do your k-means clustering then you can use that to figure out like you know what are the different groups that are inside okay all right this thing here became the default and scikit-learn uh and sklearn
+
+52
+00:24:54,000 --> 00:26:01,000
+so these folks wrote this beautiful paper they proved this nice result and now if you run a psychic learn and run the k-means algorithm it defaults to using the excuse me defaults to using the k-means plus plus initialization okay so pretty fun Sergey and folks did that anyway all right so now there's another question which was okay how do you choose K right this came up both in the Ed thread and it came up uh in the lecture hall itself how do you choose K and here's the problem with choosing k
+
+53
+00:25:27,000 --> 00:26:42,000
+there's no one right answer we'll see other unsupervised algorithms which do give a right answer but let me just illustrate this for you for one second suppose I give you this data set okay there's two copies of it one reasonable clustering is this two clusters equally reasonable excuse me is this one four clusters now if you think about the algorithm as giving you the right answer of what structure is inside your data then you really don't like this answer say well what's the right k
+
+54
+00:26:26,000 --> 00:27:06,000
+well it's not the right way to think about it maybe the right way to think about it is given that you have a k can you use this as a tool to find the Clusters that are in there of different sizes so if you're looking for five clusters and you really only found you know you look at the five cluster and the four cluster map you have to make some judgment about kind of which one is better underneath the covers and that's why unsupervised learning is kind of squishy but it also turns out to be
+
+55
+00:26:46,000 --> 00:27:32,000
+tremendously powerful so we can automate the loop of finding the Clusters but you know which one is good or bad you're going to have to use domain knowledge for that in most situations okay right so this is really another way of saying this is a modeling question so the one part you know even when I didn't really care for I don't know what I'm telling you the history of how I feel about lecture 11 but like you know you're getting it so but like one of the things that I did like about this lecture
+
+56
+00:27:09,000 --> 00:27:56,000
+always or this this part of the course is that it forced machine learning folks to move out of the comfort zone of like there's a right answer and optimization will find it which was very disturbing to me because that's not at all how machine learning works and what you're doing you're constantly in this regime where you're checking if your model works or breaks or does things I don't know how much a technique subjected you to my crazy slides but like that is the way that you live when you're building
+
+57
+00:27:32,000 --> 00:28:18,000
+these kind of ml systems like you build a model you have no idea if it worked you have to check it you have to look at it you have to inspect it you have to measure it um so this is kind of natural at least forces you to do that okay that's all I want to say about key means I want to jump to the next algorithm which is building towards this larger theory of what we did and if you can kind of squint you'll see that it parallels how we taught the supervised learning case but any questions before I move on
+
+58
+00:27:57,000 --> 00:28:48,000
+awesome please is this something you might use if you're doing supervised learning but with labels that you're not sure about oh awesome yeah great question so let's say that you're on super buy here so the way we were actually using it is exactly in that way in this paper what we were looking for I'll just to be really concrete is we were looking for what are called hidden stratification so these are times when a machine learning model let's say that it's classifying uh birds
+
+59
+00:28:22,000 --> 00:29:09,000
+that are on the land versus birds that are in the water I have more elaborate examples than this and it turns out that the model sometimes gets confused by the background and so what you want to do is you want to Cluster some notion of those like feature descriptors underneath the covers of like background descriptors that the neural net has learned to try and find a group which kind of looks like an oddball from the rest so it's like oh here's all the land Birds on land backgrounds I got them all right
+
+60
+00:28:46,000 --> 00:29:31,000
+and there's this other weird cluster there that I labeled as land Birds but actually our water birds that happen to be walking on land right and so that's the kind of thing you look into your your like labels or your Suitor labels or your predictions and try and find those it can either be labels that are given to you by a human or a neural net and that is like one of that was you know the use case that I had is exactly what you what you thought about um yeah so that's one of them you'll
+
+61
+00:29:08,000 --> 00:29:57,000
+typically also run this when you have like you honestly when you have data you don't really understand so like you run an experiment with you know search traffic or ad traffic or something and you're like what the heck are people asking about in this segment and then you run kind of a clustering to figure it out and say like oh this this looks like a topic that people are talking about X Y or Z right so those are the other times that that you use it but noisy labels is a good thing and that
+
+62
+00:29:32,000 --> 00:30:29,000
+will be a theme for next week's lectures great question please yeah so the question is if you pick a larger number of clusters then like if we go to this example here the problem is how descriptive does it get so in four and two you could kind of eyeball the two and the four and and link them up but if you start to really Jack it up to like a thousand then it like is like kind of at the brink of what does it mean to find meaningful Concepts right so if you're looking for 10 things and you know there are 10
+
+63
+00:30:04,000 --> 00:30:47,000
+things you want to find those 10 best groups if you start to jack it up to a thousand ten thousand it no longer becomes like human digestible so that's where the modeling thing comes in it's kind of like the bandwidth of what you can look at and do this and and traditionally k-means was not used in an automated Loop it was traditionally used as like a way to browse your data if the consumer of that is some neural net in the discussion we were talking about then it kind of doesn't matter you can
+
+64
+00:30:25,000 --> 00:31:08,000
+jack it up a little bit more the advantage of doing so the advantage of doing that is if you put too many centers they may be too close together and sometimes what people do is they'll just do a kind of a follow-on path where they merge some clusters that look like they're kind of not informative a pruning heuristic at the end so your intuition is dead on and like that's the side you want to err on if you air on the side of two small clusters what happens you lump two things together
+
+65
+00:30:47,000 --> 00:31:40,000
+that you could have distinguish and then you could get like a weird cluster in the center so clearly you're right the over provision setting is much nicer than the under provision setting awesome it sounds like folks got it please [Music] [Music] yeah so so I wish there was one algorithm so this is something that like people are writing still writing research papers on we had an iClear paper on there's another one coming out from some other from another group which is great that we're reading right now
+
+66
+00:31:18,000 --> 00:32:06,000
+basically what people try to do and in these things is that data point so this is kind of an impoverished setting right we have data points that are just in Rd that are in a vector space but those data points usually correspond to Something Real like there's an image or text and so the more modern ways that people do with this diagnosis like what what Sabria and folks did in and Maya did and Domino is I said oh we took those points and we embedded the text that's associated with an image and the
+
+67
+00:31:42,000 --> 00:32:30,000
+image itself and we start to like do kind of search queries on top to find the slices that are underneath the covers so this is the purest setting where you're just like I have data from in a vector space but of course like with modern methods like there's an underlying object it's a transaction or an image and a caption and then you start to use some of the more modern techniques to search through it and then of course you visualize it or monitor it and there are a number of tools that are
+
+68
+00:32:06,000 --> 00:33:06,000
+out there to do this I wouldn't say it's solved like oh you just use x and you're done but um you know there are a number of tools but yeah you do have to look at your data like there's nothing that really obviates that awesome questions all right all right so let's talk about a slight what appears at first to be a slight generalization hopefully it feels like we just relax one little thing but it gets us closer to a more fancy model that will allow us to do some really fun stuff okay and this is actually pretty
+
+69
+00:32:39,000 --> 00:33:33,000
+fun so this is a toy example from astronomy and if you know about astronomy please don't humiliate me too badly feel free to correct me I have no idea what I'm talking about but I read the paper and I understood the math so okay it's a toy example okay and it's from a paper from the University of Washington so I can find the paper again for people there okay so here's the general setup of what they're doing they have this light detector this Photon counting thing okay and they're
+
+70
+00:33:06,000 --> 00:33:55,000
+looking in the sky at various different things and what they want to do is they have in this simplified model there's kind of two celestial objects that could be out there could be like a regular star and a quasar okay and one of them is going to take the light and it's going to spread kind of evenly in all directions and another is going to send out relatively concentrated pulses okay and what happens is unfortunately when those photons come to Earth they don't come with labels no one gets to like affix a
+
+71
+00:33:31,000 --> 00:34:42,000
+metadata packet to every Photon that that hits us we have to see the photons and figure out like where the hell do they come from okay so what happens we get some data that looks like this maybe like this okay and these are all our little photons that are there okay so you know quasars and stars now okay and both of these things emit light but all we get to observe are these Photon hits all right so now what we're going to do in our sub oh please go ahead assume no we don't have to assume a linear
+
+72
+00:34:23,000 --> 00:35:27,000
+decision boundary we just have to assume that it's it's close in distance right you can get non-linear right there's no notion of a decision boundary in particular anyway like you can draw like a little vornoid diagram but we didn't talk about that very nice question awesome so we get these Photon hits okay so what we want to do is kind of figure out you know what these different sources look like and so what our given or this is what we're given what we're going to do is try and find a
+
+73
+00:34:55,000 --> 00:35:53,000
+soft assignment of these things into gaussian so remember what gaussians look like right they're basically it's a high probability they look like ovals right they can be circles right that's what a two-dimensional gaussian looks like right and the variance tells you how it's How stretched it is in each Dimension okay so like maybe there's a a cluster here cluster here and this is a tight cluster okay all right so we'll talk about that in more detail in one second but what we have to do
+
+74
+00:35:23,000 --> 00:36:37,000
+is we want to assign each photon to a light source but of course we don't actually in this case we don't have perfect information of the light sources either and so we're going to settle for what we call a soft assignment okay so this is the probability prob that point I goes to Cluster Goes To Source J okay and this is our soft assignment this is called a soft assignment okay why is it soft because we didn't remember in K means we said you must be in this in this setting here we have
+
+75
+00:36:03,000 --> 00:37:07,000
+some probability distribution over it okay all right so just compare that with compare that with k-means all right so what are the challenges here the challenges that we that that we're going to deal with here potentially are there are many sources right if there were just one source life would be easy we would kind of fit the gaussian you know how to do that from GDA you take the mean you find the variance you're done okay there are many sources here but for now we're going to assume we know the source is K we know K
+
+76
+00:36:34,000 --> 00:37:35,000
+which is the number of sources okay let's solve the problem in that setting okay and also the other problem is the sources have uh different intensities and shapes intensities and shapes okay so when I was wildly drawing those ovals the reason was is like oh maybe there's a gaussian that looks like this maybe there's a tight gaussian I don't assume I know that ahead of time I just know that they're somehow well described by gaussians please oh no great question so those are the
+
+77
+00:37:10,000 --> 00:37:59,000
+two types of things I need the number of celestial bodies so like one reasonable thing would be three there's one here one here and one here but K is still going to be picked by a modeling assumption right so this is this this curve is hard to generate with uh with a gaussian in our current setup right so there's probably not there's probably more than one on that side but that's just intuition there could be four there five there I don't know so let me let me talk about the
+
+78
+00:37:35,000 --> 00:38:39,000
+assumptions okay so we're going to assume it's well modeled and here we're in you know most of what I'm going to do is going to be in one dimension so I'm still just going to introduce the notation in one dimension by gaussian right and you remember that a gaussian means mu J Sigma J Square okay so just one dimension to make our lives similar in a second but we do not assume we know how many points that there's an equal number of points number of points is equal okay now
+
+79
+00:38:10,000 --> 00:39:01,000
+the reason is in our setup the physical reason is like you know some point sources are really concentrated and strong and they shoot out tons of photons and in other cases they'll shoot out you know diffuse photons over a region that may be farther closer away different energy levels whatever mathematically what I mean is we don't know when we're going to talk about these gaussians the shape may be a gaussian but it's only sampled infrequently for Source one and it sampled 90 of the time for Source two
+
+80
+00:38:36,000 --> 00:39:34,000
+okay this is formally known as an unknown mixture okay now one thing that's nice about this problem and the physics setting is once I get the values out so what are the what's the do here I have to get out these cluster centers that we talked about before and these probabilities which I haven't given you notation for but they're going to be called Phi in a second I can check that if how physically plausible that clustering is right so in the K the reason I like this example is and the K means you kind of kind of have
+
+81
+00:39:10,000 --> 00:40:06,000
+to eyeball it but here if I have a physics model I can compute How likely is one clustering versus another given the data sources that I'm seeing maybe have auxiliary information about what celestial objects are in the sky and that particular region and so I can I can check this information okay and the physicists in this example could actually check the information please [Music] the range of what J oh J is going to range the same it's going to range over each number of sources so we're going to assume that we
+
+82
+00:39:37,000 --> 00:40:30,000
+have this K number of sources here so J Will range over K just like it did so that's fixed that's a parameter of the problem someone's going to tell me basically what someone's going to tell me is there are K sources I have don't tell you what their means are I don't tell you what their variances are so that's for each one of them and I don't tell you how often that's this mixture they emit light so what percentage of the points go to Source a versus Source B
+
+83
+00:40:04,000 --> 00:41:01,000
+please so so for example let's imagine that we had a situation like uh let me just draw it so let's say that we had you know three points here and then I'm not going to draw them all but like a thousand points here so there are three points here and a thousand points here right so the clustering that I would want out is one cluster here and one cluster here but I don't get to see the three and one thousand I'm assuming that they're of unequal sizes so you could for example assume
+
+84
+00:40:43,000 --> 00:41:38,000
+that all the Clusters are equal sizes I'm trying to and that would be a that would be wrong and this is not the way we'd have the model that's a fair assumption if you knew that right but that would make your life a lot easier it doesn't make you have to solve both of these two things awesome question all right please yeah we make that assumption kind of implicitly because we don't say how often like there's no probabilistic model but we do allow K to have like five neighbors and 500 neighbors right
+
+85
+00:41:14,000 --> 00:42:12,000
+center cluster one could have five neighbors another one could have 500 so it does parallel k mean so in that sense it's the same assumption I'm calling it out here as an extra parameter that we didn't have to think about last time right awesome questions okay let's see some 1D mixture of gaussians mixture of gaussians is like a very fun and famous Problem by the way um people like work on like which ones you can solve um in theory still it's like a fun it's actually fun and interesting problem
+
+86
+00:41:45,000 --> 00:42:51,000
+we won't do that all right so I'm going to be in 1D for Simplicity here because it just makes my notation and drawing easier so I have to draw distributions all right so just make sure it's super clear what we're doing I think folks sound like they have it so we have 1D this is going to be the the place where our points live and then imagine there were two gaussians that were generating data okay now when I say this generating data this is the piece like when I talked about we were going to talk we're going to allow
+
+87
+00:42:20,000 --> 00:43:23,000
+ourselves to talk about models we're going to imagine that there's really a model that's underneath our data that's generating it okay this is a quite a powerful technique okay so how does it work what we're going to do our our idea for the model is we're going to pick you know cluster one with some probability let's call it P or cluster two with probability one minus P we pick cluster one we then sample a point oops let me get a thicker thing all right oops that's probably too thick
+
+88
+00:42:55,000 --> 00:43:48,000
+and we get a series of points okay that's the thought process that we're going through right there if we only knew those parameters we could sample from our model if we knew the probability to pick cluster one versus cluster two and then we would sample from it and there's many different parameters given that model that could have generated our data and we're interested in recovering the ones that are most likely that most likely generated our data okay now what we see unfortunately
+
+89
+00:43:28,000 --> 00:44:50,000
+is just this just the points okay so this is the the model over here this is what we observe oops which back just the points in r okay these are the X I's now one thing and this is going to seem like a trivial piece but it actually makes our life kind of interesting what if we knew these points all came from cluster one and these points claim from cluster two okay this is our first observation well if we knew the cluster labels what would algorithm would we run we just run something like GDA we would
+
+90
+00:44:19,000 --> 00:45:37,000
+just fit gaussians to this we'd be done right so if we knew this we could just solve this instantly solve and fit gaussians so we compute you know mu I mu 1 mu2 how do we do that well we would just average up all the things in here average up all the things in here that was bbr Muse and we could even compute the sigmas and be done the challenge is we don't get to see them we don't get those labels challenge we only see this thing okay this is our first example of a latent model there's something hidden that we
+
+91
+00:45:03,000 --> 00:46:04,000
+don't observe and we're trying to estimate the parameters of that model and that'll be a theme for the next couple lectures please [Music] sure yep oh so this is this is yeah so this was an example to motivate like hey this is like a nice picture to look at and kind of get you thinking empirically about what happens I'm going to walk through most of these things in 1D because it makes my notation a lot easier and so there's really no relationship between uh like these points and the points I
+
+92
+00:45:43,000 --> 00:46:34,000
+showed you before yeah great question awesome all right so why am I doing it in this kind of like piecemeal way is because when I show you the definition then you know it has a bunch of notation in it and I want to show you the simplest version so that then you can generalize it and do all that fun stuff on your own all right but it is it clear what the what goes on here there's this notion I've introduced and kind of sneaked into you which is the model right there's some parameter P here that picks this
+
+93
+00:46:11,000 --> 00:47:06,000
+side or this side right which is going to be called Theta Theta 1 and Theta 2. hinting later I pick something and then I sample from it if I knew where the points came from I could just solve but the problem is I have this hidden how often is everything sampled I don't know how many points should be in each cluster and I don't know which points are in the cluster not only do I not you know I don't know either of those facts so we have to estimate them somehow from data that's what we're going to do
+
+94
+00:46:39,000 --> 00:48:16,000
+okay so let's see some notation and we can come back to this example if if there are more questions about it okay so let me be a little bit more precise so we're given X1 x n element of R okay and a positive integer K and K you know positive integer or a number of sources and our do what we're given what we have what we have to do is we need to find that probability function find P such that for I equals 1 to n j equals 1 to K the Clusters this is the data we have an estimate of p z i equals J
+
+95
+00:47:32,000 --> 00:48:34,000
+this is our notion of soft assignment okay so that's what we're responsible okay and this is although it's a function it's discrete so I can write it down right I can just write down the probabilities in a table we'll later worry about cases that's not the case but for now we do make sense [Music] no so J is a cluster index and K is the number of clusters so J here says this says the ice Point belongs to Cluster J with some probability J ranges over one to K so they are K
+
+96
+00:48:08,000 --> 00:49:13,000
+clusters K was equal we we never actually were precise about what K is we had rough intuition that K should be at least three and I don't think we actually use J or if I did I meant and scribbled it incorrectly and I apologize probably was a wayward eye but I don't I don't I don't see it in my notes but apologies for that I'm sorry for the confusion please that the sample height belongs to clusters each uh belongs or comes from yeah so I I'll copy from here is this this sentence
+
+97
+00:48:47,000 --> 00:50:06,000
+probability of that point I belongs to I think it should be I think is what I meant to write I think that's better probably a point I uh comes from source that makes more sense in English from Source J yeah yeah Source J is the particular source always a particular source so I is always the data J is always the label for the cluster and K is always the number of clusters please uh that in X Oh you mean from the uh no um uh so yeah so z i is the assignment so z i is the is the soft assignment itself x
+
+98
+00:49:32,000 --> 00:50:23,000
+i is the data point yeah sorry for the overloading the notation so the zis will always be the hidden piece that says the so let me write the next sentence the next uh piece and then we'll come right back to your question I can see why you'd be be confused by that so let me write the GMM model and you'll see why these two things are being used according to the GMM model so z i is just that z i is the random variable that this probability that point belongs to it it's not the actual
+
+99
+00:49:59,000 --> 00:51:10,000
+point itself so then for example we can talk about the probability of x i and z i this is the probability that given this point and the zi is that it belongs to a particular cluster um and we'll write down the model in one second so let me write down the model and then it'll be clear what this notation means okay all right this is just Bayes rule nothing fancy here I said nothing there's no content okay but I'll use it now z i is going to be distributed as a multinomial According to some parameter that we'll
+
+100
+00:50:39,000 --> 00:51:46,000
+call Phi and Phi has a multinomial is says that some Phi J goes from 1 to K equals 1 and Phi J is greater than or equal to zero okay so Z J if you like is that sampling probability like it's the the likelihood that this particular Point came from that that place and Zi is going to be picked with this background probability that we're calling P before so in our earlier example there was like P and 1 minus P were the chance that I sampled from cluster 1 or cluster 2 above here okay these are Phi 1 and Phi 2. that's
+
+101
+00:51:13,000 --> 00:52:44,000
+what I was hinting at okay and remember in our model like I picked di that told me where I was sampling and then once I knew Zi x i given that z i equals J that means given that it was in cluster J this is going to be distributed like a gaussian mu J igma J Square okay so these are all gaussians okay now let me highlight for you the parameters we have to estimate highlighted parameters okay okay this thing with this thing okay all right these are the same color so what's going on here this is formalizing
+
+102
+00:52:12,000 --> 00:53:16,000
+the model that we talked about earlier it's our first kind of hidden model we never see Zi we don't observe it in data we don't get to see the labels you know the deity or whoever is generating his data generates a Zi and picks one of the Clusters that's its sample for this point and then it samples from this normal distribution to generate x i and if you like the data we think about as being the remnants of this process we don't get to see this process run it gets run ahead of time and then the data
+
+103
+00:52:45,000 --> 00:53:34,000
+is dropped there and the reason we're thinking about this model is we say Okay assuming that the model were like this could we recover the parameters okay and so that's the sense in which we're assuming there's some structure and it's pretty reasonable what it's saying is look I don't know how many points come from every cluster that's because I have a multinomial and two I know that the points that I the Clusters that I have they're gaussian shaped but I don't know if they're circles or all
+
+104
+00:53:09,000 --> 00:54:08,000
+ovals and I don't know where their centers are and I'm assuming nothing else about my structure can you find it for me that's your job does that make sense you have to come up with we have to come up with these parameters we have to find the cluster centers and the probabilities that each are sampled from observing the data right clearly if I pick one clustering it's going to the data is going to be very unlikely have to have been generated with those centers right like if I go back here and I pick the center
+
+105
+00:53:39,000 --> 00:54:35,000
+over here in the center over here that's less likely than if I put the center here in the center here right it would just explain the data less well we'll be able to formalize that with maximum likelihood but I hope that intuition is clear if it's not please go ahead ask me a question I'm super happy to answer ah so Phi is basically just a bunch of numbers that sum to one it's a multinomial so this is a probability I I like if I have class cluster one like so let's say this is going back here
+
+106
+00:54:10,000 --> 00:55:09,000
+let's say this is cluster one cluster two cluster three or Source one two and three and lots of points are in Source One so then maybe Phi one would be like point seven right because they're like seventy percent of the data is there and ten percent of the data is here and twenty percent of the data is here then the numbers would be point seven point one point two roughly does that make sense awesome right all right all right so let me let's do one example um I just wanna I'm trying let me see
+
+107
+00:54:42,000 --> 00:55:31,000
+call the zi latent because we don't observe it we didn't get to see it right we just got to see the points we didn't get to see which was assigned to which cluster because it's not directly observable this concept which seems at this point like kind of strange I would think about a bunch and we'll see it again and again this is what we mean by structure we're like well there's some wild collection of points but like there exists a small number of clusters that are generating
+
+108
+00:55:07,000 --> 00:56:01,000
+them that's the mathematical embodiment of what this thing is the mathematical embodiment of that intuition that's all it is and we say if that's the case then we should be able to recover it okay we should be able to recover those clusters in those situations and in the physical situation of like light sources that seems pretty plausible right like you know they have different intensities different shapes so on all right so let me give you one more example just to make sure that all these
+
+109
+00:55:34,000 --> 00:56:42,000
+terms are this notation is there and I want you to think in sampling and let me just walk through so hopefully these things make sense so Phi 1 is going to be 0.7 if I2 is going to be 0.3 why are those the numbers because I'm making them up that's why don't have another reason Phi 1 is going to be one mu 1 is going to be 1 mu 2 is going to be 2 and I'm going to set Sigma 1 square equals Sigma 2 square is about a third roughly okay so what does that picture look like here we go there's one
+
+110
+00:56:10,000 --> 00:57:20,000
+there's two there's one thing here if I draw it pretty well maybe my drawing is off but hopefully you get the point this thing should be about a third this distance should be about a third the fact that they're uneven is because I'm a bad artist not because that's the intention of the thing this is mu1 this is mu2 okay and this distance here should be about a third the 65 thing it's a standard deviation okay how do I sample from it first I pick a cluster pick one either one or
+
+111
+00:56:48,000 --> 00:57:52,000
+two one of my clusters I picked the first cluster with probability 0.7 the second with point three then I pick the relevant mean so if I picked two I will use mu 2 I go over here then I will sample from a gaussian and generate myself a point let me hear two use the appropriate gaussian okay so imagine that this were the process that we're generating your data you just get to see an instance of the data your goal is to say what's the most likely process that generated it okay and that corresponds to this
+
+112
+00:57:24,000 --> 00:58:24,000
+intuition like there exists some clusters so far so good oh and then you repeat repeat yeah please go ahead and ask questions no yeah so that would be if they if I wrote their probability distributions entirely these are still unit normal gaussians this is a great question I drew it as two gaussians I didn't draw the Phi 1 and Phi 2. I Incorporated them just in this first set so I would pick you know Phi 1 I would pick one with probability 0.7 like one 0.7 right and you could imagine re-weighting them and and normalizing
+
+113
+00:58:02,000 --> 00:58:56,000
+them but then it's just a little confusing visually and I'm not that good of an artist because we don't know how many points come from every source so remember going back to to this one up here we had like the oops I went way too far back here we had lots of points from this one source and this point you know they're 70 coming from here 30 coming from here 15 or 20 coming from there and so they they we can't we're just not assuming that they have the same if we force them
+
+114
+00:58:31,000 --> 00:59:16,000
+all to have equally sized clusters we would probably put two cluster centers Here If This Were seventy percent of the points and we would we would use that to explain our data that would be in this case sub-optimal right that's just our modeling choice we know that the Clusters have different number of points in our application so that's why we we fit them we can't assume they're the same if we knew them perfectly we knew the things we could we could sneak them in there but we'll talk about where we
+
+115
+00:58:53,000 --> 01:00:03,000
+sneak them in later [Music] the shape they understand they understand the shape really yeah yeah awesome sure um foreign that's kind of good man I mean but like should the second Peak be actually shorted at first yeah that's a great question so you could imagine for folding the files in to try and make them both probability distribution density functions where there was one distribution density function and then you would fold them in I've drawn them crudely having the same height and
+
+116
+00:59:55,000 --> 01:00:49,000
+putting the probability function up front to say these are the gaussians and then there's a height but you've got it perfectly yeah that's another way to visualize it which is if this is beyond my architecture artistic abilities like that's Legions Beyond so yeah wonderful question no no no no no that's a lion I I do not have a lot of my ego tied up in that yeah [Music] awesome so what's going on here the the trick that we're gonna do is we're going to assume like okay so every time you
+
+117
+01:00:28,000 --> 01:01:15,000
+set one of these values you give me a distribution right that gives me a distribution so now I have an infinite number of these things that are out there with different settings of Phi different cluster centers different samplings so now imagine your head like I grabbed one of them and then I did the sampling process and it generates some data okay great so we understand that piece now I I what what happens though in our problem is we're going to invert that process so we see some data just to
+
+118
+01:00:51,000 --> 01:01:39,000
+XIs themselves and now we want to select among all those infinite things that are out there which are parameterized now by these fives and mu's and sigmas which one is most likely the one that generated our data and intuitively we know as I said like if the cluster centers are super far apart and our data is all in the middle that one's probably less likely that one that has a cluster centers closer we're going to be precise in a second about how we fit that but you can kind of see where it's going to
+
+119
+01:01:15,000 --> 01:02:00,000
+come from is this model so in the same way we use maximum likelihood before we'll get there we're going to do a little bit more intuition we're going to say that the parameters that generated our data are the most likely ones after we've seen the data so we'll condition on the data and try to invert it to find it so this this thinking of like the latent forward process is super weird right and so yeah you're exactly right does that make sense though we think about the process
+
+120
+01:01:38,000 --> 01:02:29,000
+and then we're like oh if we inverted it that's kind of what it must have been right this yeah go ahead and do that for various sets of different parameters exactly right the the thing is we want to be exactly right we could just guess all the parameters or try all of them promise there's infinitely many so the questions can we solve them and find them faster than that right but if we could just in theory you know there's well and theory is a weird statement because there's uncountably many of them
+
+121
+01:02:10,000 --> 01:03:01,000
+but like we could conceptually try all the parameters and then see which one was like closest in probability you know had the highest likelihood score and we're going to try and that's going to be our gold standard of what we want to pull out you got it perfectly please foreign if there's only one value then you know everything came from one source and you're just fitting a gaussian and the most likely estimate for a gaussian is as you saw from GDA and everything else is average your data to compute the mean
+
+122
+01:02:48,000 --> 01:03:51,000
+and then compute the variance from that and then you and then you have it perfectly wonderful awesome we got this all right so let's see the algorithm that does this because it mirrors our friend k-means okay okay we're also studying this by the way because this same pattern will repeat itself in our next lecture it's a famous algorithm so it's fun to know about and it's important pedagogically I don't know if you actually have to do anything with it in the class but and it mirrors
+
+123
+01:03:19,000 --> 01:04:19,000
+k-means so like why are you teaching me these two things they seem to differ in small ways and that difference like k-means seems a lot more intuitive than this whole infinite number of models that we're selecting among but we want to get to that world view so that we want to relate the two okay so one there's an e-step okay so this em is very famous and we'll come back to that in a second here we guess just as you put it perfectly we guess the latent values which in this thing are the values of
+
+124
+01:03:50,000 --> 01:04:54,000
+the zis okay so we guess all of the cluster centers their distributions okay by hook or we just figure it out okay that's our first piece we'll see how we do that in a more intuitive way and then the m-step we update the other parameters so if we knew the distributions we knew my observation one if we knew where every Point came from then we could just run GDA on it we could just run you know find which gaussians are in each set we just fit all of them there's a slight twist that we're going to not know where precisely
+
+125
+01:04:25,000 --> 01:05:26,000
+every point is we're going to know them a distribution so we have to do something a little bit more complicated but not too much more complicated okay this is our first example of a very famous algorithm first example of em is like a very very famous algorithm that people like use for decades I don't want to oversell it I have a colleague and friend who says you only run it when you don't know what you're doing and he's right in the sense he's kind of a curmudgeon it's a good dude
+
+126
+01:04:56,000 --> 01:06:04,000
+but he's right in the sense that like if you knew exactly what you were looking for you wouldn't run this algorithm but that's precisely where it's interesting because when you run these kind of em algorithms you know something about the setup okay all right so let's see mathematically what this looks like and in your head you should be thinking how do I what did I do in k-means the e-step so here we're given the data and current values which are guesses for Phi Mu Sigma blah blah blah all the
+
+127
+01:05:32,000 --> 01:07:05,000
+stuff Sigma 1 mu 1 mu two whatever U1 all the parameters okay and our our do is we have to predict Zi okay 4i equals 1 to n all right now I'm going to introduce the notation here following our notes given x i by mu Sigma okay so what's going on okay this is our goal okay so what do we want we want to compute these weights which I'm just giving a new notation to because Z's will be changing as we run and all the rest we're given the data point condition on that so we know the point we're looking
+
+128
+01:06:32,000 --> 01:07:29,000
+at we know all the rest of the parameters the likelihoods the the frequencies with which we're sampling from each one of them we have our current guess we have our current guess of how where the center of every cluster source is and it's um you know variance and now what we want to do is we want to compute How likely a particular point is to belong to a cluster intuitively if it's really close the probability should be high to the cluster Center if it's a really you know if it's really far away it should
+
+129
+01:07:01,000 --> 01:08:10,000
+be close to zero but it's continuous it's not going to be zero itself okay because the gaussian doesn't go to zero you know anywhere okay so how do we do this well it's nothing more than Bayes rules Bayes rule okay oops Sigma oops over all right okay all right so all I've done here is something really simple I've taken x i which I've conditioned on it and I've kind of divided it up so this is like kind of the likelihood of the data being generated with this which is a
+
+130
+01:07:59,000 --> 01:09:43,000
+probability and then these two things being jointly done together then I'm gonna I'm gonna Factor them out as I sum over all of the different probabilities okay so this is going to be equal to probability of x i okay oops probability of x i z i given J probability of z i J over sum if you use l here instead of J because I don't want to confuse what we're doing z i equals l comma the whole thing p z i equals l okay so the point is we know all of these functions okay oh sorry and everything here by the way has
+
+131
+01:08:54,000 --> 01:10:03,000
+like is has this stuff we know all that information so that's everywhere okay okay so we know all of the estimates in our guess so what is this probability right here well if we knew the the that it was a condition that we knew that this point came from the cluster well it's just nothing more than our friend the gaussian right this is this character right here uh which I'll highlight this is just a gaussian we know that from the model right so is this right so if I can be really explicit
+
+132
+01:09:29,000 --> 01:10:57,000
+about it it's like you know X above x i minus mu I Square over 2 Sigma I square right times some normalizing constant 1 over the square root of 2 pi right so we know what this is what's this one those are our fives so this character here oops I shouldn't use that color this is Phi J this is Phi l so I've decomposed the problem once I know it into estimating all of these quantities which I already kind of mechanically know how to compute okay so the key point is we can compute all the terms
+
+133
+01:10:20,000 --> 01:11:06,000
+compute all the terms now this isn't super surprising so maybe you look at this and you're like wow that's just a bunch of weird notation what the heck is he talking about look this is just k-means it's saying in some kind of generalized sense it's saying I need to compute a probability distribution function okay k-means doesn't need to do that but how does it do it it says well I consider the probability that this x I was generated from this J I Know How likely it is that
+
+134
+01:10:45,000 --> 01:11:36,000
+a point came from it I know given How likely once I'm in the point what the probability of this data point is and then what I'm going to do is I'm going to compare it to the likelihood from every other cluster and that's the probability right that's all that's encoding instead of having that hard assignment and saying which one's closest like and K means this was just a Mac said look at all the other clusters and you picked the closest one now I'm going to average
+
+135
+01:11:11,000 --> 01:11:58,000
+over it and I'm just averaging over it with Bayes rule and it looks like notation is a bunch of notation but it's not super scary it's just things you know how to compute go ahead what's they wouldn't be zero but they'd be very close to zero so what would happen in that scenario so in your point let's say x i is really close to this particular J so this thing is very it's not going to be one because the height of the thing is not exactly one but it's going to be
+
+136
+01:11:45,000 --> 01:12:38,000
+some high number let's say you know 0.5 or something so some big big number okay then over here let's say 5j that's the other term so if Phi J like were equal across all the Clusters we'll come back to what happens when it's not in a second if it's equal across all the Clusters we get you know 0.5 times you know one over five or something or five clusters one over five and then we compare that likelihood to the rest of these and because you said these were really really far away what happens here
+
+137
+01:12:11,000 --> 01:13:05,000
+you get this term repeated right so you get exactly that one term plus a bunch of things which are super close to zero and so as a result this thing will be very very close to one yeah does that make sense now what happens just in that inference if if Phi J were very very close to zero so now there's this trade-off as the point you know if the point is like you know there's the cluster Center and it's closed but I think it's extremely unlikely like my 5j is like 10 to the minus 10 and I've only seen a thousand
+
+138
+01:12:39,000 --> 01:13:43,000
+points I still don't consider it very likely that this Source actually generated something okay in that setting and that's all Bayes rule does in general is trade off those two things does that make sense yeah awesome okay right now back to the oh please the probability of x i is the probability density yeah so I use them okay so yes so you can do this because you can use the likelihood ratios in this way but there and this is the correct thing to do from Bayes rule but it's a little bit sticky because like
+
+139
+01:13:17,000 --> 01:14:16,000
+this is just a PDF but the fact that it's like normalized up to it allows this thing to go through but yeah you're exactly right yeah it's a little squishy but it it works wonderful question awesome so I hope I hope what you got from this is and also I wanted to come back so that whole weird rant about like how the data are generated is now mechanically the way the math works that's why I keep ranting about it you pick a point you generate the data that's like assigning the likelihood score you wrote
+
+140
+01:13:47,000 --> 01:15:09,000
+when you wrote the generative model you told me how likely it was right that given you were in a in a in a in a particular cluster that you would generate this point that's the normal distribution and then you compare it and bake them off against each other and that gave you a probability distribution that's it awesome now there's the other step this step is much less interesting so here we're given all those wijs J which is our current estimate test of p z i equals J okay for I goes from 1 to n j goes from 1 to
+
+141
+01:14:32,000 --> 01:15:37,000
+K okay and what we have to do is estimate the observed parameters the non-latent parameters now this is conceptually interesting because right we split our thing into latent which are not observed the zi's are not observed how what the probability is that you're in a particular class and the things we did observe the frequency you know how many are in each class you know their cluster sizes and all the rest like you can measure those things okay and we'll do that using mle because that's the tool we use
+
+142
+01:15:04,000 --> 01:16:12,000
+by the way we use mle a lot in this course um but they're it's not it's very powerful but it's not everything and come back to that later but that's it's a principle okay so for example what is 5j what is the estimated frequency well we sum over all the points I goes from 1 to n of w j i this is a there are gas of the fraction of elements and from cluster J we can we can make this a little bit more rigorous and we'll do it next time and the point is is you just do mle I don't want to go
+
+143
+01:15:43,000 --> 01:16:30,000
+through these calculations because they're kind of boring um but we should you should go through them at least once and we can make that rigorous and we'll do that when we do the mle thing so I'll do it in class so don't worry if it doesn't stick now we'll do it on Monday in a little bit more generalized setting but what I hope you get here is if I know the wijs I have to compute the estimate of 5j and then I just average over the probabilities and we'll make that we'll do all the math to expand
+
+144
+01:16:06,000 --> 01:17:07,000
+that out but you already know how to do this this is just the mle stuff that you've been doing for the last K weeks okay so far so good no we're going to uh we're not going to be we're the this is the the right answer we're going to derive this in more generality so you can solve for a larger class of models on Monday oh fractional points sorry that's really terrible I said elements and then I don't know why these are the points points from this should be sourced I kept using
+
+145
+01:16:50,000 --> 01:17:40,000
+I was trying to make source and Target in independent my head and I did not use them carefully in these lecture apologies product points from first gen is the rough intuition of why this is okay means kind of this similar to you you pick a set of means which are like your sufficient statistics to describe your problem then you re-average over them and what's going on here is you're picking a set uh now instead of just picking centers you're picking distributions then what you're doing is
+
+146
+01:17:19,000 --> 01:18:20,000
+you're re-weighting the distribution saying if that was really the background probability of all these linkages then this is what your most likely cluster sizes would be this is how what you know how much points you would have in each okay does that agree with your guess and you just cycle that again and again until you get back to the guest the same way you're doing okay means awesome all right so yeah uh uh a bunch yeah a bunch Yeah so basically an em model can be applied whenever you have a latent uh Z like
+
+147
+01:17:57,000 --> 01:18:51,000
+this and you want to do some kind of decomposition to it yeah it's going to have this this two-step pattern uh where you have an uh latent variable and then I mean it's not neces like there's no requirement that any of this be supervised in some sense the latent variable is like your guess at supervision we'll see ways to inform uh so for example we'll see an algorithm where the first way it was derived actually did use em but there's a more clever way to solve it provably but em
+
+148
+01:18:25,000 --> 01:19:25,000
+is the general form of like there's a latent variable that you don't see and you have a model for it you estimate that parameter and then you solve like a traditional supervised machine learning or um kind of estimation problem under the covers yeah and that's very very general your latent variable here is clusters but we'll see it could be you know distributions and all kinds of fancy stuff later please students at least initial class or for example kilometers so no so oh great question I see where
+
+149
+01:19:10,000 --> 01:20:02,000
+the confusion comes in no so here it's like we are almost memoryless so we had those you know Phi and and sigma and all those other things and now just like in k-means we throw away some information and we try to reconstruct it and here given our link of pis we try to compute all of those observed parameters which are going to be the mues and the sigmas and the phi's and blah blah blah the rest of the observed parameters so it's like given the linkage function we do that again and then what we would expect
+
+150
+01:19:36,000 --> 01:20:22,000
+is that those parameters will not move around so much over time and that's when it will converge similar to the way K means word great great question yeah yeah uh there there is nothing that has such a crisp solution to my knowledge I don't actually know one but that's a that's a really good question how do you initialize this and and what situations can you can you better initialize it um it seems natural enough to think about one but I don't know a proof for one yeah it's a great question
+
+151
+01:20:07,000 --> 01:21:16,000
+you can post it on Ed and I can dig around and see if anyone did that my suspicion is yes because K means plus plus was such a important thing it's a wonderful idea other questions all right okay so looking at this trying to think what I should tell you um all right so we have about nine minutes left let me see all right so what I'm gonna what I want to do is I think I want to I want to just tell you the steps that we're going to go through next time because I think over the weekend this
+
+152
+01:20:51,000 --> 01:21:45,000
+will be too much traditionally I teach it Monday Wednesday but I'm going to want to redo this I think that's what I think so right now what I want to do is uh have a detour into one thing that we need which is convexity and Jensen's inequality so I'm just going to draw the basics here and then I'll give you a sense of what the EM algorithm looks like now the reason we need this is that this is a key result and it confuses people every year so I spend more time on it and hopefully it
+
+153
+01:21:18,000 --> 01:22:01,000
+confuses them last sometimes people say it's trivial and then I'm very very happy so if you think it's trivial then I did my job okay all right so what we're going to need to do the reason I want to tell you this is what we're going to have to do is we're going to have to have a mathematical abstraction of like this going back and forth and is guessing back and forth and that's going to be basically two different functions one function is going to be a lower bound of the
+
+154
+01:21:39,000 --> 01:22:25,000
+function there's going to be the actual loss function for the totally you know crazy probability distribution that has all the infinite models and everything jointly together okay the actual likelihood function and what we're going to do is we're going to have an approximation of it that says given we have a particular guess of the zi's we're going to have this lower bound and we're going to have to move between the lower bound and the upper bound and that and the lower bounding function and that
+
+155
+01:22:02,000 --> 01:23:05,000
+is going to be facilitated by something called Jensen's inequality and it's worth understanding because it's something that you can use so I'll just get started a little bit on it and draw some pictures and then we'll we'll pick it up next time okay a b element of Omega and I would certainly rather answer questions because you know we can cut into later lectures so don't we don't need to rush okay a b is n Omega okay so let me draw this okay so something is convex
+
+156
+01:22:34,000 --> 01:23:48,000
+if the line joining them oops is inside them okay so like if I take any two points in here any A and B and I draw the straight line between them or euclidean space so it's a straight line then if it's convex then no matter which points I pick the line between them is going to remain in the set this is a convex object so like an ellipse or a circle or something like that in contrast here if I pick points A and B here this is not convex okay and these These are going to be you know um yeah we're going to care about these
+
+157
+01:23:14,000 --> 01:24:26,000
+quite a bit okay so what does this mean in symbols and symbols we have to check for all Alpha for all a b and Omega which is our set Omega Lambda a plus one minus oops 1 minus Lambda B that's the line between them is an element of Omega and Lambda here is an element of 0 1. okay that's all this picture is saying this picture in this math are the same okay and you need to check for all right right here clearly if I put a here and B here there's a line between them the reason it's not convex is there exists
+
+158
+01:23:50,000 --> 01:24:41,000
+one pair of A and B for which I I go out of this set okay now we're going to use it when this bottom piece is a function right we think about the function going up to Infinity the graph of the function mean convex and what this tells us is when we if we look at chords that is points between the function like this they should always be lower bounds to the function and that will be a little bit opaque but it'll feel like you think about a function that looks like this the x squared function
+
+159
+01:24:16,000 --> 01:25:21,000
+the that set will be convex that's the canonical convex function okay all right so what we're going to see is we're going to go from these definitions of convexity on sets to convexity on functions and that's going to allow us to basically prove the following statement which we will prove next time which looks mysterious but is not you'll see this is greater than F of e of x okay so there's going to be we're going to show next time just I want to I want to you know give a little bit of a road
+
+160
+01:24:49,000 --> 01:25:43,000
+map we're going to use this definition of convexity to prove a theorem this theorem is called Jensen's theorem and it's effectively immediate from the definition like once you understand the definition of this for functions if f is convex this is true F convex a function is convex if it's graphis convex we'll draw that out okay once we know that we're going to need that for convex and concave functions that's going to be a key building block for what we do for the next couple of lectures we've talked
+
+161
+01:25:18,000 --> 01:26:11,000
+about convexity once or twice in the supervised setting um but now we're going to need it in a little bit more detail okay all right so let me wrap up and tell you what we did today so that you remember what I want you to take away so we started with this idea of the difference between supervised and unsupervised learning we then went through k-means which was a really simple heuristic algorithm but you know in a hard problem that would find these clusters we talked about this idea that you needed to be able to model
+
+162
+01:25:44,000 --> 01:26:36,000
+the problem to be able to solve it you had to input either K or something and you had to be able to check or at least visually inspect the answer we then talked about a generalization of k-mean what's called mixture of gaussians and the only generalization was rather than belonging to a single cluster deterministically you tried to find this probability distribution over everything that led to a bunch of notation but the notation still basically had this two-step procedure underneath the cover
+
+163
+01:26:10,000 --> 01:26:57,000
+of Guess The Centers and then check How likely they are the How likely they are and K means was the distance in GMM it had this more complicated probabilistic model we like that more complicated probabilistic model because it's going to allow us to model even more sophisticated Notions of structure and then I think I'm just going to go through that on Wednesday so that you have all the mathematical details there together and we'll we'll do a review of that thanks so much for your time and
+
+164
+01:26:33,000 --> 01:26:36,000
+attention have a great day
+

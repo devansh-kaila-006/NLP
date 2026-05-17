@@ -1,0 +1,592 @@
+1
+00:00:06,000 --> 00:01:01,000
+So hello everyone, welcome to lecture 7. Um I also wanted to go over some clarifications from last time. So when I gave lecture last time, there were two ed posts that I think were good that you all might want to check out. Uh but in case you haven't seen it, I'll just go through it really quickly. I think when describing dropout, how to scale probabilities at test time. During lecture, there was a bit of confusion. Um and basically the what I said in the slide had a sort of mismatch. So um in
+
+2
+00:00:34,000 --> 00:01:32,000
+each forward pass for dropout we have this hyperparameter P which is either the amount of neurons you're dropping out or it's the amount of neurons that you're keeping depending on which implementation of dropout you're using. Generally they do it's the number of ones you drop out. Um so in most libraries that's what P means. But the basic idea is that at test time you want the expected output to be the same as at training time. So this means that if you dropped 25% of your activations during
+
+3
+00:01:03,000 --> 00:02:02,000
+training time at test time you would scale by 75 so that the expected output is the same. Um and so I think there was a bit of confusion because in this slide the implementation uses P as the probability of uh keeping a unit active. So uh there's a bit of a mismatch there. Just to clarify, there was also a question in class from last time about how normalization can be useful and maybe resolve the issues that arise when you have weights that are initialized incorrectly. But we had this to choice
+
+4
+00:01:32,000 --> 00:02:33,000
+setting where we have 2D inputs to our model and a two-layer neural network with RLU. Um it's outputting basically this quadrant function. So if the point lies in the top right, it'll output one or two or three or four depending on which quadrant uh the point lies in. And uh we plot the different training losses and test losses for uh good initialization using the kiming initialization we discussed last time and bad initialization where the standard deviation is too high. And the blue plot here represents bad and the
+
+5
+00:02:03,000 --> 00:02:54,000
+green represents bad initialization with layer norm. So you can see it actually does resolve a lot of the issues but to get the best performance you still need good weight initialization which are the two lines afterwards. So you can go dive in and also whether or not layerm helped depends uh depends on the problem. So in this quadrant one you can imagine that you don't need to know the exact 2D position uh of each point. So layerm was actually helping but for some of the other functions that are in the code you
+
+6
+00:02:28,000 --> 00:03:25,000
+can check out um where you need to know the exact coordinate in order to get the right output layer actually hurts performance uh because you lose some information about the exact spatial location of your input when you're doing this subtraction of the mean and dividing by the standard deviation. So uh just some notes here um basically at a high level it does help with the issue but gap remains. So you can't get by this weight initialization issue with just normalization. Um and as I mentioned it may not always
+
+7
+00:02:57,000 --> 00:03:55,000
+make sense depending on what you're trying to model. Um so I think just to recap also from last time we've been mainly talking about these sort of vanilla standard non-recurrent neural networks so far. So this is a fixed size input and a fixed size output. Um you have sort of this onetime setup where you set your activation functions. You do data pre-processing according to some fixed mean and standard deviation for the images uh the image channels. You have your weight initialization uh and
+
+8
+00:03:26,000 --> 00:04:16,000
+normalization functions that you use as well as um transfer learning. So if you pre-train on one data set like imageet or some other large scale internet data set, you can get better results if you initialize your weights to those values. We also talked about training dynamics, how you can babysit the learning process and choosing a good learning rate, how you want to update your different uh hyperparameters and also how to optimize those based on the validation performance as well as uh test time
+
+9
+00:03:51,000 --> 00:04:43,000
+augmentation to improve performance further. So, a really good tool for points two and three here is uh something I use in basically all my projects called weights and biases. So, you might find this useful. It's a really neat way that you can um essentially look at different you set different runs with different hyperparameters. In this case, uh they show a dropout column here. So, these are all the different values of dropout. Then color coding is really nice. So, you can see that generally the lower
+
+10
+00:04:17,000 --> 00:05:11,000
+values of dropout will achieve higher accuracy. And so you can visualize uh these different uh validation uh sorry these different hyperparameters based on validation step performance and uh you can sort of uh see you know based on many runs get an idea of which hyperparameters work best. So I always use this I think it's great especially if you have the compute where you can just run something over and over again to improve performance more. This is a really neat way of visualizing it. I think they do it well. There are other
+
+11
+00:04:44,000 --> 00:05:47,000
+tools like tensorboard uh but this is personally the one that I like. Okay. Um, so for the rest of lecture today, we'll be discussing sequence modeling. So this is in contrast to a fixed-sized input uh as as input to our model. What if we have a sequence of variable length and also we'll be discussing what are the sort of simple neural networks that people use before the era of transformers which mainly consist of RNN's and some variants of RNN's. And then I'll also relate in one
+
+12
+00:05:15,000 --> 00:06:12,000
+slide how RNN's actually are similar to a lot of and inspire a lot of the modern uh type of language models that you see called state space models. So you might have heard of mamba there's some other ones too that we'll talk about in the slide but the basic ideas the key concepts from RNNs are still being used today. They're not just used in the past and they have a lot of nice advantages over transformers that we'll go into. Cool. So to specifically formulate this sequence modeling task, you can imagine
+
+13
+00:05:44,000 --> 00:06:42,000
+we have a vanilla neural network where we have one fixed size input to one fixed size output which is what we've discussed in the course so far. In contrast, you could have a one to many uh sequence modeling task. So here we still have a fixed size input like say an image but we want to output a sequence of variable length. So one common example is image captioning. So we input an image and we want to output a sequence of words or characters or however you're modeling uh the language or encoding it but the goal is to have a
+
+14
+00:06:13,000 --> 00:07:20,000
+variable length caption output for what's happening in the image. You could also have a many to one sequence modeling task. So here we could imagine our inputs are say a video and we're trying to classify what is this a video of. So we give it a sequence of video frames and the output is one single class label similar to the image classification case but now we have multiple frames as input rather than just a single image. So this is an example of many to one. Then you also have many to many. So um the number of
+
+15
+00:06:47,000 --> 00:07:36,000
+inputs and outputs in the sequences don't need to match. So you could have your input is a variable number of frames and your output in this case could be a caption of variable length and they don't need to necessarily match. Um but they could match. So you could have so for every single input you have one output. And for discussing RNN's we'll mainly be focusing on this setting on the far right but there are basically a lot of small changes you can make to change and reformulate the
+
+16
+00:07:12,000 --> 00:08:12,000
+problem to apply to the other settings. But this is sort of the most straightforward one. Every time there's an input there's an output. and we'll be using it for the beginning of class to talk about how RNN's work and a canonical example problem here would be video classification where you're classifying every single frame. Okay, so what is an RNN? Uh the basic idea is you have an input sequence X and an output sequence Y. And what makes an RNN an RNN is this recurrent nature. So
+
+17
+00:07:42,000 --> 00:08:35,000
+often people will diagram it by this sort of arrow that's feeding back into the block. uh this is how you know it's sort of like a recurrent layer when you're reading different diagrams. But what it actually means is that RNN's have this internal state or a hidden state as it's often called that is updated as a sequence is processed. So every time there's a new input to the model, we process that and we calculate a new hidden state or internal state. So there's a hidden state, it updates and
+
+18
+00:08:08,000 --> 00:09:08,000
+it depends on the new inputs as well as the previous internal or hidden state. Um I think this diagram is sometimes a bit confusing when you're trying to think about how the gradients are actually calculated and what are the order of operations. So people will often do this uh diagram of an unrolled RNN. And so here it's basically the same as before but we're explicitly showing that the current hidden state calculation is dependent on our input at that time step as well as the previous
+
+19
+00:08:38,000 --> 00:09:43,000
+uh RNN state. So we're more explicitly modeling what is exactly needed to calculate each output and each RNN. You move backwards uh in the computational graph. So I've been speaking with words so far. So let's formulate this with mathematical equations. Now so the basic idea is we're trying to uh process the sequence of vectors X and we're applying this recurrence formula at every single time step. So we have our new hidden state as a function of the old hidden state and the input vector at some time
+
+20
+00:09:10,000 --> 00:10:11,000
+step as well as we have a function with normally with an activation function along with some parameters w. So you can think of this as it's very similar to the sort of initial neural network layers we were learning where it's a weight matrix uh multiply by and then you follow it up by an activation function. This is the same thing here. The only change is that it's now a recurrence formula. So we're using um the same set of W's and the same um uh activation function each time we're
+
+21
+00:09:40,000 --> 00:10:41,000
+computing the hidden state. So um basically yeah as I mentioned this is a recurrence formula. Um and to get the actual output so how do we calculate this blue block? we have a separate uh function that depends on a separate set of uh parameters that convert our hidden dimension state into uh the dimension of our output and it also is a set of weights to convert the hidden state to the output. So this does two in one. It sort of changes the dimension of our vectors from the dimension size of our
+
+22
+00:10:12,000 --> 00:11:09,000
+hidden state which can be whatever we want to the dimension size of our output and then also it provides a transformation there. So, why is a weight matrix that you will multiply by your hidden state to get the so it does two things. It converts your hidden state to the dimension of your output. So, your hidden state and output could be different dimensions. And then also it's uh you know it's a weight matrix that you learn. So, not only does it do this dimension change, but also it applies a transformation to your hidden
+
+23
+00:10:40,000 --> 00:11:33,000
+state. So, it's how you convert your hidden states to your outputs. What WHY is. So the previous slide was how we calculate the new hidden state. So there's it's essentially the same idea where you're doing this uh recursively with the same set of parameters but we have one set of parameters and one function for calculating the hidden state. We have another set of parameters and another function for calculating the output depending on what type of task it is and how we want to model the RNN.
+
+24
+00:11:07,000 --> 00:12:05,000
+Yeah. So they still share the same weights for each time step. Um but there's two different things here. One is to calculate basically how do you maybe it'll be more clear as we go through more concrete examples but uh how do you actually calculate the new hidden state which is this internal state of the RNN and then how do you convert that hidden state to the output which is this slide. Okay. Um so looking through this unrolled uh diagram here um we can see that you sort of need to initialize your
+
+25
+00:11:35,000 --> 00:12:38,000
+hidden state to some value. So we usually call we call this H0 and you can initialize it to whatever you want. In principle usually this is a learned um input vector. Um but now we'll specifically go into each step of this unrolled uh recurrent RNN and actually go through a concrete example for what it looks like when you're doing the forward pass. So um one thing to note that already came up with some of the questions is that um we're processing the sequence of vectors x and we're applying this
+
+26
+00:12:06,000 --> 00:12:55,000
+recurrence formula at each time step. So uh really do notice how the same function and the same set of parameters are used at every time step when computing the hidden state and a separate function and a separate set of parameters are always used at each time step when predicting the output from the hidden state. Yes. So can old values of y affect the new hidden state? uh under some formulations. Yes. And we'll actually go through one example of why that's used. It's most commonly used if
+
+27
+00:12:31,000 --> 00:13:32,000
+you want to predict the next uh like if you're doing a language modeling or auto reggressive modeling task where you're trying to predict one value given the previous values. Uh people will just use the previous values as the input. Uh so that's generally how people do that explicit uh formulation of how can y affect the next hidden state. What is the difference between h and x at the first time step? Um so they use basically different uh weights. So so the H0 is using uh all of it's using the
+
+28
+00:13:02,000 --> 00:14:01,000
+weights that are used to update every hidden state to the next one. Whereas the we'll go through exactly what the weights look like but u basically they're using different weights is the short answer. Um okay so when people say vanilla RNN they usually are almost exactly referring to this type of model where um we have our hidden state t which is uh uses tan h or hyperbolic tangent as an activation function. This is nice because it's bounded between one and negative 1. Um so as you do the
+
+29
+00:13:32,000 --> 00:14:32,000
+operation over and over again your values will stay within this range. Um so this is a nice property to have. It's also zero centered and you can represent both positive and negative values. This is why people use 10h. Um uh al also we um sometimes have an output function fy here but in the simplest case your output yt could just be a matrix multiply by your by your hidden state. So this is really like the most simple formulation of of an RNN. And what we'll specifically go in our concrete example
+
+30
+00:14:01,000 --> 00:14:50,000
+today and lecture is this idea of just manly manually creating a recurrent neural network. So, we're not going to learn this through gradient descent or all these different methods. I'm just going to sort of uh show you how you could construct one by hand and we'll go through it and you'll understand the forward pass, what each of the different weight matrices are doing as well as how the output is calculated. So, in this really toy example, because it needs to be pretty simple if we're
+
+31
+00:14:26,000 --> 00:15:20,000
+just going to be like going through all the different weights, uh you're given a sequences of zeros and ones. Um, and your goal is to output a one when there's two repeated ones in a row. So you're basically detecting repeated ones. Uh, and you'll output a zero otherwise. So you can see this input sequence coming in 0 1 0 1. Uh, so far there's been no repeated ones. But now we have a repeated one. Then we have another repeated one because there's two in a row here and so on. So this is the
+
+32
+00:14:53,000 --> 00:15:50,000
+type of model we're building. It's trying to do this task. This is specifically the many to many sequence modeling task where we have one output for every input. And so um we've kind of been talking high level so far, but if you're trying to create an RNN to do this, what information should be captured in the hidden state? So you have this internal state of your model, what information needs to be captured there in order to do this task? Yeah. So the input to the previous time step and if our output is only dependent
+
+33
+00:15:22,000 --> 00:16:13,000
+on the hidden state, what else do we need to know? And the current Yeah. Yeah. Exactly. Um so this is the information that we need to capture in our hidden state. So um previous input and the current value for x. So 0 or one. And the way I'll do this is I'll just set the hidden state t to be a threedimensional vector. The reason why it's three is this one will come in handy when we're trying to do the uh output stage calculation, but you could probably construct one without a one
+
+34
+00:15:47,000 --> 00:16:41,000
+here. Um this is just to make the math easy and simple for the for the purposes of the lecture today. And the other information is the current value. So this will either be zero or one along with the previous value 0 or one. and we'll initialize it to be 001. So that um we're basically assuming it's basically seen two zeros in a row before at this point. Um yeah, so this is how we will do this will be the uh type of variables we're trying to track in our hidden state and this is how we'll
+
+35
+00:16:14,000 --> 00:17:04,000
+initialize h0. So I talked about how you can initialize it to vary different strategies or you could learn it. This is what we'll initialize it to. Okay, now let's walk by the co let's walk through the code and I'll do it step by step. So, I'm just putting it on screen here right now. But we'll also do ReLU. Um, I guess sorry, one one other thing I missed on this slide is that we're setting our activation functions to be RLU just to make the math easy. So, it'll just be max of zero or whatever
+
+36
+00:16:39,000 --> 00:17:40,000
+the value is. We're only dealing essentially with zeros and ones in this case. So, it makes it pretty simple to think about. Yeah, you probably could construct it so that it works with tan h, but this is just something that I created as an example for how to run it. And so just to make the math really easy, we'll just do RLU. Um but yeah, you could conceivably make a model that could do this with tanh. Um yeah, cool. Um so we have RLU. We have two specific weights here. We have the first
+
+37
+00:17:08,000 --> 00:18:12,000
+weight which um converts our uh previous hidden state. Uh it it applies a transformation to the previous hidden state onto the sort of to calculate the next one. And then we have this weight here which um converts our input x to the dimension of our hidden state as well as applies a transformation. So we are setting this second one. So our our our current hidden state is a function of the previous hidden state as long along with the current time step. And so when we're trying to calculate this uh
+
+38
+00:17:41,000 --> 00:18:55,000
+hidden state at time step t, we're looking to calculate this current value first. So we'll use the x value here. We'll set the weight to be a 3x one column vector um with values 1 0 0 such that when x is zero and we do the matrix multiply we get 0 vector and when x is 1 we'll get 1 0 0 and we'll add this to another term but basically this is going to be calculating what is the current value here. So it'll be either uh zero on top or a one on top and it's calculated based on this first operation
+
+39
+00:18:18,000 --> 00:19:19,000
+here. Okay. Um, so that's how we're calculating the current value based on the uh input. Now we'll talk about uh you know how are we doing this hidden state transformation. So we want to just use the current value for this top value here. So in our weight matrix we'll just have zeros in the top row. This means that when we multiply it with the previous hidden state we'll get a zero value here for the top. So it'll be 0 plus whatever value the right hand side contains. So that's how we're going to
+
+40
+00:18:48,000 --> 00:19:55,000
+maintain this not changing based on the previous hidden state. And we'll set it to be 1 0 0 for the next row. Why we do this is you can imagine we have the hidden state from the previous time step here. And we want to set the uh now previous to be the former current time step. So we have a 1 0 0. What this will do is it'll multiply by htus one. We'll set the current value over to now the previous value for this time uh step. So basically this term will be a zero on top and it will be whatever the previous
+
+41
+00:19:21,000 --> 00:20:26,000
+time step uh input value was as the second term and then this final bit here just maintains the one so that we're keeping this one across all calculations. Um so just to recap we have zeros here because we want the right hand side term to be tracking this uh current value. We have a one here to copy over the current from the former time step to be the previous uh sorry the the to to copy the current of the former time step to be the previous of the current time step. Uh so we're just doing you know h uh maybe it's easy in
+
+42
+00:19:53,000 --> 00:21:00,000
+the code but uh you know ht previous is equal to ht then we want to also move the corresponding value down one here and then this is just a copy of the one. Um so how do we actually get our output now? So we tal we basically talked about how we can track these values given the weight matrices I talked about. So whhh and w xh. So if we have a weight matrix to convert our hidden state into the output dimension we want it to be uh 1x3. So it's uh single value that's being output when we have this hidden
+
+43
+00:20:27,000 --> 00:21:34,000
+dimension as input. And this is sort of like a dotproduct between the values here and the values here. So what this will correspond to is the current plus the previous minus1 minus one because we multiply the minus1 here. This is where the one became useful and uh the current associated here with a one and then also the the previous associated here with a one as well. Um so that's how we actually do it. And if you if you think about it um this general formula will work. So uh if we have say we're looking
+
+44
+00:21:00,000 --> 00:22:02,000
+here we have the current plus the previous is 2 minus one is one for this uh left hand term inside the ru so the max of one and 0 is one and if these are both zero you'll have a minus one so we'll get zero these are a one and a zero then you'll still get zero so these are how you can construct these weight matrices but I actually wanted to pause briefly um and talk about if there were any questions about any step among this calculation because this is the only example we'll go through in class where we're
+
+45
+00:21:31,000 --> 00:22:25,000
+literally doing all the matrix and vector multiplications and the rest will be more highle explanations for how people tend to put these layers together. So I just want to pause and see if there's a question about how the matri matrices and vectors are tracked and multiplied and updated. Yeah, so the question is how do you go about constructing the weight matrices which is a really great question uh and I thought to put it in the slide here. So, how how would you actually do this? Um, it's the same way we're always
+
+46
+00:21:58,000 --> 00:22:48,000
+finding the weight matrices in this class. We're going to be using gradient descent and we'll talk about how you do gradient descent descent when you have multiple time steps and maybe you have losses computed at each time step as well. So, that'll be a lot of what we go into right next. So, it's a great question and very relevant to the lecture. So, this is um just an example so you can see how all of the weight matrices are multiplied. Um the basically if you were trying to change
+
+47
+00:22:23,000 --> 00:23:20,000
+if you're trying to initialize with this and then train it to do another task um that would be sort of like transfer learning where you're initializing the weights with this. Um but in practice I don't think it would work very well at all because your hidden state is really small and people normally do much larger hidden states. I just wanted to do something that I could fit in the slide here. Yeah. Okay. I'll go over the second row again. Um so if you imagine we have ht minus one as a column vector
+
+48
+00:22:51,000 --> 00:23:55,000
+here when you do the matrix multiply um to get the value of the left hand side here what this second row is doing is you're taking the value and you're sort of you know rotating it and doing the dot productduct with the values here. So for the second row that gets calculated it will be the entry here will be equal to the top of the the vector here. So this is how we move the current down to the previous is in this step here. So the the end result of this matrix multiply will be that such that the
+
+49
+00:23:22,000 --> 00:24:25,000
+second uh value is the uh is the current value from t minus one. So we do the matrix multiply with t minus one here. And so the second row of this operation and this operation are both giving us vectors of the size of our hidden state. And so we're adding them together. Yeah, the left is doing the previous carryover and the right is doing the current. And that's also sort of how it works for RNN's when you are doing it beyond this sort of toy example where this weight matrix is being
+
+50
+00:23:55,000 --> 00:24:55,000
+multiplied by the current input and this other weight matrix is being multiplied by the the previous hidden state. So um that's what these weight matrices track more generally than this specific problem as well. Okay. Um so how do you actually compute the gradients? Uh let's look at the computational graph. So uh just to draw it a little bit more explicitly than before. Um we have these x1 coming in and then x2 and we have a sequence of x's. We're calculating a hidden state at each time step. And we're specifically
+
+51
+00:24:25,000 --> 00:25:23,000
+using the same w's uh same weight matrices for each of these calculations as well. So we need to be thinking about this when we're thinking about how we're computing the gradients. And let's start with the many to many scenario. So we have an output for each input. And um in this scenario you can often also calculate a loss for each output which is how correct is the output at that stage. So if we're doing this uh setting you have a loss at each uh step and you can sum them all
+
+52
+00:24:54,000 --> 00:26:02,000
+together to get your total loss and this would be your loss across the entire input sequence. And um when we do back prop basically the final loss is the loss uh you know this final loss when we comput our final loss we can then calculate the loss per time step as well um or depending on the formulation. So if we're calculating a loss per time step you can treat them independently. Um sometimes you have an overall loss based on the loss uh per time step too. Um we can also uh get the basically the final gradients for each
+
+53
+00:25:28,000 --> 00:26:25,000
+of these W's. You can calculate the gradient for each time step separately and then you're going to sum them all together. So this is how it works in practice. You could imagine if it were different W's at each time step, you could pretty uh probably easily see how the computational graph could be structured such that you're calculating a different gradient for each of these different W's. And so we're essentially treating our single W for computational purposes as uh a set of um different
+
+54
+00:25:57,000 --> 00:26:51,000
+W's, but then at the end we merge all the gradients together because it's just the same weight matrix that's being multiplied. So conceptually you can think of it as you're just calculating it for each time step almost treating it in your head like it's a different W being used, but because it's the same value of the weights, you just need to sum all the gradients that you calculate at each time step together. Um in the many to one scenario, you'll just have a a single loss calculated
+
+55
+00:26:23,000 --> 00:27:14,000
+here. Um so and sometimes you'll only use the final hidden state uh to calculate the value depending on the problem setting. Like say you're trying to do video classification, it may make makes sense to use the hidden state from every step because you might have information about the video throughout the entire course of the video during classification. You can do some pooling like average pooling or max pooling or something like that to compute your your y-value. Um and then sort of uh if you
+
+56
+00:26:49,000 --> 00:27:53,000
+have this sort of one to many mapping like in image classification um or sorry in image captioning um there was a question about how you could incorporate the previous Y's. So um you still need to have an input input to your FW uh because it's sort of two different of these weight matrices. One that's expecting input vector X and the other that's expecting um the previous time steps hidden state. So um you could imagine that you can put a lot of values in here. You could just put zeros or you
+
+57
+00:27:21,000 --> 00:28:13,000
+could put the the previous um the previous output here. Okay. Um so I explained at a high level how you do the back propagation. But there's actually some specific issues that you'll run into uh when you're trying this conceptual when you're sort of looking through this conceptual framework that are very practical in terms of running out of GPU memory which is always the cause of basically all the issues when you're trying to train a a neural network that and I guess nan loss
+
+58
+00:27:47,000 --> 00:28:44,000
+during training. So um when you're computing say a loss at each time step um and you have an extremely long input sequence you'll actually it's really easy to understand you need to be keeping the activations and the gradients at each uh time step in memory then summing them all together. This is going to get extremely large as your input sequence increases. So what can you do practically to resolve this issue? Um this is called back propagation through time by the way when you have the same weight matrix that's
+
+59
+00:28:16,000 --> 00:29:19,000
+being applied in multiple different time steps and then you're summing the gradient at each time step together. Um so um what you can do is it's called truncated back propagation through time. So you basically fix a time window and you can look at basically uh pretending that this is uh all the model was trained on so far. We start with our h0. Um we calculate based on the input at time step one and our previous h value. We can calculate what is the current hidden uh state at h1. And then we can
+
+60
+00:28:48,000 --> 00:29:36,000
+use that to calculate our output. We'll have our loss. And we can run this for each of our examples. And you can imagine how in this setting it's relatively easy to see how you just sort of treat the beginning sequence as if this is all we were seeing during training. And moving to the next block, you can now essentially you're starting your H0 with now it's the output of your previous step here. So we're initializing the hidden state with whatever the output was in our final
+
+61
+00:29:12,000 --> 00:30:17,000
+step, but the gradients are no longer carrying over. So we're basically batching the computational graph such that we're only looking at the loss in a neighborhood of these time steps at a time. This is a fixed window size that you set. So this is how you get around this um relatively I would say um common issue especially as you have really long input sequences. Um and so yeah you basically are batching it out and you can just keep doing this for the entire input uh sequence. So um one other thing
+
+62
+00:29:44,000 --> 00:30:44,000
+is that um you know you might ask how does this work if we have just a single output at the very end. Um so you can still calculate the gradients at each time step but you will no longer have this um uh loss that's uh dependent on the time step uh itself uh the output of the time step itself rather you'll be relying on upstream gradients. So you can imagine we're looking at the far right of the diagram here and we have our loss that we calculate based on the output at the final time step. um we can
+
+63
+00:30:14,000 --> 00:31:25,000
+calculate what is the gradient uh with respect to our current uh hidden state at the end. And then we have our whh matrix to help us understand how did the uh how did the previous hidden state contribute to the uh final hidden state and we can use that to uh calculate the gradient and understanding based on the previous hidden state and the weight matrix. how can we change this transformation matrix whh such that um we would be changing our loss and uh then you can just you basically just applying the gradient rule to whh over
+
+64
+00:30:50,000 --> 00:31:43,000
+and over again here and you're only looking at how the hidden state changed the next hidden state and how that contributed to the loss. So you look at the final example here. This tells you how changing the hidden state depends on loss and then you know how the previous hidden states how they change how that affected uh the current hidden state which is given by this whh matrix. So using the W's at each time like using different W's at each time step would essentially mean that you're um no
+
+65
+00:31:17,000 --> 00:32:13,000
+longer modeling it as a recurrence relation. So basically you have uh you can think of it as one layer for each different possible time step. Um so you would probably see um worse performance because um if you are sort of no longer modeling it as a sequence recursively. You're just uh I mean imagine you train a neural network where you have a series of inputs. Each one has a separate weight that it goes to >> independently. >> Yeah. Independently. That would make sense for a problem where it's not a
+
+66
+00:31:45,000 --> 00:32:44,000
+sequence modeling problem. You just have a set of things that you want to classify. U you would need to know like the the amount of the sequence ahead of time. So I think it could work if it's not a sequence but for uh sequences of variable length um I I think it would not work very well u because you're sort of um I mean I'm trying to think of the simple way to explain it but it's sort of like you're just training one neural network for each uh time step. So it's sort of not the way to formulate it. So
+
+67
+00:32:14,000 --> 00:33:13,000
+how does this work with chunking? So um we have our so we we can do you understand how to this point we can at the point right here with the red dot we can calculate um the gradient of the loss with respect to our final hidden state. Okay. So um if we can do that then we can calculate the gradient of our loss with respect to our second to final hidden state because we know our final hidden state is dependent on our previous hidden state times this weight matrix W. Okay. So we can do this and we
+
+68
+00:32:44,000 --> 00:33:50,000
+can go back and forth until here and at this point uh we can uh sort of all we need to save is this final step here. So what is the gradient of this very final uh or finals I'm maybe overusing the word final but what is the gradient of this initial um hidden state within our truncated batch with respect to the loss and then when we're calculating backwards we just use that value to calculate all the previous time steps. So that's the overall process. You're only looking at how the hidden state
+
+69
+00:33:16,000 --> 00:34:23,000
+transforms to form the new hidden state. And that's the only value that's getting updated here. Um uh yeah. Yeah. Oh, and also the also how the input uh changes the hidden state. So you're looking at two values. Both how the input affects it and how the input affects the next hidden state and the the previous uh hidden state. Sorry, there's two values. Yeah. So the learning still occurs for all the batches. Um so um you have your loss with respect to um each of your parameters in W here and then when
+
+70
+00:33:50,000 --> 00:34:42,000
+you're calculating it for the previous time step um you you you basically keep this one value. If you change the final the initial hidden state here, how does that change loss? you can calculate that and then you can see how all the variables feeding into this uh and namely this original hidden state and the current time step how will that affect the variable but then when you're actually moving to the next chunk over you only need to look at how does the this hidden state here affect the hidden
+
+71
+00:34:16,000 --> 00:35:10,000
+state on in in the next chunk. So you're looking at this division boundary. The one variable you need to track over is what is the gradient um of the hidden state that occurs after the chunk. Um and then you can use that to calculate the gradient of the current hidden state which is dependent on input x and the and the previous. So there's different ways you can formulate it, but you can imagine we just apply uh the update to all the the weights here and we zero out the memory. The only thing we're
+
+72
+00:34:43,000 --> 00:35:37,000
+tracking is uh yeah the the gradient right here. So you're you can apply you can do a gradient apply step where you apply all the gradients to the weights depending on the learning rate and your optimizer and all this stuff and then you move on to calculating the next batch. So the reason why this isn't a perfect calculation is because um you're calculating these independently rather than all at once. So you sort of have three different updates rather than just one update at a time. But it should be
+
+73
+00:35:10,000 --> 00:36:16,000
+um you're still calculating the gradient for each each step here. you keep one thing in memory which is how does this hidden state the the first one in the batch how is that how can we update the hidden state here to to determine the loss and we throw out all the other ones so you have the weights in memory you can apply the gradient you do your learning rate multiply and you apply it to the weights you'll also see a similar thing if you do distributed um uh learning so if you have a gradient calculated on each GPU
+
+74
+00:35:44,000 --> 00:36:32,000
+separately they will apply them all to the same set of weights even though they're calculated independently. So I think we have a lecture on distributed learning coming up. So it's a similar thing where you're not tracking it all in the same memory at the same time and you're applying it to the weights one at a time. >> Yeah. Yeah. Yeah. It would be better if you could fit it all in memory. Yeah. Yeah. It would be better if you fit it all in memory. I mean this is mainly for
+
+75
+00:36:07,000 --> 00:37:08,000
+for this one it's essentially the same but in this setting u maybe it's more clear how you're explicitly losing information. So, um, here you're only looking at some of the outputs at a time. Um, so you it's really clear how we're not looking at the entire set of the losses when we're calculating because there's losses at each time step. So, you lose information here, but in this case, you wouldn't lose information. Uh, I think one more practical example where we
+
+76
+00:36:37,000 --> 00:37:41,000
+can't fit the whole RNN on the slide is this idea of a character level language model. And it's really funny because these were shown to be quite effective uh 10 years ago. Um and you can it's really funny because you can see how the current wave of language models are sort of a buildup of this really simple approach of just predicting characters with RNN's. Um so usually when you do a model like this you will input uh your characters and then people call this a one hot uh encoding where um you
+
+77
+00:37:09,000 --> 00:38:12,000
+basically have one uh you have a a one in your vector and zeros in every other location. So it's sort of like the index here. Uh you can encode this as the index and then uh we can use these as inputs and we can calculate our hidden layers based on the previous hidden layer as well as the current uh input. And then we have our output layer the same where now we can look at um you know what is the the output for the corresponding correct value here which is taken as the next time step. So we
+
+78
+00:37:40,000 --> 00:38:42,000
+want the output for example to be E. We map it over here. We look at you can imagine this is something like softmax and we have the logits. So these are the scores. Um 2.2 it's lower than 4.1. So um so yeah we we have a we have a you know this is maybe not so great of an output at this time step um and so on and so forth. So you can really view this as a time stepwise classification problem and that's exactly what uh in general these language model these language models are doing is timestep
+
+79
+00:38:10,000 --> 00:39:17,000
+wise classification based on softmax. Um, so at test time, the basic idea is we need to also sample characters one at a time and and just feed it back into the model. So it sees what it generated at the previous time step. Um, so so on and so forth uh repeating until we generate the words. So you can actually create RNN's to do this um basic uh language model language modeling task by operating at a character level and it works quite well. Um, one thing to note is that in terms of this input layer,
+
+80
+00:38:44,000 --> 00:39:46,000
+um, usually we don't actually input one hot embeddings into the model and instead we'll have something called an embedding layer where, um, this is essentially just a giant matrix which is the dimensions um, the it's d byd where d is the number of different inputs you have to your model. And um what you do is you sort of you can imagine this as a matrix multiply where we grab the first row or in this case we grab the second row of our embedding matrix based on what our input sample is here. And we
+
+81
+00:39:15,000 --> 00:40:15,000
+just use this as a matrix multiply. This is incorrect actually. This this one should be higher probability. Yeah, it's it's funny. We've had these slides for quite a few years and I guess no one noticed it. question. Um anyway, so we have uh E here as our target character. Um and so in this case, you're correct that it's the model's actually getting it wrong. So we will want to penalize it heavy for this time. So yeah. Yeah, it was a good question. Um yeah, so um one of the nice things about this
+
+82
+00:39:46,000 --> 00:40:40,000
+implementation is also it's really simple. So it's like 112 lines of Python code and you can train these models on a variety of different tasks. So this is like the prelim era of what you could do. You can train it on sonnetss by William Shakespeare. And as I mentioned, there's a blog post by former instructor of this course, Andre Carpathy, back in 2015 which talked about how these RNNs are sort of unreasonably effective at what they do in generating text. Yeah. >> Could you explain why you use the why
+
+83
+00:40:12,000 --> 00:41:00,000
+you use an embedded layer? Oh. >> Yeah. So, the basic idea for an embedding layer is that generally it's better to have vectors as input to our models. And you can learn what these embedding layers are too. So um you know we tend to favor like spread out weights in general when we're trying to learn uh these. So you can initialize your embedding layer to this sort of very uh small zero values with something like the kiming initialization we talked about and then you're just looking at
+
+84
+00:40:37,000 --> 00:41:29,000
+one row of it at a time as your input vector rather than it being like a a number as input. Uh how you would have to represent that is basically a one with a bunch of zeros and optimizationally the embedding works better. Okay. Um, so yeah, you can do it in 112 lines of Python code, which is pretty neat. Um, you can train it on songs by William Shakespeare and it'll actually output reasonable text. We'll go through some examples. So, one of the cool things is you can see as you train the
+
+85
+00:41:05,000 --> 00:41:56,000
+model more, it becomes more and more coherent. So, um, at the beginning, it's basically just gibberish because it hasn't learned proper values for W. And then as you train it more and more, um, it becomes more like this stage three kind of looks like English, at least some of the words, you know, right there. And then as you train more it actually starts working really well. Um which this is I guess was a a bit of foreshadowing for what was to come in the era in the era of AI which is pretty
+
+86
+00:41:29,000 --> 00:42:26,000
+cool. Um you can see fullon uh it learns things about the style how you should you know have someone's name and how uh you know something that seems fairly plausible. Uh as you have it generating more and more it starts making less and less sense but it it's pretty cool to see. Um, you can train it on code like I think this in this example they trained it on Linux. So the just the source code for Linux they trained one of these character level RNN's and you can see it generating C code which looks pretty
+
+87
+00:41:58,000 --> 00:42:57,000
+good. Uh I don't know if this would compile but it looks reasonable just looking at it. And this idea has really taken off over the past uh few years. So um I mean I'm sure you all are know especially since a lot of you work in computer science or coding or your students in this area but um there's all of these different programming tools now for these language models that were essentially trained on a similar task where they've consumed a bunch of this uh uh training data that's just existing
+
+88
+00:42:28,000 --> 00:43:13,000
+code and instead of trying to predict the next character they're trying to predict the next token which is a group of characters and how they define tokens depends on the model and there's a lot of details we could get into there But at a high level, it's a really similar thing. They're just predicting groups of characters autogressively, one after the next. And it's really seen a blow up in recent years with all these existing tools. Yeah. >> What is the input to the model? Is it
+
+89
+00:42:53,000 --> 00:43:47,000
+like a trigger? >> Oh, what? Like for this? >> Yeah. >> Um, you could have the input be Yeah, you just maybe you start with a random character could be one way to do it. Uh, but you would need some initial input. Um there could be usually with uh language models they have a start token as like a predetermined this is always what you see at the start of your sequence. So you could do a similar things with RNNs. I don't know in this exact scenario what they did. Maybe they just did a character but it's hard to
+
+90
+00:43:20,000 --> 00:44:05,000
+know. So the question is how does labeling work with language models? And the neat thing about these pure language models all they're doing is just predicting the next token. You don't need to label it. You just need to give it a lot of text. That's why these models are so good is because they scrape the internet for, you know, essentially all available text and then they train a model on all of it. So that's that's why they're so good. It's cuz you it's just generating the next
+
+91
+00:43:43,000 --> 00:44:35,000
+token and you don't need to label it. So that's why language models are so good. So the question is uh if we're always taking the maximum probability output at each time step, um won't we always just be generating the same thing over and over again? And the answer is yes, actually. So if you just took the maximum probability uh I guess uh this example is not so good but imagine the probabilities are correct here and you just took the maximum probability at each time step you would always be
+
+92
+00:44:09,000 --> 00:45:00,000
+getting the same output given the same input. In practice what people do is they don't do this is called greed decoding. You're always picking the maximum probability. In practice they sample based on a distribution the distribution given by the probabilities output by your softmax. So you won't pick the max probability. You would pick uh say in this case probability 84 for this one or probability.13 for this other uh output variable and then you would run that for each uh sequence.
+
+93
+00:44:35,000 --> 00:45:21,000
+And there's a bunch of different ways you can do it too. There's like you can search ahead called beam searching where you're trying different ones and seeing which one has the highest overall probability for the sequence. So there's there's a lot of this is like a whole active area of research. How do you sample from these models? But the simple answer is you don't always pick the highest probability. Yes. The question is in the case where we have many to one outputs are we outputting something each
+
+94
+00:44:58,000 --> 00:45:43,000
+time or do we have something to look at here? So I think in practice to save compute you wouldn't want to output something that's never used but you could feasibly output it at each time step and it might be interesting depending on your problem to look at that and understand is the output converging over the course of training or not something like that. So you you it might be useful to look at but generally people wouldn't do it just to save compute but it could be useful actually. Yeah could help you understand
+
+95
+00:45:20,000 --> 00:46:22,000
+the way your model works if there's certain triggers or things that help it predict uh the correct answer. Cool. Good questions. Um okay so we'll keep on chugging along. Um we talked about these RNNs how good they are at generating characters. We related them to some of these modern coding tools which are really neat. Um, one of the cool things also about RNN's is you can look at the activation uh activation values and they'll actually sometimes tell you interesting things about what the model's tracking.
+
+96
+00:45:51,000 --> 00:46:49,000
+So, we had in our little toy example, we had we looked at the act output activations and you would see it's the current value and the previous value. That was what the RNN states or cells were were tracking. Um, what you can also do is give it basically a sequence here. Um, in the models I'll show in these slides, it's using a tanh activation. So this is from one to minus one and minus one means it's visualized as red here and very close to one would be blue. Um we get the whole spectrum
+
+97
+00:46:20,000 --> 00:47:08,000
+here. And you can look at for each character coming in what is the activation of that cell at that time step. And so that's how they're color coding these plots here. This one's not really showing anything. It's random. A lot of them won't be interpretable. But some of them have pretty cool things that you can track. Like for example, this one's a quote detector. So it turns on basically as soon as the quote starts and it uh ends when the quote ends. So this is basically something in the RNN
+
+98
+00:46:44,000 --> 00:47:51,000
+tracking. We need to have an end quote at some point. Uh and when to put it is sort of uh something the model is trying to figure out, but it's tracking it. Um another cool thing is the line tracking line length tracking cell. So it starts uh kind of very uh high value and then it becomes a very low value as you near where the model thinks there'll be a new line character. So this is also kind of cool as a way to look at uh this other value. And these are again just single activations in a layer of this model
+
+99
+00:47:17,000 --> 00:48:17,000
+that we're looking at and mapping it to um each character. So it's highly interpretable. Um they have this sort of if statement cell. So anything within an if statement is being tracked here which is also pretty cool and uh even uh things like detecting quotes or comments because it needs to know to output the end of comment uh character here. So it's something it needs to track and so you have this nice interpretable cell as well. And then finally this code depth cell. So as you sort of have nesting in
+
+100
+00:47:47,000 --> 00:48:42,000
+your code, it activates uh more and more at each time step at each not time step at each uh step into the sort of indentation into the um into your code hierarchy. So yeah, this is pretty neat. You can actually look at the activations and directly map them onto the inputs without needing to do any fancy tricks. Um which is which is actually pretty incredible if you think about how interpretable some of these hidden states are in the RNN. It's actually somewhat similar to what we were doing where we were manually assigning it, but
+
+101
+00:48:15,000 --> 00:49:11,000
+the RNN is sort of internally doing a very similar process. Cool. Um, so I'll talk about now some of the trade-offs like why you might want to use an RNN and when is it helpful. So, um, the nice thing is they can process any length of input. So, a lot of these modern language models that rely on transformers have something called a context length or context window, maximum context window. Um, RNNs don't have this. they can just take a sequence of infinite length essentially as long as you can keep running the
+
+102
+00:48:43,000 --> 00:49:43,000
+model on it. Um so there's no context length limit. Um the computation for the time step t can in theory use information from many steps back if it's captured in the hidden state. So if your model is effectively capturing all of the dynamics of your input sequence in the hidden state, in theory it can use values from an extremely long time ago. Um but in practice there might be some issues with this which we'll kind of go into some details there. Um also the model size does not increase for a
+
+103
+00:49:13,000 --> 00:50:00,000
+longer input. So um you know we had an example where what if you just had a different layer for or different layer for each input time step. Uh you don't have this issue which is nice. And then uh we're applying the same weights at each time step. So basically we know the update rule for how we calculate the outputs is the same every single time. So um there's some nice like symmetry here and also just and when you think conceptually about the problem you're always doing the same thing at every
+
+104
+00:49:37,000 --> 00:50:40,000
+single time step which is is nice conceptually and also helps with some imple implementation as well. So what are the main disadvantages? So you need to compute the previous hidden state to compute the next one every single time. So this can be slow if you need to you sort of have each hidden state is determined and uh is conditioned on all the previous ones then this recurrence computation can actually tend up taking end up taking a lot of time. So although this is not an issue at during inference
+
+105
+00:50:08,000 --> 00:51:08,000
+time when you're always like for a transformer also you have this issue where you need to output the next uh token or character every single time but at training time it's actually difficult to batch uh all of these together and and during training because in order to calculate the loss you need to calculate the previous hidden states. Um so so this can pose challenges for scaling up to a lot of data and then in practice um it's actually difficult to access information many time steps back because
+
+106
+00:50:38,000 --> 00:51:36,000
+we have a fixed size hidden state and we're trying to cram all the information into it. So you'll eventually lose some information as your sequence goes longer and longer. Cool. I'll talk about some uh uh applications more specific to computer vision where RNNs have seen success now. Um so one of them is image captioning which we talked about. So um the basic thing here is we mentioned there's this sort of start token or start character which begins the sequence and then you will terminate when you have this end
+
+107
+00:51:09,000 --> 00:52:12,000
+character or end token. In this case it seems like it's word level uh tokens. So um you could have a model like this. you have um the most basic way to do it is you essentially have a CNN or something that encodes a visual encoder that encodes the image and we use that as input to our uh recurrent neural network as well as the uh previous text that was generated. So we sort of have two stages here and and very more concretely how would you combine the CNN and RNN? You can imagine you have this test image. It
+
+108
+00:51:40,000 --> 00:52:33,000
+comes in. So your your model sort of going downwards here starting at the first layers at the top and then moving downwards. Um you can imagine this is something that was like say trained on imageet or something. Um and so we're not going to use the class uh labels but we're going to use this second to last layer. This is sort of the common strategy we saw for transfer learning as well or this sort of getting good visual uh representations of images. So we use the second to last uh layer
+
+109
+00:52:07,000 --> 00:53:13,000
+and then we can start using this as input to our hidden state. And now our hidden state is also a function of um this w um value here. So we don't necessarily have um just a hidden state. We're also tracking the visual components here. But I won't spend too much time on this because um this won't be in any of the assignments. But just to give you a flavor of here's how RNN's were used historically with CNN's where we're taking a CNN pre-trained on imageet and now we're including this information
+
+110
+00:52:39,000 --> 00:53:36,000
+into the hidden state as well. Um so you know we use the sampling process either greedy sampling some other version of sampling to calculate tokens at each time step. We end it when we have this end token whenever we sample the end token. That's how we know when to finish. And these models actually worked very well for the time. I think uh they had a lot of great successes. So you can see here a lot of nice examples of where the model's outputting very reasonable uh captions based on the input image
+
+111
+00:53:08,000 --> 00:54:06,000
+but also they the models would struggle in a lot of scenarios too. So um a lot of these have to do with sort of the distribution of where these images are commonly seen in the training data. For example, um someone holding something with their hands sort of cupped like this. Um very much looks like how they might hold a mouse, but obviously um you know, we can tell this is a phone because it's a flat object they're holding and their their their hand is facing up, not not downwards. So, this
+
+112
+00:53:37,000 --> 00:54:33,000
+sort of thing is interesting to see. Um also, I guess they think the woman's holding a cat where she's just wearing some fur uh clothing. um you know they see a beach so they assume there's a surfboard. This type of hallucination I would say is still extremely common with vision language models today where uh it'll think there's objects present that are commonly present in a given scene but aren't in this particular scene that you're looking at. Um also you know things like bird being perched in the
+
+113
+00:54:05,000 --> 00:54:58,000
+tree or uh throwing a ball but he's catching a ball. These are all based on the bias in the data set. Essentially in the model learning that during training it is most probably true that a certain object or a certain action is being performed when in the actual image it's not the case. Um so in the data set uh there's high coccurrence of these actions or objects with the particular scene. So the model learns to associate them but it doesn't learn to disentangle. Okay, it's happening in
+
+114
+00:54:32,000 --> 00:55:21,000
+this scene because of the, you know, in this scene we know they're not throwing because the glove is here and the ball's going into the glove, not in the other hand. But you need to sort of explain it uh like that. And the way we train these models, we're we're training them just to output the caption. So we're not doing any sort of explanation there. And that's why u it's part of the reason you see this co-occurrence issue. Okay. Um so for visual question answering, this is another really common
+
+115
+00:54:56,000 --> 00:55:51,000
+task where RNN's reused. And there are sort of two formulations for visual question answering that were commonly used. One is to basically um you say you have a model that is a a captioning model and you want to see how well it could answer questions. One thing you could do is to give it this question and then have it output text and look at the probabilities of each of the answer sequences. So you have a probability for each character or token and you could multiply them together to get the
+
+116
+00:55:24,000 --> 00:56:22,000
+probability of the overall answer. This is like one way you could use one of these RNN style uh models to do question answering. Um a more common way people did it is they would have basically a question as input to the model. Um multiple different answers also as in separate inputs to your model and then it's outputting essentially a probability per question. And so in this case it would be a four-way classifier where uh you have four different classes answer one, answer two, answer three,
+
+117
+00:55:53,000 --> 00:56:45,000
+answer four and you're just outputting the probabilities and a lot of different ways you can formulate it but um this is a very common task in computer vision where you need to use language and where sequence modeling helps. Um also visual dialogue um you know at the time these were all considered very separate tasks. these days the tasks you have sort of one model that can do almost all of these um but you know how can can you have a chat about an image we've really seen an explosion in the
+
+118
+00:56:19,000 --> 00:57:31,000
+capabilities of these kinds of models in the last 2 years um maybe uh one other type of model that RNNs were commonly used for is for this visual navigation task so um you know you you have these images coming in and you want to output a sequence of directions to move in some 2D floor plan how do you get to the target destination Um this is another application for you all to be aware of where these sequence modeling um these sequence models were used. Okay. Um one thing I want to note that I didn't really explicitly mention before
+
+119
+00:56:55,000 --> 00:58:03,000
+but um just in the same way where we can have multi-layer CNN's or multilayer uh uh of these sort of dense or fully connected layers um you can also have multi-layer RNNs. And in practice most of the RNNs I showed were multi-layer RNNs. Now the main difference is that um you sort of treat each layer uh separately. So the hidden state of say layer 1 depends on the hidden state of the previous time step of of layer 1. Um so in this in the sort of depthwise dimension sorry in the yeah in in the
+
+120
+00:57:29,000 --> 00:58:30,000
+depth dimension each of these layers you're only looking at the hidden states from that layer in the previous time steps. And then in terms of looking at windows in the time dimension um instead of so the first layer will have the actual input x as the input but then the second layer will take us input the output y from the previous uh layer. So you can sort of stack these up and it forms this grid where we have each layer is operating uh with regards to the previous hidden states only within that
+
+121
+00:58:00,000 --> 00:59:09,000
+layer. But then in terms of passing input output that is between layers. And so you can see to calculate this top right value we need to calculate all of the different values uh all of the different hidden states in this entire computational graph beforehand. So you can get a feel for how as you start training this gets to be a very involved process and not very efficient. Okay. Um I'll talk about one of the key variants for RNN's that was proposed actually a while ago in the 1990s but saw a lot of success for quite some time
+
+122
+00:58:34,000 --> 00:59:45,000
+until the transformer revolution called LSTMs. You won't need to know about the details of how LSTMs operate, but what I hope you learn is that RNN's have some key um disadvantages that LSTMs seek to alleviate and a lot of the more modern statebased models also try to seek to alleviate some of these same issues that RNN's face. So um you know we talked about how by default tanh is a really commonly used activation function and we also talked about how you have this whh matrix that converts your previous hidden state to
+
+123
+00:59:10,000 --> 01:00:15,000
+the to the uh sort of the new one and it's summed with this uh wxh matrix that converts your input uh vector xt at the current time step into your uh hidden state dimension. Then you sum these together. Um, you can also formulate this as sort of uh we have our weights here and weights here and you're sort of stacking the vectors uh like this. And so sometimes for shorthand people will just combine both of these W's together to form one big W. Um but you should note that um it's sort of like these are
+
+124
+00:59:42,000 --> 01:00:33,000
+two blocks that are uh diagonally positioned together where there's there would be like if you're formulating like this there's sort of a lot of zeros in this w because whh is not interacting with xt at all but this is a shorthand way to notate it where it makes thinking about it and writing down the math easier. So you will see all three variants here. Um, this one's maybe the most explicit about where the actual values, the non-zero values in the weight matrices lie. And so one way to
+
+125
+01:00:08,000 --> 01:01:06,000
+think of it is you stack these vectors together, which is shown here. Um, we're multiplying by this w and then we pass it through tanh. This gives us our output ht, which we pass to the next uh, RNN. You can imagine these are stacked. And then you may also have either the output directly YT or we have this layer um where it's a weight matrix time HT with a with an activation function around it too. Uh yeah question. >> Oh sure. Yeah. >> Okay. >> So here we have multilayer RN.
+
+126
+01:00:38,000 --> 01:01:48,000
+>> Yeah. >> How is the uh the symmetric pretty much? >> Yeah. So the weights are shared within the layers for multi-layer RNN. All of these um all of these hidden state updates will use the same weights and then each layer which you stack it vertically in this diagram each layer will have a separate set of weights. Okay. Um yeah. So so this is sort of the way that it works. And then when you have back propagation, we talked about if you don't have a loss for each time step y,
+
+127
+01:01:12,000 --> 01:02:11,000
+um you need to only calculate your loss based on what the loss is of your output ht. Um and so when you do this back propagation, you're multiplying by w and then you're also taking the derivative of tan h. And both of these can actually have some issues. So um when specifically mathematically looking at what is the gradient of the um how can you know if we change each component of our hidden state t um with respect to t minus one. So so sorry if we change each component of t minus one how will that
+
+128
+01:01:41,000 --> 01:02:41,000
+affect ht um this is what this gradient is calculating. we need the derivative of tan h um because this is our activation function and then we have whh which is the the multiply here for converting the previous hidden state to the next one. Um so this is actually how we calculate the gradient and here we can run into issues. So um if we're calculating the loss at each time step and we have the loss here the total loss we just sum it for each of the weights. Um so the total loss is just the sum of
+
+129
+01:02:11,000 --> 01:03:28,000
+the loss at each time step with respect to these this reused w matrix. Um and so you end up getting this product of these um of these d L uh you know uh you circuit to calculate sorry the loss of L at the final step LT with respect to HT you need to calculate each of the intermediate hidden states and how that affects uh W. In order to calculate this final uh loss here by using the chain rule u we sort of mentioned example here and just to point out why this is an issue. Um if we look at these individual terms so if we hone
+
+130
+01:02:50,000 --> 01:03:52,000
+in on this aspect of how does changing the uh current hidden state change the next one which is the majority of these calculations uh contained in this product term here. we get that it's this tan it's this uh it's the same thing we mentioned earlier where you have this derivative of tanh multiplied by your whh and so why is this an issue? Well, first of all the this is sort of the derivative of tanh plotted here. The maximum value is one and so almost always you're getting less than one. So
+
+131
+01:03:21,000 --> 01:04:31,000
+you can have vanishing gradients from this term here. Um but even if we assume there's no nonlinearity uh nonlinearity or we pick some um activation function that doesn't have this issue um if we look at this uh weight matrix here um that we're multiplying at each um time step either we're going to have a large singular value. So um this will be you know as the as the vectors are coming in what is the maximum they'll be uh stretched if it's say a unit vector uh singular value is telling you what
+
+132
+01:03:57,000 --> 01:04:48,000
+what's the maximum that a unit vector could be stretched by the matrix. Uh so if it's very large you can have these gradients explode or if it's very small you can have this vanishing gradients issue. Um, and if you have exploding gradients, we have a fix which is this scaling the gradient. So you can just divide or like clip it and somehow so that you don't. So too big of a gradient, it's not too much of an issue. But this really small gradient vanishing gradient issue is actually the main
+
+133
+01:04:22,000 --> 01:05:25,000
+issue with why people don't just use really long RNNs in practice because of tanh and because you under many scenarios your your weight matrix has this property where it's either um you know expanding your activations or or or reducing them. So um yeah I think these these are the main reasons why it motivated a change in RNN architectures and why a lot of the reasons why people don't use RNN's. This is one of the main issues. So how do you resolve this? So the way that people did it was this
+
+134
+01:04:53,000 --> 01:05:46,000
+creation of the LSTM and the highle idea which I won't go into too many details because it's actually quite complicated um is that you have four of these different gates that are tracking different values that instead of just having one hidden state, you sort of have multiple of these values you premputee to determine how to change your hidden state and then also what information to pass through a different pathway. So you have the regular hidden state pathway. You have a different pathway where it's easier to pass
+
+135
+01:05:20,000 --> 01:06:14,000
+information. And this is the basic idea. Um you know at a at a high level they call it a gate gate or like what are you actually writing to the hidden state of the cell. The input gate which is deciding whether or not you write information to the cell. The forget gate how much to forget from previous time steps as well as the output gate which is like how much are you actually uh outputting for your hidden state. So you can see this is like really involved a lot of design choices here and they put
+
+136
+01:05:47,000 --> 01:06:48,000
+it all together into this I would say uh fairly complicated diagram but the basic idea is uh this part is the same where we're doing this weight multiply but now we have four different values we're computing instead of just the ht um we have the input gate and the gate gate to determine how much to write here and we have our output that's passed to the next hidden state um this is sort of you can think of this top section here is like a highway where the goal is to not have any activation functions. So no
+
+137
+01:06:17,000 --> 01:07:19,000
+tanh so we avoid the issues we had where tanh made the gradients vanish. Um and all we're applying is this forget gate. So as long as we're not basically forgetting uh all the information at each time step we're able to pass information more easily. This is the highle explanation and then more importantly in practice people seem to see that this worked very well. Um again you won't be implementing this for the course at all. Um but I think this is a really commonly used baseline still in
+
+138
+01:06:48,000 --> 01:07:42,000
+some uh deep learning papers. So it's good to know about but uh I think you can think of this through the lens of people are trying to construct these things to make up for all the issues that RNN's had which is vanishing gradients and also the lack of information being captured. Uh you need to cram everything into this hidden state. Right? So you have really long-term dependencies. Those are lost. So they created a separate pathway to to to pass over this uh more long-term information through the top here.
+
+139
+01:07:15,000 --> 01:08:17,000
+Um so do LSTM solve the Ganishing gradient problem completely? Um it definitely helps. So um it makes the RNN easier to preserve this information over many time steps by using this top pathway diagram. Um so it's in contrast it's a much harder for vanilla RNNs to learn our current weight matrix that preserves info uh info in the hidden state across every single time step if we're always doing the same operation and we're not able to just pass information directly without an activation function. Um so it doesn't
+
+140
+01:07:46,000 --> 01:08:47,000
+guarantee it but it's makes it significantly easier uh and it helps improve learning long-term dependencies and uh works very well empirically. So people generally don't train RNN so much and they'll more often train LSTMs if you were going to go with this recurrent um modeling route. Um but I think in general these are also I would saying I would say significantly fallen out of fashion. But this gives you a sense of the way that people have tried to design RNNs to account for the issues they
+
+141
+01:08:17,000 --> 01:09:15,000
+face. So, um, one other thing that would be kind of cool to tie in to something you learned earlier in this course is this idea of directly adding outputs and skipping some activation functions or other layers is actually highly related to the idea that we discussed in ResNets where you have these skip connections where uh the value is just copied over and added uh later in the in the in the in the layer block. So you have multiple in resonance you have multiple of these convolution layers stacked together and
+
+142
+01:08:46,000 --> 01:09:47,000
+then you add uh skip connection where the value just gets added here and you can sort of think of uh this in a similar light for LSTMs how it's skipping over some of these uh layers and it helps improve as you get in this case instead of very large depth of the model it's very long sequences of time steps. So um this is sort of it's a parallel but it's a little different because one is the number of layers and the other is the number of time steps. Okay. Um I think the final slide for
+
+143
+01:09:16,000 --> 01:10:08,000
+today's lecture is just a little tie-in for how um these RNNs have sort of made a bit of a resurgent in the last uh year or two which is kind of funny uh because I think if we taught the course maybe a year or two ago I would have been much more willing to want to cut RNNs entirely. But there are actually a lot of nice advantages they have. So the main one is this unlimited context length. So one of the main issues with transformers is they have a limited context length. As people are really
+
+144
+01:09:43,000 --> 01:10:35,000
+pushing the boundaries for what these models are capable of, this context length is becoming more and more of an issue. So if there have been various workarounds in the transformer space, people do things like rope and some other techniques to try to extend the context length. But it's a pretty significant limitation of the model. Um the other thing is that during um during inference for RNN's the compute scales linearly with the sequence length or or during training too but uh basically as
+
+145
+01:10:08,000 --> 01:11:05,000
+you add more and more uh steps to your sequence uh you just need to recomputee the same operation over and over again. So there's no operation that looks across the entire input sequence like you have for transformers. Um so these are really big advantages and there have been a couple of papers. So to shout out a few um there's this RWKV model um you can check out archive link here and also mamba are both uh mainly highlighting this idea of we're able to achieve linear time sequence modeling. So as you
+
+146
+01:10:37,000 --> 01:11:30,000
+scale up your input sequence the compute also scales linearly as opposed to quadratically with transformers and so you get uh it's better for long context problems sometimes in terms of compute it works better and has these main advantages. So we will try to get the best of both worlds and there's been a lot of research in this area. How can you get the performance of transformers with the scaling of RNNs? Okay. Um so that's all for today in class. We basically talked about how uh there's a
+
+147
+01:11:04,000 --> 01:11:59,000
+lot of different ways you can design architectures with RNN's. Vanilla RNNs are simple but they don't work that well. And there's been more complex variants that people have proposed that introduce ways to selectively pass information. um this backward flow of gradients in the RNNs can either explode or vanish depending on the activation function you use or what is the properties of your weight matrix. So um you often need this back propagation through time to actually compute the gradient as well. Um and then finally
+
+148
+01:11:31,000 --> 01:11:56,000
+basically these better architectures are hot topic of research right now as well as just generally new paradigms for reasoning over sequences. So yeah I think that's it for today. Uh next time we'll talk about attention and transformers.
+

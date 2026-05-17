@@ -1,0 +1,608 @@
+1
+00:00:06,000 --> 00:01:07,000
+We're here with our final guest lecture for the course. Um, and today we have uh Dr. Yunju Lee. He is an assistant professor of computer science at Columbia University where he leads the robotic perception interaction and learning lab. He is also a former instructor of CS231N like all of our guest lecturers. and he taught the course in 2023 while he completed his posttock here at Stanford with professors fee Lee and Jaun Wu. His research lies at the intersection of robotics, computer vision and machine
+
+2
+00:00:36,000 --> 00:01:38,000
+learning and specifically his work focuses on robot learning uh and aims to significantly expand robots perception and physical interaction capabilities. In today's lecture, he'll be discussing exactly that topic, robot learning. And I'll now hand it off to Yunju for today's lecture. Yeah, thank you Z for the very kind introduction. I'm super excited to be here like last time I was here giving lectures was two years ago 2023 and uh similar lately like I was going through many of the lectures and today I'm going
+
+3
+00:01:07,000 --> 00:02:04,000
+to talking about like some of things that I have been working on and also it's also a very coherent piece of this overall pictures on deep learning for computer visions and this is specifically on robot learning. So I'll be discussing like what are some of the interesting considerations especially in enabling the robots to better perceive and interact with the physical world and how some of the considerations might be different from some typical computer vision task and computer vision like
+
+4
+00:01:35,000 --> 00:02:44,000
+methods. So first of all like you guys have already learned like a lot about supervised learning. The thing and the setup for supervised learning is that you have data X and Y. X is the input and Y is a label and you are trying to learn a mapping that maps from the input X to the output Y. There are examples you have already learned like classification, regression, object detections etc. And you have also learned about selfsupervised learning where instead of having labels in this case you are just having the data
+
+5
+00:02:10,000 --> 00:03:14,000
+without any labels. when you are trying to do is you come up with learning algorithms that is able to extract or identify the underlying hidden structures of the data just by like uh working or designing some auxiliary loss. Some typical example including like autoenccoders. There's many other like examples in trying to do unsupervised learning or self-supervised learnings like on top of this mass amount of unlabelled data. And the special thing and the unique things about robot learning is that
+
+6
+00:02:42,000 --> 00:03:41,000
+robots has to make physical interactions and make interactions with the world. So it's not just you have the input and outputs and mapping from the input X to Y or some kind of latent representations. It's really about you are influenced evolutions of the environments. So no matter what action you decide to take in the real world, the world will change as a result of that actions and the world will give you some kind of new observations or reward telling you like how the thing how the environment has been changing and how
+
+7
+00:03:11,000 --> 00:04:24,000
+good you are in executing certain tasks. So the goal is trying to actually come up with a sequence of actions with feedback from the environments that is to maximize some reward or minimize some cost and robot learning like especially in the recent like years has attract significant attentions both within academia and also within industries. So we have seen like a many like startup companies and including for example physical intelligence like a Tesla bots or figure they are producing those like
+
+8
+00:03:47,000 --> 00:04:46,000
+a very seemingly very nice and fancy videos of robots doing a wide range of very complicated tasks like folding shirts like manipulating coffee beans or trying to have this humanoid like doing interesting tasks in the real physical world. So this field like I mentioned has attract a lot of attentions and also a lot of investments. Here are just some examples of some recent startups in the field of robot learnings that is able to attract a huge amount of investments trying to build this general purpose
+
+9
+00:04:17,000 --> 00:05:24,000
+robots that can make physical interactions with the environments. So obviously not only those startups many like a big established companies are also having their own uh robotics in investigations and initiatives trying to develop their own like general purpose robots that is able to make uh general purpose and high performance physical interactions with the environment. So for today's lectures I'm going to give you some kind of overviews on some of the key techniques enabling factors of the current success and boom of robot
+
+10
+00:04:50,000 --> 00:05:48,000
+learnings. We will start with like a problem formulination. So how can we more concretely define the problems we have been building and how can we formally thinking about the robots interactions with the environments. So I will then discuss on the more perception sides. I will talk about the difference considerations between how robots perceive the environments and how people typically consider in the computer vision community and what's special about robots perception. Now talking about reinforcement learning, model
+
+11
+00:05:19,000 --> 00:06:31,000
+learning, model based planning, imitation learning like also some of the recent trends on robotic foundation models and also like using the remaining time to discuss some of the challenges we still see like a lies ahead of us. So starts with problem formulation. So this is in general like how the problem should look like at least in a graphical u illustration. So in the middle we have this agent. The agent is given some task objective. This task objective could be for example language instructions from human or some kind of
+
+12
+00:05:55,000 --> 00:07:09,000
+objective functions measuring how good this agent is in doing some specific task. This agent is taking states from the physical worlds or some kind of environments and the agent decides what action to take like this at here that needs to be executed in the physical worlds and this physical worlds will be updated and given this agents this states S+ one as well as the rewards telling the agents how good it is doing its task. So this is how the framework in general look like. So you have to be very clear on this type of formulations
+
+13
+00:06:31,000 --> 00:07:36,000
+that consists of goal, states, actions and also rewards that specifically defines the problems of the robot learning like type of scenarios is very different from the computer visions. I would like to say like computer vision is mostly about trying to learn some kind of representations of the environments based on the inputs like highdimensional data. But for robotics, it's basically trying to solve some kind of optimization problems where you have the constraints which is a physical world of the environments. You have your
+
+14
+00:07:05,000 --> 00:08:04,000
+objective functions defined over your goal and you are essentially trying to solve this optimization problems by coming up with a sequence of actions that can maximize or minimize your objective functions. So that's a key difference between like robot learning and what people typically consider in computer vision. So some specific instantiations of this problem like for example carpole the goal is can be balance the pole on the top of a movable carts and the states of these environments essentially describe
+
+15
+00:07:34,000 --> 00:08:41,000
+the physical states status of the systems which can include the angle the angular speeds positions horizontal velocities etc. And the action could be the horizontal force that is applied to the carts. And you could have the rewards or one indicating at each time step if the pole is being kept as an upright position. Some other example could including like robots locomotion where the goal is to make this robots moving forwards and the states could include the angle, position, velocities of all joints
+
+16
+00:08:08,000 --> 00:09:16,000
+within this robots and the action could be the torque applies to each one of the joints and the reward can be like one at each time. the robots like make a step forwards and also being kept in an upright positions and also like some like interesting example including the Atari games. The goal can be complete the gaming with the highest score as high as possible like you can get. And the states will be the raw pixel inputs of the gaming screen and action could be the gaming control like up, down, left and right. And the
+
+17
+00:08:42,000 --> 00:09:49,000
+reward could be the score increase and decrease at each time step. And uh some of the like a more famous examples you probably have noticed like earlier especially with the developments of alpha go. And the definition and the problem of go can also be defined in similar ways where the goal is to win the game. In the states will be all the pieces that are currently already on the go brought and action could be where to put the next piece down on this board and the reward could be uh on the last turn. If you win, you get a reward of
+
+18
+00:09:15,000 --> 00:10:18,000
+one and if you lose, you get a reward of zero. And this not only applies to for example gaming domains like even with the recent like developments of large language models, you can also like thinking about those problems especially for sequ sequential like generation problems in a similar manner. Or the goal could be to predict the next words and the state could be the current words in the sentence. And the action will be what the specific next words you want to put there. And if it is correct, you get
+
+19
+00:09:46,000 --> 00:10:51,000
+a reward. If it is incorrect, you get a rewards of zero. And uh similarly now you probably have already played with many of the chat bots quite a lot. And we can also define a problem like similarly where the goal is to be a good companions to the human user. The states could be the current confi conversation and action that should be generated by the chatbots will be the next sentence you are given to the human user and according to the human evaluations we could define the reward. If the person
+
+20
+00:10:19,000 --> 00:11:28,000
+is happy like if it if they are satisfied you get a rewards of one and if uh you are not happy or neutral you get some other rewards and more specifically for example in the robotics domain and the task could be to fold the clothes and one clothes be folded nicely in the states is the current observations the robot is getting from this environment which could including the multiv- view RGB or RGBD observations of the environment And the robots needs to decide its actions like how to move it in factors. Should it
+
+21
+00:10:53,000 --> 00:11:51,000
+close or open its scrapers in order to manipulate this close and according to human evaluations if the close is properly folded? You give the robot a reward of one. And if the close is not folded, you give the rewards of zero. So here is actually how you want to like a more concretely thinking about the robot learning problem. This really is a way that allowing the agents to interact with the world that considers the effect of an actions and also this sequential decision- making problems that is
+
+22
+00:11:23,000 --> 00:12:23,000
+different from what people typically consider in computer vision. We just needs to predict the outputs and the goal states actions and the rewards and objective functions are the things you need to keep in mind whenever you are thinking about problems along this direction. So this is about problem formulation. So question is like how specific the reward needs to be designed like in many of the task the reward can have many different type of specifications. For example in the self-driving the reward could be
+
+23
+00:11:52,000 --> 00:12:45,000
+like as fast as possible or reward could be like we want the the the the passengers to feel comfortable as you are driving along the roads. So even for clothes folding depending on the user's preference a clothes can be folded in many different ways. Some want the total area to be as small as possible. Some want it to be as like a smooth as possible. There could be a difference like types of rewards. Here I'm just talking a generic terms like if a person look at the clothes like do they think
+
+24
+00:12:19,000 --> 00:13:18,000
+this is folded or not but more specifically in terms of the reward design. There's actually a lot of nuances in like a satisfying specific needs of a specific application. Okay. So I'll continue. So this is how we are thinking about those robot learning problem that allows the agents to interact with the physical world. Now I'm moving on to robot perception especially in discussing how the perception problem within this robot learning domain is different from what typically people typically consider
+
+25
+00:12:49,000 --> 00:13:54,000
+incom. So this image again you you're actually going to see this image again and again like through today's lecture. So this is essentially in the question of how we are handling the whatever information you are getting from the physical world. The physical world can give you for highdimensional RGB observation or RGBD observations. It could also include some other sensory data like tactile sensings. And this robot perception problem is essentially trying to distill or harnessing some structured knowledge
+
+26
+00:13:21,000 --> 00:14:28,000
+from those highdimensional data that is useful for the robot to do the downstream decision-m and essentially the question we are trying to tackle is trying to making sense of this unstructured real world and the real world can be very messy. So essentially the observations the robots are getting from the environments can only contains like incomplete knowledge of the objects and the environments. There could be occlusions. There could also be like errors from the sensory like data and the imperfect action may
+
+27
+00:13:55,000 --> 00:14:57,000
+also leads to failure. For example like the robots can trying to grasp some objects but that grasping behavior may not always be successful. Sometimes you'll accidentally drop that objects which will also cause like evolutions and unexpected changes of this environment. They will also need to have this perception system that is able to handle those scenarios and also this environments can change. It is dynamic consists of not just rigid object but deformable object clothes medias. There could be other agents like
+
+28
+00:14:26,000 --> 00:15:29,000
+dogs or other kids or other humans that are also in the same environments messing up with the world and your perception system needs to be able to cope with all those kind of changes. So that is why like in the robotics domain people typically not just working with like a camera data they try to add as much sensor as possible to the robots as long as they can provide some useful informations. It really considers like for example like a tactile sensing the audio information the depth informations
+
+29
+00:14:57,000 --> 00:15:57,000
+next and typically we will have to like a design a systems that is able to put all the sensors togethers that allows them to uh complement each other whereas audio information might tell you things about the physical contacts and the tactile information might tells you about whether a grasp is stable or not and the camera information tells you about something that is more on the higher level on the grand scheme of things about the overall states of this environment. So how these sensors can be composed together and work together is
+
+30
+00:15:27,000 --> 00:16:26,000
+very very important to design a capable robotic system that are working in the real physical world. And besides the the numbers of sensory modalities very important difference between like a robot vision and computer visions is trying to really understand the effect of an actions and also the affordance of this environments. On the left is a very typical examples you have already seen in computer vision which is trying to do instant segmentation. What you are given is this 2D image. You are segments
+
+31
+00:15:57,000 --> 00:17:00,000
+different instances from this 2D image like a by drawing like a contours over this 2D pixels. But what's difference in the robotics domain? For example, on the right, the robot can for example given one object and this object seems to be maybe just one object or maybe some a lot of pieces that are for example stacked into each other. The robot has to know like what type of actions will allow us to have better understand better perceptions about this environments. Is this one piece of object or multiple pieces composed
+
+32
+00:16:29,000 --> 00:17:38,000
+togethers? The robot should come up with actions like perturb and actively interact with the environments for the robot to get a better perceptions about the states of this environment. So that is why a robot vision is embodied active and also environmentally situated. By embodies what we mean is robots have this kind of physical body that is directly experiencing the physical world directly. Their actions are part of a dynamic uh with the worlds that have immediate feedback on their own sensations
+
+33
+00:17:03,000 --> 00:17:57,000
+and active meaning the robots are active perceivers. It knows why it wishes you to sense and chooses what to perceive and it determines how and when and where to achieve that perception. You can move your head around you to know like what's behind this table. You can just move around to see what's behind the tables. So this is the active parts which is different from what people typically consider in computer vision. that are mostly like work with a passively collected data sets. The third point is
+
+34
+00:17:30,000 --> 00:18:34,000
+about situated. The robots are situated in the world. They do not deal with abstract descriptions but with the here and now of the world directly influencing the behavior of the systems. Bots really have to understand especially in closing perception and action loop. It sees the world and understanding its goals and be able to act in the environments upon its perceptions. Sometimes the robot don't have to know the full state of environments. For example, if I'm buttoning my shirt, I only have to know
+
+35
+00:18:02,000 --> 00:19:05,000
+the local regions near that button for me to button that shirts. So some of the perception has to be tightly coupled and co-designed with the task and the downstream decision-m systems for the robot to focusing on the relevant region or task relevant regions of the environments to be properly like a close this perception and action loop. So this is about some very specific considerations and how robots perception might be different from what people typically consider in computer vision. I will starting to discuss some of the
+
+36
+00:18:34,000 --> 00:19:48,000
+algorithms that not only allow the robot to see but allow the robot to act in the world and we will starts with reinforcement learning. Remember earlier we have like seen this image the robots has to act upon this environment and get rewards from this environments. So one very typical ways of trying to solve this optimization problem is allow the robots to interact with the worlds as extensively and as massively as possible. You just collect all the experience data and do this type of like a trials and errors allow the robots to
+
+37
+00:19:11,000 --> 00:20:16,000
+understand this action leads to higher reward and that action leads to lower rewards and we can pivot the agents behaviors towards the actions that give the agents some higher rewards. This is like the general ideas of reinforcement learning. is really a way to allow the agents to constantly interact with the environments and do this trials and error to maximize the reward or minimize the cost. And here I also want to be a bit more specific in discussing the difference between reinforcement learning and supervised learning. So
+
+38
+00:19:44,000 --> 00:20:45,000
+this is a typical framework of how reinforcement learning look like. You have the environments. Environment give the agent some states. Agents generate actions. And the environments like give the agent the feedback which is the rewards and the environments will change where the environment give the agent the new states S t plus one and it essentially a sequence like a temporal sequence on the temporal domain where the robots has to the agent has to make the sequential decisions and here is a typical like image u typically look like
+
+39
+00:20:14,000 --> 00:21:18,000
+for supervised learning. So you have the data sets. The data sets will input to the model this X and this model will generate the prediction Y and you will be able to calculate the loss according to the model's predictions versus the ground truth from this data sets. So this is a typical setup of supervised learning and the key difference some of the key difference between reinforcement learning and supervised learning is that the environments might be stochastic or the same actions the environment might
+
+40
+00:20:46,000 --> 00:21:49,000
+change in a different manner. Let's say if you are pushing a box forward, depending on the distribution of the supporting force, the same exact actions will lead to can potentially lead to the box rotating into different angles. Meaning there can be uncertainties and stochasticities in the environments that will like lead to like a stochastic behaviors of these environments which will also give this agents stochastic like rewards where the same action may not always leads to the same rewards. So
+
+41
+00:21:18,000 --> 00:22:18,000
+this is very different from supervised learning. We are dealing with an uncertain dynamical system. The second is about the question of credit assignments. So for supervised learning you give the inputs, you predict the outputs and directly calculate the loss like you directly know like what are the mistakes and what are the error you are making by making a specific predictions. But in the reinforcement learning or sequential decision- making domain, the rewards can be delayed. Meaning if you like play the
+
+42
+00:21:48,000 --> 00:22:57,000
+game of gold like only until the very ends of this episodes do you realize you are winnings or you were losing and that's rewards 01 mice is because of some very very early like steps maybe even the first like steps or some steps during the middle of the games. So how to properly assign the credits you are getting along this sequential decision makings towards all the actions is also another very like a tricky and important questions people hope to answers within reinforcement learning. The third thing
+
+43
+00:22:22,000 --> 00:23:26,000
+is the non-defision diffusion abilities of this dynamical systems for example for supervised learning like you have the inputs you feed the inputs through the model you get outputs you calculate the loss. So everything along this process is differentiable. So you can directly g gradients of the loss functions with respected to the parameters within the model. But that's typically not the case for reinforcement learning where the environments can often times not differentiable. So how to properly gather gradients of the
+
+44
+00:22:54,000 --> 00:24:00,000
+rewards with respect to the actions can be tricky. Sometime people have to relies on a massive sampling to do like those type of zeros order estimations of the gradients for you to do proper learnings. That's also is another difference like the last difference is about this non-station of this scenarios where the evolutions and the states of the environments is really a result of your actions. For supervised learning, no matter whatever you predict, it doesn't influence other data points you are
+
+45
+00:23:27,000 --> 00:24:27,000
+getting from this data set. But your actions will influence the next states you are getting in this sequential decision- making problems. It is also what makes this kind of reinforcement learning problems a little bit more like a nuanced than supervised learning. So here are some more specific examples. Like for example playing these Atari games like I mentioned earlier the goal could be to complete the games with the highest score and the states will be the raw pixel inputs from the gaming screen
+
+46
+00:23:57,000 --> 00:25:05,000
+and the action could be up down left and right from the keyboards and we're trying to like the reward are the score increase and decrease at each time step and some typical algorithms within this domain either lies in the field of for example like a pure learnings or for example policy iterations Here's a one examples of like trying to learn this Q function. Q function essentially measures the discounted expected future accumulated rewards like when you apply a specific action A at a specific state
+
+47
+00:24:31,000 --> 00:25:32,000
+S and you'll be able to get this Q functions through like interactions with this gaming environments and after you have learned this Q functions you can evaluate for example like what are the Q values you are getting by applying different actions in this case there's left and rights ups and downs months. So there could potentially be four actions and given this four actions you can look at their Q values and just execute the action that give you the highest Q values. So that is what allows you to do
+
+48
+00:25:01,000 --> 00:26:02,000
+this type of like decision makings in this domain. So uh because today we're going to cover a lot of materials so we won't go into the details of the reinforcement learnings but some of the current state-of-the-arts reinforcement learning algorithms including SACE like soft actor critics and also PO like proximal policy optimizations. So if you are interested you are like very welcome to look at those algorithms in details. There's a lot of like open source like implementations and tutorials online.
+
+49
+00:25:32,000 --> 00:26:39,000
+But here I want to highlight to you some of the results you could potentially get by going through this reinforced learning specifically like Q-learning process. This is developed by Google deep mind that is trying to develop this agents that is trying to play the game breakouts in this kind of Atari world. So just after like a 10 minutes of training the robot the agent can already like touch the ball but often the times like can still missing the ball like quite often and after some more times of
+
+50
+00:26:05,000 --> 00:27:20,000
+learning for example like a two hours of training and the the the agents can control this kind of paths in a much more reliable and consistent fashions that can nearly like all the time can catch the ball and be able to like constantly getting more and more rewards by like a uh by by by by bouncing it back. And after like a four hours of trainings, something that's interesting happens where the agents come up with actually a novel strategy which possibly is not known to many of you that is trying to like a push bounce the ball
+
+51
+00:26:42,000 --> 00:27:45,000
+back to create a tunnel on the left sides of this wall and then it will push this ball like on the upper side of the wall to do this very efficient like uh reductions of those uh bricks. This is a type of strategy that can be discovered by reinforcement learnings. So this is like what's nice about reinforcement learning meaning you allow the agents to do very extensive and comprehensive exploration and interactions with the world. And it is totally possible for this reinforced learning agents to
+
+52
+00:27:14,000 --> 00:28:16,000
+discover some strategies that are better than even the best human players. Like a very typical examples will be the game of go. So when Alpha Go came out in the January 2016, it was also like about the time when I was trying to decides like what type of like research directions I'm going to go. Before that time, I was just working on deep learning for computer visions. But when Alpha Go came out, I'm like I have to work on this kind of decision- making problems. So that's why I started to touch upon
+
+53
+00:27:45,000 --> 00:28:44,000
+reinforcement learning, imitation learning and all the way until now to do robot learning that allows the robots do physical interactions with the environments. So um I wasn't satisfied with just working with a passively collected data sets but we really wanted an agent that can do active interactions with the environment. So questions was how does specifically this Q functions like works. So you can see this Q take as input the state S and also the action and this setup would essentially be the
+
+54
+00:28:14,000 --> 00:29:12,000
+parameters of this Q functions where the Q is instantiated as a neuronet network. In this specific case like I mentioned earlier the states is the raw pixel inputs that directly getting from the gaming screen. So the inputs could be this kind of four steps four frames that directly inputed to this Q function. And if you're dealing with images, a very like a straightforward way of in instantiating this Q function is to use convolutional neuronet networks. So you have convolutional layers like show in
+
+55
+00:28:43,000 --> 00:29:38,000
+this kind of orange blocks and then you'll be able to go through this fully connected layers to directly derive this like a Q value and in this case because there are like a four discrete actions like in this case probably just left and right but let's say there's like a four discrete actions up and down left and right. So you'll be able to have like different Q value estimations that is the results of this specific action A and that's how you can use this Q values to make decisions on what action to take
+
+56
+00:29:10,000 --> 00:30:12,000
+that is the most effective at maximizing this Q value. Does that answer your question? Yes. Like uh this is when Alpha Go came out and obviously since then there has been a lot of developments and evolutions in making this type of gaming agents better and better. So then later there's like alpha go zero that is essentially a simplified versions of alpha go they're no longer using any imitation learning to do any initial in initialization and is able to beat like at that time the number one like a
+
+57
+00:29:43,000 --> 00:30:48,000
+player like co. So this is actually one thing one lessons like people learned inside u this AI communities which you can call it like the bitter lesson from the rich suten where sometimes you want to find the simplest recipes that is the most and best compatibles with the scaling. You want to leverage the scale like the the power of scalings and sometimes like making this method simpler will actually give you better performance by like making it more compatible with whatever infrastructure you can use for scalings and stuff. And
+
+58
+00:30:16,000 --> 00:31:17,000
+then later uh um they develop alpha zero that is able to generalize the same set of algorithms into not just chess uh not not just go but other games like chess and shoji and then they they designed like a mzeros that's like not just like do this kind of model free reinforcement learning but it's able to learn a latent space dynamics models to plan over that give you like even better performance. So for this specific domain like I would say especially in the gaming developments that really empowers a lot
+
+59
+00:30:46,000 --> 00:31:55,000
+of like design and developments in how people can do better and more sample efficient and more scalable design of those reinforcement learning like agents and uh in November 2019 like Liso like who was beaten by alpha go announced his retirements and he realized there just no it's just not possible like at that times for any human players to beat the best like a go like AI agents out there. And obviously since then there has something been other like more complex games like Starcraft and Dota that shows
+
+60
+00:31:21,000 --> 00:32:18,000
+that as long as you put enough compute as long as you have like a good like a very welld designigned like algorithms and infrastructure for you to do the reinforcement learning you can get very very good performance in games that are actually noticeably and orders small magnitudes more complicated than the game of go. So I would say like if you have a game like a reasonably designed games like uh there's like a very legit chance like if you put as the the sufficient resource you can have very
+
+61
+00:31:49,000 --> 00:32:55,000
+very powerful gaming agents. So not just in games people have also been developing this reinforcement learning algorithms and agents that can work directly in the real physical world. So this on the left is a work from ETH that was published in science robotics 2020 that essentially changed my minds about how useful reinforcement learning can be for real physical robots because before it was just mostly games like could argue in games like there's a lot of you can just like spawn as many games as
+
+62
+00:32:23,000 --> 00:33:19,000
+possible but for the real worlds there's always like sim to real gap where you are training on the same game you are also testing on the same game but for robots was if you train on a simulation like how much does the sim to real gap matters for the agents you generalize to the real environments and this paper really convinced me that sometimes the sim to real gap just may not matter that much so we are not simulating the bushes we are not simulating the snows but the agents that's using reinforcement learn
+
+63
+00:32:51,000 --> 00:34:01,000
+training simulation can give you some very very robust performance in the real physical worlds like snows and slipper very very slippery like a surface On the right is a very recent video released by Unitry that shows just another levels of like dexterities for locomotions that can do this kind of sim to real transfer allow this robots to do like a very very crazy and dynamic behaviors that can navigate into some very rough and challenging terrains. I would say in the domain of robot locomotion is close to be a solved
+
+64
+00:33:25,000 --> 00:34:38,000
+problems and the solution to this problems is exactly reinforcement learning. So this is about local motion. The other domain is about manipulations where the robots has to manipulate the objects in the real physical world. So in 2019 when open AI was still like a touch upon like a robotics they designed the systems they are trying to do dextrous manipulations of rubric cube they are able to do the reinforcement learning in simulation and do sim real transfer they allow this kind of robots to like solve this rubric cube but one
+
+65
+00:34:02,000 --> 00:35:06,000
+caveat is that their success rate is very very low like although this video seem to be very beautifully done but their success rate was very low and if you really look at the papers uh they only tested a very limited amount of trials and uh given that number possibly the reliability is not very like satisfying but still like since then people have been able to like extends upon this texturous manipulation problems allow the robots to do enhanced texturous manipulation and reorientations of different types of
+
+66
+00:34:33,000 --> 00:35:38,000
+objects and into different like target configurations um is all thanks to the developments of reinforcement learning. But we can see until now our examples in locomotions and in hand manipulation, it doesn't really solve the problem. For example, if the robot can just fold the clothes for you or doing the laundry for you in your home like for manipulation is still in this kind of very like isolated domains like working with this kind of isolated like environments. So this is actually some of the key
+
+67
+00:35:06,000 --> 00:36:10,000
+challenges and bottlenecks of existing like a model free reinforcement learning. This mostly learns from the trials and error with the environments and it requires extensive like interactions with the worlds. For example, for the Alpha Go Zero, like it actually learns from 3,000 years of human knowledge in 40 days, which is amazing, but like it still requires like many many like years of computation like years of like equivalent computations for the agents to learn. If in domains where there's like a huge simal gap and
+
+68
+00:35:38,000 --> 00:36:33,000
+you want to do the reinforcement learning in the real physical worlds that will be a huge bottleneck for learning this reinforced learning agents very effectively and also of course if there seem to gap if you only can learn the model in the real environments there's a lot of like safety concerns for example here is an example of showing this kind of learning progressions of agents that is controlling this humanoid robots to move forwards you can see like during this learning process Although at the very
+
+69
+00:36:05,000 --> 00:37:08,000
+end the robot is able to like move forwards but there's a lot of like a very weird behaviors that you can totally imagine if you apply this agents on the real physical robots it will like fail catastrophically and uh uh it also have like a very limited interpretabilities and sometimes very hard to correct things when things go wrong. And like one interesting thing if you really think about how human learn to interact with the environment versus like pure reinforcement learning you realize that we humans have a very
+
+70
+00:36:37,000 --> 00:37:40,000
+intuitive understanding of this environments. We can imagine how the environment is going to change if we apply a specific actions. So it's exactly this predictive capabilities that allows we humans to plan our behavior in achieving some specific targets. And this predictive capabilities is also actually learned from with humans physical interaction and everyday experiences with the real physical world. So going beyond the reinforcement learning the next like topics I want to discuss will be how we
+
+71
+00:37:08,000 --> 00:38:11,000
+can indulge the robots like with similar capabilities in imagining the effect of their actions and to do model based planning. For this specific examples we have a simulation. Typically the simulation people use would be for examp essentially a bunch of like rigid body simulations where the robots like just touching this kind of like a polygon type of represented like a pl like a representations of the floor. It is not simulating for them the bushes. It is not simulating those snows. But what people do is to randomize the simulated
+
+72
+00:37:41,000 --> 00:38:42,000
+environments a lot. They randomize the friction, the geometry and many other physical parameter inside this environment such that people will assume whatever you encounter in the real physical world is just one data points within the distributions you randomize within your simulation. So if your policies can be robust like robust in controlling this robots within that distribution and if the real just one data point within that distribution the policy can generalize and so far at least from this empirical evidence this
+
+73
+00:38:12,000 --> 00:39:08,000
+type of assumption actually holds and the policy actually works very reliably and robustly in the real physical world. So the question is about like what is actual command. So actually in many of the existing demos there can be a person providing high level commands to the robot. For example, which direction should the robots like walk? Should the robots like rotates in place or just still like keep walking forwards condition on that high level actions provided by human? The robot has to decide this kind of low-level actions.
+
+74
+00:38:40,000 --> 00:39:42,000
+The low level actions are typically for example the um the the the joint torque that are applies to each and every one of joints on top of this robots. So that is how like this typically like looks like meaning humans give high level commands condition high level commands robot has to use this policy to decide this kind of low-level like actions which is in instantiated using like joint torque. So like I mentioned one biggest lesson I learned from this lines of work on locom motion is that the simulation doesn't have to be perfect as
+
+75
+00:39:11,000 --> 00:40:06,000
+long as you randomize enough you can generalize very robustly in the real environments. But such lesson hasn't really been generalized like very well in the manipulation domain. So in the manipulation domain like how accurate the simulation needs to be and how much does the symmetry real gap matters is still a research question people hope to answer. So I can give you one specific example. If in the simulation you are pushing a box forwards. If in simulation the box rotates for 10° but in reality
+
+76
+00:39:38,000 --> 00:40:37,000
+rotates for 12° it may not matter that much. But if in the real world your grasping was successful but in simulation the object shoot just flies away because of some kind of numerical issues or if the object like sleep like away between your fingers that's problematic. So there are regions where sim to real gap matter. There are other regions simil gap may not matter that much in the manipulation domain and people still are trying to trying to answer and trying to understand like how simil gap can happen and what are some
+
+77
+00:40:08,000 --> 00:41:08,000
+of the most important like recipes and characteristics that this simulation needs to have for the most reliable like seem to real transfer. So if I understand your questions correctly you're asking like there are still a person like providing high level commands to the robots. Your question is can robot come up with better plans than a human. So I can actually give you a more nuanced perspective. Although many of these videos seems very nice. There is a human operators operating the robots to choose which route to go. For
+
+78
+00:40:38,000 --> 00:41:35,000
+example, like what people typically do is for example, let's say there's kind some kind of rough terrains or some pile of rocks. And the humans can actually try to command the robot to going forward trying to climb those kind of rocks. If that fails, humans can actually provide some other high level conveyance to get around this pile of rocks. So there can be some kind of learning also on the human side in understanding the capabilities of those robots. So this is also why some of this video can actually looks very nice
+
+79
+00:41:06,000 --> 00:42:08,000
+because human select the routes that human knows can show the limits and also the capabilities of this kind of low-level controllers and how to do that autonomously. That's actually an very interesting like questions people are also doing research upon. Mhm. So then I'm going to continue. So I have discussed like some of the successful examples and power of reinforcement learnings and I also discussed the limitations of reinforcement learning and we still haven't really seen very very successful and wide scale
+
+80
+00:41:37,000 --> 00:42:36,000
+deployments of reinforcement learning in manipulation yet. And we human not just learn from trials and error. We actually build this type of internal model. So we're asking the question can we actually learn the models from the robot's interactions with the environments and using that model for the robot to do better physical interactions. So specifically what we are touching upon again back to this figure is how we can learn and approximations of the real physical world and how can this approximated
+
+81
+00:42:06,000 --> 00:43:09,000
+physical world that runs on the virtual domain can help guides the robots actions and decide what action to take in the real physical world. So let's say if you already have the model for example let's say you have already learned the models like we humans have in our like mental like environments we can predict given the current state s and also the action t how the state of the environment will change in new states t + one and then we can use this essentially is a forward model like given the current state and action
+
+82
+00:42:38,000 --> 00:43:33,000
+predicted next states. So what actually is the problem for us to do the planning which is essentially an inverse of this forward model where the plan is to give the current state and the target states and to come up with the action they can allow the robot to achieve the target states from a given current state showing the blue dots. We have a targets here in the red. We can have maybe some initial guesses of how the actions might look like. And our model, our approximated learned models will be able
+
+83
+00:43:06,000 --> 00:44:10,000
+to predict the sequence of the evolutions of the states which is show in this green like a trajectory. And then we can measure the distance between this green dots and the red dots and back propagates or doing optimizations using the gradients of those their their distance uh with respected to all the actions along that trajectories to do this type of optimizations in order to know like what actions can guide us to getting us closer to the targets show in the red. And obviously the model may not
+
+84
+00:43:38,000 --> 00:44:38,000
+be accurate enough. So we typically only execute the first actions and we obtain the new states from the environment and we can reoptimize the action sequence using gradient descent or any other optimization technique you use to do this trajectory optimizations. And one of the key benefits especially recently with the developments of GPUs and also neurodynamics model is that you can use a GPU for parallel and simultaneously sampling to allow you to do like a large scale sampling and optimizations of
+
+85
+00:44:08,000 --> 00:45:05,000
+those action sequences which is actually quite efficient. So like given this like a general framework you have the model which is this kind of forward process and you can always use a kind of forward model to do this inverse optimizations to come up with the actions that can like get you closer to your target configuration. And one of the key questions has always been what should be the right representation of the what should be the right and most effective state representation is and how we can learn this model based on
+
+86
+00:44:37,000 --> 00:45:38,000
+this state representation. And over the years there has been many different investigations on choosing or investigating different type of state representations. Some earlier work including how can using for them just 2D images as a representation of the states and trying to learn pixel dynamics meaning how the image might change if you apply a specific actions. This is a work called deep visual foresight which set up some of the initial works in the whole domains of like a world models. And by learning this kind of pixelbased
+
+87
+00:45:08,000 --> 00:46:08,000
+dynamics models, people can come up with strategies that is able to for example minimize the distance between the current observations and some can rotate objects and pushing the objects around in order to achieve the targets show in green and the current states is show in red. So this is about like a pixel dynamics and what people can also do is to use a key points as a representation of the environments to learn like a key points dynamics models. And here like what we can do is to track the movement
+
+88
+00:45:38,000 --> 00:46:49,000
+of the key points on top of this box over the 3D space and also neural dynamics model of those key points as a result of some pushing actions. And then we can allow the robots to use this forward predictive models to plan the robots behaviors you to track some specific trajectories in order to push this box to achieve a target configurations. So besides using key points, so what if you are encountered some objects with even higher degrees of freedoms. So if you go like one level finer, you can also represent those objects using a
+
+89
+00:46:14,000 --> 00:47:18,000
+sets of particles essentially a set of points here like which is actually a work uh uh that was done while I was here like as a postto where we're representing this pile of granular pieces using a bunch of particles and trying to predict how those particles will move around if you apply a specific actions and this forward model can allow the robots to do this inverse decision makings. They handle a wide range of granular objects of different like granular sizes and we come up with strategies that can gather those pieces
+
+90
+00:46:46,000 --> 00:47:49,000
+into the target region show in the bottom right like a corner of each like a segment and the same model with like a good feedback from the environments allow the robots to correct from the model's error and come up with strategies that can be very reliably aggregates all the object pieces into the target region and obviously See this model not just can generalize to like a different like a granular pieces of different granular sizes. You can also change to different target configurations. Here you will very
+
+91
+00:47:18,000 --> 00:48:19,000
+quickly realize what the target configurations are. The robot has to come up with a strategy that to do non-trivial redistributions of the granular pieces. And after the redistribution you had to align the fine grain details with the targets like shape in order to accomplish this like a pile rearrangement tasks. The task here is actually to rearrange this granular pieces into different letter shapes all the way from letter A to letter Z. And with this kind of forward models will be very successful in coming up with a
+
+92
+00:47:48,000 --> 00:48:52,000
+sequence of strategies. Of course with feedback from the environments to allow the robot to rearrange this kind of object pieces into the target regions. And this is actually a highly non-trivial task. And going beyond that, we are also uh have this like a subsequent work which I was also involved and done when I was here at Stanford. And we designed this kind of dumping making robots that is actually equipped the robots with 15 different 3D printed tools. We have four RGBD cameras looking at the environments to do a
+
+93
+00:48:20,000 --> 00:49:23,000
+reconstructions of the geometry of this doll. And the robots will have to decide what tool to use and what action to take in order to guess this dumpling into getting this dough into a dumpling. And the key enabling factor is also this like a forward predicting models represented like using particles. Right here the red dots are representing the shape of the tool and the blue dots are representing the shape of the object. The first row is our model's open loop prediction and second row is like what's
+
+94
+00:48:52,000 --> 00:49:54,000
+actually happens in the real environments. So this learn model that directly learns from this real world interactions can very actually predicts the change of the shape of the dough when using different tools applying different actions and ins allows us to have this integrated integrated system that can make a dumpling out of a dough. What's interesting about this video is there's a person constantly perturbing the robots from doing its job. The robots will take the real time visual feedback from this environment to real
+
+95
+00:49:23,000 --> 00:50:24,000
+time understanding the shape of the dough and then using the current observations and also the learn dynamics model that predicts how the environment is going to change how the do shape will change. You use a tool to apply a specific actions and based on this forward model is making this inverse decision. This decision is happening at two levels. Both at a high level which is to decide what tool to use which is a task level decision-m and given this tools the robot is also have to make like a lower level like a motion level
+
+96
+00:49:53,000 --> 00:50:55,000
+decisions in deciding what specific action to take you to progress into the next task stage. Human are just so annoying adding pieces folding the dough. The robot is very robust to this external disturbance in continuing its progress in doing the task. Here's what's interesting. After robot cuts a circle, the humans shows no mercy, destroy everything. The robot knows you actually have to start from the very beginning like redo the task from the beginning in order to progress with this kind of task objective. So this really
+
+97
+00:50:24,000 --> 00:51:29,000
+shows the patience and also the robustness of our systems with this type of external disturbance. And all of these capabilities is enabled by this kind of neuron dynamics model that predicts how the shape of the dough will change if you apply a specific actions. In the end, the robots will place the skin on top of this dumpling clip and move this kind of feelings on top of this dumpling skin and using a hook to close the dumpling clip. You to use this general purpose robots equipped with 15 general purpose tools to make a dumpling
+
+98
+00:50:56,000 --> 00:51:54,000
+out of a dough. So this is about like how we can learn the model and and how that model can be useful for for downstream like model based planning. So for this specific case like u if we want to describe it more rigorously we are not using reinforcement learning like we just learn the model and using that model to do planning although the plan can be distilled into a policy that can be executed in the real environment in a more efficient manner but some people also call it model based reinforcement
+
+99
+00:51:25,000 --> 00:52:17,000
+learning. decide which background you are coming from. You can either call it like model learning and model based planning. You can also call it model based reinforcement learning. But the key idea you want to learn the model from the robot's physical interactions with the real physical world and using that learn model that is very effective in helping the robot to decide its behaviors to like a progress with a task objective. So in this specific case it is the high level plane and low-level decision
+
+100
+00:51:51,000 --> 00:52:49,000
+making is done by two different models. So over the high level we are given the current states like current observation of the environments and the targets the robot help to achieve is essentially a classifier and classify which tool to use and condition on this classify like tool label there a lowle like a policies that decides what specific action to take in order to like progress into the next task stage. Very good question. So back then this work was done in 2023. At that time vision language model wasn't
+
+101
+00:52:20,000 --> 00:53:21,000
+like very powerful. So at that time like what we did was to allow a human operator to do the data collection demonstration of the task for 10 times. We use that data to train this kind of classifier to classify what tool to use. That allows us to actually jump back and forth over this chain. Like I mentioned earlier after the robots cut a circle the human destroy everything. the ROS should jump back to some earlier stages like that fits to its current observation in order to like do the proper like um recovery from the
+
+102
+00:52:51,000 --> 00:53:43,000
+external disturbances. So in this specific case like what we have been doing is a combination of sampling based trajectory optimizations versus like a policy learning. So what we have been doing is to give the current states of this dough. We have our like forward predicting models. We'll be able to sample a bunch of actions and sample a bunch of tools to like a predict like what is the evolutions of the shape of that dough. And then we'll compare the model's prediction with the targets like
+
+103
+00:53:17,000 --> 00:54:16,000
+we hope to achieve which is similar to what I showed earlier. For example, our model predicts the shape of the dough will go into this green dots but the targets is this red dots. We are comparing their distance and then that allows us to select the most effective actions that can gets us to the target at to be as close as possible and we can do a lot of samples like this but sampling during the test time is very time consuming. So we do this type of sampling in an offline fashions which give us a data sets and we can use that
+
+104
+00:53:46,000 --> 00:54:43,000
+data sets to train a policies that can be uh inferred at a very very like using a very short period of time to do the inference during the test time. There is still a neural network as a policies. Yeah, although that policy is nerds by distilling from our models like uh predictions over a huge amount of samples. For this specific work, there's no physics based simulation at all. We actually have a baseline that use a state-of-the-art deformable object simulator which is called MPM, material
+
+105
+00:54:14,000 --> 00:55:07,000
+point methods. What we realize is that even if we do very extensive system identification like estimating the parameters of those physics based deformable object simulator, the identified model is noticeably less accurate than the model that directly learned from the real world interactions. Like I showed earlier, for example, the first row is our model's open loop prediction. The second row is a ground truth. Our model's prediction aligns very well with the ground truth, which is just much more accurate than
+
+106
+00:54:41,000 --> 00:55:42,000
+whatever physics based simulators out there. Okay. So if there are no more questions I will continue. So what we have discussed is this kind of model learning and how this learned model can be effective for the downstream like a model based planning and next category of algorithms is imitation learning. So like just to like recap a little bit like we discussed reinforcement learning that is learn direct learning the policies by doing trials and error with the environments which has a lot of troubles for example the sample
+
+107
+00:55:13,000 --> 00:56:11,000
+efficiency the safety concerns and for the model learning what we have been doing is actually forced back to the category of supervised learning where we have the evolutions of the environments. You use that data to do supervised learning to train this model and using this model to do model based planning and instead of just using supervised learning to do to train the model people are also asking can we do supervised learning also for the policies. This is the general idea of imitation learning
+
+108
+00:55:41,000 --> 00:56:42,000
+meaning can we have a big data set that shows how a task needs to be done and using this data sets like to train this kind of policies. I'm showing this figure again. This is trying to learn this kind of policy taking the states as inputs that predict the actions and all of this kind of learning signals and learning procedures are done through a large scale collected datas from human demoing to the robots how a task needs to be done. So learning from demonstration is of course not new. that
+
+109
+00:56:12,000 --> 00:57:17,000
+has been investigated for decades is also constantly how we human is actually learning to perform a lot of like a physical interactions or social activities in the real world like since we are very very young. So one of the most like earlier classic like imitation learning algorithms is called behavior cloning and essentially trying to learn this kind of mapping. The map currently like from this observation O into the action A and this policy is represented using this function pi parameterized by
+
+110
+00:56:44,000 --> 00:57:47,000
+the SATA. So one of the key issues for behavior coloning is called cascading error because like I mentioned the key difference between the robot learning or agents interaction with environments is it is a sequential decision making problem. It differs from like a typical like a supervised learning in the typical computer vision domain in that your error can accumulate and being amplified over time. Let's say at the very beginning you made a very small error. That small error can list your states that is slightly deviates from
+
+111
+00:57:16,000 --> 00:58:17,000
+the distribution of data you use to train your model. That will lead a policy to make a even larger error and this error will be amplified over the temporal horizons that leads to a trajectory that can decrease quite a lot from the demonstration trajectories. So that's a typical issues of behavior chronic. So that's why uh often times when people are trying to make imitation learning work people follow this type of pipeline where on the top we have the demonstration collected by the experts.
+
+112
+00:57:46,000 --> 00:58:48,000
+Then we'll use that as a training data to do supervised learning to train this policy and we'll rule out the policy in the real environment and observe those failure cases and we either collect additional data or provide corrective behaviors that allows this data sets to not only contains the initial demonstrations but also those corrective behaviors that gets the errors from the policies back to the cononical trajectory or get back to the trajectory. they can still successfully accomplish the task. So this is actually
+
+113
+00:58:17,000 --> 00:59:24,000
+a typical like life cycles we are trying to develop any imitation learning agents or imitation learning algorithms in the real physical world and uh uh along this lines because like if people do this kind of imitation learning there's not uh very explicit definitions of what the task actually is the task is implicitly hidden within those demonstrations. So there's a class of algorithm called inverse reinforcement learning where on the left is what people typically like thinking about for reinforcement learning whereas
+
+114
+00:58:51,000 --> 00:59:58,000
+on the right where people are trying to use this inverse reinforcement learning to like summarize the rewards from your demonstrations and be able to use that rewards to do typical reinforcement learning to learn this kind of algorithms. Some of the earlier like susex examples were actually also developed at Stanford's by uh Peter Bio and also Andrew in it that allows them to control uh helicopters to do some very very crazy behaviors and this is actually a very old work and uh be able to achieve this type of like agile and
+
+115
+00:59:24,000 --> 01:00:19,000
+uh and effective behaviors on this real physical helicopters is very impressive uh at that times. So this is the power of learning from demonstrations and using that demonstration to summarize the rewards and in connections with reinforcement learning this is what we are able to achieve. So obviously over the years like people have been making the imitation learning algorithms more and more effective especially in connecting with for example energy based models. So instead of learning this kind
+
+116
+00:59:52,000 --> 01:00:52,000
+of explicit policy shown on the left they directly do the mapping from observation all to the actions. If you are coming up with kind of implicit policies that's takes idea from energy based models that direct taking the observation actions to predict the score and using this kind of like a energy based model to do inference to get this kind of predicted actions ahead allows the robots to handle demonstrations that are very multimodels or handle scenarios where the optimization landscapes may
+
+117
+01:00:21,000 --> 01:01:26,000
+not be very very smooth and the robot is able to come up with this kind of strategies like distill these policies from the demonstrations in doing this kind of contentrich manipulation tasks. Another to say like uh some of the recent very recent success of robot learning as a whole is a results of this work called diffusion policy which again is also taking some of advances in the community of gener models. For this one like for the implicit behavior people are drawing inspiration from development
+
+118
+01:00:54,000 --> 01:02:04,000
+of energy based model. Energy based model is a type of generated models developed in the deep learning community. And there's another class of like a more powerful models in the deep learning community is called diffusion models. And people are also trying to use the diffusion models to use it as a policy function class to allow the agents to also like inherence the benefits and the properties from those diffusion models. So this work uh was originally done at Colombia. That's is where I uh am right now and the leads
+
+119
+01:01:28,000 --> 01:02:30,000
+like a PI of this work now come to Stanfords. You can see like many of the work I selected are has a lot of like roots like here at Stanford's like she's currently like at the WE departments at Stanfords and this policy really shows some like a very diverse set of capabilities allow the robots to do not just like a planner pushings but many like a fine grains like manipulation task not only pick and place but for example here spread butter on top of the spreads and also like like a like a
+
+120
+01:01:59,000 --> 01:03:00,000
+scramble eggs like like also or peeling the potatoes and sliding the books. It really shows that this type of recipe where you collect a bunch of demonstrations and using the best like policies like learning mechanisms, you can get a policy that work in the real physical worlds in a very very efficient manners. Meaning you collect the data in the morning, you train a policy in the moment, in the afternoon, you can have a working policies working in the real physical world. So obviously there's a
+
+121
+01:02:30,000 --> 01:03:32,000
+lot of caveats in how reliable your policy is and how generalizable your policy is, how diversified the initial configuration can be for the policy to still work very robustly. But still imitation learning is the most efficient way for you to get a policy that can do something interesting in the real physical world. And for the policies to be very effective and robust to the real world variations, this type of iterative like data collections will needs will needs to be in place for the policy to
+
+122
+01:03:00,000 --> 01:04:10,000
+cover those kind of like uh unexpected behaviors or some kind of dev eating behaviors. So this is about imitation learning. So any questions? Okay. So if there's no more questions, I will use the remaining time to discuss some of the uh recent developments that drive all the craziness about robot learnings which is like a robotic foundation models and uh of course like this is a very involved domain actually for each one of these items you can actually have a course around them. So like for today's lecture I'm just like
+
+123
+01:03:38,000 --> 01:04:44,000
+skimming through them very very quickly. I only tell you the gist like the high level like knowledge you need to get by looking at those terms. And for robotic foundation models, it is a type of models that is very similar to like a reinforcement learning or imitation learnings in their function class. There's no explicit representation for example of the states or this kind of model. For example, this robotic foundation model doesn't learn the model of the environments. It is still a policy that map from the observation and
+
+124
+01:04:10,000 --> 01:05:08,000
+goal into the actions that still like a representative can be very nicely represented using these figures. So you have this agents which is a policy that taking the current state and also the goal as inputs that trying to generate this actions that can be executed in the real physical world. But you might say like this is very similar to imitation learning and reinforcement learning. So what's special about this robotic foundation models? So this is actually all rooted back to the all the developments within the foundation model
+
+125
+01:04:39,000 --> 01:05:42,000
+domain especially those language related foundation model and also those vision language related foundation models meaning it is a policy but it needs to generalize much better than a policy that just work for one specific task like here is actually my definitions I'm joining analogies from the current developments of vision language models meaning their outputs may not always be the perfect one but to always generate something reasonable as you promise this kind of foundation model. So what we
+
+126
+01:05:11,000 --> 01:06:06,000
+hope to achieve with this robotic foundation model is the synthesized action may not always be the optimal actions as conditioned by the observation and the task. But the generary trajectory or will always be beautiful and reasonable to execute in the real physical world. Like beautiful meaning it shouldn't just any like jiggling motions. It should be smooth and continuous. Reasonable meaning you should listen to the language instructions you are given to the robots. So obviously there are also many
+
+127
+01:05:38,000 --> 01:06:37,000
+different names describing exactly the same things. Some people call it vision language action models like VAS. Some people call it like a large behavior models. But in the eence they're all describing the same thing meaning this policy taking the observation and language instructions or whatever like a task specification is trying to generate the actions that generalize widely across a wide range of scenarios. So this area is actually quite noisy. Noisy meaning it's very very like hard
+
+128
+01:06:07,000 --> 01:07:04,000
+to quantify the progress of different kind of robotic foundation models because you're coding a foundation model. What does that mean? That means you expect this model to generalize like very broadly over a wide range of scenarios. If that's your expectation, you actually need significant evidence to show it actually generalize broadly. So that's why evaluation and quantitative measurements of their progress is very challenging. But still by looking at the empirical videos you can still see a lot of very interesting
+
+129
+01:06:35,000 --> 01:07:49,000
+and concrete progress over the past few years. So a lot of the earlier investigation starts like with like RT1 which was released in the December 2022 and since then I would say maybe roughly every half a year there's a new model for RT2 RTX open VA and some of the recent ones like uh PI zero that's is making concrete progress along this lines of developing more and more generalizable robotic foundation models and actually this year that's a boost there's a huge like first of a lot of
+
+130
+01:07:12,000 --> 01:08:12,000
+like foundation model like a helix high robot gemini robotics pispin 5 etc. So there's a lot of investigations and also investments in this domain in not not only like a capital investment but talent investments in developing better better and better and more generalizable robotic foundation models. So due to the time I I I clearly cannot go into details of all these models. So if you are interested, I actually gave a tutorial two months ago at tripleAI specifically describing and discussing
+
+131
+01:07:42,000 --> 01:08:53,000
+some of the models along this axis. If you are interested, please go and uh watch it. And for today, I'll be mostly give you a high level overview of what actually uh is essentials for this kind of foundation models and what it actually looks like with an examples from PI zero. So PI0 was first released in October 2024. I think this is a word that convinced me that this type of robotic foundation model can do some very reliable like a texturous manipulations in the real world environments. It can handle like
+
+132
+01:08:17,000 --> 01:09:21,000
+cloth folding and box folding and many other different types of manipulation tasks at a very reliable manner. And here's how the framework actually looks like on the high level. On the left is data sets. So for any model to be called foundation model it needs a fuel for that foundation model and that fuel is data. So they aggregate a lot of data both within academia and also data collected by themselves across course many different embodiment where the robots are doing like some kind of interesting and useful task in the real
+
+133
+01:08:49,000 --> 01:09:52,000
+world environments and they use this data to do pre-training and one important caveat of this pre-training this starts with a pre-trained like vision language models the vision language model that's already trained on vast amount of like a vision language related data that can naturally adapt those kind of semantically and knowledge from those models and together by doing co-fineting what they call co-fine tuning using both objective for action predictions and also the objective adapted from those vision question
+
+134
+01:09:21,000 --> 01:10:19,000
+answering those type of tasks you will be able to first preserve the semantic knowledge within those model but at the same time you can predict the robot actions and this is a pre-tuning stage a very important like design for many of the existing robotic foundation models is called post training which is also inspired by many of the developments in the large language model communities where you have this base model. Base model can give you some reasonable baseline performance but you really want
+
+135
+01:09:50,000 --> 01:10:51,000
+the performance to be very very good on a specific task. You actually have to collect task specific data to fine-tune the models do post training on the data for that specific task for the performance to be satisfied. So they are evaluating their whole systems over three different categories. The first one you should directly use their base model and their base model can already be good enough for some very simple indistri in distribution data. The the task like is actually the task that might have already been encountered
+
+136
+01:10:20,000 --> 01:11:22,000
+during the pre-training stage. If for indistribution task but slightly more complicated you can do post training to allow the base model to further improve on those indistribution task. And for unseen task typically you have to do post trainings by collecting those task specific data and fine-tune your pre-trained model on this tasks for it to be performance and this pi zero model is actually open sourced and you can just download the checkpoints my lab the students in my lab have already been starting to
+
+137
+01:10:51,000 --> 01:11:48,000
+playing with this like uh their models and trying to do post training and we are starting to see some very promising like results. So if you are interested highly encouraged to try it. That is a very good question. So you are essentially asking about the efficiency of the existing robotic foundation models. So there's a lot of reasons why the policy is actually slower than humans. One of the major reason is actually adapted from how the data was collected, how the demonstration data was collected. Typically for many of
+
+138
+01:11:20,000 --> 01:12:18,000
+these scenarios the demonstration data was collected by human tele operating the robots on that exact same robots to do the data collections in for example folding this box and human tele operations is actually slower than human just using their hands to do this tasks even if you have gou for them hours of training. This is because you are just using a different embodiment than a environment that you person is the most familiar with. And also at the same time because the robot arms are still like
+
+139
+01:11:49,000 --> 01:12:45,000
+certain distance away from you. There will be occlusion. Sometime you have to look very closely carefully like changing your heads changing the the the viewing angles in order to really understand is it a time to progress into next task stage or not. there's a lot of like caveats and inefficiencies of the current data collection regimes. That is why the policy directly trained on those data turn out to be slower than like human speeds. So that's why there's a lot of like investigations in how we
+
+140
+01:12:17,000 --> 01:13:14,000
+can do those kind of data collections to be even more efficient to be at human speeds that is actually a very active research direction. So this is a very good question. So for this like a box folding house I would argue this is already a very long hor task. So I was very impressed by how good this one single policy is able to handle this long harden task. But you could argue if you really want this policy to be useful in some like a more larger scale like in a wide scenarios in your home you not
+
+141
+01:12:45,000 --> 01:13:44,000
+only want the robot to fold a box if I wanted to fold the shirts and clean the beds and clean all the messes on the floor. If in those type of scenarios like uh currently me personally I don't believe one gigantic policy is able to be able to adapt to those scenarios some higher level obstructions or some kind of singraft some symbolic representations needs to be in place as a condition for this vision language action models for those like policy to be the most effective and useful to steer into different type of tasks and
+
+142
+01:13:15,000 --> 01:14:07,000
+scale to larger scale environments and more complicated tasks. So they started with a pre-trained vision language models. So that's why like there's already a lot of semantic knowledge that are learned through this large scale pre-training using this vision language data. So that is why like some of the generalization are coming for free. Meaning the base model can actually have surprisingly good levels of generalizations at a semantic level. And it's just that you have to fine-tune this model with those robot
+
+143
+01:13:42,000 --> 01:14:40,000
+data to making sure it can also generalize not as a semantic level but also as action level. So we can have the question maybe at unknown because we're already about time I still have maybe one the last maybe two three minutes I'll discuss the some of the remaining challenges especially along the developments of robot learning models so one of the major challenges the whole community recognize is evaluation evaluation currency is primarily done in the real world for example this is a picture of uh Google
+
+144
+01:14:10,000 --> 01:15:02,000
+robotics they have a grid of this kind of teleoperating like Aloha systems that they are doing data collection and also evaluation and real world evaluation is both costly and noisy. Their exact words to me was for evaluation they have large enough budget such that they can still make progress. This was their exact words. Meaning if you were to do the evaluation or I were to do the evaluation the results can be very different from each other depending on how we specify the initial configuration
+
+145
+01:14:37,000 --> 01:15:32,000
+and how the lighting condition might change. Even the friction parameters of the manufacturer can make a huge difference in how robust your downstream policy is. So this is very costly and they have to wait for two days for the results to come back and currently like uh there's very weak correlation between the training loss and real world success rates. This is another very important caveat and difference between supervised learning and also this kind of sequential decision-m this kind of policy learning is for supervised
+
+146
+01:15:04,000 --> 01:16:08,000
+learning like your training loss directly measures how good your model is. But for this kind of poly learning your training loss measures how good this onestep prediction is which sometimes may not be and actually often the times is not indicative of the performance of policy over like a long task horizons. Even if your loss is low but for long horizon task execution your policy can actually be worse. And uh the training objective versus the task specific metrics like training versus test horizons are some of the reasons
+
+147
+01:15:36,000 --> 01:16:32,000
+explaining like why it is very hard to come up with even approximate or proxy metrics to measure the performance of the policy and people have to rely on real world evaluations. So then the question is what about doing the evaluation in the simulated environments there has been a lot of like investigation for the behavior which is done in fif lab here also at Stanford's and also the habitat 3.0 zero from meta. People are trying to come up with this expensive simulated environments trying to do evaluation and
+
+148
+01:16:04,000 --> 01:17:06,000
+measurements of the robot policies and obviously there has their own issues especially with regard to sim to real gap like how can you do very accurate simulation of rigid body deformable object close they have good correlations with the real world performance and assets is also another major issues where large scale generalizations and generations of those assets is a huge pain um I can elaborate but like maybe after the lectures and also how to digitize the real world is an issue and how to do procedural generations of
+
+149
+01:16:35,000 --> 01:17:37,000
+realistic and diverse things are all issues of using simulation to do evaluations for robot learning policies and really we want to find a correlation between s and real and it's calling upon the imagets in embodied AI like the reason why imaget was successful is because at least for few years any progress in imaget meaning progress in deep learning and computeration we want the same thing we want have this platform meaning any progress on that benchmark or platform meaning progress in robot learnings so that's something
+
+150
+01:17:05,000 --> 01:17:59,000
+that we really want and uh um I can maybe skip through like uh we talk about how to build this foundational policies there can also be investigations on how to build like a foundational word models especially now people are collecting large scale action condition robot interaction data to train this foundation policies but there's a lot of dynamics knowledge embedded in those data if we just use those data to do policy learning that would be such a waste. So we are also thinking about how we can use this large scale action
+
+151
+01:17:33,000 --> 01:18:31,000
+condition robot interaction data that was already collected to train those foundational policy to train this foundational word models and how they can do interplay between each others and there are some existing works that are thinking about along the direction of building this kind of foundational word models and there are some like very like interesting like characteristics you might thinking about like do you want it to be 3D do you want structural prior how much learning versus how much physics and how you can correlate with
+
+152
+01:18:01,000 --> 01:18:54,000
+the real physical world. And maybe actually I think uh we are about time so I will end it here. And uh this is the future we hope to achieve to really build this foundational robotic model that can work very widely and generalize very well in the unstructured data environments around us. And next lectures will be human- centered AI. And that will be uh the end of today's lecture. Thank you so much.
+

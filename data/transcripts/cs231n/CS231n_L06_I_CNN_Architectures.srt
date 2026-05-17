@@ -1,0 +1,592 @@
+1
+00:00:05,000 --> 00:01:02,000
+Hi everyone. Um, my name is Zayn. I realized I actually didn't introduce myself on the first lecture I gave uh, which was lecture three, but I'm one of the co-instructors for the course. My name is Zane Dante. I'm co-advised by Essan and Feay. I'm a fourth year PhD student uh, at Stamford. And in this lecture today, lecture six, we'll be talking about training convolutional neural networks and also um, CNN architectures. So um you know I would say this lecture is really broken up into two different
+
+2
+00:00:34,000 --> 00:01:25,000
+components. The first one is just telling you how to piece together all of the different building blocks that we've learned like convolutional layers uh linear layers or fully connected layers together to create uh CNN architecture. We'll go through some examples and then also we'll talk about how you actually train these and all the steps uh involved there. So as I mentioned before we'll have basically two different topics. The first one is how to build CNN's and by this I mean how do you
+
+3
+00:00:59,000 --> 00:01:57,000
+actually define your CNN architecture to set it up to be trained and then the second set of topics today is how do you train CNN's. So starting with the first set of topics here we'll go through the layers in convolutional neural networks. And if you recall from last lecture we learned about the key layer in these models which is the convolution layer. And the way that these layers work is they have these filters. um you have a predefined number of filters per one of these convolution layers. In this case,
+
+4
+00:01:28,000 --> 00:02:23,000
+six. Um they match the depth of your input data here. So in this case, we have a 32x32 RGB image. So we have three depth channels. Each of these filters slides across the image and calculates a score at each point. At that location in the image, you take the dotproduct of the values in the filter with the values in the image. Uh so you multiply all these values together, you sum them together, and then you add a bias term. And this is how you calculate each um value in your output activation map on
+
+5
+00:01:56,000 --> 00:02:54,000
+the right. So you have these sliding windows that go across the image. They calculate a score at each position and that's how you get these uh activation maps and you have one per each filter. Normally we'll do a sort of relu or a nonlinearity activation function at the end here. So this is from last lecture. I won't spend too much time on it. The question is for images the depth is equal to the number of channels RGB but here the depth is six for the output here. So if we had a second convolution
+
+6
+00:02:25,000 --> 00:03:19,000
+layer afterwards they would need to be filters that uh go across all six of these uh activation maps. So the next layer would be a depth of six. Okay. And then the second layer we talked about which is much simpler than the convolution layer is this idea of a pooling layer. So here um it's still this sort of filter that we're sliding across the image uh you know 2 x2 filter with stride two. So we're skipping over. We're not doing every single location. And here is a max pooling. So we're just
+
+7
+00:02:52,000 --> 00:03:43,000
+taking the max of each of these areas. And that's the value we get here. Or you could do an average pooling. Um you know these are both commonly used I would say. And depending on the architecture you would probably just if you're creating new architecture you would try both of them and see what performs better here. But the basic idea is to consolidate among the height and width dimensions for your image. Okay. So um we've basically gone over at this point in the course all the the top
+
+8
+00:03:17,000 --> 00:04:07,000
+row here which is convolution layers, pooling layers and also the fully connected layers. These are the first layers that we talked about in the uh neural networks lecture where it's basically one matrix multiply followed by an activation function. And for the rest of this lecture, I'll talk about the remaining layers that you see in CNN's at least the the commonly used ones which include normalization layers uh which I'll go into those and then also dropout which is a regular uh
+
+9
+00:03:42,000 --> 00:04:37,000
+regularization technique that's used actually in the model architecture itself and then finally we'll revisit the activation functions and I'll tell you about you know here are the most commonly used ones both historically and in the modern era of deep learning. Um, so starting out with normalization layers, the basic idea here is we're going to be calculating statistics like the mean and standard deviation for our input data and then using those to normalize the data and then we'll uh
+
+10
+00:04:09,000 --> 00:05:14,000
+we'll basically learn what is the uh optimal distribution for the model to learn at that point. So so very concretely we learn parameters that will scale and shift our input data by a learned mean and a learned uh standard deviation. So how all of these normalization layers work is there's two steps. The first is to normalize the data coming in to be a unit Gaussian. So mean zero, standard deviation one. And then we will scale and shift it. So multiply by some value to increase or decrease the standard deviation and then
+
+11
+00:04:42,000 --> 00:05:36,000
+shift it to change where the mean is. And all normalization layers do this technique. But the way that they differ is how they calculate the statistics. So how are you calculating the mean and standard dev standard deviation and which values are you applying these calculated statistics to but all normalization layers are doing this highle process. So um I'll talk about layer norm which is the most commonly used uh normalization layer I would say today in deep learning and it's really commonly
+
+12
+00:05:09,000 --> 00:06:15,000
+used in transformers specifically um and so you can imagine you have some data coming in X which is a batch size of N. So we have n samples coming into our model and each of these are vectors of dimension d. So what it layer norm does is we calculate a mean and standard deviation for each of our samples separately. So we're calculating what is the mean among the along the depth uh or or the dimension d here and what is the standard deviation. Then we learn parameters and so these are learnable
+
+13
+00:05:42,000 --> 00:06:46,000
+parameters learned uh through via gradient descent in our model. uh to then apply to each sample. So after we calculate our statistics in this way, treating each sample separately to calculate the mean and standard deviation, we then apply these learned uh scale and shift or uh parameters here. So we subtract the mean and divide by the standard deviation within our input data to normalize it and then we apply the scale here but with multiplication and the the shift. So um this is the idea behind layer norm and
+
+14
+00:06:14,000 --> 00:07:15,000
+at a high level layer uh had a high level idea all of these different uh normalization layers are all are are all computing very similar things but the main difference is how are they computing the uh the mean and standard deviation. So this is a really nice visualization from a paper called group normalization that introduces a new way to normalize. um it's I would say not so commonly used these days but this is actually a really great way to gain intuition about how these different normalization layers are different. So
+
+15
+00:06:44,000 --> 00:07:44,000
+for layer norm um I described the really simple case where we just have vectors that we're normalizing but in the in the case for convolutional neural networks we have a channel dimension or the depth uh we have the in the height and the width or the spatial dimensions of the image. So what layerorm does is for each sample we're still processing it separately and we're calculating the mean across all of the channels all of the heights and all the widths. So if we look um sort of back into this diagram
+
+16
+00:07:14,000 --> 00:08:12,000
+here um you would basically be counting calculating one uh one mean and one standard deviation over all of these over all of these values. So um we're for each of our input uh data points we're calculating one mean and one standard deviation across all of the channels all of the height and width dimensions. So this is what layer norm is doing. But you could imagine feasibly that you could calculate these statistics differently. Batchnorm uh you're you're taking each channel so each channel is being calculated as one
+
+17
+00:07:44,000 --> 00:08:26,000
+mean and one standard deviation and you're applying it just to that channel. Uh and so you're averaging across all the data in your batch. Instance norm is even more granular and then a group norm. So I just want to point out all these layers are kind of trying to do the same thing where you're a you're you're basically normalizing your data and then having these learnable scaling and shifting parameters but the way they do it is different because they're calculating the statistics using
+
+18
+00:08:05,000 --> 00:08:53,000
+different variable uh different subsets of your your input data. Yeah. So the question is for layer norm are we calculating one mean and one standard deviation for each image or input data? Yes, they're all calculated separately. >> But for batch norm it's they would not be the case in this example here. Yeah, for batch norm it's actually within the mini batch when you're, you know, you're doing gradient descent, you have a small batch of data you're looking at, you
+
+19
+00:08:29,000 --> 00:09:22,000
+feed it into your model. Um, you're calculating the per channel, uh, mean and standard deviation based on all of the data in your batch. Yeah, I think this is like a good if you can understand this diagram, I think you understand what all of the different uh, normalization layers are doing. So it might be worthwhile after lecture if you still don't fully understand it just to like go through and make sure you understand what you know the and shaded in blue these are the values we're both
+
+20
+00:08:57,000 --> 00:10:09,000
+calculating our statistics over and then applying the mean and standard deviations to uh yeah one final question and then we'll go on is channel same as like the layers >> so channel here is the is the depth here so the the number of uh spatial um the different spatial values you have at each spatial the number of values you have at each spatial location. Okay, cool. Um, so this is uh we talked about normalization layers. The key idea is you're calculating these statistics, applying them to your input data and
+
+21
+00:09:32,000 --> 00:10:31,000
+then uh learning a scale and shift uh parameter that you then apply. So um the next type of layer we'll talk about is called dropout. And this is a regularization layer in CNN's. This is the final layer that you'll need to learn in order to basically we can start going through all these different CNN architectures that people have created over the years. Um so with dropout the basic idea is to add randomization during the training process that we then take away at test time and the goal is
+
+22
+00:10:02,000 --> 00:11:06,000
+to make it harder for the model to learn the training data but then it will generalize better. So this is a form of regularization. The way we do it concretely is that in each forward pass of our layer, we'll actually randomly zero out some of the outputs or activations from that from that layer. And uh the main parameter you have for this dropout layer, which is just a fixed hyperparameter, is the probability of dropping out the values. And 0.5 is probably the most common or 0.25 is also commonly used here. Um so
+
+23
+00:10:34,000 --> 00:11:28,000
+you're just dropping out a fixed percentage of the values here. And so uh you know going forward to the next layer these would be zero. Um and so you don't you don't really need to calculate the um the values here. So um I mean basically all the all the outputs here are zero at this point. So you can get there's some tricks you can do with masking. So you don't even need to calculate the values because 0 times any value will be uh will be zero. So um I think in general uh you might ask why
+
+24
+00:11:01,000 --> 00:12:04,000
+does this work? And um I would say this is more of an empirical thing than a uh well wellstudied from a um from a theoretical standpoint. But um there are actually some ways you can view what dropout is doing to gain intuition of why this might be useful. So um it it basically forces your network to you can imagine it forces it to have redundant representations. So if we have a list of features that we're learning at a given layer, say the the layer right before the output of our model, and we have a
+
+25
+00:11:33,000 --> 00:12:28,000
+CNN that is basically extracting each of these features. So it can detect if there's ears in the image or if there's a tail, if it's furry, it has claws. And you want to uh your model to output the probability of a cat score. So um one of the things that's useful about this is because some of these values might randomly be dropped out during training, your model can't over rely on certain features being present. in in uh some of the classes and actually needs to learn a more broad uh set of correspondences
+
+26
+00:12:01,000 --> 00:12:57,000
+between your features and your your output classes. So the model can't just you know hard focus on uh okay well if if it has an ear and is furry these are and you know it just so happens that these are always cats uh or something like this or if it has claws um and it has an ear it'll it'll almost always be a cat on your data set. So it'll actually help you generalize better to new new features despite the fact that in your data set there might actually be really strong correlations between the
+
+27
+00:12:29,000 --> 00:13:22,000
+codependency of certain features in your output class. By having dropout you're essentially making it so the model can't rely on these during the training phase because it won't always see the pairs of features together. So this is an example for for for cat and the question is if we had something like tree instead how would you determine which features to drop out? So, uh, the dropping out part is actually completely random. So, we're not making any choices about this. It's
+
+28
+00:12:55,000 --> 00:13:49,000
+just in this case, 50% of your your features at any given step will be dropped out and set to zero. Um, so yeah, you don't have to make choices about it, which is kind of nice. Um, but it is completely random. How would the model know if you're only seeing a subset of the features like tail and claw here? Um, the point is you will actually do worse on the training data because you're only seeing a subset of the features. So it does make the model worse by not having all the information. Uh but then it does better
+
+29
+00:13:23,000 --> 00:14:15,000
+at test time is the idea. So worse in training time and better in test time because at test time um you're basically no longer having this dropout. So the final component here which maybe I should have explained first before fielding questions is the idea at test time you're no longer dropping out any of the values. So this is randomness that we're adding during the training phase only. Then at test time we're uh ne we're never masking any of the output activations and we're removing this
+
+30
+00:13:48,000 --> 00:14:46,000
+dropout uh idea altogether. Now one thing we need to note is that because if we were dropping out 50% of the activations uh during training time at test time you're basically having 50% more values that are being input to uh each of your uh layers. And so this can cause issues if you don't scale it. So what you need to do is multiply by the probability of dropout so that the um the sort of magnitude of the values coming into each layer is preserved during training and test time. Otherwise
+
+31
+00:14:18,000 --> 00:15:14,000
+if you're dropping 50% of the values and then at test time you just include all of them you'll get really weird behavior because um you'll be seeing much larger magnitude of inputs than before. >> Yeah. So what about for backward prop? Uh so for back prop when you have these zeroed values yeah it's sort of like uh you don't uh you you don't need to traverse that uh path of your directed graph anymore. It's very similar to relu if you have a a zeroed value at that
+
+32
+00:14:46,000 --> 00:15:50,000
+point. Um the gradient becomes zero. So um anything be sort of uh further back in your computational graph uh there's no gradients calculated at that point. If you're dropping out um certain values or activations, the weights associated with those specific activations will not be updated uh during gradient descent if you're dropping them out. Yeah. So the question is um maybe I'll reframe it. What are we doing at test time? So at test time we are using all of the um output activations. We're not dropping
+
+33
+00:15:18,000 --> 00:16:11,000
+them out anymore, but we need to scale by the probability of dropout. So we multiply each of our output activations by this p value because now we're using all of them. Uh so otherwise the uh you can imagine you have each node is sort of seeing a significantly higher number of inputs than it did during training at test time. So you need to uh multiply by this p value to maintain the same uh magnitude of your your your inputs coming in and uh the variance stays the same and all these different properties
+
+34
+00:15:45,000 --> 00:16:40,000
+it works very nicely if you do it like this. Yeah. So the question is can you just add noise to the image instead? The answer is yes and we'll go over how to do that in future slides. Yes, that's a great idea to add noise to your image. Okay. Um, some specific code here. I won't go over this because we already mentioned this, but you know, you're dropping a um a p percentage of your activations here and then you multiply here at test time. Okay. Um the the next topic I'll talk
+
+35
+00:16:12,000 --> 00:17:03,000
+about is activation functions. So, you all have basically learned all of the key layers now in CNN's and now we're going to be talking about these activation functions. If you remember, the whole point of these activation functions is to introduce nonlinearities to our model. So, um right now with these convolution operators, the kernel sighting across the image and the simple layers without act uh sorry, the fully connected layers without um activations, they're all just linear operations
+
+36
+00:16:37,000 --> 00:17:38,000
+because they're multiplications and additions. Um and the whole point of the activation function is to add nonlinearity. So um historically sigmoid is a really commonly was a really commonly used activation function but there's actually a key problem with sigmoid that is the reason why it's no longer used today. And so sigmoid if you graph it looks like this. You can see the equation in the top right of the slide here. And um the main issue is that empirically what happened was after
+
+37
+00:17:08,000 --> 00:17:59,000
+many layers of sigmoids you would get smaller and smaller gradients as you're computing back props. So starting from the end the gradients are fairly large in magnitude and as you undergo multiple layers of back propagation go to the initial early layers of your model um you would get smaller and smaller gradients as you do this process. So I'll actually open this question up to the class um you know this isn't a a phenomenon we see that occurs with sigmoid and so in what reason reason uh
+
+38
+00:17:33,000 --> 00:18:21,000
+regions in our graph does sigmoid have a really small gradient? Yeah so very negative and very positive values is correct and this is actually a huge issue. I mean you can visually see here in the graph the gradient's very flat at you know you're taking the derivative here it's very small um and so basically for almost all of our input space uh from negative infinity to positive infinity you have very small gradients and it's only this narrow range in the middle where you have something that's
+
+39
+00:17:57,000 --> 00:19:03,000
+uh non non zero so it basically approaches zero very quickly on both ends of the extremes and so this means that if the values coming into sigmoid are very large or very small then your gradient will be uh very So this is one of the main reasons why relu became super popular because now in the positive region we don't have any of this behavior. Um it's just a derivative of one here. Um but in in practice you still have this flat portion here on the left where um you know your gradient is
+
+40
+00:18:31,000 --> 00:19:29,000
+zero. Um so so now we basically have half of our input uh domain here. we we get a gradient of one and the other half is zero which is better than almost all of it being zero or very close to zero except for a small region in the middle. So in practice these work better also it's much cheaper to just compute a max operation between zero and your input value than the sigmoid function. So for those two reasons, Railus became super popular. Um but you still have this issue where for any negative input, you
+
+41
+00:19:00,000 --> 00:20:18,000
+get a zero gradient. And so um more recently, there's been uh popular activation functions that avoid this um by basically having a non-flat section of the activation function in the nearby neighborhood uh to near zero. So um this is Gaoo and there's also Celu which I'll show in a slide but I won't go over the formula. They look very similar. Um the basic idea is to smoothen out the this uh non non smooth jump here in the in the derivative from 0 to 1 at 0 for RLU. So um no you know this is a very sharp
+
+42
+00:19:39,000 --> 00:20:44,000
+uh uh and non smooth function with RLU. But the nice part about Gillu is we actually have nonzero gradients here. And in the limit as x approaches infinity or negative infinity, it does converge to uh relu as well. But you get sort of more smooth behavior in the middle here. And specifically what GU calculates is this um Gaussian error linear unit. So this is the uh cumulative distribution function of a Gaussian normal. So if you imagine the area under the curve of a Gaussian uh that's what this 5x is at any point x.
+
+43
+00:20:12,000 --> 00:21:13,000
+So if you have a really uh negative value here you'll have a value close to zero which is why it sort of converges to relu zero here and then a very uh high positive value it gets very close to one the area under the curve so it converges to x here. So um this is gau it has these nice properties and it converges to relu at the extremes too and this is the main uh activation function used in transformers today. Um if you look at all of them and you kind of squint a lot of these kind of look the same. The basic idea is
+
+44
+00:20:42,000 --> 00:21:50,000
+something relatively flat and then it uh in the limit it approaches x equals uh sorry f ofx equals x um and and sort of it becomes a linear line. Um so celu is actually x * sigmoid of x um which also has this property of for a very negative value you have something close to zero and for a very positive value uh it's close to one. So it's actually similar to the um cumulative distribution function for the unit Gaussian that is fi here. So that's why the the shapes are actually really similar looking too.
+
+45
+00:21:16,000 --> 00:22:15,000
+Okay. Um so you might ask where are these activations used in CNN's and the general answer is that they're placed after linear operators. So almost anytime we have a feed forward or a linear layer or a fully connected layer, these are all words for the same layer. So matrix multiply followed by activation function. um or if we have a convolutional layer pretty much after these is where we place the the so after the convolutional layer or after these linear layers we'll put the the activation function.
+
+46
+00:21:46,000 --> 00:22:40,000
+Okay, so you've learned everything now about all the components of CNN's and I'll now go through some examples of how we put them together and how people have created state-of-the-art convolutional neural network architectures. Um I think this is a really neat slide because it plots two different values. So on one hand we have the error rate which is these blue bars and this is over time. So these are different models people have trained on imageet and then you have these orange triangles which
+
+47
+00:22:12,000 --> 00:23:12,000
+represent the number of layers uh that models have and you can see at the same point that we have a significant drop in error where we actually surpass human performance for the first time we see uh a huge increase in the number of layers. So we'll go over in class today how they were able to achieve this and what were the design challenges and goals for how they how they did this. Um historically AlexNet was the first sort of CNN based paper that worked really well on imageet and they used they were able to train it
+
+48
+00:22:43,000 --> 00:23:50,000
+by using GPUs. We talked about this earlier in lecture, so I won't spend too much details around AlexNet from a historical lens, but I do want to compare it to another architecture called VGG, um, which was a really standard and commonly used uh, architecture in the 2010s. And I think, uh, I can plot the two, uh, CNN architectures together side by side here. So in general in AI, we like to plot our model architectures using block diagrams where each block represents a different layer or a group of layers
+
+49
+00:23:16,000 --> 00:24:15,000
+that are stacked together. And it also helps you gain intuition about you know what are the general differences just at a at an initial glance. So these orange blocks which are the common ones here are 3x3 convolution layers. So these are convolution layers that have filters that are sliding across that are size 3x3. Uh their stride is one. So they're visiting every location in the image, not skipping over anything. And they add padding of one around the outside so that we're we're not shrinking as we do
+
+50
+00:23:45,000 --> 00:24:46,000
+these convolution uh uh layers. And so um they also add these pooling max pooling layers throughout here too. And you'll notice that for all of these they have um after a pooling layer they'll start doing two sets of fully connected layers of dimension uh 4096 followed by a dimension of a thousand. And the reason we have a thousand at the end is because imageet was a thousand different image categories. So we need to have scores for each of these categories. So the final layer is always uh equal to
+
+51
+00:24:16,000 --> 00:25:13,000
+the number of classes you have for for image classification problem. Um, and so you can see it actually looks extremely similar. It's sort of just like a scaled up version of Alexet with more uh layers here. And also they're now doing some uh sort of three groups of convolutions at a time followed by pooling rather than uh two layers in a pooling or even one. Um so it is actually pretty remarkable that there's only basically uh three different types of layers right in these models but they
+
+52
+00:24:44,000 --> 00:25:47,000
+they perform extremely well compared to anything people had tried before at this point. Um so these are I would say the simplest layers. You might uh simplest models we're going to discuss today. But you might ask why are they doing three by uh 3x3 convolutions like how do they pick this this value? And um there is actually some intuition behind how they chose 3x3. So um and specifically they have groups of three or even four of these. So I'll ask you all a question. Um what is the effective receptive
+
+53
+00:25:16,000 --> 00:26:13,000
+field? So we we looked at receptive field um last time but it's it's basically the idea of the parts of your input image that a particular value in your activation map has seen before. So what values have been used to compute the final activation map after many layers of your model. So we have three of these layers that are all 3x3 convolutions with this sliding filter with stride of one. What is the effective receptive field of each value in our activation map A3 here? So this is after the third
+
+54
+00:25:45,000 --> 00:26:55,000
+layer. So I'm showing one of the layers here. You can see for each value in A3, it's computed by looking at a 3x3 grid of values in A2. And then conceivably for each one in A2, it's a 3x3 grid in A1. And for each of those, it's a 3x3 grid in our input. So uh I'll let you all think about this for a little bit. Uh maybe it will help to see the next uh layer here. So it is actually really helpful to visualize this. So at A1, each of the corners here, you know, we're calculating a new from a new 3x3
+
+55
+00:26:19,000 --> 00:27:25,000
+grid here. Um, so from our input, how large is this overall square? 7 by 7. Yeah, exactly. So this first one is 3x3, this next one is 5x 5, and then the next one is 7 by 7. And we can visualize it here uh pretty easily. So the nice thing about the 3x3 convolution with stride one is that uh you're basically always adding two to your receptive field at each layer because um you know each point here you're looking to the left and to the right and above and below it. So after you have many blocks of those
+
+56
+00:26:52,000 --> 00:27:45,000
+you're just adding two each time. Okay. Um so we basically just showed that a stack of three of these 3x3 convolution and stride one layers has the same effective field as one 7 by7 layer. >> Yeah. So the question is how much of this is justification after the fact versus how much of this is intuition that they then use to say design the experiments. Um I think it actually probably depends on the architecture. So for some of them it's more intuition focused. And actually the one we're
+
+57
+00:27:22,000 --> 00:28:19,000
+going to cover next I think really was uh the whole research direction was spawned by an empirical finding that there's a thought experiment about. So that's resonates and I think for there there's actually pretty good intuition that led the whole investigation into what will work well. Um, but then for this one, I mean, I I I can't say for I can't speak for the authors um whether it's justification after effect or um you know, based on empirical findings or um or if it was involved in the design
+
+58
+00:27:51,000 --> 00:28:50,000
+choices because I haven't seen them speak publicly about that yet. But for resonance, I do know it it was the the hypothesis that led to the creation. Um but this is actually a really nice property. So three of these 3x3's have the same effective receptive field as one 7x7 layer and it actually has fewer parameters too. So um we have if you imagine our channel dimension is saying stay staying the same. Uh you have these 3x3 grids where um you have you know your input number of channels. So 3 * 3
+
+59
+00:28:20,000 --> 00:29:30,000
+* c would be the number of values in each of these filters. And if we have c of these filters it's 3 * 3 * c * c or 3 c ^ 2 and we have three layers total. So um sort of if we look at it through this lens, it's actually um it's actually fewer parameters and we're having a more complex um and more nonlinear model uh that we're building here. So fewer parameters and it can model more complex relationships among your input data. So this is maybe why stacking these 3x3 layers together um could be better than
+
+60
+00:28:55,000 --> 00:30:00,000
+having just a larger filter that you're sliding across. So fewer parameters and then also you can model more complex relationships. Okay. Um I'll now talk about resonance which I I guess I'll very much bring up the thought experiment that someone just asked a question about. So um there was actually an empirical finding that spawned a lot of the um conversation and thought around designing ResNets and the idea was um actually shown that if you keep stacking deeper layers on a plain CNN network like something like this and
+
+61
+00:29:28,000 --> 00:30:27,000
+you just keep adding layers to it, you build it larger and larger. What happens? So what we found and what they found is that um the 20 layer model will actually have a lower test error than a 56 layer model. And you might think that this is because of overfitting, but it's actually not because if we look at the training error, the training error of this 20 layer model is also lower. So it has a lower training and a lower test error. Basically means that the model is doing better on all accounts. Um so why
+
+62
+00:29:56,000 --> 00:31:03,000
+is this 56 layer model performing worse than a 20 layer model? it doesn't you know you might it might be confusing and we know as I mentioned right before it's it's not caused by overfitting so these deeper models have more representational power and theoretically they should be able to uh represent any model that a more shallow network uh can can model. So the the set of possible um uh mappings between your inputs and different values for your larger networks is a is a superset of for your
+
+63
+00:30:30,000 --> 00:31:30,000
+smaller networks. Uh because theoretically you could imagine that um you basically are just setting some of these layers to be the identity function where um they're the layers doing nothing and then you would have if you set half your layers to do nothing you have exactly the same representation power as a as a model one half the size. So the idea is not that um these models are worse, but we're in terms of the representational power, but they're actually harder to optimize because this
+
+64
+00:31:00,000 --> 00:32:01,000
+the set of possible models for your your deeper networks is larger and it contains all of the possible models that your your your more shallow networks could could learn. So I sort of hinted at it before, but how specifically could the deeper model learn to be at least as good as a shallow model? It's by setting. So if we have a two-layer model versus a one layer, uh so one layer here and two layer on the right. If we set one of the layers to just essentially be a identity matrix or you know this is just an
+
+65
+00:31:30,000 --> 00:32:37,000
+identity function, the the the model should be at least as good as the shallow model. Um it should be at least as good as a shallow model. So how do we actually build this intuition into our models? We want them to be able to be just as good as a shallower model if they want to be uh during optimization. So the way that we do this is actually by fitting what's called a residual mapping instead of directly trying to fit a desired underlap underlying mapping. And what this looks like is we basically take the
+
+66
+00:32:03,000 --> 00:33:13,000
+value x and we copy it over past our convolution layers. So that um the value at this point is already receiving x our original input as well as the output of our two convolution stacks. So um basically at this point this f ofx or which is called the residual map here um it could just learn uh zero values for the uh all the com filters and the output would be zero here and then we would just add x uh along here and we would get x. So it allows a very simple way for the model to bypass these layers
+
+67
+00:32:39,000 --> 00:33:41,000
+if it doesn't need to learn anything for the layers. And what this means is you can really easily now learn uh basically this identity function that we talked about earlier by just learning uh zero zero filters. So your filters all are filled with zero values for example or uh in this case more practically what happens is they just need to learn very small values because instead of learning the uh this entire mapping from x to h of x they just need to learn this difference which is f ofx. So um you're
+
+68
+00:33:10,000 --> 00:34:12,000
+now just learning this sort of difference between your desired output here and um the the copied over block. This is called uh residual block or residual connection residual connection when you copy over values from an earlier layer into a later layer in your model and then you just add it to the the values at that point. So that I talked a bit about the intuition which was this observed phenomenon that these larger networks were achieving worse training and worse test error because they were harder to
+
+69
+00:33:41,000 --> 00:34:33,000
+optimize. So the intuition was we need to build a model that can really easily model the shallower networks so it can be at least as good as a shallower model. The way they did this was by adding a residual connection so that you can just copy over the values easily um build that into the architecture itself rather than trying to learn some identity mapping among the convolutional layers. And empirically this showed to work extremely well too. Yeah. So what does the residual block carry? Um so we
+
+70
+00:34:07,000 --> 00:35:04,000
+have our input X. We pass it through two different convolutional layers and we get our output f ofx. Um x is lit is just copied over here. So this is exactly the same as X and we add it to the output of uh these two blocks which is f ofx. Yeah, x is the output of one of the previous layers or if it's the very first layer of the model it would be the the image. >> Yeah. So the question is if maybe you just don't have enough data and if you added enough data then maybe you could train a model without these blocks. Um I
+
+71
+00:34:36,000 --> 00:35:30,000
+think these blocks actually do extremely help you with learning from more data. Um I think the issue it was really an optimization problem. So transformers use residual blocks for exactly the same reason because uh and I think it actually helps you model these more complex models and it actually enables you to use more data. So um I I think it's very good residual blocks help you use more data more efficiently because you're able to model a greater number you're able to more easily model a
+
+72
+00:35:02,000 --> 00:36:10,000
+greater number of uh functions. Yeah. So the question is that um maybe if we just trained for longer um the performance would eventually converge to the value of the smaller network and maybe it's just harder to optimize because it takes longer to train a a larger model. Um and I think the answer is no that these um these these were not uh like they were not converging to the performance of the smaller model regardless of how long you trained it. And the reason is because it's being stuck in essentially local minimum uh
+
+73
+00:35:36,000 --> 00:36:37,000
+and when you add these residual connections you're uh avoiding these. This is the actual explanation why this is the case is still I would say being a more active area of research. Um it's really hard to understand exactly what causes these models to um avoid local a global minimum or sorry to avoid local minimum and not get an optimal solution or to uh what causes them to not train uh and find better solutions. And often times this is really an empirical finding but there's some intuition
+
+74
+00:36:07,000 --> 00:37:12,000
+behind it. And in this case the intuition was that uh we want to enable our models to do at least as well as the shallower models which we know were performing better at the time. Um, so it's not that you could just train it for longer and it would uh do better. Um, it was actually a limitation where it was no longer it was un just completely unable to achieve as good as the shallower models. Okay. Um, so here's the overall ResNet architecture. Um, we have these stacks of residual blocks now. So that's what
+
+75
+00:36:42,000 --> 00:37:42,000
+these two blocks here together mean. um it's a residual uh block. So we have a 3x3 convolution with a relu followed by another 3x3 convolution and we're copying over this x value here. We're adding it to the outputs here and then we're having a relu afterwards. So each of these pairs of blocks is one of these residual and that's why you see this line skipping over here because the values getting added forward. Um the cool thing about ResNets also um is that they uh basically had a lot of these
+
+76
+00:37:12,000 --> 00:38:04,000
+different um depths that they created. So they created a whole family of models, some smaller and some larger. And they showed that as they increased the number of layers, their performance was increasing, albeit the the sort of the difference in performance as you got to the larger and larger models became smaller. So it was sort of reaching a point of given the data set uh they weren't able to scale any significant amount by adding more layers further than that but you they saw significant
+
+77
+00:37:39,000 --> 00:38:32,000
+improvements in performance among especially the earlier models and then 101 to 152 is where the performance it wasn't really change it was marginally better but uh performance change was maybe only like 1% at that point. Yeah. How did they get the number of 152? I actually don't know how they got the number of 152. Uh I think they wanted to try different values here and you can see that I mean they're not exactly doubling but you know there's sort of you know a significant increase in each
+
+78
+00:38:05,000 --> 00:38:56,000
+time. I don't know how they picked 152. I I that's a good question. Maybe they showed it somehow worked better than other I actually don't know though. So generally when you're trying multiple different uh number of layers for your model like given that say these are the number of layers you want to try um what you'll do is you'll sort of first train the smallest model see performance and then add more layers see if your performance increases and go on so forth. So that's probably why they
+
+79
+00:38:30,000 --> 00:39:34,000
+stopped at 152 is because performance wasn't increases as much anymore. Um and also there's GPU memory limitations. So as you get larger and larger models, it becomes harder to train from a hardware perspective because you need to fit more parameters into your GPU memory. So um there is like a limit for given your compute setup how large of a model you can train. Um I think you need to train these models separately though. So um you have one model run for 18 layers and one for 34 etc. So the question is um how to think of
+
+80
+00:39:01,000 --> 00:39:54,000
+intuition of CNN blocks given we're using these residual connections because um you can still think of it as higher levels of abstraction and this is shown to be true in the layers. So um you're you're not in instead of learning the um within the block itself instead of just learning the higher level features you're learning the delta from the original image to get the higher level features. That's what you're learning in the block. So you're learning the delta but you're still achieving these higher
+
+81
+00:39:28,000 --> 00:40:25,000
+level representations at each step. So that part is the same but the actual functional way of doing it is we're learning this uh right you learn this f ofx that you add your your your previous input to. So it's like you're learning the delta. The question is if you do addition does that require you to have the same tensor size? The answer is yes. And uh it's part of the reason why it's really a nice property that all of these ones have this 3x3 convolution with stride one so that you maintain the in
+
+82
+00:39:57,000 --> 00:40:56,000
+one padding so that you maintain the same size uh at every at every layer going forward. So after you had say a pooling layer, you wouldn't I mean you could maybe come up with a way to do it where you double the you know you increase uh you sort of unpool the values. Uh but after a pooling layer for example you couldn't do a naive addition anymore because the size of your tensors are different. So these are done within you know before a pool at least the regular one. I mean you could get around it by just having each
+
+83
+00:40:26,000 --> 00:41:32,000
+value be spread out on into multiple values for example. Okay. Um so these are basically the main takeaways for ResNets. Um one other neat trick they do is they basically periodically after a certain number of these blocks they'll uh double the number of filters and down sample the spatial dimension. Um so basically you can imagine if you start with a really flat uh image as the activations get pushed through the network it becomes smaller spatially but then the depth is larger. So um this is how to think of it
+
+84
+00:40:59,000 --> 00:41:55,000
+and then at the very end it just becomes a vector that you then use for classification. So that's how you should be like visualizing what's happening to the values in the network itself and the shape of them. And then one other sort of thing that's somewhat unique to ResNets other architectures do this too but before all these uh layers with the residual blocks they have uh this relatively larger convolution layer and here is just empirically shown that it did better if they added this here. So
+
+85
+00:41:26,000 --> 00:42:26,000
+this one is purely empirical finding. Okay. Um I think um yeah basically to highlight you know it did extremely well these larger models. It was the only it was the first time they were able to train 100 plus layer models successfully. So it was a really big deal and basically resnets were used in a huge variety of computer vision tasks afterwards. Almost every task in computer vision was using a resnet at the time because they performed so well because of these residual connections. Okay. Um so we talked about some CNN
+
+86
+00:41:57,000 --> 00:42:58,000
+architectures the main ones being the main one being ResNet and then uh also VGG historically. So we talked about why the smaller filter size is useful and having many layers of these is useful. So the final thing I'll talk about in terms of how we actually construct the CNN's and prime them to be ready for training is how do you actually initialize the weight values of the individual layers. So um you know depending on what values you choose you could either put values that are too small or too large which
+
+87
+00:42:28,000 --> 00:43:38,000
+would cause significant issues for your model during training. So here we're it's basically a um six layer network where we have uh 4096dimensional uh features and this is just a fully six layers of fully connected model and we initialize them here. This is getting a unit gaussian random and then we're multiplying it by 0.01 to get very small values close to zero and we have you know ru at each layer too. So if you plot the forward pass of this model, uh you would actually see that at the
+
+88
+00:43:02,000 --> 00:44:04,000
+beginning you get a relatively high you know cuz it's rel so all the means are going to be positive. Um but you'll have a mean and standard deviation that is relatively high but as each layer progresses because we had a really small weight initialization um it becomes smaller and smaller mean and standard deviation. And really ideally we would want basically all these to be the same for each layer. Um because it makes our optimization problem much nicer to solve. Um so if we say use 0.05 instead of 0.01
+
+89
+00:43:34,000 --> 00:44:31,000
+uh can anyone imagine what might be the issue here if we set it to too large of a value. So what's too when it's too small it goes to zero basically. What happens if it's too large? Yeah. Basically the activations get larger and larger at each layer. So uh if you plot it here you can see that you know by the end there's just a massive mean and standard deviation and if you're training a 152 layer ResNet and you know you can imagine this becomes quite an issue very quickly. So how do you
+
+90
+00:44:02,000 --> 00:44:59,000
+actually uh do this? So in this case um you know maybe the the optimal value I think is 0.022 or something but how would you actually know that and how would you do this more generally across any layer? Um, there are a few different ways you can initialize weights. And I'll go over the most commonly used one today in class, but know there are other ones. And generally what they're a function of is the dimension of your um of your of your values here. So you'll have a different value for a 4096
+
+91
+00:44:31,000 --> 00:45:34,000
+dimension uh fully connected layer versus a 2048. And the specific formula we'll go through um is called Kaiming initialization is actually the same person who created uh resonance. So Kaiming Hu he was you know very famous I mean he still is a very famous computer vision researcher. I think he's one of the most widely cited computer scientists of the last uh 10 or 15 years, maybe the most. Uh so he he's extremely well known in the computer vision community and he also came up with uh this idea of initializing the
+
+92
+00:45:03,000 --> 00:45:52,000
+values to the square root of two over your input dimension size. And I won't go over all the details for how they uh derived this and showed that with a relu activation this would cause the standard deviation and mean to be relatively constant throughout the layers. But if you do uh plot it, you see this does have the effect. So you can almost think of this as a magic formula where if you plug it in, you get the desired properties. And if you want to know the derivation, you can actually uh we link
+
+93
+00:45:28,000 --> 00:46:24,000
+the paper here. So feel free to look into that, but you can just sort of uh take our word. I won't go through the details here, but um it does this desired effect where the mean and standard deviation is unchanging. And you can also imagine that for any given setup, you could also just through testing try to find what is the what is the value here. Okay. Um, so these are how you we discuss how you initialize weights, how you combine these different layers together to form a CNN architecture,
+
+94
+00:45:56,000 --> 00:46:47,000
+which activations function, which activation functions people use, and then all the different layers and CNN's. So I think already we covered quite a few topics. So I think I'll pause very briefly to see if there's any questions about these. In the second part of the lecture, it's actually much less dense than the first part. So we'll be mainly going over a lot of nice practical tips for when you're training these models. So the question is how do you do weight initialization for CNN's? So you still
+
+95
+00:46:21,000 --> 00:47:20,000
+use this same uh initialization but your dimension in here is the size of your kernel. So if you have a 3x3 kernel with channels uh say six it would be 3 * 3 * 6 that is but it's the same idea. It's just you calculate your dimensions differently depending on the layer the type of layer. Yeah. It's you can think of it's the number of values roughly in each operation but it does depend on the layer and and some layers use different uh weight initializations but this is specifically
+
+96
+00:46:51,000 --> 00:48:01,000
+for CNN's how this timing initialization applies to it. >> Yeah. So the question is why do your activations expose explode if you have too large of an initialization value? So um if you so you you imagine at each layer of your initialized network you have um a set of randomly initialized values and if they're very large then um when you do your um you know you have a RLU activation afterwards and that doesn't actually cap the um the the outputs of your layer right you can go to infinity with RLU so if you have a
+
+97
+00:47:26,000 --> 00:48:21,000
+too large of a set of values that you're essentially repeating the same operation on because you're initializing all the weights uh to the same set of uh random values. Then at each layer, you'll be multiplying one set of large values by a set that's been initialized too large so that it becomes larger at each uh iteration afterwards. I I I mean you could think of it as it's sort of like a recurrence relation where u because they're all initialized randomly at the start where it's being multiplied by a
+
+98
+00:47:53,000 --> 00:48:46,000
+value and you would want in a simple recurrence relation you'd want it to be one, right? But because we have a vector of values that are being multiplied by our matrix um it depends on the dimension of the vector what your average uh output would be and what the uh sort after the relu because um you have basically a standard deviation for what is your activations then you you remove all the negative ones and you're left with what are your outputs at that point and if you have a really large
+
+99
+00:48:20,000 --> 00:49:13,000
+values you have a really large standard deviation so when you remove the the uh the bottom half of it you get your your starts moving more positive and more positive. Uh, did that make sense? It's sort of I didn't have slides to show it, but okay. Mostly sorry. Yeah, you can see more details in the paper. It's actually not too bad to read, I think. >> So, the the conclusion of the discussion here is that normalization will solve this activation issue where they're blowing up, but it
+
+100
+00:48:49,000 --> 00:49:43,000
+still might be harder to optimize. Um maybe we can we should probably do a follow-up post on Edge explaining this in more detail, but I think it's a really good question actually. Yeah. Um it would solve I think this particular issue, but maybe it's still hard to do something like this in the discussion. Yeah, it's a good question. Okay, cool. Um so I'll talk about these steps now. So how do you actually train your model? And uh the nice thing for data prep-processing is it's really easy for
+
+101
+00:49:18,000 --> 00:50:13,000
+images. So if you have your giant image data set, the standard way to do it is you calculate the average red, the average green and the average blue pixel along with the standard deviations and you take your input image, you subtract the mean and you divide by the standard deviation. And this is how you this is how you do uh data normalization for images. It's actually very straightforward. Um so it does require you to premp compute the means and standard and standard deviation for each pixel channel. Um so sometimes what
+
+102
+00:49:45,000 --> 00:50:45,000
+people will do is they'll use means that have already been calculated like a very common one is to use the imageet uh means and standard deviations and uh apply those to your input images even if you're training a model not on imageet. Um so it it is very um data set dependent is is is the way to think of this and different models will use different values here depending on their data set but the most commonly used one is just use the mean and standard deviation from image net. Yeah. So any
+
+103
+00:50:15,000 --> 00:51:15,000
+input image you've apply this operation before the model sees it. Okay. Um so yeah that one was really quick. Um and then in terms of data augmentation, so someone had a suggestion uh earlier in the class, why don't we just add noise to our uh image? And that's a great idea and we'll talk about the different ways you can add noise to your image here. This helps with regularization and helps prevent your model from overfitting. So we talked about it before um but this is sort of a common pattern with
+
+104
+00:50:48,000 --> 00:51:47,000
+regularization where during training time you add some kind of randomness and then at testing time you then average out the randomness. So um sometimes this is approximate but you know for example for dropout we saw that during training time we'll randomly drop say 50% of the activations and then at testing time we'll use all the activations but then we'll need to scale it down by this probability of dropout P. Um so this is a really common pattern and it's also used for data augmentation. So um you
+
+105
+00:51:16,000 --> 00:52:17,000
+can imagine this uh being a this cylinder here is like your data set. you load an image and a label. So we have a cat label and we have our original image from our data set um before we actually pass it into our model. It's extremely common and basically always in in modern deep learning people will always use data augmentation for training uh computer vision models. But the basic idea is to apply some transformations to the image to make it look different uh but still recognizable for the category
+
+106
+00:51:48,000 --> 00:52:40,000
+class and then pass that to your model and you're computing the loss here. So one of the nice benefits of this is you can effectively increase the size of your data set because instead of seeing each image multiple times, it will be seeing different versions of the image with different transformations that all still are the same category label. So you can basically get more data and therefore it increases your generalization capabilities, but your training loss will be higher because um you're not just seeing the same example
+
+107
+00:52:14,000 --> 00:53:18,000
+over and over again. So it makes it harder for the model to just memorize. So how do we know the weight initialization is just right? So we know it's right in this case because the means and the standard deviations are relatively constant throughout the layers of the network and we're not seeing uh in this case we saw sort of uh mode collapse to zero. In this case it was sort of blowing up to infinity as we increase the number of layers. So the way you can ensure it always happens is by using the formula. This will always
+
+108
+00:52:45,000 --> 00:53:48,000
+initialize them. Well um so in practice that's how people do it. If you were creating a new layer um that maybe does some different kind of operation that no one's done before, then yeah, you probably would need to try a bunch of different weight initialization schemes and see what works best. Um but generally for these linear layers or for or the convolutional layers, you can use this uh formula here which is called the kiming initialization. Yeah. Okay. Um so back to data augmentation.
+
+109
+00:53:17,000 --> 00:54:12,000
+Um, so what are the different augmentations you can do specifically? So one of them is horizontal flipping. This depends on the problem. Um, so if you want to have a model that reads text, this would be a very bad augmentation to use because the text is now it's like you're looking through a mirror and you can't read it properly. Um, so this is sometimes useful for everyday objects. It's usually pretty good because most objects are symmetrical. So this property uh actually works pretty well. Um, and then
+
+110
+00:53:45,000 --> 00:54:36,000
+you could also imagine if you're looking maybe at images from a microscope or overhead that you could also do a vertical flip and that would make sense. But for everyday objects, vertical flipping actually doesn't really make sense because a cat is almost always seen in this position. But maybe if you had a data set where cats were in all different orientations, you could imagine that flipping or rotating or all these things would make sense for for your data set. Um, another type of augmentation is this
+
+111
+00:54:10,000 --> 00:55:30,000
+resizing and cropping idea. So what ResNets and many um different image models in uh deep learning do is they basically take a random crop of the image and uh then resize that to be your image size. They might even take another crop afterwards. So the most common strategy is you pick the length of what is basically the short side of your image. Um so if you have a input image size to your model of 224 x 224 pixels you would pick a value larger than this first and uh find sort of find some crop of your image that contains these uh
+
+112
+00:54:50,000 --> 00:55:58,000
+this larger scale L uh and this these are commonly used values. You crop the image um so you you you uh sorry you don't crop you resize the image to be uh that scale. So instead of say this is a 800 by 600 image if we used 256 here um we resize the short side. So 600 would be 256 and then 800 would be scaled correspondingly. So we scale it to this L. We scale the short side to L. And then we crop a random patch of 224x 224 pixels from that image. So you're scaling the image by first preserving
+
+113
+00:55:24,000 --> 00:56:19,000
+you preserve the relative resolution but you make it smaller or larger to fit this L and then you take a random crop of that. And this is like by far the most commonly used uh rand random resized crop is what it's called in most libraries. So this is used in most problems because it works pretty well and it reserves the relative uh resolution of your of your images. Um and then there's another neat trick you can do with augmentation called test time augmentation. So if you really just want to get the best performance
+
+114
+00:55:52,000 --> 00:56:43,000
+possible, you can basically get a bunch of these different crops and resizes and run them all through your model and then average your predictions at the end. And for ResNets, people will often try a bunch of different scales, um, a bunch of different crop locations, and, uh, maybe even flip it. And usually you'll start getting diminishing returns, but you can get actually pretty good like 1 to 2% performance boost by using this sort of test time augmentation. So if you're in a setting where it really
+
+115
+00:56:18,000 --> 00:57:19,000
+matters, you're trying to eek out every last bit of percentage points, then this is actually a really great trick that you can use for any almost any computer vision problem. Um, okay. So a final sort of few augmentations. One is color jitter. So here we're specifically randomizing the contrast and brightness and scaling the image correspondingly. So maybe images look more muted or more sorry the colors look more muted or more um brighter. But these are sort of very traditional uh image processing techniques. And usually
+
+116
+00:56:48,000 --> 00:57:34,000
+with all these different augmentations, you'll try different values and see which ones make your images still look in distribution and look normal to you as a human. And that's like a pretty good way to judge what values you should pick for how much jitter you should have, how much brightness variance, uh, etc. So, normally when I'm starting a problem, I'll try a bunch of these different augmentations. I'll see what is making the data look different from the original data, but then still
+
+117
+00:57:11,000 --> 00:58:02,000
+recognizable to me and still very easy to recognize. And that's like generally a good set of augmentations to use. Um, final one is you can imagine just like cropping out parts of the image where you just are basically putting a black or a gray box over it. Um, and I think this one's maybe less commonly used, but it kind of shows you how you can get creative with the augmentations depending on your problem. Like say you're in a setting where things will get covered, like the the the camera
+
+118
+00:57:37,000 --> 00:58:36,000
+will be oluded, so it won't be able to see the objects fully. This could be a really neat trick you do to make your model more resilient to stuff blocking parts of your objects. So, you could almost imagine for your given setting, what augmentations make sense? what ways can you uh transform your your input data so that it's still recognizable to you as a human but it makes it harder for the model to memorize the training examples. Okay. Um so the final set of topics here are basically extremely practical. So
+
+119
+00:58:05,000 --> 00:59:00,000
+when you're say doing a project or uh training a model say for your course project um I think you should basically do the exact things we're going to be describing in the coming slides. Um but this also applies outside the course to any computer vision domain you could be uh practicing in. So um in practice in many times we don't actually have so much data. You know imageet the original version had a million images. Uh maybe you don't have a million images for your problem which almost none of us do
+
+120
+00:58:33,000 --> 00:59:27,000
+unless you've been collecting vast amount of data with a huge team. So um if you don't have a lot of data can you still train CNN's and the short answer is yes you can but you need to be a little bit smart with how you do it. So um I think in one of the I think maybe it was last lecture we showed how the different uh filters in your CNN are sort of extracting different uh types of features. So this goes back to someone asked about like the hierarchy of features in convolutional neural
+
+121
+00:59:00,000 --> 01:00:04,000
+networks. So at the beginning it's more of just like edges or patterns or or really small shapes. And then at the highest level um you can imagine uh if we put an image into our CNN and we get this uh final uh vector right before we get our class scores and we compare that to other images in our data set. Um you'll actually see that these these values uh of the vector of our image are actually really close. So this is sort of like you can think of this as sort of like the nearest neighbors thing we did
+
+122
+00:59:32,000 --> 01:00:31,000
+before, but instead of it being the pixels of the image, we're we're looking at the uh the vector at the very end of your CNN right before you you have the classification layer. Um so this would be like the the 4096 or the 2048 layer. And if we look at the difference here is the L2 distance. Um you'll find that for a given image if you put it into your model and you look at the other images that are close to the model in this vector space right here after you uh go through all the layers except the last
+
+123
+01:00:01,000 --> 01:01:04,000
+one that you'll find the images are extremely close to each other when the items are in the same category. So intuitively what this basically means is that these features here are actually really good at at uh you could build a linear classifier on top of them and then be able to or or a K nearest neighbor classifier and be able to classify objects extremely well. Um so so how could you use this in practice? So um what you would do is you would first train your model on imageet or you would just grab a model someone else has
+
+124
+01:00:33,000 --> 01:01:28,000
+trained on imageet or one of these really large uh web internet scale data sets and you can just uh freeze all of these layers. So you don't train any of them. You keep them exactly the same as before and you replace this final layer instead of it being in the in the case of imageet a thousand classes you replace it with the number of classes you have in your data set. And then when you're training the model, you only train this layer here. So if we think about um we talked about how there sort
+
+125
+01:01:00,000 --> 01:01:52,000
+of in the old paradigm of computer vision, you had feature extractors which was a predefined set of operations to get stuff like color histograms and other uh predefined features. Um you can almost think of uh the frozen model as doing this. It's a predefined feature extractor that we're not changing in any way, but we're using it to calculate features that we then train a model on top of. It's actually extremely similar under that paradigm because you're not training it here. And if you have a
+
+126
+01:01:26,000 --> 01:02:28,000
+larger data set, what tends to work best in practice is to actually train the whole model, but you're initializing it from these values that are that were pre-trained say on imageet or some other really large internet scale data set. So I think pretty much for all of the problems I ever work on, I'm doing this step three here because my I have maybe a million or 10 million training examples. So I'll start it with a model that was trained on billions that I don't have the compute for and then I'll
+
+127
+01:01:57,000 --> 01:02:29,000
+fine-tune the model uh on my relatively smaller data set and I'll get better performance than if I just try to train a model myself uh because the model's basically seen more data. that's uh created a better feature extractor and then when I fine-tune the whole thing it can still be specific enough to my problem. You're basically taking say say say say say say say say say say say say say say say say say say say say say say say say say say say say say say say say say say say say say say say say say say
+
+128
+01:02:14,000 --> 01:03:03,000
+say say say say say say say say say say say say say say say say say say say let's use a very concrete case where we're training a model on imageet um we're taking this model and we're replacing the final layer so that it's no longer outputting a thousand classes it's outputting um you know the number of classes in your data set and we're initializing this randomly using the kiming initialization we talked about before but the rest of these layers are maintaining their values uh that they
+
+129
+01:02:37,000 --> 01:03:27,000
+they had before so we're not changing these values and during gradient descent we're never changing these values. So, um these values are unchanged. We basically take our image, we pass it through our model, and now it's just like we have a it's almost like you're just training a linear linear classifier where your input are these 4096 vectors for each image that we calculate by passing it through the whole model. Then we have our vector of 4096 and we're just mapping that to the number of
+
+130
+01:03:02,000 --> 01:04:07,000
+classes and we're only training this mapping at the end. >> Yeah. So the question is uh will you have some bias in your model because it's trained on imageet? The answer is definitely. So um the the model if you do this uh number two like this uh way of training um then it will do best on data sets that look very similar to imageet. So these would be like pictures of everyday things like laptops or uh maybe a classroom or a person things like this where imageet is everyday objects but if it was say photos of Mars
+
+131
+01:03:35,000 --> 01:04:28,000
+uh it would do a lot worse. So there's definitely bias based on the training data of the pre-trained model and you want to get something that is in the same type of distribution or you're seeing the same kinds of objects or locations or things like that. So um the question is what do you do when your data set is out of distribution? Um I actually have a um a slide here to cover some of that. So it's a great question. Um so um if you have a very similar data set but very little data, you can use
+
+132
+01:04:01,000 --> 01:04:46,000
+the linear classifier strategy we just mentioned. If you have a similar data set, quite a lot of data, you'll get best performance by fine-tuning all the layers. These are strategies two and three on the slide that I mentioned earlier. But what about when you have a very different data set? So, um if you have a lot of data, you might just want to start from scratch. Um or you could you might get better performance if you still initialize here. You would test, but there's no guaranteed way to know
+
+133
+01:04:24,000 --> 01:05:11,000
+that performance would be better or worse. Um and then yeah, if you have very little data or a very different data set, you probably want to try to find a model that's trained on something close. There are specific techniques that researchers have looked into for out of domain generalization and um you know this basic idea of you have one domain, you train a model on one domain and you're trying to learn a new domain that's different in some ways. So this is an active area of research, but I
+
+134
+01:04:48,000 --> 01:05:35,000
+wouldn't say there's like a general technique that always works and it's a bit problem dependent in that setting. Whereas this is for everything except the upper right quadrant here. It works pretty well in practice. So there are actually techniques for this and it's a pretty active area of research and certain models generalize better. Like I think language models are pretty good at learning a lot of different domains for example. Um but yeah it's it's it's definitely the worst scenario to be in
+
+135
+01:05:11,000 --> 01:05:55,000
+where you have a completely different problem that anyone's ever worked on before and you don't have a lot of data. It's by far the hardest to train a model in that setting. So the question is do you ever do anything between training one file layer and all layers? Yeah, people have actually done a lot of work looking into training a subset of the layers. Um, there's also a technique called Laura, which we might go into in the transformers lecture. I'm not sure if it'll make it this year, but the
+
+136
+01:05:33,000 --> 01:06:32,000
+basic idea is to fine-tune all the layers in a way where you're not changing all the values exactly, but you're learning uh basically low rank uh uh differences between the different layers. um where you're sort of fine-tuning the differences between the original layers rather than fine-tuning the layers themselves. So um yeah, there's techniques you could use Laura uh and it would need more explanation, but the basic idea is instead of fine-tuning the actual values, you're fine-tuning uh these differences between
+
+137
+01:06:03,000 --> 01:06:55,000
+the value layers. Sort of like how a ResNet, you're learning the difference. Loras are like that, but you do it with a very small number of parameters. I think the question is uh how did they basically decide how many layers to pick? Why did they pick a large number of layers? Specifically, why are there two convolution layers of each size instead of one? Um, so it's actually really similar to the example we showed earlier with VGG where if you have three of these 3x3 convolutions, you're able
+
+138
+01:06:28,000 --> 01:07:30,000
+to uh have the same receptive field as a 7x7 convolution, but you're able to model more nonlinear relationships because you have these three activation functions rather than just one activation on the 7x7 filter. So basically 3x3 is more expressive, but you're still looking at the same set of values as long as you have enough of them. So a a larger set of smaller filters is more expressive than a smaller set of larger filters. Okay. Um okay. So we'll go on. Um yeah, basically try to find a large data set
+
+139
+01:06:59,000 --> 01:07:52,000
+that has similar data. Uh get a model that was trained on that and then fine-tune it on your own data. Uh some good links. Uh PyTorch image models has a bunch of models that are trained on imageet and other data sets. Um and then also just in the PyTorch vision GitHub repo, you'll find some too. Okay. Um I'll talk over very briefly at the end for hyperparameter selection. So um if you're having difficulty training your model and it's not working right away, I think the best thing you can do is to
+
+140
+01:07:26,000 --> 01:08:11,000
+overfit on a small sample. So this is like the default debugging strategy in deep learning where you just have one data point and you want to see your training loss basically go to zero. Your model should be able to memorize one training example and if it's not able to do that, you have a bug somewhere in your code or you're not picking the right kind of model to model your problem. Um, so this is a really good uh training problem and it'll also tell you like what learning rates work or what
+
+141
+01:07:49,000 --> 01:08:37,000
+ones don't work and you'll get a rough idea of the neighborhood of learning rates you should explore. So this is a good way to make sure your model's correct, make sure your learning rate is reasonable and also to make sure you don't have any other bugs that could be impacting your code. So this is like always step one if you're having issues just uh running some code. This is how you debug. Um the second thing you would want to do after you get this is maybe you try a very coarse grid of
+
+142
+01:08:12,000 --> 01:09:04,000
+hyperparameters. So I would first try with different learning rates and see how if you train model on different learning rates what are the training losses look like. You want one that has the most sustained uh decreasing in the training loss over maybe one epoch. That's like a pretty good estimation but you can train for longer. Um once you get a good set of learning rates you could then look into other hyperparameters too. And specifically besides the loss, you'll also want to look at the accuracy curves.
+
+143
+01:08:38,000 --> 01:09:30,000
+So you have your training accuracy and your validation accuracy. Um if they're still going up, it means you want to keep training. Uh pretty reasonable, but you might have a scenario where the training loss is going up, but your validation loss is going down. Uh this is overfitting. So um we need to either increase the regularization or if we can get more data, that could also work. But you need to do one of the two um in order to improve your performance further beyond uh the peak right here I
+
+144
+01:09:05,000 --> 01:09:59,000
+guess would be the best model you have so far. Um if you're seeing very little of a gap here then you can probably train for model uh for longer because generally we you do want to just uh get to the point where your validation loss has been maximized. So if you could just keep training uh you know you could keep training. So uh even if there's not a significant gap here or anything um if you see uh the validation loss is similar to the training uh sorry the validation accuracy similar to the
+
+145
+01:09:32,000 --> 01:10:27,000
+training accuracy you can probably keep training until your training accuracy starts diverging from your your validation accuracy and you basically can repeat this process over and over again. Um one final note is in terms of for hyperparameter search normally people think you know you have two hyperparameters or more that you're searching over should you try every combination of the hyperparameters or what is the best way to do it I think in practice a random search over their hyperparameter space works a lot better
+
+146
+01:09:59,000 --> 01:10:51,000
+than a like a grid search where you're trying every set of a predefined set and the reason is mainly because you can imagine you have one axis which is an unimportant hyperparameter where depending on the value your performance will be roughly the same versus an important one. If you do random values across all of these, you'll actually search the hyperparameter space of your uh important parameter much more thoroughly. Whereas you're sort of wasting time uh doing on on the grid search rechecking multiple values for an
+
+147
+01:10:25,000 --> 01:11:12,000
+unimportant hyperparameter. So in practice, you should define the ranges you want to try and then just uh randomly collect hyperparameters with values from those ranges. And that's probably the best way to do it. And you just keep running till you get the best model. Okay. Uh that's it. So we talked about layers and CNN's activation functions, CNN architectures and weight initialization. How do you actually predefine and build these models and then we talked about how do you actually
+
+148
+01:10:48,000 --> 01:11:18,000
+train it? How do you change your data to be input to the model? How do you augment it? Uh transfer learning is a really neat trick for improving performance and then how do you pick the best hybrid parameters. So uh yeah, we covered a lot in lecture today. Thank you all so much. Uh yeah.
+

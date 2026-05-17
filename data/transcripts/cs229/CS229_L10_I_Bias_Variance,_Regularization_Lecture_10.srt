@@ -1,0 +1,584 @@
+1
+00:00:05,000 --> 00:00:58,000
+so I think I'll still spend like five minutes just briefly review um on the the bad propagation last time I think I I was running behind last time so so I didn't have time to explain this figure which I think probably would be useful as a high level summary of what's Happening uh I'm going to Omit all the details so so I guess I'm drawing this in this way like this is the forward path this is how you define a network and the loss function right so you start with some example X and then you have
+
+2
+00:00:32,000 --> 00:01:37,000
+some I guess this is a matrix back to multiplication or Matrix Matrix modification if you have multiple examples but this is a matrix Vector message multiplication module and you take this you take X in a product of multiply with w and B and then you get some activation the pre-activation and you get some post activation you take some Matrix Vector multiplication and you get um I guess I'm using I'm matrix multiplication but actually it's Matrix Factor multiplication so uh and you get
+
+3
+00:01:04,000 --> 00:02:08,000
+the activation and then you do this right this is the how you define the loss how you define the model I guess the output of the model I think last time we used tall which is the output of the model and then you have something that defines that defines the logs right this is the the so-called forward path and and and the in some sense the the you can summarize the the back propagation uh in a way uh like follows so basically if I draw it right so this is uh of course you know what you really do is
+
+4
+00:01:36,000 --> 00:02:40,000
+you implement this in computer um but if you draw it in some sense you are doing it in a backward way so what you do is you say you first compute if you look at the the flow the data flow or the kind of the com the process of the back props um back prop process so you compute uh the laws with respect to uh the output first and this is often very easy this is like just you take the because the loss is something like y minus Tau Square Times a half and this one is just a very simple formula and then you compute
+
+5
+00:02:09,000 --> 00:03:23,000
+um you can you compute the derivative of the loss with respect to a two here I only have three layers so and then you take the derivative you compute the derivative of loss with respect to Z2 and then you compute the derivative of loss with respect to uh A1 and then something like this this is the the order of the computation uh you walked and and this is kind of like it's kind of like you are actually in this networking in a backward fashion in some sense um but how do you do this each of this
+
+6
+00:02:47,000 --> 00:03:46,000
+Arrow so this is by the the Lemma that we discussed right so so I think we have three landmarks or three abstractions right so and each of this arrow is using one of those three elements so and and now you can see what this those kind of like landmarks are for those dilemmas basically are saying that if you know DJ over dtau how do you compute d0 over d a and and there's another element which says that if you know how to compute DJ over da how do you compute DJ over DZ and and all of those slime us
+
+7
+00:03:17,000 --> 00:04:20,000
+about this kind of relationship if you know how to compute um the derivative with respect to the output of some module right suppose this is a module towards the output of this module right so if you know how to compute DJ over D the output of the module then you want to know how to compute the derivative with with respect to input of the module so all of the three lemas are doing these things I'm not going to the details because you know we don't have enough time to review again but that's the basic idea and
+
+8
+00:03:49,000 --> 00:05:06,000
+um and also there's another thing which is like this is only about the derivative with respect to activation you can also compute a derivative with respect to the the weights right so if you know this quantity then uh I think if you know this quantity then you know how to compute the derivative with back to the last layer weight and if you know this quantity then you know from this quantity you know how to compute the derivative with back to W2 and from this quality you know how to compute derivative with respect to W1
+
+9
+00:04:26,000 --> 00:05:29,000
+and also the same thing for for Beats so um and and this kind of the the last row this quantities right so they are they don't depend on for example after you get this you can compute this right and after you get this quantity you can complete these two quantities but this this Row the derivative with respect to activations you can only do it sequentially you cannot say you compute this before you do this so so this arrows kind of is kind of the the orders of the dependencies between these quantities
+
+10
+00:05:04,000 --> 00:06:18,000
+and um and and each of these Arrow you know is basically done by one of the Lima that we discussed last time right each of the Lima is kind of dealing with the um with this any questions this is just the extension of the last five minutes of the option I didn't have enough time to elaborate on this okay so um good so now in this lecture and the lecture afterwards we are talking about um um I guess a few Concepts one concept is called generalization which is the main point of this lecture and also next lecture we're going to
+
+11
+00:06:02,000 --> 00:07:03,000
+talk about on the concept of regularization and next action we also talk about some of the practical a Viewpoint of ml like how do you really tune your model how do you uh whatever you have to do in this whole process right so like you start with the data process and then you have to tune a model and then maybe you have to go back to change your data so on and so forth so um so basically these two lectures I think we are um um we're gonna discuss this kind of um this concept I think the generalization is probably the main
+
+12
+00:06:32,000 --> 00:07:35,000
+thing that we are talking about here so um so generalization as you can see you know as you can guess it's really just about you know how well you are your model is performing on Einstein test examples so we're going to discuss you know how do you make sure your model can also generalize to unseen test examples so so far we only talk about training right so we have some examples which we have seen when they are tuning data sets and we fetch some model on top on them right so and now we care about whether this model
+
+13
+00:07:03,000 --> 00:08:00,000
+will work for future unseen examples so and we are going to discuss you know um on a bunch of Concepts you know the bearings very straight off which is which is a kind of a principle when you think about how test error changes as you change model complexity and we're going to talk about some of the new phenomena people have found in deep learning which is a little bit different from the classical understanding um okay so I guess uh um that's just a very high level overview I guess I use a
+
+14
+00:07:33,000 --> 00:08:36,000
+lot of passwords I'm not expecting everyone to follow everything so um let me um maybe be concrete um okay so I guess so let me start with some kind of basic notations and Notions so I guess some basic Notions one thing is this so-called tuning loss which you probably already know what it means you know shooting laws or sometimes it's called tuning error sometimes it's called training cost I think in in this lecture sometimes we use the word cost so they all mean uh the similar type of Concepts sometimes
+
+15
+00:08:04,000 --> 00:09:02,000
+people use loss to refer certain kind of losses and error to refuse refers to certain other type of losses but but they are from the purpose of this lecture they are all means same thing right this is what you care about in a tuning right for example if you care about the square loss then the training loss will just be this I think we have to write down we have written down this equation of times this is the loss function you care about when you have square loss and other laws could be cross entropy
+
+16
+00:08:39,000 --> 00:09:40,000
+laws it could be um um like a mle the maximum likelihood estimator I think that's actually one principle to derive the tuning loss right you derive the maximum likelihood estimator for uh for a data set and that you use that as your training loss you use the negative log likelihood as the tuning loss so this is basically so far what we have focused on in the last few weeks so how do you get the feeling loss and how do you really Implement on this and optimize this right so there are many ways to optimize it for example in
+
+17
+00:09:10,000 --> 00:10:08,000
+one of the lectures we use the analytical formulas right so we we have the GDA we analytically compute what is the the minimum loss right the minimum uh uh the minimizer of the negative log likelihood and it's you know of the other lectures we are using a numerical algorithm to minimize this loss right so like we for example like in deep learning we are using stochastic wind descent um and we have talked about Newton's methods so and so forth but so far everything we have to talk about is this
+
+18
+00:09:39,000 --> 00:10:39,000
+loss function when we try to find the minimizer of the source function or some oh you know not necessarily exactly this one but like either the but always it's always a loss function defined on the training examples okay so now um suppose you have obtained right so suppose we have some parameters Theta so suppose we have obtained um some SATA how do you evaluate what you're saying is good or not so ideally you want to model to not only perform well on the tuning data because for the tuning data
+
+19
+00:10:10,000 --> 00:11:21,000
+you already know the prediction right why you care about letting the model to predict something you already know you already know so what you really care about is you care about you know you want to evaluate on unseen examples so that's why the test loss is defined on unseen examples um and I'm going to use this notion so suppose let's say you draw so the process is that you draw some new example X comma y from some distribution D and often this is called test distribution and and then you evaluate
+
+20
+00:10:59,000 --> 00:12:13,000
+what's the expected loss on this new Test example so you look at L Theta which is the expected loss of and the expectation is over the randomness of this new example Juan from this test description so what's important is that this X and Y is not seen in the training it's a new Fresh example and of course here I'm defining it as expectation right so actually in places I'm taking average over the entire discussion so so if you really want to do it in parallel what this really means is that you draw
+
+21
+00:11:42,000 --> 00:13:05,000
+a bunch of examples maybe let's call it X1 test test one you draw maybe I'm of this these are another examples you have used for training these are new examples you draw during the test time you draw them from B ID from the distribution d and then you evaluate the Empire the error on this side so and you evaluate average error on average loss on on this set on the test set because you know that if you evaluate on this test set uh it's it's pretty much just approximating this expectation you
+
+22
+00:12:34,000 --> 00:13:40,000
+are just using empirical way to estimate the expected value right like if you want to if you want to estimate any expect an expectation of any random variable one way to do it is you just draw multiple copies from the same distribution and you take the empirical average right that's why the test set is a reasonable estimate for the um for the test error and just to be clear these test examples you know you don't you haven't seen them in a changing site they are something you draw um you know you can draw them in advance
+
+23
+00:13:09,000 --> 00:14:10,000
+but you don't you cannot like them to be seen in your training uh the tuning process and there is a notion called generalization Gap foreign often people called this is basically talking about the difference between the test loss and the tuning loss and oftentimes you know it's not always true but oftentimes the training loss is less than a test loss when you test you found that your model is not as good as you thought before on the training set you know you know it's probably sometimes it's probably a
+
+24
+00:13:51,000 --> 00:14:46,000
+little bit worse sometimes it's a lot worse sometimes they are very similar but generally you shouldn't expect that your test performance is just dramatically better than the training performance I mean of course in extreme cases you can design data set such that this happens but but I think in in realistic practical situations I don't think you should expect that at all um so so it's often the case that this Gap is either very close to zero or maybe a slightly negative slightly
+
+25
+00:14:18,000 --> 00:15:16,000
+positive or it's it's much bigger than zero so you want this Gap to be as small as possible so so basically you just in some sense you care about two points is you care about the training loss and you care about the gap you want both of these two to be small if both of these two be small or if both of them are small then the sum of them will be small and that's your test by your test loss is small um that's that's the hope you hope that this both of these two are small foreign
+
+26
+00:14:53,000 --> 00:15:57,000
+so this one is something you can control in some sense right this is what you try to optimize for right but this one is harder to control because you don't so right because you cannot say I'm going to find a data such as L Theta is small because if you do that in particularly you try to optimize Theta such that the Tesla is small then you have to see the test data set right so so so so so so that's why you cannot really easily control this because you you are not allowed to test the assets so you like you cannot choose
+
+27
+00:15:25,000 --> 00:16:27,000
+your Theta based on the loss you can only choose Theta first and then you evaluate loss but not vice versa so that's why the the generalization Gap is something that is very hard to control at least you cannot directly control it you know and and the the point of this lecture is to discuss you know in what cases you can somewhat no this is not too big right like when this can you can hope that this is not too big um okay so and and then we also did uh before getting into more details let me
+
+28
+00:15:56,000 --> 00:16:52,000
+also Define of two notes two kind of like commonly used uh terminology so um of course we are dealing with the case when else so we are mostly concerned about the case when L say that it's too big right so if else it is small that's great right you don't have to worry about anything so when LCD is Big the question is what what do we do to change it right like if You observe that your test loss is very big then what you can do to make it smaller that's the kind of the question you want
+
+29
+00:16:24,000 --> 00:17:33,000
+to study so and typically when LCD is Big you can there are two on failure mode in some sense these are not supposed to be um these are not supposed to be um you know comprehensive but I think typically you are in either one of these two failure modes so one of the filler mode is called um affiliate patterns so one of the failure mode is called overfitting and so over 15 you know I'm going to discuss a lot about overfitting um but you know the first other bit is that the typical situation of
+
+30
+00:17:02,000 --> 00:18:19,000
+overfitting is that the training loss J is small but the the test loss is big so you have this big generalization Gap so you have a discrepancy between tuning and test so that's at least that's you know that's not a definition for our fitting but that's a very um uh a a very typical um characteristic of overfitting so um for example I guess I'll probably draw this you know very often uh our job is going to figure out very often uh in in this lecture so suppose you have a um some X and some y you have some data
+
+31
+00:17:40,000 --> 00:18:51,000
+sets I guess the running example I'm going to do is that I'm going to have some data set that lives very close to this quadratic quadratic function so the the data are approximately quadratic so X and Y so you want to be has a one-dimensional problem so given X you want to predict Y and You observe some um so you have a data set for example you have four points so each point is like this maybe this and something like this maybe something like this right so you have you see these four blue points and you want to fit a line
+
+32
+00:18:15,000 --> 00:19:38,000
+to it or filter some curve to it and the question is what curve you're gonna affect so suppose you fetch something crazy like this let me try to see what color I'm using for this well sorry one moment let me um think about how do I use the color on your consistent way so I guess if you fit I'm going to use black follow for the model you fit so suppose your model your fat is something like this I'm drawing something crazy so this model is I intentionally make this model to pass these points exactly
+
+33
+00:19:06,000 --> 00:20:12,000
+so this model face the data the fortunate data perfectly right so the J Theta is really small it's kind of close to zero but you can imagine this model shouldn't generalize to anything examples right so suppose you suppose you um regenerate some examples you know and you kind of believe that ANC examples also are kind of like similar um like have a quadratic relationship you generate something like this maybe somewhere here maybe somewhere here then you can see that the The Fading to the
+
+34
+00:19:41,000 --> 00:20:43,000
+the right Point becomes very worse so much worse becomes much worse so the so the test loss is very big so so this is a typical situation of overfitting in some sense you are saying that you you fit to the data very well but you are you are on you are over fitting in the sense that you you um you only focus on the training data but you you kind of like um forget about the the test performance you know I will discuss why this will happen um I guess you can probably guess um but this is for so far I'm just
+
+35
+00:20:12,000 --> 00:21:26,000
+defining the roughly what over facing means so it means that you are not um you you feel the tuning data but you don't you don't generalize and another um uh notion is called underfading so an undertaking basically just means that you face something like this maybe let's say you fit this suppose this is another model effect so underfating just means that both The The J the J Theta is also big so so even your model does it doesn't even do well on a tuning set and that that is basically means under fitting
+
+36
+00:20:56,000 --> 00:22:04,000
+um so you as the word suggests that you are not fitting the data um and and whether you're in the overfitting regime all the underfating regime or in the in a nicer regime um depends a lot on different things and one kind of decision we are trying to discuss today is that you know what is the right model complexity so like whether you're going to use linear model maybe use our quadratic or maybe fifth degree polynomial or when you might work so and so forth so we're going to discuss you know uh
+
+37
+00:21:39,000 --> 00:22:45,000
+what will happen if you change your model complexity and whether you know in what cases you may underfade in what cases you may overfit and what is the best sweet spot any questions so far and kind of like as a spoiler in some sense like we're going to discuss two um we're going to decompose the test error l Theta we're going to decompose this into two terms actually I'm not going to show it mathematically because I don't think I have enough time to do that but intuitively you're going to decompose
+
+38
+00:22:24,000 --> 00:23:29,000
+the test error into two terms which is called one is called bias and technically it's y squared because the bias is defined as the square root of this term so plus variance so you're going to have this you're going to Define these two terms and and say that these two terms if you take the sum of them it will be the test error and these two terms has this property that's the BIOS is going to be uh an increasing function so we're going to see something like this the bias is going to be a
+
+39
+00:22:59,000 --> 00:24:04,000
+decreasing function as the model complexity I haven't told you what the bias is what the virus is I'm just kind of giving your kind of like a a spoiler on what kind of things we are going to discuss so the bias is something like this and a virus is something like this so these are basically you are kind of like trying to figure out the underlying kind of like mechanisms um so so the mechanism is that if you change the model complexity to make it more complex then your bio environments will be bigger and the bias will be
+
+40
+00:23:34,000 --> 00:24:50,000
+smaller and your sum of these two functions which is the test error will be something like this and then the best one will be something in the middle so so this is the kind of the uh um a quick overview of what we're going to discuss so all right okay so now I'm going to um Define bias and virus um in a little bit more formal uh ways still not very formal like like there there's um like I'm going to start with uh like it's a great it's a graduate process I'm gonna have a little more
+
+41
+00:24:12,000 --> 00:25:35,000
+formal definition of the bias okay and I saw some uh examples so any questions so far why is crazy I mean oh this is just a maybe I should draw this is just because it's kind of a unique thing you need to define the bias to be the uh it's just the um how do I say this like it's a definition like a like a actually some people call the the biosaurus bias actually in some literature sometimes people take a square root it's just a how do you choose the right unit um yeah and I I you know when I say bias I
+
+42
+00:24:54,000 --> 00:26:03,000
+I don't really distinguish whether it's squared or not it's so um okay so I guess um what I'm gonna do is I'm going to have a running example which is basically like this and I'm going to uh kind of like try um what what happens with linear 50 degree polynomial these are um and and kind of use this technology as a solid experiment to demonstrate these qualities so let's start with linear so this is um sometimes this is a solid experiment but but actually we have some real data
+
+43
+00:25:28,000 --> 00:26:55,000
+experiments in the electron notes here I'm just drawing this um um so like um but I think it's um it's pretty much the same so so suppose you okay maybe I will set up just really quick so my running example is basically like what I on Drew about um so so I'm gonna have some training examples and these training examples are something like y i is equals to a quadratic function quadratic which is just this quadratic um imagine and plus a little bit noise this is a small noise so that's why these blue points are not
+
+44
+00:26:17,000 --> 00:27:19,000
+exactly like on the quadratic it's just there is a little bits fluctuation so um and sometimes I think um I guess this quadratic sometimes they're called as H star XI just for the sake of technology I think sometimes I call this the ground shoes this is the in some sense the the true function you are trying to find out um but of course you don't know it you want to you want to try to recover it and I'm going to do a cell experiment first you know I'm going to do a few experiments I'm going to start with
+
+45
+00:26:50,000 --> 00:28:02,000
+linear model and then I'm going to try fifth degree polynomial and then I'm going to try quadratic so um so linear model suppose you have a linear model I guess you can probably see you know what will guys what will happen so I'll draw this again so you have this four data points something like this now what happens with linear model is that you know you have these four points what's the best linear effect probably would be something like maybe this for this particular data set right so
+
+46
+00:27:36,000 --> 00:28:55,000
+and and you can see that uh what's the what are happening here so maybe let me see how do I um maybe let me erase this for the moment I'm going to redraw this again so for linear models I guess you can see a bunch of properties right so you can see that this is a large training Arbor training loss alternate losses for consistency there's a lot changing loss because um I guess what's your prediction on a tuning data set this is your prediction for this for this ax right so so this is X1
+
+47
+00:28:32,000 --> 00:29:40,000
+and the prediction is here and the prediction Fox 2 is here the prediction fox 3 is here the prediction for X4 is here and you look at the distance between the production and the true label you see that the distance is pretty big right so um so the channel the Chinese Hardware is fairly big and so on and so so this is under 13. okay by our definition of under 50. because the tuning is already big and now let's uh think about so what what you should blame like why the training is back what was the what's the
+
+48
+00:29:08,000 --> 00:30:17,000
+corporate the the corporate you know I would argue is that it's just because no only linear model can fit your data it's not just right no only linear no any linear model can can work and it's not because you don't even have enough data it's just because you know like even you have more data a linear model wouldn't work as well right so this is just because the linear model is not expressive enough so and and that's the and this is called bias so this is so this is called bias
+
+49
+00:29:51,000 --> 00:30:52,000
+so we're in this kind of settings um things happens you like you have device so the bias is um basically like it's saying that okay the reason why I don't know exactly why people call It Best in the very first time but I think you can kind of the the kind of the relationship the thing is that you are you are imposing additional structure right so you are imposing a linear structure but the true data is not linear so it doesn't matter how many data you see if you as long as you impose this you you just insist that
+
+50
+00:30:22,000 --> 00:31:40,000
+I just believe that this thing is is linear you're going to fail because this is the wrong belief about the relationship between Y and X so that's why this is called bias and this is not you cannot mitigate cannot be mitigated by more data as I said and a nice actually it can also not be mitigated by less noise even your data is more and by less noise data right because even you have more data and with less noise you can imagine what happens right so suppose you see a little bit more data
+
+51
+00:31:10,000 --> 00:32:03,000
+supposed to see some more data as tuning data right and now and maybe let's say you just no suppose in the extreme case you just see everything on on this exactly on this on this quadratic line without any noise still if you think about what's the best fit for example let's say just you see all of this blue and the green points and what's the best effect the best fit probably would change a little bit that's true right it probably wouldn't be exactly this maybe it would be
+
+52
+00:31:40,000 --> 00:32:41,000
+I guess it would be something like this maybe maybe something like this I don't know like you have to trade off right because you know whatever you fit right if you fit this then you you don't fit some of these examples if you do you know there's no any option right it's like whatever it's just because linear model cannot represent quadratic function that's it so so that's the the typical uh situation where you have a large spice and mathematically so the way you define miles so here I'm
+
+53
+00:32:11,000 --> 00:33:33,000
+just only talking about some characteristics of having large bars so mathematically one way to define the bias you know is that you can say this is the um so buyers is I guess actually there's some approximation here depending on what exactly your model is but roughly speaking is the the the the best uh our loss uh you get you can get with even infinite data so you guys I guess you know if you suppose you have infinite data you have a data set with infinite data following the same kind of property right so like
+
+54
+00:32:54,000 --> 00:33:53,000
+I'll generate from this quadratic plus noise then what's the best you can do and that's called Vice and and you can kind of see that you know it's probably important for buyers to be small because if its bias is large even with infinite data you cannot do anything right so um and that's the that's the problem with linear models any questions the distance um I think I think that's pretty much you know uh so for this case they're pretty much they are the same so basically
+
+55
+00:33:33,000 --> 00:34:42,000
+so so in this in this case it's exactly true that the bias is the best linear model uh so the closest like the closest medium or the model that is closest the the linear model that is closest to the ground truth and that error that closeness is is device right because when you generate infinite data basically you just generate the ground truth the whole line right if you have no noise you are now changing the model class you're only using linear but you cannot okay so buyers would be the best
+
+56
+00:34:15,000 --> 00:35:22,000
+okay so in some sense technical reasons to say bias is is is property of the the the the family of models right so so the linear mode the linear model family has a large price right I I think you know um yeah I think that's that's that you know we are always talking about model family right so we're talking about either linear model family the family of linear model so the family of fifth degree polynomial or the family of quadratics Okay cool so this is the bias and now let me talk about the virus
+
+57
+00:34:48,000 --> 00:36:08,000
+um and here there's you know I'll come back to the virus for this model but here the variance is in some sense you can say it's not very important only the bias is the corporate and now I'm going to show cases where the variance is the corporate to blame for so um so I guess I'm gonna really draw this so you have 2004 points okay so now I'm going to fetch a fifth degree polynomial so the model is something like hclx is you know some Theta 5 x to the 5 plus up to instead of
+
+58
+00:35:50,000 --> 00:36:48,000
+zero but recall that we can do this with with linear regression because you just this is still linear in the Theta right we have a homework question on this we also talk about how to do this you know with kernel methods if if you care about efficiencies right so so we are able to do feathers and an intellectual notes actually there are some visualizations of the real the real model is going to fit so here I'm just gonna draw it so if you fit your 50 degree polynomial so probably you're going to get a 50 degree
+
+59
+00:36:20,000 --> 00:37:25,000
+polynomial can be can can go up and down so many times several times I think technically a 50 degree polynomial you can have I think four four Global four local four local maximum all good minimum four or five something like that so the higher the degree is the more times you can go up and down right so um right because if you have a quadratic the only thing you can do is this or maybe this and for cubic you can do this and for for first degree problem you can probably do something like this right so
+
+60
+00:36:55,000 --> 00:37:52,000
+um so the exact details here don't matter so uh just the the point is that if you have high degree polynomials you can it can be more flexible right and then if you fill the data um if you fetch the the polynomial to the data then possibly you can organize something kind of Plenty flexible something like this and actually if you really look up for some like this is not required for this course but if you look up the book follow the calculus or like polynomials you know that if you have four points
+
+61
+00:37:27,000 --> 00:38:25,000
+there's always a 50 degree problem when they pass through all of them so in some sense if you don't have enough points and your degree is high enough then you just you can always you can always make the tuning out with zero literally zero so in this case the tuning area is literally zero so so and and then why right so I guess this is expired and the the thing is that so this is over 13 so but why what's the problem here why is overfitting so why um the test is not good so in some sense
+
+62
+00:38:03,000 --> 00:39:14,000
+the kind of the the intuition is that this kind of model fits so it's faced to the Spurs patterns to this first patterns um you know in the in a small and noise data small and noise data so so this is because you don't have enough data and your model tries to explain all of this not small perturbations small noise and because it over expands the small noise it lost it's it kind of like didn't pay enough attention to the to the more important stuff and the reason why you can over refer to
+
+63
+00:38:42,000 --> 00:39:40,000
+the small noise the final data is because um because you you are you're so flexible right so whatever patterns you you see in these four points as long as you just have four points whatever crazy patterns you see you can always find the degree five polynomial to expand it right so so whatever patterns you see in four data points you know like you can explain it so that doesn't sound right right so like how come your model can explain like everything and anything like a random so so basically you are
+
+64
+00:39:11,000 --> 00:40:17,000
+looking at the you are kind of like over threading to the Spurs um patterns um but instead of the the big pattern so the big pattern is this right the spur is fine inside of the fluctuations in some sense right so um and so all the other words I think you are you are explaining the noise instead of the the ground truth so um and and okay how do you make this intuition a little more formal so okay I'm not gonna go very very formal but like some more kind of like things I can say about this intuition is that this is
+
+65
+00:39:44,000 --> 00:41:02,000
+saying that you are sensitive your model is sensitive or maybe kind of like specific to to the noise how do I formulate this like one way to kind of formulate this a little more mathematically is that you can consider you redraw on the samples and you ask right after you redraw the samples are you going to see the same model okay right so you draw some new samples with different Spurs packets right because they are Spurs because they are noise right so so if if you're if your model is specific to the spirit's curtains
+
+66
+00:40:27,000 --> 00:41:16,000
+that means if you redraw you are going to expect this you are going to learn the new Spurs patches and you're gonna have a different model and if you're not specific or sensitive to Spurs patterns even you have a new data set you probably shouldn't change much but you should still be somewhere to say you should still out of the same model and it turns out that if you have the five degree polynomial you reach all the data sets then you will find a new model so what happens is I suppose you
+
+67
+00:40:52,000 --> 00:42:08,000
+um read all the data set in the election notes there are some real experiments again but here I'm just gonna uh Jordan so suppose for example now you still have the same ground shoes But You observe some maybe let's say here I'm going to have something upon like this maybe developer like this maybe yeah like hit this and I'm going to try to make the pattern a little bit different then maybe you're gonna get um something different Maybe I don't know like you try to find out what's the
+
+68
+00:41:29,000 --> 00:42:25,000
+polynomial maybe you want to guide something like this okay actually this these two are still a little bit similar but I can't do anything empirically you'll see that it will be different just because you know any small perturbations of this would change a lot but maybe you you got this so and and if you actually you can also do some local thing right suppose you move these points a little bit lower then you probably would change this function a lot so just because you are very sensitive to the data phones
+
+69
+00:41:59,000 --> 00:43:04,000
+not increasing the number of samples right so so far I'm saying that you you don't you don't you don't you draw the same number of samples with similar well choose the same constitutional institution but just the randomness are different right you're using different noise so um right so and that's a good question that's exactly what I'm going to talk about next so so uh um okay sorry one moment before that so so basically okay just to summarize here so if if you reach all the examples and
+
+70
+00:42:31,000 --> 00:43:54,000
+you find that a large variation between so suppose you have a so you so you have um um so you call this so basically Define the variance to be uh in some sense the variations across um models learned on different data sets so for example you draw five data sets right so each data set has four examples maybe and you try you do these experiments and you get five models learn now five different data sets so if you see a lot of differences between these models right so then that means you have large variants
+
+71
+00:43:23,000 --> 00:44:23,000
+and and if you don't see a lot a lot of differences then you don't have a large virus that's the some of the formal definition of this you know we will have a little more formal version of this but this is the idea right so so maybe for example if you you get a new data set you get something like maybe here here they're here and maybe you're going to learn something very different maybe something like this right so and there are all some so here at least you can see this one is very
+
+72
+00:43:54,000 --> 00:45:15,000
+different from this one because on the left hand side here you're going up here you're going down so um so so that suggests that you have large virus and and now talking about data right so suppose so so this one of the characteristic of virus is that virus is something that can be uh reduced if you have more data so um and and in some sense the virus is caused by lack of data and it can be mitigated if you have more data so let me continue here keep all of these markers in my hand otherwise I have to walk back and forth
+
+73
+00:44:35,000 --> 00:45:43,000
+Okay so so the virus and sometimes you can say this is caused at least partially you know at least one cause is that this is caused by lack of data and um and okay of course you know it's probably you cannot say this is only caused by lots of data because you know if you have um a different model right it's a very very so in some sense there are two reasons one thing is it's like you have lack of data and the other is you have two expressive too expensive models and these two things are kind of like a
+
+74
+00:45:16,000 --> 00:46:27,000
+relative to each other right so if you have uh uh very expressive model but your data is really really big then probably is okay on the other hand you know if you have not too many data but you have very very simple model then it's probably still okay so um and and as you can see that you know then if these are the issue the reason then you how to mitigate the virus then the mitigation is just that the medication is that either you get more data or you have small simpler model so technically you don't have more data
+
+75
+00:45:59,000 --> 00:47:10,000
+if you have more data you should already use them already but for the for the for the um for the understanding let's see for example what happens if you have more data with this what's this thing right suppose you have more data and you still fit a fifth degree polynomial so suppose you have a a lot more data this is the ground shoes and you observe a lot of more data as you have a million data right roughly you know there's a little bit fluctuation of course so now you want to fit a 50 degree
+
+76
+00:46:57,000 --> 00:48:06,000
+polynomial what happens will be that this is probably not entirely obvious but like okay one obvious thing is that you cannot you probably wouldn't do anything like crazy as this right because if you do this a crazy thing maybe this crazy thing goes through some parts but you cannot go through all the points right like for example right you can see here is there's a big match between this part and this point right and here you have some uh mismatch right so so this this one wouldn't give you even a small training
+
+77
+00:47:31,000 --> 00:48:25,000
+error so this is not a best model fit on the training data so what you really will fit like if you minimize the error on the training data with this so many trillion examples then what you get will get is probably something like this more like this maybe there's still some small fractions it's not like necessarily matching exactly the ground shoes but you have a little bit smaller fluctuation but it will be something like this because because if you don't do this then you wouldn't fix the original data as good
+
+78
+00:48:01,000 --> 00:49:00,000
+as well and and this is you know you know this is kind of like more like a quadratic but you know but a fifth degree polynomial contain the family of degree 5 problem will contains the family of quadratic function because you can just thread you can just set your Theta 5 say the four to be zero then you get a quadratic so empirically what you're going to do find is that probably this if you really look at the details this the best fit model is still degree five polynomial but the set of five
+
+79
+00:48:30,000 --> 00:49:30,000
+Theta 4 the first few coefficients are very very small so effectively you are just very close to quadratic oil [Music] s right so so the question is like a um another possibility is that affiliate mode is that you just couldn't find this degree five polynomial right you you find because some optimization issue right maybe even though there exists one that is very good they face the data but you couldn't find it um that's that's that's probably not true for the fifth polynomial for this
+
+80
+00:49:10,000 --> 00:50:09,000
+one entire example just because this is very simple but it could be possible uh for for some other cases where you just the the model does exist but you cannot find it so so this uh is something that we don't discuss at least in the scope of this lecture so in this lecture we are we are assuming that you can just optimization always works you always find the best model so um so if existed you can find it so um so that's why like I'm I'm okay like there's there in this case you know even
+
+81
+00:49:39,000 --> 00:50:37,000
+you have a lot of data right and even have a very complex model say degree five polynomial or even degree 10 maybe in this case right so there's always exists one model right that works which is like something like this like like the ground shoes and and and we'll find it you know for this case definitely we will find it because it's a it's a linear regression problem you'll find the best mode right so okay cool so um and also another maybe just uh to to answer the question so
+
+82
+00:50:09,000 --> 00:51:26,000
+um um so in some sense the the problem you are referring to is easier it's easier to detect in some sense to some extent it's not always true because at least you can detect that from the training right so here we are more talking about the United States So Okay cool so any other questions is yeah yeah so so so so here when I say more data I really mean that you have you just collect you you have more data from the same discussion like uh from the same description yeah yeah so like if if you collect more
+
+83
+00:50:53,000 --> 00:52:02,000
+data from yeah so like in sometimes you you you you kind of like the I'm not saying this is universally applicable to every situation but the main side we are in is that um for example you have um um how do I say okay you have a lot of like a um like medical images right so like they are for example there is a million patients with the cancer diagnosis kind of thing and but not all of the data are are labeled right so like only problems at the beginning only for four four images that are labeled as cancer or not
+
+84
+00:51:29,000 --> 00:52:26,000
+you know so and so forth and now but but these four Images are sampled from this big population and now I'm asking you know I found out my variance is very big so how do I mitigate that so I probably one thing is that I can just sample more data from the same I started I have like one million unlabeled examples right I I had four labeled ones and now I'll say I'm going to collect more labels so I sample like another like 100 examples from the same distribution and then I label them and
+
+85
+00:51:58,000 --> 00:53:06,000
+then I run algorithm when the variance will be smaller from troops it is a leadership so the question is that how do like if you don't know the ground truth right so how do you know that you are uh you're having a large bias so so that's uh like like a you you cannot really exactly know when you don't look around truth so all of these are so far are fall analysis purpose right so when you don't know the ground shoes um you cannot really exactly like um let me think so um yeah we don't know the ground shoes I I
+
+86
+00:52:43,000 --> 00:53:46,000
+think you cannot um exactly computer bias um because you know the definition of device actually requires you to sample a lot of uh like data right so you also don't have infinite data so there's no way you can evaluate the bias exactly so so typically what you do is you say um you fit the data on a training set and you see you are under 13 and that's that's when you say innovating means like you have um you have a large chaining error and that's when you start to believe that
+
+87
+00:53:15,000 --> 00:54:21,000
+you have a large bias this is a test error yeah I'll discuss that in a moment like because I didn't I'm gonna draw this I didn't even tell you what is I'll go back to come back to this degrees for highly imbalanced data set so maybe let's discuss this offline I'm not sure whether this I think it probably requires more you know the investors that is is pretty often you know like we have research on that but maybe it's not exactly related to the context here maybe you can discuss offline
+
+88
+00:54:37,000 --> 00:55:54,000
+okay I think I still have something to say about the virus um and then I'll come back to the trade-off um all right so so basically okay so now let's see so let's Briefly summarize um so basically if you have the buyers this is really just about the lack of models expressively it's something of intrinsic nothing to do with data right this is just the uh lack of if you have large bars that means you have a lack of um like expressivity the model is not expressive enough it doesn't depend doesn't depend much on
+
+89
+00:55:29,000 --> 00:56:21,000
+the data um I guess you know for linear models you can just say it doesn't depend on number of data for not only the models there is some technicality you know which you know you don't have to like the only reason why I add much is just because you know there's some technicality for that provide me to say this is exactly irrelevant to the number of data but but you should basically just believe that it doesn't it's it's intuitive it's not a notion about how many data you have
+
+90
+00:56:04,000 --> 00:57:13,000
+it's really about how expressive your model is so um environments you know if you have a large variance then it could be two things but one is lack of data and another thing is you have a too complex of a model okay I guess I'm just repeating summarizing and then I guess we can see there's a trade-off um so I guess I'll go to here so and also there's a way to for you to prove that test is equal to device plus plus virus uh I don't think I have uh I will see what I have time to discuss that
+
+91
+00:56:42,000 --> 00:57:45,000
+um but um but you can also prove the test error is equal to by square plus variance um so but maybe let's just uh draw this from scratch so this side is the model complexity right so let's first think about how do you draw the bias on the right this is the test this is the um how do you draw the the bias on this curve a smaller complexity change so we say that the bias is large it's because your model is not com mod is not expressive enough so that means that if your model is more expensive
+
+92
+00:57:13,000 --> 00:58:11,000
+than your battery decrease so that's why the bias is a decreasing function as the model complexity right so this is the bias and now let's let's think about how do you draw the virus on this thing so we said the variance is caused because you have too complex of a model that means if the model is more and more complex then you should have bigger and bigger virus that's why the virus is like this and the test arrow is the sum of them so so the test error is like a u curve thing so the test error wait
+
+93
+00:57:47,000 --> 00:58:57,000
+what is my oh here so the test hour is the sum of these two and the environment and and so the question you want to answer is that if you change the model complexity what is the best tester right so so it means that somewhere in the middle so um so so so like a um actually there I'm going to tell you something different from this you know in a moment just though but it's supposed to believe in this then what the conclusion the implication of this is that um you should um somehow kind of find a
+
+94
+00:58:29,000 --> 00:59:22,000
+sweet spot when you choose the model complexity right so for example maybe at the beginning you found that your training error is very low so our training value is very high which means your battery is very very high right so suppose your model complex is here then suppose the model complex is very small and then then what happens is the bias is high and the bias is high it means you are under 13 and means that your training average is Big so basically when you see the training hours back you kind of see your biases
+
+95
+00:58:56,000 --> 00:59:58,000
+you kind of believe that your bias is too high so that's why you should increase the molar complexity and at some point you found that you are you know in the other regime where the virus is too high then you should you should stop so basically you increase the molar complexity to some extent until you violence um uh is uh your bias environment has the right trade-off s yeah so I think this this figure so this is the okay you ask a good question right so here this is the molar complexity of the the model you use to
+
+96
+00:59:37,000 --> 01:00:37,000
+learn the the your your your parametress model right so when you're asking about what what happens if the ground shoes is different right so um the when the ground I think this is now very sensitive to what the ground truth is right there's always a trade-off but but where the trade-off comes from you know where The Sweet Spot is would depend on the ground truth so uh for example actually that's a very good question for example suppose you uh for for this data set right so probably the best thing is to use quadratic
+
+97
+01:00:07,000 --> 01:01:08,000
+quadratic would uh has small enough bias because you know quadratic is in principle expressive enough to express our data so that's why quadratic has small bags and also quadratic is probably the among all the models with small bikes among all the models that can express your function quadratic is the least complex right so that's why you use quadratic that's the probably the best solution and if you really run random algorithm the quadratic you would probably recover something very close yeah so
+
+98
+01:00:39,000 --> 01:01:39,000
+um but if you're going to choose this cubic then maybe the three spot is like the the best trade-off is achieved at Quebec Maybe you know it's not they don't necessarily have to match each other because it also depends on the data uh how many datas for example suppose you are maybe let's let's give you an example supposed to say um your ground shoes is a degree 10 polynomial but they somewhat look like a linear function so so suppose your ground choose is a ground shoes is like a
+
+99
+01:01:08,000 --> 01:02:03,000
+um almost linear but with a little bit kind of like small fluctuation and but you don't have a lot of data you just have like a five data points right so you just have five Training data points and now if you want the virus to be literally zero then of course you should use degree 10 polynomial because that's that's the only case you are expressive enough but maybe but then your virus is too big so the so the right trade-off here probably is closer to be a linear because if you use a linear you bias is
+
+100
+01:01:36,000 --> 01:02:40,000
+not zero but still you know small enough right uh and and in that case the variance is small so so so the right the best trade-off depends on for example how many data you have as well right that's a good question and and the answer to that is that no you cannot come to the biotics and virus so all of this um all of what we discussed today is is more about um some internal understanding so this bias environment is not something you can um at least in some cases you can estimate them a little bit but typically
+
+101
+01:02:18,000 --> 01:03:18,000
+you don't you probably shouldn't really actively estimate the the bias environments in your yours these are mostly just for it's an internal understanding for for for for our research for ourselves but not necessarily something you empirically evaluate um so okay so so I guess so one question you know I guess many of you probably are wondering you know if all of these quantities cannot be even evaluated you know how do you choose the right trade-off what's the optimal model complexity so what you do is actually
+
+102
+01:02:48,000 --> 01:03:53,000
+that's that's gonna be I think what we discussed mostly next week uh next lecture so this is this is Wednesday right next week yeah so um so you think the virus or virus the virus and buyers are just for understanding empirically what you really do is that you try to you should try to uh try a lot of different models and you select based on a validation set right but but this picture would let you know would help you a little bit in some sense because for example suppose you have tried this and this and this and
+
+103
+01:03:21,000 --> 01:04:27,000
+this suppose you have tried four model complexity right so and suppose you believe that this is a u curve the test error is a u curve then should you try even bigger models be your family with models probably you shouldn't right because you believe that you kind of believe that it will be even worse so so you should just try even more in in the middle right so that's the what's what this understanding will help you [Applause] [Applause] Okay so [Applause] um there's some uh more formal definition
+
+104
+01:04:06,000 --> 01:05:05,000
+of the of the bias and virus and that's in the lecture notes in section 8.1 I think I don't have time to discuss the formal uh definition even if the definition I probably wouldn't be able to give you the proof the proof is actually relatively simple so if you are interested you can you can read that section yourself um I don't think it's required for the for the for the exam or anything um but it's a relatively simple rate if you're interested and and also just this kind of bias
+
+105
+01:04:36,000 --> 01:05:39,000
+virus trade-off is not that always easy to to achieve mathematically so uh for square loss there is a classic you know well established kind of decomposition but if you don't have square laws you don't have MSC like mean squared error if you have cross entropy loss actually it was open question how do you formally decompose this so um so in all the intuitions still apply right so but like how do you do the mathematical decomposition is actually pretty challenging um so that's why in the in the election
+
+106
+01:05:07,000 --> 01:06:09,000
+notes we only talk about Square loss and any anywhere you if you read any textbook or any literature probably they were top top bars Square loss um but the intuition is still kind of fine right so if you don't care about what exact definition of classes so I will spend the next 20 minutes to talk about um a new um something that is actually challenging this picture so something that um so this is the maybe just follow the more context so this kind of like a u-curve test everyone best friends
+
+107
+01:05:39,000 --> 01:06:48,000
+trade-off this has been um um um like a this discovered or kind of like analyzed for I don't know how many years maybe like 40 years or something like that but maybe like I I'm not a historian so I don't know exactly which is the the first time this is discovered but this is like a very classic like a like um however people realize that there's some uh issues with this understanding um especially we realized that in deep learning like you like actually people start to realize this in deep learning
+
+108
+01:06:13,000 --> 01:07:29,000
+but actually it turns out that even this understanding has an issue for linear models um so so this understanding has a it's not complete uh it has uh it's Miss uh it misses some uh some other things so um so that's what I'm gonna talk about um and this is a this is the area of um uh uh research productive in the last probably three or four years so let me try to find out where should I erase um foreign [Applause] at the beginning and then analyze theoretically this phenomenon is called
+
+109
+01:07:10,000 --> 01:08:20,000
+double design if you are a historian then I think actually this the the the this phenomenal actually dates back to something like 1990 um um some papers actually at that time also pointed out this issue but I think it just becomes popularized uh and and more relevant these days and uh and what does this mean is that so basically I've told you that this is test error this is model complexity I guess technically here I'm writing a number of parameters because I want to be precise like imagine the
+
+110
+01:07:50,000 --> 01:08:56,000
+model complexity by how many parameters you have and the classical belief as we discussed is that these test error should have this u-curve something like this but then people realize that this is a striking thing so people realize that if you increase your model number of parameters even more at some point you will see that it will be like this so this is the basically this is the new regime that people cause this is the second Descent of the test error that's why it's called double designed
+
+111
+01:08:27,000 --> 01:09:50,000
+because there is a design here there's a design here and and this is the um everything the blue part is what people didn't realize um as as much as as in the last four years last four or five years and and these are the so-called over parametrized regime foreign so which means that in this regime typically the number of parameters is larger than the number of data points in some sense this is the regime that if you ask her you know someone 20 years ago the news said this regime is just a dead no-go Zone because you
+
+112
+01:09:15,000 --> 01:10:25,000
+should see very very bad test error but it turns out that if you have more part you make it even more extreme you make the number of parameters bigger than the number of data points uh you you may actually um is in not in all cases but in some cases you may see uh the um actually I wouldn't say I shouldn't say more some cases like in many cases like I could I'm not sure how to qualify this but at least you know a lot of cases um you will see your second descent so um so that's the Striking thing
+
+113
+01:09:53,000 --> 01:11:02,000
+the one with much more data so is this um not directly let's say because this is you know at least on the surface if you look at this right so you you your this regime is the regime where the parameters is bigger than number of data points so so so if you want to find the right course you know I'm not saying um like you probably would say at least you need to to be in this regime probably you need to compute you need a lot of compute because probably you know like 10 years ago or 20 years ago you cannot even afford to
+
+114
+01:10:30,000 --> 01:11:30,000
+run experiments in this regime because you don't you don't want to use that many parameters because you don't have enough compute right so but of course you know in in nowadays we also have more data points so and because we have normal data points because we are using Lightworks you know we we run larger and larger experiments you know so so indeed we it's correlates with more data points like we do see more data points in on these days right so um and this is the the so-called double
+
+115
+01:11:00,000 --> 01:12:09,000
+design phenomenon and it's kind of mysterious um uh it's a bit less mysterious these days like after people have started um this you know in the last five years um very carefully um I'll talk about some of the explanations intuitions um but before that let me also give another um a related phenomenon which is um also called double design but it's called Model it's called Data wise double desert so here I'm doing a um a similar I'm just showing a similar graph but on the x-axis I'm going to change
+
+116
+01:11:34,000 --> 01:12:50,000
+the number of data points so so here the the y-axis is still a test error and the x-axis is the number of data points so and now okay maybe you have a guess first you know what what this curve should look like well as you have more monitor points how does the test error change right the guess would be the test error would be decreasing right because I guess here you know at least if you believe in this biased environments kind of intuition then the bias doesn't seems to depend much on the data right the virus
+
+117
+01:12:25,000 --> 01:13:34,000
+will be smaller and smaller as you have more and more data right so so then what you if you believe in that then you should say that okay the test error should look like this and it should continue to decrease as you have more and more data and it turns out that actually um in many cases what happens is that the test error will look like this I'll increase at some point and it will decrease again and on this peak here it's kind of like similar to the peak here so this peak it's often happening when
+
+118
+01:13:06,000 --> 01:14:18,000
+um is roughly equal to D I guess by the way here like you know there is a and this is active research area so I'm not being very precise in every places so um so only is the number of examples this is number of examples this number of parameters so what I said here um I think is basically mostly a kind of 100 correct for linear models but for non-linear models you know whether this is exactly n is equal to D or not it's a 2d or the relationship is a little bit less clear but let's say suppose we think about
+
+119
+01:13:48,000 --> 01:14:56,000
+relatively simple models and um when the number of data points is closer to the number of parameters then in this case you you're going to see a peak and then after that you have more data it actually helps I saw some questions or does it eventually increase again um so in the in the first year so in the first figure this this is a good question so I think I've seen empirically um um both cases so sometimes it does increase again a little bit but often not much and sometimes I just keep
+
+120
+01:14:28,000 --> 01:15:35,000
+decreasing and sometimes it plateaus so so I think that's why people probably don't study that part that much yeah this one I think is also new like I think this actually the paper that first systematically discussed this is like 2020. um this discovering the same paper right at the peak there there is it's not molotone the fact that yeah I think at least uh you know they might you know like immersion learnings it happens so often that you know someone did something and then people in
+
+121
+01:15:17,000 --> 01:16:24,000
+the community forgot about it um that that's possible but at least I would say like at least it's only until 2020 that people start to most people start to realize this and because of the that paper uh I think the paper is just called Model wise because this is data wise because you are changing the name of data points right so um okay so now okay this sounds like mysterious enough right so like a very very interesting um and what's the what's the explanations right in the last few years
+
+122
+01:15:56,000 --> 01:17:02,000
+um people try to explain why this what happens right and I'll try to risk ourselves with our old um understanding about this um and also this is an important question because this regime this blue regime is actually um actually you cannot you can it's a it's not clear whether when you run like a classical linear models I don't think necessarily you're in this regime but at least it's pretty clear that um it's at least more it's more um true that uh for for deep learning
+
+123
+01:16:29,000 --> 01:17:28,000
+you are basically always in this regime at least it falls I guess this is still you know it's not it's never nothing is never universally true but I think for most of evasion experiments you are in this regime where you have more parameters than a data points so so this is something that is really like a empirically relevant so that's why people really care about it so um and maybe another thing I I need to clarify is that I kept I think I I was I think I probably mentioned that you know
+
+124
+01:16:59,000 --> 01:17:55,000
+this the study about the linear models the phenomenon on linear models is um uh is uh is more kind of clear like there are a lot of studies and we have pretty good conclusion and what I mean by that is that even within linear models you can try to change the model complexity so what that what that means is that you just insist that you always use linear model but what you change is that you you try to decide how many features you use so you can start with only using one feature or two features like for example
+
+125
+01:17:27,000 --> 01:18:19,000
+in the house price where you can use the square foot as the single feature or you can collect a batch of other features right so keep adding more and more features that means you have more and more parameters right so so even within linear models you can still change the complexity just to clarify that so I know and most of this theoretical study I think are for linear models and they are pretty precise these days um and I'm trying I'm going to try to kind of roughly summarize the intuition
+
+126
+01:17:52,000 --> 01:19:07,000
+from the study of this double design so the intuition I think um I'm gonna list a few I've done so foreign so some intuition and explanations and these explanations are mostly for linear models um so I think the first thing to realize is that this peak so you can I can argue what is the most exciting or surprising thing about this graph right so but let's let's first talk about the peak right this is a peak in the middle so I think the the first thing is that in some sense people realize that the
+
+127
+01:18:43,000 --> 01:19:43,000
+existing algorithms um especially if you just talk about for example Simple Green descent or sarcastic with instance for linear models so the existing algorithms so underperform atically um when n is close to the so so it both these two peak are basically like this right so here you are changing n the number of data points and you found that when n is close to D you have to pick and here you are changing the number of parameters you are changing D the number of features you use and we've realized when D is
+
+128
+01:19:28,000 --> 01:20:34,000
+kind of about n about the number of data points you you have to pick so both of these two picks two peaks are are showing up here it's just that you are changing the axis in something so this is also when n is close to D when the number of number of data points is closed number of features so so and and the the explanation is such as the algorithms the existing algorithms or the algorithms you are visualizing here right so when you visualize this right you do you do ranks part some you do use
+
+129
+01:20:02,000 --> 01:21:02,000
+some algorithms to learn the parameters so that particular algorithm that you use to produce this graph is it really underperforms very automatically it doesn't it's not really saying that when n is close to D the the real test I will shoot with this it's just saying that this algorithm is bad if you change your algorithm you probably wouldn't see this peak so so that's why the peak shows up so um and okay so so and what's what's wrong with the the by existing algorithm
+
+130
+01:20:31,000 --> 01:22:00,000
+I really just mean that for example some just basic reading decency so um so for linear models maybe this is let's say this is for linear models so so what goes wrong with the so-called existing algorithm right so this um basically green descent algorithms so um the the what goes wrong is that the norm of the the the the Theta the the linear models you learned uh it's very big it's very big uh when is roughly equality so and and I we kind of believe that this is at least a partial reason for
+
+131
+01:21:19,000 --> 01:22:37,000
+why this leads to a peak so this gives the peak so even though um so okay so I guess let me draw something here we have some real experiment real data in the lecture notes but if you draw that Norm foreign so suppose you you change the number of parameters which means you add more and more features in your you know in your data set uh and so that you have more and more parameters and you if you visualize the norm in the y-axis you're going to see something like this and this peak here is roughly corresponds to and it's
+
+132
+01:22:00,000 --> 01:23:12,000
+closely and which is kind of similar to these Peaks so so basically even though suppose if you compare this this experiment in this experiment right so so here you have more parameters than this than here but when you have more parameters maybe sometimes you have lower smaller Norm so the norm is close to D for some reason it's just very very big and there they are actually we know the reasons the reason is that some random Matrix you know is not well behaved and it's close to D but I guess we are not
+
+133
+01:22:36,000 --> 01:23:52,000
+going to go into that but at least the immediate reason is that when n is close to D somehow this algorithm is producing a very large Norm uh uh classifier Theta which is you know you can argue that in the norm is if the norm is too big then your model is too complex so so in some sense this is saying that if your model is actually very complex so very complex uh according to the norm so this model it simulator doesn't have a lot of parameters compared to for example this model so if you compare this model and
+
+134
+01:23:20,000 --> 01:24:27,000
+this model so this model seems to have less parameter than this by definition the norm is actually very big so in some sense if you use the normalizer complexity actually these Peaks have large complexity exactly 0.1 to give us that's a great great question so so so you got that you know I'm implying that the norm seems to be a better metric for the complexity right so what is the right measure for complexity so this is a very difficult question like for different situations you have different
+
+135
+01:23:58,000 --> 01:25:03,000
+answers um um so so but you know there is no Universal answer but Norm could be one uh complex match in some sense the norm is also a way to describe how many like suppose you have a small normal right so you have fewer choices to to fit your data in some sense so you have a few degree of Freedom if you have you know in like you have a few options in some sense to fill your data so that's restrict the complexity and which Norm that's that's actually um for different situations you can
+
+136
+01:24:31,000 --> 01:25:25,000
+argue which Norm is the right complexity actually there's probably no Universal answer but but well I guess what I'm trying to say here is that the number of parameters is also not necessarily the right complex measure because if you have more parameters suppose all the parameters are very very close to zero that's probably also a very simple model because those parameters are not really working right so so but if you have just a few parameters but the norm is really really big maybe you can use the the
+
+137
+01:24:57,000 --> 01:25:56,000
+right maybe it's used to also called quality very complex so you know my short answer is that there's no Universal uh answer to this um um the the point is that you know probably the number of parameters is not the only complex dimension so and for linear model it just happens that for mathematical reasons I think L2 normally behaves really nice like it seems to relate to a lot of like fundamental properties like maybe you can argue L2 Norm is useful because you are measuring a square error in many
+
+138
+01:25:27,000 --> 01:26:26,000
+cases and it's it's nice with the linear algebra so and so forth okay so I guess let me I'm running a little bit late but I think I'm almost done here so [Applause] um right so so here it's just saying that at least for this case it sounds like Norm seems to be a slightly better complex dimension and and actually if you um and you can test this hypothesis in some sense so you can say that okay I'm saying here the existing algorithm underperforms but if you have a new algorithm that's uh regularized suppose
+
+139
+01:26:01,000 --> 01:27:00,000
+you regularize the um the norm I guess I haven't told you exactly what regularization means but here just what I mean is that you you try to find a model such that the norm is small so so you add an additional term that tries to make the norm small so you don't only train on the tuning loss but also you try to make the norm smaller then you're going to see something like this so so regularization would mitigate this to some extent I'll discuss more about regularization in the next lecture but
+
+140
+01:26:32,000 --> 01:27:32,000
+here just it really just means that you you don't you don't only care about tuning loss but also you try to find uh uh a model with small knobs so you and you have some kind of like balance between them right so you can sacrifice a little bit of training hour but you insist that you're normally small then you can see this right so so that in some sense explains partially why you had a peak because the peak is caused because your algorithm was sub-optimal right your algorithm didn't use the right complex measure and
+
+141
+01:27:03,000 --> 01:28:01,000
+you can fix that Peak by adding more but there's one more question which is you know there's no peak but why there's no ascent right so so suppose you just see this right well actually here you also you will also see this something like this so this figure is actually pretty reasonable because if your data point is increasing you probably should just have one decrease like you just keep decreasing your um or you you just keep decreasing the the tester right so this one let's say
+
+142
+01:27:35,000 --> 01:28:36,000
+we are okay with that we're happy if you see just a single um single decrease but here you're supposed to see a single descent right I I feel like it's still you know it's kind of arguable whether you're you should be happy with this answer because um why when the number of primary is so huge you can still generalize right so why when you use for example a million parameters and you just have like five examples why you can still generalize why you don't have a Ascent eventually in many cases you
+
+143
+01:28:05,000 --> 01:29:00,000
+don't have a sign and in many cases the best one is just you have more and more parameters so um and and actually for example another question is that when number of parameters is bigger than the number of data points you know sometimes you are thinking this is still you have too many degree of freedom to fit all the um specifics of the data set you shouldn't generalize but actually in particularly you do work pretty well so that's the that's the last uh in sometimes the another missing point a
+
+144
+01:28:32,000 --> 01:29:52,000
+missing part and this part um we also have some explanation for that and the explanation is that so when any is very much much bigger than d [Applause] sorry D is much better and the number of parameters is much bigger than the the D that the uh sorry the much bigger and the name of data points so the thing is that even though it sounds like you are supposed to overfit but actually the norm is small but why the norm is small right why when you have so many parameters you still learn very simple model
+
+145
+01:29:16,000 --> 01:30:20,000
+the reason is that somehow there's a um there is a there is a uh some implicit regularization effect which makes the norm small so so so when you when we applaud this right so all of these experiments didn't have any regularization I didn't have any explicit encouragement to make the norm small so that's why the norm here is very big but why the norm here is small the reason is that your your optimization algorithm has some implicit encouragement to make the norm small which which is not used which is not
+
+146
+01:29:56,000 --> 01:30:39,000
+explicitly written in the in the loss function so um and that's something I'm going to discuss uh I think more next time um um right so so so for this lecture I think I'm just so so we're going to discuss this more uh next time so the um yeah the high level thing is just that something else is is driving the norm to respond next
+

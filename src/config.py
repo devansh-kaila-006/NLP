@@ -24,8 +24,14 @@ CACHE_DIR = DATA_DIR / "cache"
 LOGS_DIR = BASE_DIR / "logs"
 
 # Create directories if they don't exist
+VIDEO_DIR = DATA_DIR / "videos"
+TRANSCRIPTS_DIR = PROCESSED_DIR / "transcripts"
+FRAMES_DIR = PROCESSED_DIR / "frames"
+VIDEO_CHUNKS_DIR = PROCESSED_DIR / "video_chunks"
+
 for dir_path in [PDF_DIR, PROCESSED_DIR, CHUNKS_DIR, EMBEDDINGS_DIR,
-                 INDICES_DIR, CACHE_DIR, LOGS_DIR]:
+                 INDICES_DIR, CACHE_DIR, LOGS_DIR, VIDEO_DIR,
+                 TRANSCRIPTS_DIR, FRAMES_DIR, VIDEO_CHUNKS_DIR]:
     dir_path.mkdir(parents=True, exist_ok=True)
 
 # ===============================
@@ -61,6 +67,52 @@ PDF_SOURCES = {
 }
 
 # ===============================
+# Video Sources Configuration (YouTube Playlists)
+# ===============================
+VIDEO_SOURCES = {
+    "Stanford_ML": {
+        "type": "youtube_playlist",
+        "url": "https://www.youtube.com/playlist?list=PLoROMvodv4rNyWOpJg_Yh4NSqI4Z4vOYy",
+        "course": "CS229 Machine Learning",
+        "instructor": "Andrew Ng",
+        "priority": "high",
+        "description": "Stanford CS229 Machine Learning course by Andrew Ng"
+    },
+    "Stanford_NLP": {
+        "type": "youtube_playlist",
+        "url": "https://www.youtube.com/playlist?list=PLoROMvodv4rOaMFbaqxPDoLWjDaRAdP9D",
+        "course": "CS224n Natural Language Processing",
+        "instructor": "Chris Manning",
+        "priority": "high",
+        "description": "Stanford CS224n NLP course with Deep Learning"
+    },
+    "Stanford_CV": {
+        "type": "youtube_playlist",
+        "url": "https://www.youtube.com/playlist?list=PLoROMvodv4rOmsNzYBMe0gJY2XS8AQg16",
+        "course": "CS231n Computer Vision",
+        "instructor": "Fei-Fei Li, Justin Johnson, Serena Yeung",
+        "priority": "high",
+        "description": "Stanford CS231n Computer Vision course"
+    },
+    "MIT_DL": {
+        "type": "youtube_playlist",
+        "url": "https://www.youtube.com/playlist?list=PLUl4u3cNGP63URZnh5iqBzDTDYPUTQT-8",
+        "course": "MIT 6.S191 Introduction to Deep Learning",
+        "instructor": "MIT",
+        "priority": "high",
+        "description": "MIT 6.S191: Introduction to Deep Learning"
+    },
+    "MIT_DL_Alternative": {
+        "type": "youtube_playlist",
+        "url": "https://www.youtube.com/playlist?list=PLUl4u3cNGP60YyhMjYmXuVmX562QcClSp",
+        "course": "MIT Deep Learning",
+        "instructor": "MIT",
+        "priority": "high",
+        "description": "MIT Deep Learning course (6.S191) - Alternative URL"
+    }
+}
+
+# ===============================
 # Text Chunking Configuration
 # ===============================
 CHUNKING_CONFIG = {
@@ -70,6 +122,32 @@ CHUNKING_CONFIG = {
     "max_chunk_size": 800,          # Maximum chunk size
     "semantic_chunking": True,      # Use semantic chunking
     "hierarchical": True,           # Hierarchical chunking (chapter → section → paragraph)
+}
+
+# ===============================
+# Video Processing Configuration
+# ===============================
+VIDEO_PROCESSING_CONFIG = {
+    # Download settings
+    "download_format": "mp4",
+    "resolution": "720p",           # Video resolution for download
+    "download_subtitles": True,     # Download available subtitles
+
+    # Transcription settings (Whisper)
+    "whisper_model": "base",        # tiny, base, small, medium, large
+    "whisper_language": "en",       # Auto-detect if None
+    "transcription_timestamps": True,  # Include word-level timestamps
+
+    # Frame extraction
+    "frame_interval": 5,            # Extract frame every N seconds
+    "frame_quality": 85,            # JPEG quality (1-100)
+    "slide_detection": True,        # Detect slide changes
+
+    # Video chunking
+    "min_chunk_duration": 120,      # Minimum chunk length in seconds (2 min)
+    "max_chunk_duration": 300,      # Maximum chunk length in seconds (5 min)
+    "semantic_chunking": True,      # Use semantic boundaries (topic shifts, slides)
+    "chunk_overlap": 15,            # Overlap between video chunks in seconds
 }
 
 # ===============================
@@ -193,7 +271,20 @@ METADATA_SCHEMA = {
         "pdf": ["chapter", "section", "page_start", "page_end"],
         "html": ["module", "class", "function", "url", "section"],
         "zip": ["file_name", "section", "subsection"],
-        "web": ["url", "title", "section"]
+        "web": ["url", "title", "section"],
+        "video": [
+            "video_id",            # YouTube video ID
+            "video_title",         # Video title
+            "video_url",           # Full video URL with timestamp
+            "playlist_name",       # Playlist/course name
+            "lecture_number",      # Lecture number in playlist
+            "timestamp_start",     # Chunk start time (seconds)
+            "timestamp_end",       # Chunk end time (seconds)
+            "duration",            # Chunk duration (seconds)
+            "instructor",          # Course instructor
+            "slide_number",        # Slide number (if detected)
+            "frame_path"           # Path to representative frame
+        ]
     }
 }
 
@@ -209,12 +300,15 @@ def validate_config():
     if not LLM_CONFIG["api_key"] or LLM_CONFIG["api_key"] == "your-api-key-here":
         errors.append("GOOGLE_API_KEY not set in .env file")
 
-    # Check data sources exist
+    # Check PDF/ZIP data sources exist
     for source_name, source_config in PDF_SOURCES.items():
         if source_config["type"] in ["pdf", "zip"]:
             path = Path(source_config["path"])
             if not path.exists():
                 errors.append(f"Data source not found: {source_name} at {path}")
+
+    # Note: Video sources are validated during download (not checked here)
+    # Video processing is optional and not yet implemented
 
     return errors
 

@@ -1,0 +1,79 @@
+CS229 Machine Learning Course - Lecture Metadata
+================================================================================
+
+Lecture  1: I Introduction Lecture 1
+  File: CS229_L01_I_Introduction_Lecture_1.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I Introduction I 2022 I Lecture 1.srt
+
+Lecture  2: I Supervised Learning Setup, Lms Lecture 2
+  File: CS229_L02_I_Supervised_learning_setup,_LMS_Lecture_2.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I Supervised learning setup, LMS I 2022 I Lecture 2.srt
+
+Lecture  3: I Weighted Least Squares, Logistic Regression, Newton'S Method Lecture 3
+  File: CS229_L03_I_Weighted_Least_Squares,_Logistic_regression,_Newton's_Method_Lecture_3.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 I Weighted Least Squares, Logistic regression, Newton's Method I 2022 I Lecture 3.srt
+
+Lecture  4: I Exponential Family, Generalized Linear Models Lecture 4
+  File: CS229_L04_I_Exponential_family,_Generalized_Linear_Models_Lecture_4.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I Exponential family, Generalized Linear Models I 2022 I Lecture 4.srt
+
+Lecture  5: I Gaussian Discriminant Analysis, Naive Bayes Lecture 5
+  File: CS229_L05_I_Gaussian_discriminant_analysis,_Naive_Bayes_Lecture_5.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I Gaussian discriminant analysis, Naive Bayes I 2022 I Lecture 5.srt
+
+Lecture  6: I Naive Bayes, Laplace Smoothing Lecture 6
+  File: CS229_L06_I_Naive_Bayes,_Laplace_Smoothing_Lecture_6.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I Naive Bayes, Laplace Smoothing I 2022 I Lecture 6.srt
+
+Lecture  7: I Kernels Lecture 7
+  File: CS229_L07_I_Kernels_Lecture_7.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I Kernels I 2022 I Lecture 7.srt
+
+Lecture  8: I Neural Networks 1 Lecture 8
+  File: CS229_L08_I_Neural_Networks_1_Lecture_8.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I Neural Networks 1 I 2022 I Lecture 8.srt
+
+Lecture  9: I Neural Networks 2 (Backprop) Lecture 9
+  File: CS229_L09_I_Neural_Networks_2_(backprop)_Lecture_9.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I Neural Networks 2 (backprop) I 2022 I Lecture 9.srt
+
+Lecture 10: I Bias Variance, Regularization Lecture 10
+  File: CS229_L10_I_Bias_Variance,_Regularization_Lecture_10.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I Bias - Variance, Regularization I 2022 I Lecture 10.srt
+
+Lecture 11: I Feature Model Selection, Ml Advice Lecture 11
+  File: CS229_L11_I_Feature_Model_selection,_ML_Advice_Lecture_11.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I Feature  Model selection, ML Advice I 2022 I Lecture 11.srt
+
+Lecture 12: I K Means, Gmm (Non Em), Expectation Maximization Lecture 12
+  File: CS229_L12_I_K_Means,_GMM_(non_EM),_Expectation_Maximization_Lecture_12.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 I K-Means, GMM (non EM), Expectation Maximization I 2022 I Lecture 12.srt
+
+Lecture 13: I Gmm (Em) Lecture 13
+  File: CS229_L13_I_GMM_(EM)_Lecture_13.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I GMM (EM) I 2022 I Lecture 13.srt
+
+Lecture 14: I Factor Analysispca Lecture 14
+  File: CS229_L14_I_Factor_AnalysisPCA_Lecture_14.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I Factor AnalysisPCA I 2022 I Lecture 14.srt
+
+Lecture 15: I Pcaica Lecture 15
+  File: CS229_L15_I_PCAICA_Lecture_15.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I PCAICA I 2022 I Lecture 15.srt
+
+Lecture 16: I Self Supervised Learning Lecture 16
+  File: CS229_L16_I_Self_supervised_learning_Lecture_16.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I Self-supervised learning I 2022 I Lecture 16.srt
+
+Lecture 17: I Basic Concepts In Rl, Value Iteration, Policy Iteration Lecture 17
+  File: CS229_L17_I_Basic_concepts_in_RL,_Value_iteration,_Policy_iteration_Lecture_17.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 I Basic concepts in RL, Value iteration, Policy iteration I 2022 I Lecture 17.srt
+
+Lecture 18: I Societal Impact Of Ml (Guest Lecture By Prof. James Zou) Lecture 18
+  File: CS229_L18_I_Societal_impact_of_ML_(Guest_lecture_by_Prof._James_Zou)_Lecture_18.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 I Societal impact of ML (Guest lecture by Prof. James Zou) I 2022 I Lecture 18.srt
+
+Lecture 20: I Model Based Rl, Value Function Approximator Lecture 20
+  File: CS229_L20_I_Model_based_RL,_Value_function_approximator_Lecture_20.srt
+  Original: NoteGPT_TRANSCRIPT_Stanford CS229 Machine Learning I Model-based RL, Value function approximator I 2022 I Lecture 20.srt
+

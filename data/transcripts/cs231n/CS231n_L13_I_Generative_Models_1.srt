@@ -1,0 +1,696 @@
+1
+00:00:06,000 --> 00:00:53,000
+Welcome back to CS231N lecture 13. Today we're going to talk about generative models. Last time we were talking about self-supervised learning um which is this really interesting paradigm where we want to somehow learn structure directly from data with no with no supervision with no labels. the and and the typical present like the typical formulation of self-supervised learning that we talked about a bunch of examples last time is you have your big data set with no labels. Ideally, it's just
+
+2
+00:00:30,000 --> 00:01:15,000
+images. This is great. You can get a lot of images. Um you're going to feed these through some kind of encoder that's going to extract a feature representation from your images. Then go through some decoder that will predict something from that feature representation. And in the whole trick in self-supervised learning is coming up with some kind of pretext task that you can train this whole system on without requiring any kind of human annotation or human labels. Um and then and then so
+
+3
+00:00:52,000 --> 00:01:40,000
+we talked about things like rotation uh different kinds of tasks that we can use as pretexts for these self-supervised to to formulate these self-supervised learning objectives. And then typically um this is usually a two-stage procedure where first you're going to go and learn this self-supervised encoder decoder on your self-supervised task on all the data that you can find. And then after that you're going to throw away the decoder and then slot in some new maybe tiny possibly tiny fully connected
+
+4
+00:01:16,000 --> 00:02:04,000
+network um and actually train this thing maybe end to end or maybe just learn the fully connected network at the end um on some small labelled task. And the idea here is that via self-supervised learning this pretext task you can train on lots and lots of data millions hundreds of millions billions of samples where we don't have access to to high quality human labels. And in the process of self-supervised learning it's going to learn something about the general structure of images or of data. Um, and
+
+5
+00:01:40,000 --> 00:02:21,000
+then you can transfer that knowledge to downstream tasks where you have small amounts of human labels. So then the typical setup you should keep in your mind that we want to work towards in self-supervised learning is that you're going to train on like a billion unlabeled images that we're getting from the internet somewhere. Um, and then we're going to transfer those features to tasks where we're going to we're willing to sit down and label maybe tens, hundreds, maybe thousands of
+
+6
+00:02:00,000 --> 00:02:49,000
+examples for particular tasks that we really care about. But we want those tasks to be um improved by this generic knowledge that from that we've learned through this self-supervised pretext task. And we talked about a couple different kinds of pretext tasks last time including rotation, rearrangement, reconstruction. Um all of these are basically having this this sense of that you're making some geometric perturbation, geometric disturbance to the input pixels and then you're asking
+
+7
+00:02:25,000 --> 00:03:07,000
+the model to somehow recover from that dis from that perturbation. So in the case of rotation, maybe you rotate the image and you ask the model to predict how much it was rotated. In the sense of rearrangement or solving jig jigsaw puzzles, you're going to cut the image up into patches and ask the model to try to predict what was the relative arrangement of those patches in the original image. Um or in reconstruction, maybe you're going to delete some parts of the input image and then ask the
+
+8
+00:02:46,000 --> 00:03:34,000
+model to fill them in as some kind of inpainting or reconstruction task. Um and these are fairly successful. Um, we also talked last time about a different formulation of self-supervised learning called contrastive learning, which has been very successful. Um, and here I I was told that you ran out of time a little bit to cover a couple of these later methods. So, I wanted to just go over go over those really quickly at the beginning of today's lecture instead. Um, so the really the idea of
+
+9
+00:03:10,000 --> 00:03:57,000
+contrastive learning is you're going to get pairs that are similar and pairs that are dissimilar and you want to pull the similar pairs together and push the dissimilar pairs apart. And the way that you usually do this in the context of self-supervised learning is you're going to start with your input images. And again, these are unlabeled images. You don't have labels. You don't have labels for them. And now for each input image, you're going to apply two random transformations. So in the case of the
+
+10
+00:03:33,000 --> 00:04:24,000
+cat, we sort of took one crop around the cat's face, another crop around the backside of the cat, um, and and around the monkey, we sort of took one around the monkeykey's face and also dropped it to black and white and, etc., etc. So basically for each one of your input images you're going to apply two or possibly more possibly more than two but two is a is a nice minimal subset two random perturbations to your input image. Now you're going to feed all of those randomly perturbed um versions of
+
+11
+00:03:59,000 --> 00:04:54,000
+your input data to some kind of feature extractor um which is which could be a vit could be a CNN um any kind of neural network that can input an image and output a feature representation. Then you want to apply this notion of contrastive. So um for each of the two augmentations that came from the cat, we want those two feature vectors to be the same. So we color them green. So basically you you basically comput this big n square similarity matrix where if well I guess it's 2 n open pern 2 n
+
+12
+00:04:26,000 --> 00:05:21,000
+closed pern squ. So it's 4n^ squ if you have n if you have n images you put two perturbations on each. So we have a giant um 2nx by 2n matrix for all the all these perturbed images all these perturbed uh augmented samples that we that we got. Um, and now basically we want to pull together the two augmented samples that the two augmentations that came from the original image. Um, and for every pair of augmented for of every pair of augmentations that came from different original images, we want to
+
+13
+00:04:54,000 --> 00:05:44,000
+push them apart. So you basically run um run through this feature run all of these things through your feature extractor, compute this giant um 4n squared matrix of all of your scalar similarities between those feature vectors and then pull together the ones that are similar, push apart the ones that ought to be different. Um, and that's the basic idea of contrastive learning. Um, and one paper that really pulled all this together, um, a couple years ago was called Simincar that, um, applied this very successfully to
+
+14
+00:05:19,000 --> 00:06:04,000
+self-supervised representation learning on images. Um, and that's the one I think he walked through last time. Um, but one kind of problem with the SIM clear setup is that it requires a fairly large batch size um, to actually good to get good convergence. Um, because it gets too it's sort of too easy of a problem for the network. If there aren't that many samples, it's sort of too easy to pick out the two cat ones that looked similar. So to make the problem hard enough for the network to give it good
+
+15
+00:05:42,000 --> 00:06:26,000
+enough learning signal, you tend to need quite a large batch size in order to get this model to converge to good features. And then once you do that, you need to rope in all the ideas around large scale distributed training that we talked about a couple of lectures ago, which is totally feasible. It totally works. Um, but you might ask, is there some way you can get away with with without that? Um, and that that leads to a couple of approaches that I don't want to go into too much detail. I actually don't want
+
+16
+00:06:04,000 --> 00:06:47,000
+to walk through through these and tell you exactly how they how they work. I just want to make you aware of their existence and give you the the general flavor of what they're trying to achieve. Um so in this MOCO or momentum contrast approach to self-supervised learning, the setup is very similar to what we just saw in Simcle. You're taking data, you're getting augmented pairs. You want you run them through with feature encoder. You want to pull together the ones that are similar, push
+
+17
+00:06:25,000 --> 00:07:22,000
+apart the ones that are dissimilar. But the thing that with the thing that differs is that we want to get away with not having to have a gigantic batch size at every iteration. So to do that they keep a queue of um negatives. They keep a queue of samples from previous iterations of training. Um and then at every training iteration I've got my my X query is my current new batch of data. And I have this this Q um X0 X1 X2 key which are previous batches of data that I've seen on previous iterations of
+
+18
+00:06:53,000 --> 00:07:41,000
+training. Now, my current batch of data I'm going to run through my encoder network the same as I always did um and compute these sort of compute the contrast of loss the same way that we did with SIM clear the and then these uh these this larger Q these like previous history of batches we're going to run through something different the momentum encoder um and then still get feature representations and compute the same kind of similarity that we did through the through through the SIM clear uh
+
+19
+00:07:18,000 --> 00:08:03,000
+thing but the problem is that we don't want to back propagate into the momentum encoder because it has too much data it too big of a batch. We can't afford to fit that in GPU memory. Um, so we want to not have to back propagate through that part. So instead, so that means that we're not we cannot upgrade update this momentum encoding encoder, this second encoder via gradient descent descent. Instead, we're going to do something kind of wacky. What we're going to do is have this momentum
+
+20
+00:07:40,000 --> 00:08:24,000
+encoder have its own set of weights. We're going to learn them not via gradient descent. Instead, what we're going to do is have the momentum encoder be a exponential moving average of the weights of the normal encoder. So the normal encoder, we're going to learn via gradient descent. everything is normal. Um, we'll forward prop, we'll back prop, we'll get gradients, we'll make a gradient update step on the in on the on the typical encoder. That's the normal thing. But then after we do that, the
+
+21
+00:08:02,000 --> 00:08:52,000
+momentum encoder, we're going to take we're going to decay the encoder weights. We're going to decay the current momentum encoder weights by like.99 um, and then add in 1% of the encoder weights. So then the momentum encoder, we have this other update rule where it's this lagging trailing exponential moving average of the encoder weights. Um, and I don't have a great intuition or explanation for why this exactly makes sense, but there's very strong empirical evidence that this
+
+22
+00:08:27,000 --> 00:09:12,000
+works. Um, so I unfort so that's uh that's kind of the state of things, but it's nice because it means that you can now get away with learning these self-supervised representations without having to have this gigantic massive batch of negatives at every iteration. Um, and this was fairly successful. There were a bunch of follow-up papers that uh that push this direction. Um, another one that you should be aware of is called Dino. Um, again the idea is very similar. It uses this similar sort
+
+23
+00:08:49,000 --> 00:09:39,000
+of momentum encoder, this like dual um normal encoder that's learned via gradient descent and a momentum encoder just as in Moco. Um but the loss is a little bit different. Instead of using softmax, they use some kind of kale divergence loss. Um and the reason I'm mentioning this one is because you should be aware of the existence of Dinov2 even if we don't talk about exactly what it does because Dinov2 is a really strong um feature a really strong model for self-supervised features
+
+24
+00:09:14,000 --> 00:10:07,000
+that's used quite a lot in practice these days. So what they basically did is took this recipe from Dinov1 which was kind of similar to MoCo has a lot of ideas from Simcle clear as well but a lot of unique details in their approach as well. Um but the big the big difference in Dinov2 is that they scaled up the training data quite a lot. So a lot of these previous self-supervised approaches had been trained on the imageet data set which was 1 million images. Um and Dinov2 was able to successfully scale up this approach to a
+
+25
+00:09:40,000 --> 00:10:31,000
+much larger training set of about 142 million images. So, you know, in deep learning, we like bigger networks, we like bigger data, we like more GPUs, we like more flops, we like all of those things. Um, and Dinov2 was able to find a recipe for self-supervised learning that successfully scaled up to this much larger data set gives very strong self-supervised features. And this tends to be used quite a lot in practice today. Um, if you want to pick up features and then super fine-tune them or supervise them for some for some of
+
+26
+00:10:06,000 --> 00:10:55,000
+your own downstream tasks. Um, so again, I don't expect you I don't want to walk through all the details of how this works. I don't expect you to know, but I want you to know that it exists in case you want to pick it up and use it for some of your own projects um in the future. Um so that that's basically all I had to say about self-supervised learning. Um any any questions about that before we move on to the the meat of today's lecture? Okay, guess not. So today the main topic
+
+27
+00:10:36,000 --> 00:11:25,000
+is generative models. Um this is really cool. Uh this is an area of deep learning that basically went from not working at all 10 years ago to like really really working in the last couple of years. Um and this has given rise to things like language models. These could be these can be viewed as generative models as we'll see. Um all kind of image generation models, all kinds of video generation models. These really went from just absolutely not working at all when I was in grad school. Like that
+
+28
+00:11:01,000 --> 00:11:47,000
+you would look at these samples and peer into them and they just look like low resolution, complete blurry garbage, but somehow you could view some promise in them. And I'm glad that people kept pushing on that and pushed through the blurry garbage and scaled it up over the past decade because now a lot of these techniques really do work and that's very exciting. So this is a this is a this is an area of deep learning that basically didn't work at all with the first time we taught this class and
+
+29
+00:11:23,000 --> 00:12:17,000
+that's really cool that it now does. Um but that said like a lot of the fundamental ideas around generative modeling actually remain the same. um the ideas about how you think about data um what are what are approaches for modeling them a lot of those mathematical fundamentals actually have not changed that much um in the past decade um and so but what changed is better is more compute more stable training recipes uh bigger data sets uh distributed training and the ability to scale all this up into more useful tasks
+
+30
+00:11:51,000 --> 00:12:35,000
+I think was really what drove the progress over the past decade um there were some algorithmic tweaks and especially we'll see that next lecture as we talk when we talk about diffusion models But um first before we talk about generative modeling, I wanted to step back a little bit and talk about supervised versus unsupervised learning, right? Because there's a couple of different there's a there's a couple of different tasks that we try to approach in deep learning. Um and they can
+
+31
+00:12:13,000 --> 00:13:02,000
+sometimes be sliced along a couple of different orthogonal axes. So I wanted to talk about those a little bit just so we get our terminology and our nomenclature clear. Um so supervised learning is what we've mostly been doing all semester um except for last lecture. Um, in supervised learning, we have a data set of pairs X and Y. Um, and the goal is to learn some function that maps from the input data X to the target or label Y. Um, and we've seen a lot of examples of this kind of approach so
+
+32
+00:12:38,000 --> 00:13:33,000
+far. Um, something like image classification. Our input X is an image. The output Y is going to be a label or image captioning. The input X is going to be an image. The output Y is going to be some piece of text describing what we see in that image. Object detection. Input is an image. output is a set of boxes and category labels describing the objects that appear in the image or segmentation. Maybe you assign a pixel label, assign a label to every pixel in the input image. And these are supervised learning problems because the
+
+33
+00:13:05,000 --> 00:14:00,000
+task you're trying to solve, the thing you want to predict is exactly what you have in your data set. And you sort of all you need to do in some sense is learn a function that mimics that XY mapping on your training data set and then generalizes that mapping to new samples um beyond your training data set. Now, unsupervised learning is something a bit more fishy and mysterious and hard to describe. Um, but the idea of unsupervised learning or sometimes self-supervised learning is that you don't have any labels. You just
+
+34
+00:13:32,000 --> 00:14:24,000
+have data. You just have samples X. Um, you just have images and you want to learn some kind of structure from that data. Um, there's no particular task you're necessarily targeting. You're just trying to uncover good representations, good structure in all of that data. Um, why? so that you can you know as we talked about in self-supervised learning often so you can apply it to downstream tasks later on um but there's but the the task itself in unsupervised learning is often somewhat unspecified
+
+35
+00:13:58,000 --> 00:14:44,000
+some examples of this are K means clustering where maybe we're trying to identify um clusters in the data which is which is some kind of structure that we can examine from the raw pixels that you know was even though we didn't have labels for um or dimensionality reduction PCA where we're trying to uncover some lower dimensional subspace or lower dimensional manifold that explains the structure of our data. Um, and again, this is something we're trying to discover from the data itself.
+
+36
+00:14:21,000 --> 00:15:04,000
+We don't have annotations of what this what this ought to be. Um, or density estimation. Maybe we're trying to fit a probability distribution to the data. We're trying to understand what is the probabilistic function that gave rise to the data samples that we're seeing. And again, we don't have explicit labels for this or an explicit training set for this. So, this is some kind of hidden or latent structure that we're trying to uncover through the process of training. So, this um supervised unsupervised
+
+37
+00:14:43,000 --> 00:15:30,000
+dichotomy is something that you always should keep in mind. Um and you can do unsupervised learning which is not probabilistic or not generative necessarily. Something like clustering, something like PCA, you know, often they have probabilistic interpretations. Um but these are examples of unsupervised learning that don't necessarily have a generative or probabilistic interpretation or or don't have to be thought of as such. Um so I often like to think about the supervised unsupervised dichotomy as kind of one
+
+38
+00:15:06,000 --> 00:15:56,000
+spectrum along which methods or or or um systems can lie. A separate spectrum along which we can classify systems or tasks is that of generative versus discriminative models. Um and these are inherently probabilistic. And when when we talk about generative or discriminative models, we're always imagining some kind of probabilistic structure in our data that we're trying to uncover or learn from. Um and the difference is exactly what is the probabilistic relationship between the variables that we're trying to model. Um
+
+39
+00:15:31,000 --> 00:16:26,000
+so in discriminative model, so so typically we have some some y and some x. Um, and usually we think of the X as something large, highdimensional, usually an image in our case, and the Y is some kind of label or description or auxiliary information. Um, and so that would be like your text, like your caption, like a category label, something like that. Um, and when you do when you talk about a discriminative model, we're trying to learn a probability distribution of Y given X. So, we're trying to learn a distribution
+
+40
+00:15:58,000 --> 00:16:54,000
+over labels um conditioned on our input image X. Um and to understand to really appreciate you know what's going on probabilistically you need to remember one very important feature of probability distributions and that's that they are normalized right when you talk about a probability distribution or more generally a density function p of x um p of x is basically a function that applies that that um that that uh that assigns a nonzero number um to every every possible input x with the very
+
+41
+00:16:27,000 --> 00:17:20,000
+important normalization constraint um that if you integrate over the entire space of all possible x's It integrates for it integrates to one, right? And this normalization constraint really gives rise to the the power of probabistic models in some sense because the normalization constraint means that all of your x's need to compete for probability mass. There's a fixed unit amount of probability mass. Um, and the and a prob and and choosing a probability distribution or density function basically amounts to aortioning
+
+42
+00:16:54,000 --> 00:17:44,000
+out that fixed amount of probability mass and smearing it across all possible values of x that could exist. Um, and all of those X's are in competition because there's only a fixed unit amount of mass to go around. So if you want to push up the probability of one X necessarily, the probabilities of or or densities of other X's have to go down. And this this and so then in these different formulations of probabilistic models, basically what's changing is what are the variables that are
+
+43
+00:17:18,000 --> 00:18:08,000
+competing for probability mass. Um and that means that even though the symbols that we write on the page look very similar um they they the different the different competitions among what is competing for probability mass um induces very different structure that the model is trying to learn or uncover. So in the case of a discriminative model we're learning a probabilistic model of y conditioned on x which means that for every x we our model is predicting a probability distribution over all
+
+44
+00:17:43,000 --> 00:18:44,000
+possible labels. So if our labels are discrete and categorical um like cat dog then that means we have a fixed amount of probability 0 to one um and cat and dog must must sum to one um and we have a separate probability distribution over the labels for every input x um and crucially notice here that there is no competition among images for probability mass because every image is inducing its own distribution over the label space there's no kind of competition for mass across the different images the the only
+
+45
+00:18:14,000 --> 00:19:04,000
+things that are competing for mass are the different labels for each image and that's very important when you think about discriminative modeling. Um and one interesting other thing so you know and one interesting other facet of discriminative modeling is that they have no real way to reject unreasonable inputs. So once we've fixed our label space of say cat and dog in this example if we feed in something that's not a cat or a dog at all like a monkey or a piece of abstract art the system has no
+
+46
+00:18:39,000 --> 00:19:23,000
+flexibility. It has no freedom to say this is unreasonable. it's forced to output a a distribution over the fixed vocabulary that we assigned at the beginning. Um so that's that's maybe could be seen as a shortcoming but it's just important to understand what exactly is happening under the hood when you think about modeling different kinds of data probabilistically. Now a generative model is something very different. Now instead what we're doing in a generative model is learning a
+
+47
+00:19:01,000 --> 00:19:54,000
+distribution P of X. Um we want to learn a distribution over all possible images X. Um and now this is very interesting. This means that all possible images that could ever exist in the universe are all now competing with each other for probability mass. Um, and this is now really really a hard question that requires, you know, it sounds kind of simple in in on its face, but this requires you to confront some very deep and philosophical problems about the world, right? Because now all images are
+
+48
+00:19:28,000 --> 00:20:09,000
+competing for probability mass. And it you're forced in order to model that, you're forced to answer questions. You're like, you know, should an image of a three-legged dog, how should that get probability mass in relationship to an image of a three-ear armed monkey? Probably the three-legged dog should get pro more probability mass because that's, you know, you can have that happen by a dog losing a leg. But how are you going to get a three- armed monkey? I don't know. That seems much
+
+49
+00:19:48,000 --> 00:20:37,000
+more rare. Um, unless you're modeling sci-fi images or something like this. So once you're in this regime of im all possible images competing for probability mass now your model really needs to think very carefully about the kinds of structure that can can exist in the data and it becomes a much much harder problem to solve. And another interesting thing here is that now with a generative model the model now does have the capacity to basically say no this is not a reasonable image this is not a
+
+50
+00:20:13,000 --> 00:21:06,000
+reasonable input and the way that it can do that is by assigning you know low or even zero probability mass to any one image that it gets. So maybe in our generative model um maybe we only want it to recognize you know be a generative model of zoo animals and if we want to have a generative model of zoo animals then you know if we feed in an image of abstract art it should have zero probability mass. So now we have a mechanism for rejecting or or saying that this type of image is not within the scope of what we care about.
+
+51
+00:20:39,000 --> 00:21:35,000
+And now a conditional generative model is um even more interesting. So this is where we're learning a conditional distribution over images x conditioned on some um some some label sigma y. And now this means that for every possible label um maybe we're now inducing a distri a competition among all possible images. So in this case if y is say a categorical label of cat and dog now um for every for each possible categorical label cat and dog the model is separately inducing a competition among
+
+52
+00:21:07,000 --> 00:21:50,000
+all possible images. So now you know in in the top distribution maybe this is the probability of all these images um conditioned on the cat label. So then obviously the cat image should be high. Maybe the monkey and the dog images image should be somewhat higher because they're still mammals at least, but the abstract art should be very low, maybe even zero. Um, and then you know a different distribution among images if we're conditioning on the dog label. Um, and this gets even more interesting if
+
+53
+00:21:29,000 --> 00:22:21,000
+you imagine that your conditioning signal Y is something much richer than a single categorical label. That that conditioning single signal Y might have been a text description. It might have been a whole paragraph of written text. It might have been another image plus a piece of text. So now once you talk about modeling these very rich output spaces X um conditioned on very rich input spaces Y now you're actually asking the model to solve a very complicated and and quite illdefined problem that requires very deep
+
+54
+00:21:55,000 --> 00:22:45,000
+reasoning about the about the objects involved. Um so that's why I think that generative modeling is such an interesting topic because it looks kind of simil it looks kind of simple. All we did was flop the X and the Y. How hard could it be? Um but all of a sudden it required us to think really hard about what's going on in the visual world. Um, and what's also interesting is that we wrote down discriminative generative models and conditional generative models as three separate categories of things.
+
+55
+00:22:20,000 --> 00:23:15,000
+Um, but actually they're all related. Um, and they're related through Baze rule, which is um, you know, your kind of your one of the most one of the most amazing relationships in probability. And in particular it says that you know if we have we can write we can if we have access to a discriminative model P Y of X um and an unconditional generative model P of X um as well as some prior distribution over our labels Y we can compose those to build a conditional generative model P of Y given X um or in general you can always
+
+56
+00:22:47,000 --> 00:23:41,000
+rearrange B rule in some way so that if you have any two of these you can always get a third one which is pretty cool. Um so I mean so in practice like in in theory you can in principle build a conditional generative model out of the other two components. Although in practice this is not really how you do it. You tend to sort of learn conditional generative models um from all from scratch on their own. Although as we'll talk about in diffusion you do end up sometimes learning conditional and unconditional models jointly um for
+
+57
+00:23:14,000 --> 00:23:55,000
+some reasons. Um but this is nice to keep in mind that there's a very deep relationship across these different flavors of probabilistic models. So then you might be wondering, okay, what can we do with these different flavors of probabilistic models? Um, with with discriminative models, this one shouldn't require a lot of creativity. We've seen a lot of these examples so far this this this uh this quarter. So with discriminative models, after you train them, you can assign labels to
+
+58
+00:23:35,000 --> 00:24:23,000
+data. You can also do feature learning, right? In the case of say um supervised learning on imageet, we've seen that by in the process of trying to predict um categorical labels of images, those models tend to learn useful feature representations in the middle that can be transferred to downstream things. So this is an So you tend to use descriptive models for just directly predicting the y's that you care about or for learning feature representations that are induced in the process of trying to predict those y's.
+
+59
+00:23:59,000 --> 00:24:51,000
+Generative models um actually these unconditional generative models I I think are actually kind of useless um in general but what they kind of let you do is maybe detect outliers. Um they look at images and say are they are they really do they really have low probability mass? Are they unreasonable images? um you can view that you can sort of use them for feature learning without data without labels. Um so hope that in the process of trying to fit an unconditional distribution P of X the model maybe learned some useful feature
+
+60
+00:24:25,000 --> 00:25:12,000
+representations. Um although in general these have not been super successful for self-supervised learning. Um and typically the contrasted methods that we've talked about in the previous lecture have in practice been much more successful for self-supervised learning as compared to an unconditional density estimation. Or um in principle you could use this unconditional generative model to sample and produce new samples X. Um but I think this is actually kind of useless um because it gives you no control over
+
+61
+00:24:48,000 --> 00:25:30,000
+what what is being sampled right if you have an unconditional generative model of images then you can sample from it to get a new image but you have no control over what what's in that image. Um so I think that's that's actually you know it's mathematically interesting to think about how to build such models but it's I don't think they have as much practical significance. Um and conditional generative models are where are where I think actually things are the most useful and the most
+
+62
+00:25:10,000 --> 00:25:58,000
+interesting. Um and these are the kinds of generative models that get trained and used in practice by far the most. Um so you can in principle use them to assign labels while rejecting outliers. Right? You could say you know if I have a piece of data X then look at the P of X given Y over all over all of my possible Y's and then you know I could reject if if the if that's too low among all the possible Y's. So in principle, you could use conditional generative models to do some kind of classification
+
+63
+00:25:34,000 --> 00:26:25,000
+while also maintaining the ability to reject outliers. Um although I don't think that's really used too much in practice. Um what's really useful for conditional generative models and what is used in practice all the time everywhere is sampling to generate new data from labels where you actually get to control what is generated, right? Because if your Y is now maybe a piece of text, you can write down I want to see a cat wearing a hot dog flavored t-shirt on the moon or whatever and then
+
+64
+00:25:59,000 --> 00:26:46,000
+your favorite generative model of images will generate you a brand new image X conditioned on that label Y. So this is where I think all the juice is, where all the magic is, where all the excitement is. Um although somewhat confusingly in the literature whenever you see the term generative model you'll they kind of mush up between um unconditional and conditional generative modeling. Um, and a lot of the papers that you read will even sometimes drop the conditioning signal. Why? Because it
+
+65
+00:26:23,000 --> 00:27:10,000
+makes the math look cleaner. It makes the equations look cleaner. Um, but I don't think unconditional generative modeling is super useful. Um, it's almost always conditional generative modeling that you really want to do in most cases. Um, so just keep aware just be aware that if you read papers, see equations, hear people talk, when they talk about generative modeling, they're probably the one they care about training more are these conditional generative models. Even if the math doesn't even if the equations or
+
+66
+00:26:46,000 --> 00:27:34,000
+notation doesn't reflect that. >> So uh for unconditional generative model what does this >> ah so I I didn't really tell you that um and and I I was sneaky there because how you parameterize that actually depends a lot. There's a lot of different formulations for all of these things and what exactly are the going to be the inputs and the outputs of the network are going to vary quite a lot depending on the formulation. Um so we're going to talk about a whole tonomy of those in a
+
+67
+00:27:10,000 --> 00:28:06,000
+couple slides. Okay. So you know why generative models? Um the main reason you want to build generative models is whenever there's some ambiguity in the task you're trying to model, right? So the the the beauty of a probabilistic model P of X given Y is that it's probabilistic. Um there might be a whole space of possible outputs X conditioned on that input label Y. So whenever there's not a like in some case sometimes there's just a deterministic mapping, right? I look at an image, I want to ask how many cats
+
+68
+00:27:38,000 --> 00:28:23,000
+are in the image. There's just three cats. There's just one answer. Um, but in a lot of cases it's more subtle. If I ask for a picture of a dog wearing a hot dog hat, like there's a lot of different images that could exist based on that query. Um, there's uncertainty in the output. Um, and that's exactly what generative models are trying to model. They model a whole distribution of outputs conditioned on their input signal. So, anytime that there's ambiguity in the kind of output that you
+
+69
+00:28:00,000 --> 00:28:50,000
+want the model to produce conditioned on the input, that's where you want to turn to a generative model. Um, and this is why, and this is we've seen, we'll see a couple examples of why where this has gotten used a lot in the last couple of years. So, one example is language modeling. Um, someone asked about chatbt a moment ago. So, in language modeling, what you're often trying to do is predict output text X from input text Y. Um, sorry, the X's and Y's ended up flipped in an awkward way on this
+
+70
+00:28:24,000 --> 00:29:11,000
+example. Um, but you know, so so here's a here's an example from Chad GBT, but the input is write me a short rhyming poem about generative models. And wow, it actually works. This is crazy. This didn't work at all when we first taught this class. Um, I'm not going to read it. That would be embarrassing. You can read it yourself. Um, but you know, now this is a conditional generative model. You could imagine there's a lot of different possible rhyming poems about generative models that one might write.
+
+71
+00:28:48,000 --> 00:29:33,000
+Um, and we had to pick one of them. And the beauty of a generative model is that it in principle models that whole distribution over over possible outputs conditioned on that input. Um, or text to image. You know, make me an image showing a person teaching a class on generative models in front of a whiteboard. um you're kind of looking at one example through your eyes. Chat GPT gave you a different example, right? There's a whole different space of possible images that might match this uh
+
+72
+00:29:10,000 --> 00:29:56,000
+this input text and a generative model allows you to model that whole space and sample from that space depending on what you want. Um or image to video, you know, input an image. What happens next? Um you know, this was me holding my AirPods over a cardboard box. Maybe I'm going to drop it. Maybe I'm going to move my hand. Maybe, you know, maybe I'm going to move my hand and the AirPods will morph into a different kinds of AirPods. Um there's all kinds of things that could happen. A generative model in
+
+73
+00:29:34,000 --> 00:30:24,000
+principle lets you kind of model and sample from these possible futures. Um so those are so I I so this is sort of why we want to care about generative modeling. Anytime there's ambiguity in the output that's when you want to try to turn to a generative model to solve it. Um and someone asked about what are the inputs and outputs. It turns out this is a huge field. Um and this is surprisingly one field of deep learning that is quite mathematical. um because it requires you know thinking about what
+
+74
+00:29:59,000 --> 00:30:44,000
+are different ways to model probability dist distributions, how can we write down loss functions that cause the right things to happen. So this is one area where when you read papers there may be a lot of math there may be a lot of equations um and you actually might need to think through those equations pretty carefully to understand what's going on. So this is one sub field that tends to have more more math and more equations um which I think is kind of fun kind of interesting. Um so there's this whole
+
+75
+00:30:22,000 --> 00:31:13,000
+taxonomy of different kinds of generative models that people build. So on the one hand you can imagine one part of the family tree are what we call explicit density um methods. These are ones where the model actually does you know the whole thing is we're trying to model P of X or P of X given Y. Um and with these explicit density methods you can actually compute you can get that value out P of X for any sample X. Um and the counter the counterpoint are implicit density methods. These are ones
+
+76
+00:30:47,000 --> 00:31:35,000
+where you can't actually get that probability mass value. you can't actually get that density value P of X out from the model, but you can somehow sample from that probability probability distribution. So the difference here um is that in an implicit model, right, you can't actually access the the the value of the density function, but you can sample from the underlying density function somehow. So the model has implicitly learned to model the density even if you can't get the value out. Um
+
+77
+00:31:11,000 --> 00:32:03,000
+and on the explicit density side, um it's almost the almost the opposite where in many cases even when you like you can get that explic that explicit density value out but then sampling tends to be more complicated sometimes with these explicit density methods. Not always but sometimes, right? And the reason why you might turn to implicit models is because in many cases you may not actually care about knowing what exactly was the density value for any input. you maybe all you care about is generating samples and get generating
+
+78
+00:31:37,000 --> 00:32:26,000
+good samples get generate generating a good diversity of samples. So if the thing you really care about is sampling then maybe you don't actually need to explicitly be able to see the value of the density for any for any for any input. Um and then things break down and cascade and get more fractal-like from here. So inside explicit density methods um there's ones where like actually yeah you can really compute the real P of X that's being modeled. Um and auto reggressive models are one example of
+
+79
+00:32:01,000 --> 00:32:56,000
+that. um or another version of explicit density methods are ones where you can get a density value out but it's not the real one. It's some kind of approximation to the true density um of the data. Um and variational autoenccoders are one example of an explicit but approximate um generative method that we'll see. Now on the other branch of the family tree um we can think about direct methods for implicit density. These are ones where maybe it requires a single network evaluation to just draw a sample from the underlying
+
+80
+00:32:29,000 --> 00:33:15,000
+from the underlying distribution that's being modeled. Um, and a generative adversarial network is an example of a generative model in this part of the family tree. Um, and the other part is um, I don't know if it has a good name. Um, I I called it indirect, but this is a name I made up yesterday. So, please feel free to correct me if there's a better term for this. Um but these in indirect ones are ones where you can sample from the underlying um from the underlying density P of X that's being
+
+81
+00:32:52,000 --> 00:33:33,000
+modeled. But it requires some kind of iterative procedure. There's no feed forward function that where you can input and get the sample directly out. There's some kind of iterative method that you need to run in order to draw a sample from the underlying density that's being modeled. Um and diffusion models are an example of this that we'll see next time. I told you a couple slides ago that people are sloppy with notation and drop the Y. And I did that explicitly on purpose on this slide so
+
+82
+00:33:12,000 --> 00:33:57,000
+that someone would ask me that question and you would always be attentive to that fact. Um so yes exactly every time I've written P of X on this slide and actually all the rest of the slides this lecture I also have been lazy and dropped the Y but you should always imagine an additional condition on Y um in all of these P of X's that you see for the rest of the lecture. So thank you for asking that. So the question was like is the is the indirect method is it still you know can you just treat that
+
+83
+00:33:34,000 --> 00:34:25,000
+indirect iterative procedure as a blackbox and then treat that as as a direct sampling method. Um in principle yes but in practice no because your samples kind of end up end up approximate um you know depending on exactly the method but like with with diffusion models you kind of would need to take an infinite number of steps in order to draw a true sample so instead we approximate that with a finite number of steps and that's you know true of other methods as well diffusion models are the most common for this today um
+
+84
+00:34:00,000 --> 00:34:51,000
+but you know some kind of marov chain method or MCMC method in years past might have also had this property where there is an iterative procedure but if you want to draw an exact sample from the distribution that's being modeled, you need an infinite number of steps to converge. Um, so we always approximate that and by taking a finite number of steps. Okay. And I was I was pretty I was pretty proud of this tonomy because it's very symmetric. There's, you know, it's a it's a there's there's four leaves,
+
+85
+00:34:25,000 --> 00:35:12,000
+there's two branches, and we're going to cover half the tree today and half the tree next time. Um, so I thought that was a pretty nice uh pretty nice breakdown. question is what's the difference between the approximate density and directly sampling from an implicit p of x? The difference is that even in an in an indirect but implicit method there's no density value anywhere to be found. You can't compute one at all. Um but you can still iteratively sample in some way. Um with an
+
+86
+00:34:48,000 --> 00:35:41,000
+approximate density method um you can still get a value out like you can actually get a density value out that's going to be some approximate or bound to the true p of x. Okay. So then the first such auto the first such generative model that we'll actually talk about in a little bit more concrete specificity are auto reggressive models. Um so autogressive models we're actually going to take a slight detour and talk about an a really general idea behind all of generative modeling and that's the idea of maximum
+
+87
+00:35:16,000 --> 00:36:07,000
+likelihood estimation. Um and maximum likelihood estimation is actually a quite general procedure that we can use to fit probabilistic models given a finite set of samples. Um so the idea is we're going to write down some explicit function for the density. um we said that in that that um some methods are going to explicitly model the density. Well, let's do it with a neural network. Let's write a neural network that's going to input the data x um input the weights w of the neural network and it's
+
+88
+00:35:41,000 --> 00:36:32,000
+going to spit out a number that's going to tell us what is the density. Um so then you know we're going to train the data we're going to given a data set of samples x1 x2 xn we're going to train the model via this this objective function. We want to find the weights that give rise that make the data set most likely right where we want to set because as we vary the weights it's going to vary the kind of densities that are being modeled by the network. So we want the network to select the density
+
+89
+00:36:06,000 --> 00:36:55,000
+that maximizes the likelihood of the data. Um note that we said likelihood rather than probability. Um that's a deep philosophical rabbit hole you can fall into. Um the difference is what we're varying. Right? If you think about probability, you kind of imagine you that the density is fixed and we're sort of sliding X around and changing what is the probability of X under a fixed distribution. When you talk about likelihood, instead you're often fixing the samples X and you're varying the
+
+90
+00:36:31,000 --> 00:37:20,000
+distribution itself. Um and saying, you know, what is the how does the prob how does the probability density of those samples change as we vary different distributions. So you have to think about very carefully in these equations what's being fixed and what's varying. So in this process of maximum likelihood estimation, what we're doing is varying the distribution that the model that the that the neural network is modeling to try to maximize the probability of the fixed set of samples we have of from
+
+91
+00:36:55,000 --> 00:37:47,000
+that distribution in our training set. Right? And I guess the the unsaid thing behind all of this is that we assume that there is some underlying true probability distribution P data which was used by the universe to generate the data that we are seeing. Um and in some sense always what we want to do is try to model that true underlying unknown distribution P data and we can never access P data because we don't know we don't have this omnisient view of like exactly how the universe works. um but
+
+92
+00:37:21,000 --> 00:38:13,000
+instead we get some samples from P data that the universe has given to us and what we're trying to do through our learning procedure is uncover that unknown distribution P data um given a finite number of samples from that unknown distribution right so one procedure that you can go about this is like well let's select the distribution that makes the data that I saw actually most likely um and that's the objective that's that's the maximum likelihood objective function right and then a standard trick that we
+
+93
+00:37:47,000 --> 00:38:33,000
+do here right we assume that the data was iid um independent and identically distributed. So we assume that each one of those X's was drawn from that true P data distribution. And now we want to maximize the joint distribution of all the data that we saw. But because it's independent, we can factor it down um into independent probab like independent likelihood of each of the independent samples. Um and then the common trick that we always use is the log trick. So we know that log is a monotonic
+
+94
+00:38:10,000 --> 00:38:59,000
+function. So if you maximize something, it's equivalent to maximizing the log of that something because log is a monotonic function. Um, and then log is also very convenient because it swaps sums and products. So it's common to just instead of maximizing the the the pro the the the likelihood of the data, instead we're going to maximize the log likelihood of the data. And that's the same as maximizing the likelihood. And once we apply the log, then that that um that product splits into a sum and sums
+
+95
+00:38:34,000 --> 00:39:22,000
+are easier to handle. Um and now you know we slot in our neural network um because our neural network is now maybe directly outputting the density. So this gives a direct objective function that we could use to train a neural network. Um give it to you know this gives it a very concrete loss function that we can use to train a neural network to solve this kind of generative modeling problem. Um but we need a little bit more structure here to actually make progress. Um so this this is where so this this idea of maximum likelihood
+
+96
+00:38:59,000 --> 00:39:49,000
+estimation is very general. It doesn't really assume anything about the kind of data. Um it doesn't really assume any structure in the data. Um and we in in general need to put a little bit more structure on this to make some progress. Um, so auto reggressive models basically make the assumption that there is some canonical way that we can take our data X and split each ind each data sample X into some sequence of subp parts. Um, X1, X2, XT. Um, you got to be careful with indices here. Here I said the subp
+
+97
+00:39:24,000 --> 00:40:17,000
+parts these are subp parts of a single sample. Um, so I use a subscript and the previous slide we had superscript to indicate different samples um, x1 to xn. So be careful with that. you know, sub superscript on this slide is different samples X. Subscript on this slide means different parts of the same sample. Um, so we assume that there's some canonical way to break up our our data sample X into some sequence of subp parts. Um, and now we can apply the chain rule of probability. So um, probability of X is
+
+98
+00:39:51,000 --> 00:40:46,000
+just the joint probability probability of all of those subp parts X1 to XT. Um, and then given any probability distribution, you can always break it apart into this chain rule. Um that probability of the joint distribution of all these variables is equal to probability of the first one um times probability of the first given conditioned on the first probability of the second condition on the first times probability of the third conditioned on the first and the second etc etc etc right and this is this is the chain rule
+
+99
+00:40:18,000 --> 00:41:11,000
+of probability this requires no assumptions this is always true of any kind of um joint distribution of of random variables um and then this this sort of gives us our our objective function or then then like then you could basically train a neural network that's going to input, you know, the po the the the previous part of the sequence and then try to give us a probability distribution over the next part of the sequence. Does that sound familiar? Does that sound like something we've done before? RNN's. Yes.
+
+100
+00:40:44,000 --> 00:41:32,000
+So that's exactly what an RNN is doing, right? And RNN has this very natural structure that you know by passing hidden states along forward through time, um the hidden state always depends on the beginning of the sequence up to the current point. Um so then with there's a very natural way to use RNN's to for auto reggressive modeling. Um so you're you have your sequence of hidden states that are basically summarizing your your sequence and then from each hidden state you predict probability of
+
+101
+00:41:08,000 --> 00:42:01,000
+the next piece of the sequence. Um condition on the rest condition on all earlier parts of the sequence um and that basically is an RNN language model that we saw some lectures ago. Have we seen anything else that can do this? Yes, transformers. Um and particularly mask transformers, right? So we talked in the transformers lecture um transformers can also be used to have this this structure where by masking out the attention matrix in the right way we can make each output of the transformer depend on only the prefix of the
+
+102
+00:41:35,000 --> 00:42:22,000
+sequence. So we can also use transformers for autogressive um autogressive modeling and this and they're very commonly used for this. Okay, so this is um but the problem with autogressive modeling is that you need to break your data up into a sequence and this is very very natural with um with text data, right? Because text data is naturally a 1D sequence. Um and it's even a 1D sequence of discrete things which is great because it's very easy to model probabilities of discrete things.
+
+103
+00:41:58,000 --> 00:42:49,000
+Um we've been doing that all semester um with our favorite cross entropy softmax loss, right? The cross entropy softmax loss is always, you know, distribution over discrete like fixed discrete number of categories. um the network predicts a score for each one of those. Normalize it with a softmax, train with a cross entropy loss. We know how to do that. Um so that's that's why these things fit very naturally for language models. Um because language is already discrete. Um language is already a 1D sequence. Um so
+
+104
+00:42:24,000 --> 00:43:15,000
+there's a little bit of fuzziness and how you know there's a tokenizer in there. We're not going to get into that. Um but these are very naturally well suited to language problems because language is already 1D. It's already discreet. Um images are more tricky because images are not naturally 1D. Um, images are also not naturally discreet. We often think of images as continuous real valued things. Um, so this is they don't these don't naturally fit quite as nicely onto images. Um, but you know,
+
+105
+00:42:49,000 --> 00:43:45,000
+you got a hammer, you're going to whack some nails. So, um, people definitely apply autogressive models to images in kind of a naive way. Um, at least at least some years ago. So one thing you can do one one one thing you can do to um model images with autogressive models is to treat the images it treat an image as a sequence of pixels right and in particular each pixel is actually just three numbers um and you know in most displays and in most representations most representations of images those
+
+106
+00:43:17,000 --> 00:44:18,000
+numbers are actually discreet right so most JPEGs or PGs most of the file formats we use to store images um are typically 8 bit per channel so there's actually you know only a fixed number of values that each pixel can take. So a pixel is just three um three single bite values. A single bite is just like an integer from 0 to 255. So a pixel is just three integers each of each integer can be 0 to 255. So what we can do is um take our image and then rasterize it out into a long um into a long sequence
+
+107
+00:43:48,000 --> 00:44:41,000
+where each element of the sequence is one of the sub pixels values of our image. Um, and now we've turned our image into a discrete into a into a one-dimensional sequence where each entry in that sequence is a discrete value. So you can apply autogressive modeling directly to that sequence um in exactly the way that you might have for a language model um using an RNN or a transformer. Um can anyone spot a problem with this approach? Too long. Very expensive. Very very expensive. Um so you know a kind of
+
+108
+00:44:14,000 --> 00:45:06,000
+reasonable image that you might want to model is maybe 1024 by 1020 1024. Um, that's not even that high resolution really, but that's a pretty good resolution. But if you have 1020 1024 x 1024 image, that's going to be a sequence of 3 million sub pixels. Um, you know, people actually can model these days sequences in the millions, but it gets very very expensive. Um, there's got to be a more efficient way to do this. Um, so there were some papers a couple years ago where people applied these sort of autogressive
+
+109
+00:44:40,000 --> 00:45:27,000
+models directly to pixels of images. Um, but they were not super successful, I think, because they they're very difficult to scale to high resolution. So a spoiler alert that we'll talk a little bit more in next lecture is that this actually has made a resurgence in the last couple of years. Um but the trick is to not model the individual pixels in the sequence um as individual pixel values but instead to use some other kind of process or procedure or model neural network maybe to break that
+
+110
+00:45:04,000 --> 00:45:59,000
+image into a sequence of one-dimensional tokens. Um so that's something we'll talk about a bit more next lecture. Um but this at least gives you the sense of what is an auto reagive model. Um what's the probabilistic formulation of them? How do you apply them to language? how do you apply them to images? So then from auto reggressive models we next turn to variational autoenccoders um and variational autoenccoders are pretty fun. So we talked about you know we in in um in these autogressive models we talked
+
+111
+00:45:31,000 --> 00:46:14,000
+about you know we're trying to do maximum likelihood. We broke up our data into a sequence of parts. We're trying to maximize the likelihood of the data. Um and variational autoenccoders are going to do something a little bit different. um instead we're there's still going to be an explicit method. There's still going to be some kind of density that we can compute. Um but there it's going to be intractable. We're going to be able to approximate it. Um why are we going to do that? We
+
+112
+00:45:53,000 --> 00:46:37,000
+had a perfectly good method that computed densities exactly. Um and what we're going to give up for that is we're going to gain something. Um we're going to gain the ability to compute reasonable latent vectors over our data. We're going to have you know vectors that represent our data that come out that pop out naturally from the learning process. And those vectors are going to be useful in their own right. And the ability to get access to those latent vectors is going to be useful enough to
+
+113
+00:46:15,000 --> 00:47:03,000
+us that we're willing to give up computing exact densities and instead settle for these approximate densities that are actual actually lower bounds on the true density. Oh, the the motivation for breaking stuff up in a sequence in autogressive models um because it factors the problem. It makes each part each part easier to model, right? So imagine, you know, imagine you're doing language modeling, right? Um and you have a vocabulary of Vword um and I want to model the probability of two words
+
+114
+00:46:39,000 --> 00:47:28,000
+jointly, right? How many possible two-word sequences are there? There's V^ squ. Um how many possible three-word sequences are there? There's V cubed. Um then in general, if you have like how many T word sequences with a vocabulary of V are there? It's um V to the T, right? So that's bad. It grows exponentially. If you wanted to directly model the joint distribution of a sequence of T things, the number of entries in that discrete probability distribution you need to model is going
+
+115
+00:47:04,000 --> 00:47:46,000
+to grow exponentially with the sequence length. um and that's quickly going to become completely intractable if we if we want to go to long sequences. So then the reason we break that up is so that we don't have to model it all at once. We factor it in this way and predict only one part condition on the previous parts. Good question. Can we apply the log trick to mitigate that? Yeah, exactly. So in practice like you'll never actually see these these real these like probability density values
+
+116
+00:47:25,000 --> 00:48:07,000
+modeled. Um almost always you're going to work in log probabilities instead. Um so the model that outputs um the model is going to output log probabilities. You're going to compute your loss in log space. like for numeric stability you're almost going to compute everything in log space in practice. So then the p of x is being generated because at the output at the at the top of the transformer it's outputting a probability distribution over the next token condition on all the previous
+
+117
+00:47:46,000 --> 00:48:30,000
+tokens and it does that for every point in the sequence. So you could actually recover this exact probability density value um by multiplying out the the values at all points in the sequence. So if I have an input sequence, I pass it to the transformer. The transformer will have predicted at every point in the sequence what is the probability, what is the distribution over all the tokens conditioned on the on the earlier part of the sequence. Um and I can compute what was the actual next token, what was
+
+118
+00:48:08,000 --> 00:48:59,000
+the predicted probability of the next token, and then multiply all of those across the entire sequence. So that's how we can recover the exact density value out of one of these autogressive models. And that actually would apply either to an RNN or a transformer. Okay. Um good questions. So then in a variational autoenccoder um things get hairy. So we're actually going to drop the V and talk about autoenccoders for just a couple slides because I don't think we've done that yet this this uh
+
+119
+00:48:33,000 --> 00:49:26,000
+this course. So in a non-variational autoenccoder this is basically going to be an unsupervised method for learning to extract features Z from inputs X without labels. Um and this actually you know is kind of a ver kind of you know in this vein of self-supervised learning that we just talked about. Um, and our notion is that the features ought to extract useful information about the data, right? Maybe they somehow implicitly encode what is the what what is the identity of objects in the image, how many of them there are, what are the
+
+120
+00:49:00,000 --> 00:49:48,000
+colors of them. We want this feature vector Z to contain useful information about about the input X. Um, and this encoder itself could be a neural network of any architecture. It could be an MLP, transformer, CNN, whatever you want. Um, but it inputs our data X and then it's going to output some vector Z. And then the question is how do we learn this without without labels. Um we actually saw a lot of examples of this in the previous lecture. Um but there's a very simple one which is just try to
+
+121
+00:49:24,000 --> 00:50:10,000
+reconstruct the input. Um so we're going to now have a second part of the model called the decoder which is going to input the Z and then output back an X. Um and we want Oh, and I dropped the X. Um and and we're going to train this thing to so that the output from the model should actually match the input. Um this is the in some sense the stupidest loss function ever. We're just training the model to mimic the identity function. Um why do we do that? we already know the identity function. Why
+
+122
+00:49:47,000 --> 00:50:29,000
+are we expending a lot of flops and training a neural network on a big data set to just learn the identity function that we already know? Um it's because we're going to bottleneck it in some way. Um if this model had infinite capacity, for example, if that Z vector was very wide, if there were no constraints on the learning, um I would expect a neural network to just nail this problem. Um but we don't want to do that because we explicitly don't care about learning this objective. We
+
+123
+00:50:08,000 --> 00:50:59,000
+already know the identity function. We don't need an expensive neural network to compute it. What we want to do is force the network to try to learn the identity function under some constraint. And the constraint that you often use in a in a traditional autoenccoder is by bottlenecking that representation Z. In particular, that means that that vector Z in the middle is going to be much much smaller than the input X. So your input X might be a high resolution image, maybe like a 1024x 1024 image that we
+
+124
+00:50:33,000 --> 00:51:27,000
+said is composed of 3 million floats, but then that Z might be like 128 dimensional latent code. So the model is now asked to solve this problem where I want to reconstruct the output, reconstruct the data X, but squash it through this layer, this like bottlenecking representation in the middle. And we hope that this is going to force the model to learn some non-trivial structure about the about the data by squashing it through this this representation in the middle of the network. Um, and then after we do this,
+
+125
+00:51:00,000 --> 00:51:52,000
+we can apply our normal self-supervised learning trick where, you know, you could throw away the decoder um, and then use this Z to initialize some supervised model for some downstream task. the same story as in the supervis the the self-supervised story that we just saw. Um, but what about what if we want actually want to use this to generate data? Um, then what we'd really like to do is somehow the opposite of the self-supervised story. What we'd really like to do is throw away the encoder and instead be able to somehow
+
+126
+00:51:25,000 --> 00:52:20,000
+sample Z's that match the kinds of Z's that the model learned to represent data as. And if we had some procedure for sampling Z's that matched the data distribution in some way, then we could sample a Z, pass it through our learned decoder, and now generate a new sample, right? And now this is an implicit method, right? You said that there's no there's no densities floating around anywhere. But if we had a way to do this, it would be a way to draw samples from the model um without explicitly
+
+127
+00:51:52,000 --> 00:52:41,000
+modeling the density in any way. But the problem is that, you know, we've just kind of kicked the can down the road here a little bit because we said we wanted we want if we want to generate images, we want to generate X's, we have a data set of X's. How do we do that? We said we're going to solve that by training this autoenccoder and now we have a data set of Z's and we need to sample in Zpace. It's it's not any easier. So it kind of kind of we're kind of stuck. Um and the idea of variational
+
+128
+00:52:16,000 --> 00:53:06,000
+autoenccoders is you know what if we could force some structure on the Z's. Um if you have this traditional auto-enccoder structure all you're you're not forcing the model to impose any known structure on the Z's. You're just asking it to reconstruct the data um given its latent representation. But what if we had some mechanism to force the Z's to come from a gausian distribution or some other known distribution. If that were the case then we could just draw a sample at inference
+
+129
+00:52:42,000 --> 00:53:38,000
+time after this model is trained. Draw a sample from that known distribution pass it through the pass it through the decoder and now we would have our have our sample. So forcing these auto-enccoders to be probabilistic and to enforce a probabilistic structure on that latent space exactly is what a variational autoenccoder tries to do. Why variational? Um it's a long story. Um it says has a long history in a long term lot of history around that terminology in the literature. Um but basically variational autoenccoders are
+
+130
+00:53:10,000 --> 00:54:07,000
+a probabilistic spin on our traditional autoenccoder. Um, so it's going to learn latent features Z from raw data and then we'll be able to enforce a structure on that learned latent space Z such that we can sample from it at inference time after the model is trained and generate new samples. So in more more more concretely we'll assume that our training data X I again note here the superscript I means these are different independent samples of of X. um we assume that um each x i was
+
+131
+00:53:39,000 --> 00:54:34,000
+generated from some underlying latent val latent vector uh z that there's some zi that's lurking under the surface associated with every x i and in the universe's procedure for generating data first it generated the zi then it generated the xi from the zi um and all everything that the universe needed to know in order to generate the image that we seed that we saw was contained in that latent vector z but we can't see those latent vectors z we can never observe them. We don't have a data set
+
+132
+00:54:06,000 --> 00:54:55,000
+of them, right? So the intuition is that X is an image. Z is some kind of latent feature representation that tells you everything you would ever need to know about that image, but you can never observe that latent vector. Um, and then after training, we could generate a sample by uh, oh, and the other constraint is that we're going to force those Z's to come from a known distribution. So then after the model is trained, then we can do exactly what we just said. Draw a Z from that known distribution, pass through the decoder.
+
+133
+00:54:30,000 --> 00:55:21,000
+That's going to give us a sample. Um, and then we'll typically assume a simple prior. Um, almost always a unit gausian distribution is the most is by far the most common. So then how do we possibly train this? Like this feels like an impossible problem. Um, we want to basically train this network that's going to, you know, get these Z's, find a Z for every X. We can never observe the Z's. This seems impossible. What are we going to do? Um, we're going to go back to maximum likelihood, right? If we
+
+134
+00:54:55,000 --> 00:55:50,000
+indeed had a data set of X's and Z's, then we could use maximum likelihood to directly use the same kind of log trick um maximize the log probability. We could use the exact same thing that we previously saw. Um and then train a conditional generative model P of X conditioned on Z, but we don't know Z. But let's pretend we do for a moment. Um so but if but because we don't know Z, we could try to marginalize, right? we know that p of x is equal to like maybe there's some joint distribution of x and
+
+135
+00:55:23,000 --> 00:56:17,000
+z um that must exist even though we can't observe it. Um and then in principle you could integrate out the z to marginalize over it to get a p of x. Um and then maybe we could do like pretend there's a joint distribution x and z marginalize out the z somehow and still do maximum likelihood. Um you know maybe let's see how this works. So this term in and and then here we've also used the chain rule to break up that P of X given Z into that that joint probability P of X and Z into P of X
+
+136
+00:55:49,000 --> 00:56:36,000
+given Z and just P of Z. So um this P of X given Z that's okay. Um we could compute that with our with our decoder here on the left. That's a neural network that we're hoping to train. Um this P of Z term is okay. We're going to assume that that's a unit gausian or some other simple distribution that we can compute or reason about. Um but this integral kills us, right? In in general, we have no feasible way to integrate over the full space of a neural network's input. Right? This um this p
+
+137
+00:56:13,000 --> 00:56:54,000
+of x given z is going to be some very complicated function that's modeled by a neural network. There's no going to be no way that we can analytically or or exactly integrate this. You can train neural networks for individual parts here. Right? So the whole underlying notion here whenever you're doing this probabistic modeling is like we're going to write down some probabilistic terms. Um hopefully some of them are going to be simple distributions that we can write down analytically and reason
+
+138
+00:56:34,000 --> 00:57:20,000
+about. um some of them are going to be learned neural network components. So we're kind of assuming that probability of X given Z is going to be some neural network that we could that we could in principle learn via maximum likelihood. Um but we don't we but we're trying to write down what objective could we use to learn that neural network via maximum likelihood. Um and we're out of luck here because you can't you have no way to integrate over Z. Um you could try to approximate that integral via some like
+
+139
+00:56:56,000 --> 00:57:45,000
+finite sampling. Um, but in general that's probably not going to work very well because this Z is a super high dimensional space and trying to like do a do an approx do doing a an approximate numerical integral in the inner loop of your training is not going to be very a very good idea. Um, so we could try something else. Uh, baze rule. That's the other thing we always do in probability. So let's try basu. Um, if we have basu we have another formula that we can use to write down p of x,
+
+140
+00:57:20,000 --> 00:58:13,000
+right? So p of x we can write down in baze rule. Um, using using baze rule in this equation on the screen. Um let's see what we can do with these terms. So this one okay P of X given Z again we can compute that with our decoder. P of Z again okay this one's um we assume this is Gausian so we can compute something with it. Um there's no integrals here that's good. So we're we're in good shape. Uh but now we're out of luck. This P of Z given X term um this posterior of Z given X. Uh we have
+
+141
+00:57:47,000 --> 00:58:39,000
+no good way to compute this. Um in order to compute this term you would also need some kind of integral. Out of luck we can't compute it. What are we going to do? Okay, let's use another neural network. So the variational autoenccoder trick is like let's there's that trolistic term on the bottom here, a b rule that we can't compute. Um let's just slot in another neural network to try to comput it for us. Um so we're going to have another neural network Q with different weights um phi that's
+
+142
+00:58:12,000 --> 00:59:07,000
+going to learn a different conditional distribution prob probability of z given x. And the whole thing is we want this other neural network to try to approximate the the true P of X given Z of the first neural network. And you can't really enforce this in general, but you know, let's put a neural network there and see what we can do. So then if we could somehow have this other neural network that was approximating this term on the bottom that we can't compute. Um then we could go and compute our our likelihood and
+
+143
+00:58:40,000 --> 00:59:32,000
+max and do maximum likelihood and we would all be all be set. Um so that's kind of what we do when training a variational autoenccoder. We're basically going to jointly learn two different neural networks. One is the decoder which inputs the latent code Z and outputs a distribution over the data X. Um the other is an encoder which is going to input the data X and output a distribution over the latent codes Z. And each of these are going to be separate neural networks that are separately trained with their own
+
+144
+00:59:06,000 --> 00:59:53,000
+independent weights. There's a question you might have which is um how can you possibly output a probability distribution from a neural network? That seems confusing and hard and unclear. Um, so the trick here is we're going to actually force everything to be a normal distribution. Um, and we're going to have the neural network output the parameters of the normal distribution. So typically for the decoder network, we're going to assume that we're going to the output distribution from the
+
+145
+00:59:29,000 --> 01:00:21,000
+decoder is going to be um diagonal gausian where the where the entries in the diagonal are the pixels of the neural network. Um, and the model is going to output the mean of that diagonal gausian distribution. And typically for the decoder we'd assume a fixed um a fixed uh variance or or standard deviation sigma squared. Um now for the encoder network um similar same idea the model's going to input the data sample x and then it's going to output the parameters of a gausian distribution
+
+146
+00:59:55,000 --> 01:00:49,000
+that model the distribution uh q of z given x. Um so in this case the de the encoder network will output one vector which is the the mean of that gausian distribution and another vector which is the diagonal of the coariance of that ve of that of that gausian distribution. Um and here it's very important that we assume the diagonal structure because otherwise we would have to model you know h squ kind of entries in that full coariance matrix right. So here right you have a you imagine an image that's h
+
+147
+01:00:23,000 --> 01:01:10,000
+by w p p p p p p p p p p p p p p p p p p p pixels. Um so that means that the entries in your diagonal matrix are like the right the full you could in principle model the co the full coariance across every pair of pixels in the image but that would require h squ w^ squ entries that would be too big um so instead we'll just ignore any kind of correlation structure among the the the different values um and now that means that the diagonal coariance is now a vector that's the same size as the data
+
+148
+01:00:46,000 --> 01:01:46,000
+itself right so that means this mu of z given x and this sigma of z given x are both vectors of the same shape as z um so we basically treat the neural have the neural network output two vectors of the same shape and then treat them as the parameters of this gausian distribution. So that's how we can output a distribution from a neural network. If you do maximum likelihood on this uh thing with a fixed standard deviation, it actually becomes equivalent to L2. Um and that's a nice trick. Um, and the reason you want to do
+
+149
+01:01:15,000 --> 01:02:00,000
+that is because trying to model the diagonal, like if you want, like you could in principle try to model the same thing on the decoder and try to model the individual like a separate variance of every pixel, but that would be kind of useless. Um, because that would be like if you're not modeling any coarian structure among the pixels, that would basically be saying that each pixel is allowed to like vary a little bit. Um, and the amount that each pixel is allowed to vary kind of depends on the
+
+150
+01:01:38,000 --> 01:02:28,000
+pixel. and then sampling from that distribution would basically amount to um fixing the mean and then adding per pixel independent noise that's scaled by the per pixel variances and that would not be a sensible thing to do. Um so in general like for the decoder you kind of you kind of cheat a little bit um and in you kind of pretend it's outputting a probability distribution but in general we're never going to sample from that distribution. Instead we're always going to output the mean. Does that make
+
+151
+01:02:03,000 --> 01:02:55,000
+sense? Yeah. And then it turns out like if you write this down like the that that that constant sigma square just comes off as a constant in the front. Um and in practice all like maximizing the log likelihood of a gausian distribution with a fixed with a fixed variance along the diagonal um is equivalent to minimizing L2 distance between the mean and the X which is kind of nice. Yeah, good question. Is there some kind of like weird invariance or non-invarian structure here with the pixel shifting?
+
+152
+01:02:29,000 --> 01:03:16,000
+Um that would be that would be more a property of the architecture that you would choose to build the neural network. Um, so you could try to build into your network architecture that's predicting these, you could try to build some invariance or um or equariance properties into the architecture. Um, but yeah, you're right that in general that's not accounted for at the at the loss level here. Okay, so now we've got this idea. We've got an encoder, a decoder, they're both
+
+153
+01:02:54,000 --> 01:03:43,000
+one is inputting X, outputting a distribution over Z. Other is inputting Z, inputting a distribution over X. What's our training objective? Um, and here's the one slide where we're going to do some math. Um but we'll see. So here we're gonna we basically the idea is we want to do um maximum likelihood. That's usually the the single thing that we want. That's like the the guiding principle behind a lot of objectives in generative modeling. Um so we want to maximize log P of log P of X and then we
+
+154
+01:03:18,000 --> 01:04:10,000
+can use B rule to write that as log P of this B rule expression. All right, this is this is an exact equivalence. Um now we're going to do something silly. We're going to multiply the top and bottom of this by our Q of Z given X. Remember, we just introduced another neural network Q out of nowhere that was in that was modeling this other distribution Q of Z given X. And now we're going to multiply that density term on the top and bottom of this uh of this base rule expression. Now we're going to do some logarithm. Um
+
+155
+01:03:44,000 --> 01:04:40,000
+and if you're, you know, have some foresight actually, you know, you'll you'll you'll for some reason decide to rearrange these terms in this particular order. Um and I've colorcoded them so you can later go and track which term went where. Um but we do some logarithms and ar and like break this up into three separate terms. Um now you need to make another magical observation which is that this p of x um actually does not depend on z right like so far this this sequence of three terms this is all an
+
+156
+01:04:12,000 --> 01:05:07,000
+exact equivalence. Um these are all exact equalities. So even though there's a z in this expression um it actually doesn't depend on z because all the z's would cancel out. Um and if you have something that doesn't depend on Z, you can always wrap an expectation um over Z of that thing. So in this case, we know that this is a P of X, we can we can always feel free to wrap an expectation of Z sampled according to any distribution that we want um of P of X. Um and because that internal thing does
+
+157
+01:04:39,000 --> 01:05:34,000
+not depend on Z, this is always true for any for any uh for any distribution that we might choose to to take this expectation over. Okay. So then because because expectation is a linear thing um we can apply that expectation to each of these three terms upstairs. Um and now we have these three terms um each of which looks very mysterious. Um but if you if you kind of you had a lot of intuition about probability you memorize all these formulas that you may have seen in an earlier statistics or probab
+
+158
+01:05:06,000 --> 01:05:58,000
+probability course um maybe you could learn to recognize some of these. So this first one um we're going to carry down as it was before and these second two are actually kale divergence um are actually kale divergence terms. So the kale divergence is a kind of measure of dissimilarity between probability distributions and it just so happens to have this exact definition of these these latter two terms. So we can rewrite this exactly as this first term which is this expectation blah blah blah
+
+159
+01:05:33,000 --> 01:06:25,000
+we'll talk about it. Um and then plus then plus these two other KL terms. Um, so these two KL terms are basically measuring dissimilarity but or or measuring discrepancy or dissimilarity between these different kinds of probability distributions that we have floating around on this slide. Um, and now these all look kind of crazy. Um, but if we stare at each of these terms, we can actually recover a like interpretable structure like an interpretable meaning for each of these three terms. Um, this first one is
+
+160
+01:05:59,000 --> 01:06:53,000
+actually a data reconstruction term. If we walk through what this is saying, this is saying that we're going to sample a Z. And the way we're going to sample the Z is by Q of Z given Q of Z given X which is our encoder. So we're going to take our X pass it to the encoder. The encoder is going to predict a distribution Q of Z given X. Then from that predicted distribution we're going to sample a Z. Then we're going to take an expectation over all such Z and maximize the log probability of X given
+
+161
+01:06:26,000 --> 01:07:27,000
+Z. So this is basically a data reconstruction term. It's saying that if we take an X, a data point X, run it through the encoder to get a distribution over Z, and then pass any sample of that distrib of that predicted distribution over Z into the decoder, we're going to recover X. So this is a kind of data reconstruction term. The middle one is a prior term. This is saying we want to um this is the measuring the KL divergence between Q of Z given X and P of Z. So remember Q of Z given X this is the encoder is inputting
+
+162
+01:06:56,000 --> 01:07:52,000
+the data X and outputting a distribution over the latent space Z. Um so this is the predicted distribution over the latent space of the encoder and this other term P of Z this is the prior this is the prior that we assumed for the latent space usually diagonal gausian. So this term is basically saying um the model is separately predicting is sort of predicting distributions of Z given X and we want those predicted distributions to match the simple Gausian prior that we had previously set um that we' previously chosen. So this
+
+163
+01:07:24,000 --> 01:08:26,000
+is just measuring how much does that latent space that's learned by our model match the prior and this third term gets us in trouble. So this third term is um Q of Z given X. So that's the predicted distribution over Z given the input data X to the encoder. Um, and how much does that match P of Z given X. So that's this uh this flipped around distribution of what the decoder is modeling. And this one we're out of luck. We cannot compute this term cuz remember what got us into trouble in the first place was
+
+164
+01:07:55,000 --> 01:08:46,000
+this P of Z given X. The whole reason we introduced Q was to was because we couldn't intro we could not compute this P this P of Z given X. Um, so now what do we do? We're going to throw it away because we know that kale divergences are always greater than equal to zero. So we know that this last term because it's a kale divergence of two distributions even though we cannot compute those distributions in general, we know that it must be greater than zero because that's a that's a
+
+165
+01:08:20,000 --> 01:09:16,000
+well-known property of kale divergences. So we can throw it away um and get a lower bound to the true probability. So if we throw away that last term then we know that log p of x um is greater than or equal to those two terms our reconstruction term and our prior term. So this will be the loss that we use to train our our variational autoenccoder. Um and the idea is that this is an approximation to the true log likelihood. This is this is a lower bound to the log likelihood. So if we maximize the lower bound hopefully that
+
+166
+01:08:49,000 --> 01:09:35,000
+will also maximize the true log likelihood even though we're not doing it exactly. So that's our training objective for variational autoenccoders. So that's kind of the summary. Um, you know, you're going to jointly and trade, you're going to jointly train an encoder Q and a decoder P to maximize this variational lower what's what's called a variational lower bound on the true data log likelihood. Um, and this is also sometimes called the evidence lower bound or elbow. So it's just the elbow
+
+167
+01:09:12,000 --> 01:09:58,000
+when we're going to maximize the elbow. Um, and it has this particular term. We have these encoder network, this decoder network. Um, that's what we do. So then, you know, to kind of walk through what the training procedure looks like more explicitly, we're going to have this neural network in we're going to have this neural network encoder inputs the X outputs the distribution over Z. Um then we're then we're going to apply this KL term to the predicted distribution. Um
+
+168
+01:09:35,000 --> 01:10:24,000
+and in particular because this this is going to force the predicted distribution to be unit gausian. So it's basically going to force it's going to encourage the predicted mean to be zero and the predicted sigma to be diagonal ones to be all ones. Then once we get to those predicted distribution from the encoder, we're going to sample from that predicted distribution using this so-called reparameterization trick that allows allows you to back prop through this. Then we draw a sample Z from the
+
+169
+01:09:59,000 --> 01:10:53,000
+predicted distribution. Once you get the predicted distrib this sample Z, you run it through your decoder to get your um to get your normal distribution predicted by the decoder and then you apply your reconstruction your reconstruction term of the loss to the output of the decoder. So even though this looked like a large scary slides of math, it actually led to like not too crazy of a training objective for this uh for this thing. Um and I think this variational autoenccoder is actually very interesting because these two
+
+170
+01:10:26,000 --> 01:11:16,000
+losses fight against each other in a very interesting way. So the reconstruct because we're basically forcing the model to bottleneck through this um through this latent space Z and these two terms kind of want different things from the latent space. So the reconstruction loss um kind of wants the sigma to be zero and the mux to be a different and unique vector for each uh for each data x. Um because if that were the case then we could perfectly satisfy the reconstruction objective. We would
+
+171
+01:10:51,000 --> 01:11:38,000
+have a separate a separate separate unique vector for every data point. Um and there would be no probability in there. We could perfectly reconstruct everything. So that's kind of what the reconstruction loss wants. But the prior loss actually wants the sigas to be all one because it wants it wants it to be unit gausian and it wants all the mues to be zero. Um which is very different what the two losses want. So in the process of training a VAE, you're asking these two losses to fight against each
+
+172
+01:11:15,000 --> 01:12:09,000
+other to try to find some equilibrium between um reconstructing your data well and forcing your latent space to be close to your prior. And then once you've trained it, then you can sample Z from your prior, run through the decoder and get a sample. Um, another nice thing is that because your latent space was diagonal gausian, there's also a notion of of um uh uh statistical independence across the different the different entries in your latent space Z. So you can vary them separately. Um and maybe
+
+173
+01:11:42,000 --> 01:12:33,000
+those separate dimensions often encode something useful or interpretable or orthogonal about your data. So in this case we took a VAE trained it on a data set of handwritten digits and you kind of see that as we vary two dimensions of the latent space the the digits kind of smoothly morph from one kind of category into another and this is a pretty common property of VAEs. So that's basically it for today. Um to kind of recap what we talked about we talked about supervised versus unsupervised learning. We t
+
+174
+01:12:08,000 --> 01:12:45,000
+talked about these three different flavors of generative modeling. Um and then we talked about one branch of this family tree of generative models. Um so then next time we're going to uh come back and talk about the other half of the family tree of generative models in particular talking about generative adversarial networks and diffusion models.
+

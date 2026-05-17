@@ -1,0 +1,93 @@
+MIT 6.S191: Introduction to Deep Learning (Main Playlist)
+========================================================================
+
+Course Information:
+- Course: MIT 6.S191 Introduction to Deep Learning
+- Institution: Massachusetts Institute of Technology
+- Instructor: MIT
+- Playlist URL: https://www.youtube.com/playlist?list=PLUl4u3cNGP63URZnh5iqBzDTDYPUTQT-8
+- Total Lectures: 24
+- Total Tutorials: 1 (PyTorch)
+- Total Duration: ~30+ hours
+
+Lecture List:
+-------------
+01. Introduction to Deep Learning
+02. How to Train a Neural Net
+03. Approximation Theory
+04. Architectures Grids
+05. Architectures Graphs
+06. Generalization Theory
+07. Scaling Rules for Optimization
+08. Architectures Transformers
+09. Hacker's Guide to Deep Learning
+10. Architectures Memory
+11. Representation Learning Reconstruction-Based
+12. Representation Learning Similarity-Based
+13. Representation Learning Theory
+14. Generative Models Basics
+15. Generative Models Representation Learning Meets Generative Modeling
+16. Generative Models Conditional Models
+17. Generalization Out-of-Distribution (OOD)
+18. Transfer Learning Models
+19. Transfer Learning Data
+20. Scaling Laws
+21. Language Models
+22. [Missing from playlist]
+23. Metrized Deep Learning
+24. Inference Methods for Deep Learning
+
+Tutorials (1):
+-----------
+T01. PyTorch Tutorial
+
+Topics Covered:
+--------------
+- Deep Learning Fundamentals
+- Neural Network Training
+- Approximation Theory
+- Neural Network Architectures (Grids, Graphs, Transformers, Memory)
+- Generalization Theory and OOD Detection
+- Optimization Scaling Rules
+- Representation Learning (Reconstruction-Based, Similarity-Based)
+- Generative Models (Basics, Conditional, Representation Learning)
+- Transfer Learning (Models, Data)
+- Scaling Laws
+- Language Models
+- Metrized Deep Learning
+- Inference Methods
+- PyTorch Framework
+
+File Naming Convention:
+----------------------
+MIT_DL_LXX_T_Topic.srt  (Lectures)
+MIT_DL_TXY_T_Topic.srt  (Tutorials)
+
+Where:
+- XX: Lecture number (01-24)
+- XY: Tutorial number (01-01)
+- T: Type indicator (I = Lecture/Tutorial)
+- Topic: Brief description of lecture content
+
+Transcripts Source:
+------------------
+NoteGPT (30-second interval transcripts with timestamps)
+
+Course Structure:
+----------------
+This is the MAIN MIT 6.S191 playlist with comprehensive coverage:
+- 24 lectures (vs 11 in dl_alt)
+- 1 tutorial
+- More advanced topics
+- Comprehensive deep learning curriculum
+
+Processing Status:
+----------------
+[ ] Upload transcripts (completed)
+[ ] Rename transcripts (completed)
+[ ] Process video chunks
+[ ] Generate embeddings
+[ ] Create FAISS index
+[ ] Test multi-modal queries
+
+Last Updated: 2026-05-17

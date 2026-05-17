@@ -1,0 +1,380 @@
+1
+00:00:06,000 --> 00:01:26,000
+Welcome to the last lecture of the quarter for CS231N. And it was great to see you guys uh at the beginning and now at the end. And this lecture is a little bit of a departure. We're not going to teach any new materials in terms of algorithms. It's more a talk that I'd like to give to students to put a perspective both on um um on a a more longer term research evolution but as well as a another dimension that is important to today's AI which we would call it the human perspective. So um for the completeness
+
+2
+00:00:46,000 --> 00:02:06,000
+of the material there's a little bit of a overlap uh that you might see from other parts of this course but uh hopefully you it it makes sense in a in a fuller in a fuller way. So the title of this slide or this lecture is what we see and what we value AI with a human perspective. And I know that some of you have already heard about this is really the beginning the origin of vision both in terms of evolution as well as in terms of our technology. And we did talk about um the first light that came to
+
+3
+00:01:25,000 --> 00:03:04,000
+the animal world back in back 540 million years ago. And uh that was when uh animals or trilobytes to be specific developed uh a photo a photosensitive cells to glean what the outer world is about. And according to zoologologists like Andrew Parker, um what happened is that because of this um uh first the onsite of vision, uh it set off an evolutionary arms race where animals either evolved or died. And that arms race gave rise to the speciation or explosive speciation of animals which now zoologologists call the Cambrian
+
+4
+00:02:15,000 --> 00:03:50,000
+explo explosion or the big ban of evolution. And of course um you wouldn't be surprised that vision is still to this day a primary sensory intelligent system in many many animals. Not all animals use vision. uh admittedly but many do and that's uh also one of the primary sensory systems for uh humans and uh we use vision to um to you know do everything from survival to work to entertainment to socialization to learning development and many other things. So that's the the the recapture or summary of evolution. And
+
+5
+00:03:02,000 --> 00:04:26,000
+we also uh briefly talked about um computer vision being a summer vision project back in the 1960s as an attempt to use a couple of undergrads to construct the significant portion of the visual system. And that was very in line with the history of AI where we tend to um have clarity of the northstar but underestimate how long it would take. We are still probably experiencing that today. But a lot has happened, right? Like um you don't need me to tell you that from empowering self-driving car to
+
+6
+00:03:44,000 --> 00:05:12,000
+understanding images to the generative AI uh revolution, we're seeing vision is uh playing a huge role and and also in many parts leading the wave. So maybe it's time to just take a different look at this both historically and going towards the future is where have we come from and where are we going and this is an important uh topic to to uh discuss because a lot of what has happened will inform what will happen. Uh so I'm organizing this talk in three chunks is um first of all building AI to see what
+
+7
+00:04:28,000 --> 00:05:37,000
+humans see and that's where we came from that we were so inspired by human capability that we want to m make machines that do the same and then we'll talk about building AI to see what humans don't see and then we'll finish with building AI to see what humans would like to see. Uh let's just start with the first one. Building a to see what humans see. Again, just a little bit of a review. Humans are so good at seeing. We know this. This is a very half a century old um uh experiment
+
+8
+00:05:02,000 --> 00:06:19,000
+showing us that even watching a video you've never watched played at 10 hertz, which means every frame is only about a on the screen for 100 milliseconds. You've never seen that. It's still no problem for human eyes to detect a target. In this case, a person in a in a in this complex scene where you have no idea a prior knowledge about what this person is. It really underscores the sup s uh superb ability of human visual understanding especially object focused understanding. We also
+
+9
+00:05:40,000 --> 00:07:12,000
+have briefly mentioned that around the turn of the century uh neurosych uh neurohysiologists are measuring the speed of light uh speed of vision in terms of uh humans seeing complex objects in um in in in the form of brain signals, brain electrical signals measured from EG caps. And we see that differentiating or categorizing animals versus animals is a very complex task. Yet humans are capable of doing that at 150 millisecond after the onset of the stimuli. And this is remarkable speed given the the wetwware we have between
+
+10
+00:06:26,000 --> 00:07:54,000
+our under our skulls. Also neuroysiologists have taught us that uh objects is a very important functionality in our visual intelligence in humans. So important that there are neuro cororlates in our brain areas that are dedicated to object understanding such as face areas or place areas or body parts areas. This shows that evolution has really spent time to hone in our visual intelligence skills when it comes to object recognition. So all this built up the history for the field of computer vision
+
+11
+00:07:10,000 --> 00:08:30,000
+that a few decades ago object recognition became a fundamental building block for visual intelligence and we want to empower machines with that. And in order to do that, we define the problem or at least the original problem as given an image, how do we empower enable a computer to call out the objects or what what the uh what the object is in the image. That's such an effortless task for humans. But if you think about it now that you've learned enough computer vision to know that mathematically there's infinite
+
+12
+00:07:50,000 --> 00:09:18,000
+possibilities to um to actually uh recognize any object because of different lighting, texture, background, occlusion, uh viewing angle, scaling and and you know whatever you name it. So this is actually fundamentally a a difficult tasks difficult task. Um the history pre-deep learning is also very interesting. There were some pretty heroic attempts at solving the problem of generic generalizable object recognition and the first wave of attempt was actually very inspired by psychology itself. We self-introspect
+
+13
+00:08:34,000 --> 00:10:04,000
+sometimes uh sometimes even to the detriment of over self-introspection. We think that humans compose parts, right? Like we look at objects, we can see geometric parts and then we can compose them into different objects. And that idea of using pre-desated parts or shapes and to you know compose them in specific ways was the first wave of object recognition. So these are different um work or models coming from the 70s, 80s or even going all the way to 90s of using different parts and configurations to recognize objects. Of
+
+14
+00:09:20,000 --> 00:10:34,000
+course, it didn't really work. It's mathematically beautiful and simple, but it didn't work. So a second wave of object recognition pre-deep learning was actually a really important um uh era in in the field of AI is really the beginning of machine learning statistical m machine learning. It was the marriage between computer programming and statistical modeling. And with that marriage, we start to re realize the world is so complex. These problems, this intelligence problems, whether it's visual intelligence or
+
+15
+00:09:57,000 --> 00:11:13,000
+language intelligence or other kind of intelligence, uh in order to generalize, we need to learn um learn the parameters. It's very hard to use hand-tuned models to to um to uh um you know get good good uh learning. We now know we need data even though we didn't at that time know how much data but we also know that we need to uh design or architect statistical models so that they have the capability of learning through different uh through different learning rules. And because of that we
+
+16
+00:10:34,000 --> 00:11:58,000
+saw a blossoming of models in that era where we're learning you know random fields or base nets or support vector machines and all that. Um and in fact a lot of progress was made um by the time we are in the first decade of 21st century in object recognition that we even have international benchmarks of a small number of object classes to encourage everybody to um to to to compare their algorithms. So we're inching together. The last unlock for object recognition as we have learned again goes back to cognitive science. So
+
+17
+00:11:16,000 --> 00:12:35,000
+this particular psychologist Irv Beerman had long conjectured that humans can recognize a huge number of objects and this is intuitive for our common knowledge. But he actually put a number on it. I I personally call it the Beerman number which is that by you know age six or seven children he conjectured were able to recognize about 30,000 to 100,000 different visual categories and he used this where did he come up with this number is a combination of looking at dictionary the number of nouns as
+
+18
+00:11:56,000 --> 00:13:16,000
+well as visual studies of how kids uh recognize different uh uh objects But it's a number that's pretty daunting and pretty sobering for the field of computer vision because up till now this is middle of the first decade of 21st century we were working with tiny number of object categories and a tiny number of uh images to work with compared to what humans experience. And this was as you know the onset of the uh the the motivation for image net project which um took this beerman number really
+
+19
+00:12:36,000 --> 00:13:59,000
+seriously and um constructed uh we constructed this data set that is on par with what the psychologist beamman conjectured which is around 22,000 object classes over 15 million images and of course that's the beginning that you start to come into this uh class is that because of the large data provided by imageet we start to see that powerful algorithms like neuronet network at the beginning it was convolutional neuronet network of course now we use transformers and all that uh start to really show their power through big data
+
+20
+00:13:17,000 --> 00:14:29,000
+and uh and I'm this is a generic uh slide for those of those people who didn't learn about this, I'm going to skip this because you all know this. So the the the the quick history is as soon as we have imageet, as soon as we use convolutional neuronet network a few years after the uh beginning of imageet, we saw this door blasted open in terms of uh uh solving the problem of object recognition. Now we have algorithms that we can take to look at any picture in the world and be able to recognize
+
+21
+00:13:53,000 --> 00:15:11,000
+objects in the big or small and and in any kind of you know orientation. It's not is it 100% soft? No. There's always longtail problems we can solve. But as far as industrial application goes, this has come a long way and really has been um a a a matured problem. And of course all of you know and all this came at the convergence point which is the year 2012 where the image that challenge provided the data for the convolutional neuronet network and they used two GPUs at that time and the three ingredients come
+
+22
+00:14:32,000 --> 00:15:47,000
+together and brought uh brought the moment of uh deep learning um uh the birth of deep learning and uh in this class we also talked a little bit about different various architectures that image net challenge engendered u throughout the past uh decade or so in terms of you know convolutional neuronet network or restnet and and so on. So that's um that's um you know that's the beginning really about deep learning revolution. And of course, in terms of the quest for visual intelligence, we're
+
+23
+00:15:10,000 --> 00:16:22,000
+not going to stop at just being able to label objects in a scene. For example, in this two scenes, right? If you just label objects, you'll think it's just a llama and a person. But if I show you the second scene with the llama and a person, the story is completely different. Even though you have the same object, you have very different relationship. So, cognitive scientist once again was a head of computer scientist uh and and inspired us to think about um visual intelligence beyond just naming objects or
+
+24
+00:15:46,000 --> 00:17:06,000
+categorizing objects. In this particular paper, Jeremy Wolf, who is a pretty prominent uh psychologist um wrote this beautiful paper that called out that relationships between objects must be coded as part of our understanding of complex natural things. And inspired by that work, the field of computer vision start to look at how do we uh understand relationships. And this is uh early work. You guys got a lecture from Renjay and uh uh last week or or yeah last week this is was his PhD thesis looking at
+
+25
+00:16:26,000 --> 00:17:43,000
+learning object relationships using scene graph as a representation. In this case, scene graph is defined by these entity nodes that are objects and their relationships are uh defined by the connectivity between the nodes or sometimes they have attribute relationships that defines the the particular objects. And even a scene as simple as this with mostly just two people, you know, um, one feeding a cake to the other, you can form a very dense scene gra scene graph because of the richness of the visual scene. And this
+
+26
+00:17:04,000 --> 00:18:28,000
+was Ren's thesis after the the the image that object recognition um era where we try to we build a data set uh uh called visual genome where we try to uh put together object relationships object uh and also story descriptions. And uh one of the work that Ranj did I thought that was really fun was zero shot learning of unusual uh object relationships. For example, it's not unusual to see person riding a horse. It's not unusual to see person wearing a hat, but it's unusual in general to see horse wearing hat. And
+
+27
+00:17:47,000 --> 00:18:54,000
+in the era of big data training, it's hard to get this kind of data repeatedly because you just don't have too many of that. But using this compositional scene graph representation, we're able to learn the more common relationships and then derive uncommon relationships um in that representation. And again this is another um example of zero shot learning where you know person sitting on chair and and fire hydrant on the lawn or on the field are all common relationships but person sitting on fire hydrant is
+
+28
+00:18:21,000 --> 00:19:46,000
+the one that would not you know it's hard to get data and we're able to do that uh uh to make that happen and this is just a figure from the paper that shows that wrenches work at that time achieved state-of-the-art recognition rate compared to many other um uh methods. But relationship is not enough, right? The ability to actually tell a story that is a lot more richer or also using natural language is actually um the next big goal. So around the year 2014 201 around 2014 we start working on that
+
+29
+00:19:04,000 --> 00:20:23,000
+problem. And think about it. That's just two years after the image that uh Alex that moment. But the field was starting to evolve so fast. We're so inspired by um by what we can do using uh a combination of u convolutional neuronet network as well as a a uh um a language model called LSTM. And this is the thesis by Andre Kapathy that uh we were one of the first uh teams that um showed how to do image captioning or storytelling as well as dense captioning which is also part of the work that
+
+30
+00:19:43,000 --> 00:21:04,000
+Justin Johnson did and and I know he's he's one of the co-hurs of this course and that was around the time between 2015 to 2018 a lot of work has happened um to to solve the problem. Of course, today using a multimodal LLMs, we have taken the solution of this problem even to another uh another notch. But this is the beginning of that line of work and uh uh frankly I myself as a computer vision scientist who entered the field at the beginning of the century was very surprised by how fast uh our field was
+
+31
+00:20:23,000 --> 00:21:46,000
+able to solve this problem. as soon as we've got data as well as neuronet network algorithms. But a much harder problem is actually in dynamic scenes. In dynamic scenes, we uh we tend to have much more complex relationships, much more complex uh movements and the camera also the camera uh movement or or the the the um the entity the actors within the scene can do a lot of different things. So in this work that a collaboration with Isan and um a bunch of students in our lab uh we call it multiobject multi- actor
+
+32
+00:21:05,000 --> 00:22:23,000
+activity understanding. This is a much newer work. We only published this a couple of years ago. uh to capture the relationship between these actors and their activities in dynamic scene is still I would say an unsolved problem and this will have profound implication you know that you're in Silicon Valley so you you're hearing so much um um um excitement of robots for example if we ever dream to have everyday robots that work amongst us robots costly to solve solve this problem. Understand how
+
+33
+00:21:44,000 --> 00:23:01,000
+complex the scene is, what people are doing, who is doing what, what is next and this is an unsolved problem. Um so also you know in addition to what I have shown you you you have learned a little bit in this class and and and related computer vision problem uh but not we didn't have time to elaborate for example 3D computer vision or human pose understanding and of course generative uh AI and generative models. So this is just to show you that the field of computer vision uh since the rebirth of
+
+34
+00:22:22,000 --> 00:23:47,000
+modern AI has been just moving extraordinarily fast. But the take-home message in this section for me is that um two things. One is that data compute and neuronet network algorithm truly have converged about 10 years ago or 13 years ago and that was the moment that modern AI or deep learning revolution has happened. But the history of that and so much of the problem that we have been working on is truly inspired by cognitive science and psychology and neuroscience. And that to me is a um is going to continue
+
+35
+00:23:04,000 --> 00:24:19,000
+to to uh happen is that we will continue to be inspired by what the brain can do or how the brain does things and also we'll continue to use AI to help our brain brain research. So there is a very intimate relationship between today's AI and cognitive science, neuroscience, brain science and all that. So that's uh that's the first section and of course a lot of people students and and collaborators have contributed to what I have just presented. Now let's talk about going beyond just
+
+36
+00:23:42,000 --> 00:25:10,000
+building AI to see what humans don't see. This is where pushing AI beyond the capability of humans or you can call it superhumans. For example, most people don't recognize a ton of dinosaurs. You can probably name a few. Some kids really can name a lot. Well, let alone thousands and tens of thousands of bird species or tens of thousands of car categories. So, this is the the the line of work that I call fine grained object categorization. humans are just not that good at it. And um this is still a
+
+37
+00:24:27,000 --> 00:25:57,000
+problem that I don't think we're fully solved yet to be honest. Um uh in this generative AI era especially we're talking a lot about multimodal LLMs. this problem has somewhat be um neglected or or it just is not a mainstream problem but it really will you know still will come and and play a important role. So in this early work of fine grain bird species recognition, we put together you know a data set actually we used a data set of 4,000 birds and as you can see as we go down the tree of the species the uh the um
+
+38
+00:25:10,000 --> 00:26:49,000
+the the eras actually as we go up the species as we have generalizable um more general names the error decreases but which means it's a convoluted way of saying by the time you're in the fine grained uh um um level we still make a lot of errors the the algorithm are still not totally u totally u u ready um another work that I find fascinating is that a few years ago a group of students uh and and in my lab um train a fine grained car classifier in terms of mod u make model and year. It turns out after
+
+39
+00:26:00,000 --> 00:27:35,000
+1970s there are thousands of car make car models that are defined by different make, model and year. And then you can tea take we took um Google Street View images from 200 or 100 I think major cities across the country and then we use the uh fine grain car detectors to detect what are the cars on the street of these uh cities and we use it as a lens to study social uh patterns. For example, um what is the pattern here? I showed education patterns. You know, car models and education patterns are highly
+
+40
+00:26:47,000 --> 00:28:10,000
+correlated or uh or uh income patterns highly correlated. In that paper, we show voting patterns highly correlate uh correlated or even environmental, you know, patterns highly correlated. So it's a really interesting way of using computer vision as a lens to study our society and no human no individual human not even a collection of humans uh can do this easily at all. So so AI is really pushing the boundary of what uh humans can see. Um to drive home this idea let's do a couple of tests. Humans are actually
+
+41
+00:27:30,000 --> 00:28:50,000
+have our limitations, right? I just talked about celebrating humans ability of seeing, but we also have our limitation. This is a very famous uh uh visual illusion test called Stroop test. And the idea is that you all can read the words, but if you if I ask you to read the color of the word as fast as possible going from right, left to right and top to down, you find it's it's not that easy, right? Try to read it like red, yellow, green, purple, blue, black, orange. It it it's it's it it's fighting with you. This is
+
+42
+00:28:10,000 --> 00:29:25,000
+the fight between visual attention and and all that. Here's another example. Um, there are two alternating images of the of the uh picture and there's one change, a pretty big change that's happening between the two alternating pictures. I don't know if you spot the change. Do you spot it? >> The engine. >> Yes, it's the engine, right? So, it takes a while to to spot it. So, this is a very famous psychology uh experiment called change blindness. Now all this is fun. Stroop test is fun. This is fun.
+
+43
+00:28:47,000 --> 00:30:12,000
+But this is not fun. That human attention is limited. And in some situations in our work and life, that kind of attention limit can be dire. For example, medical errors are the third leading cause of death in in America's health care system. And of course leaving this pair of scissors in the body of the patient is kind of the iconic image of medical errors. But there are so many medical errors, pharmaceutical errors, there's uh you know um procedure errors, clerical errors, u diagnostic errors. So so one
+
+44
+00:29:30,000 --> 00:30:58,000
+has to be very careful. For example, in surgery rooms, um, honestly, scissors don't get left in the bodies typically, but much smaller, uh, things like suture needles or a piece of gauze and all that. So, we uh, and today most of this is still just track by hands, right? Like we have these checklist to to uh to to track in the surgery rooms. If something is missing, the surgery has to be paused. On average, that pause is close to an hour. And think about the danger for the patient, the exposure to bacteria and
+
+45
+00:30:14,000 --> 00:31:38,000
+the bleeding and all that just because we have to search for that item. So if there is a way to use AI to help our PA uh our uh doctors surgeons to track item that would be so powerful and this is just a demo this is not a deploy system were not there in terms of fidelity but this is a demo to show that we can use AI to count in this case goss you know uh and and all that and um and this is just an example of pushing AI to see what humans don't see. Here's another example um that is really fun. I don't
+
+46
+00:30:56,000 --> 00:32:19,000
+know if I showed this before, but this is one of my favorite visual illusions where I'm just giving you the answer. If if you look at the two square A and B on a checkerboard on the top, it is so hard to believe they have the same grayscale or luminance. And then you look at the bottom, you're like, "Ah, of course they do." But why? Even though you have the bottom picture in front of you, seeing the top is still gives you the illusion. Why? Because evolution has pre-wired us in in conjecturing or understanding our
+
+47
+00:31:37,000 --> 00:33:03,000
+world in its common way with the common physics of the shape of objects, lighting source, how shadows are made and all that. This is this is so deep in our evolution in our visual development that it's hard for us to see see it another way. So what I'm trying to get at is there's bias in our visual in our human visual system. The bias might come from evolutionary construct. The bias can come from our social um uh experience. The bias can come from the data we're exposed to. But some of these
+
+48
+00:32:21,000 --> 00:33:45,000
+biases can be harmful. Right? when the bias happens that became unfair uh to a group of people a community and we have to be aware of this. A few years ago face recognition algorithm was not good and and it tends to recognize uh certain skin color and and even gender better than others and it has consequences. Think about self-driving car think about you know um many other uh medical use cases. So um so we have to be vigilant about this. Um I do believe that um AI bias has been a problem that people
+
+49
+00:33:03,000 --> 00:34:26,000
+now are carrying. You know a few years ago this problem was so new that many people are not even paying attention. But fast forward to 2025. I'm not saying we have solved this problem. But I'm personally a lot happier to see that so many people are paying attention to this. Not only just in academia but also in industry. And then there's another kind of not seeing and this is interesting. Sometimes not seeing is exactly what we want because you want to respect privacy. So how do you create AI that helps people
+
+50
+00:33:44,000 --> 00:35:03,000
+to see yet you still want it not to see what people don't want you to see? This is a very deep. It's a technical problem as well as a human problem. So from a technical point of view, there are many ways to consider ML machine learning privacy. I'm just listing here from a visual approach point of view a few years ago. Our lab wrote this paper about um using smart cameras in patient rooms or patient homes to help doctors to see better. uh but even there we have to recognize issues like faces or just
+
+51
+00:34:23,000 --> 00:35:34,000
+full body information and and even homes and this is a list of potential solutions. For example, you can do blurring or you can do masking, you can do dimensionality reduction, but you can also, you know, try to do uh different approaches for example, federated learning so that you don't send all the data to the server or encryption and and other things. So, I'm not going to belabor this, but there's one work I want to show you. It's not even my work, but I really like this work. And um it's
+
+52
+00:34:58,000 --> 00:36:22,000
+a work about taking videos of people and try to recognize the action of people but yet respecting the privacy of people. How do you do that? Right? For example, in this case um you want to take a video of this kid uh moving in the scene. Um there are ways to do this. If you blur this you or defocus this or do some of these it kind of yeah you can you can provide uh you can protect privacy but you also lose enough information that you might not even know what this person is doing and for many applications the whole goal is to know
+
+53
+00:35:41,000 --> 00:37:09,000
+what this person is doing. So in this particular work uh led by Hong Koen's students they actually did a combination of hardware and software approach where they handcrafted a lens that is actually um that that that actually filters uh visual data in a particular way. so particular that if you look at the top row, the lens, what the lens captures into the camera protects the privacy a lot. You don't see the person's face, you don't see the body and so on. But because it's a lens that's particularly
+
+54
+00:36:25,000 --> 00:37:39,000
+designed in connection with a piece of software, it can help to back out the movement information or the the the human activity information without backing out face information. So that's a really interesting approach. That's a hybrid between hardware and software aiming towards important applications that you want to see people to protect them but you don't want to see too much because you want to respect privacy. So that's that's a work I really like. I really like the spirit of that work. So
+
+55
+00:37:02,000 --> 00:38:14,000
+okay. So in this part of the lecture I shared with you a number of things just considerations of building AI to see what humans don't see. Sometimes we're pushing AI like fine grain recognition of birds to go beyond human ability. Those are superhuman ability. Sometimes we know humans are not good. We have bias or we have attention issues and then we want to use AI to help us. And then sometimes we generally have situations we don't want anyone to see. And then how do you use AI to continue
+
+56
+00:37:38,000 --> 00:39:04,000
+to help without violating those privacy concerns. So you can see that AI is a very interesting powerful tool. It can both help but amplify us. And if we have bias, if we have issues, AI can amplify us too. So when we build AI, it is so important not only to take that technology perspective but also to take the human perspective to commit to study, forecast and guide AI to understand its human impact and and respect human values. So that's that's the second message take-home message and again a number of collab collaborators
+
+57
+00:38:20,000 --> 00:39:47,000
+and students participated in this work. Okay, now let's talk about building AI to see what human want to see. And in fact, we're going to go beyond seeing. We're going to connect seeing and doing together. So if you think about today's societal anxiety about AI, one of the biggest anxiety is labor. Uh a lot of headline news will say labor is under threat. robots taking over jobs. The truth is the the the picture is complex. You know, denying job change is wrong. Every technological shift in
+
+58
+00:39:04,000 --> 00:40:33,000
+humans history has caused labor market change. And some of them are very painful. Some of them can lead to even civil wars and wars. Um but so but but also that change sometimes is inevitable and uh a tiny digression a lot of the labor threat rhetoric that we have been hearing think about physical labors but today in the past two years if you look at genai's impact is white collar u jobs that are drastically uh being impacted especially software engineer engineering and uh and uh analytical work in in
+
+59
+00:39:49,000 --> 00:41:08,000
+offices. So, so there's just definitely uh labor change, but in the meantime, we also need to recognize that AI also can be helpful. We actually fundamentally have human labor shortages in many situations, especially in elderly care as well as health care. First of all, as modern medicine improves, uh, human life expectancy increases and that just inevitably pushes the society towards um, uh, longer living and that's a good thing. But in the meantime, we have shortages of labors. Young people
+
+60
+00:40:29,000 --> 00:41:48,000
+need to work and that's how to make this uh, society uh, vibrant, economy vibrant. But who is taking care of our elderlys? who are taking care of our chronically ill. Uh even in America's hospital, we have such a attrition of uh health care workers especially nurses um that uh we don't have enough h hands, ears, eyes to to help our patients. So instead of thinking about this word replace, we actually can think about AI augmenting. And you got a glimpse of that in my surgery room example. Indeed,
+
+61
+00:41:08,000 --> 00:42:25,000
+in health care, there's so many spaces in our health care that we don't have enough pairs of eyes. And that's what I call the dark spaces of health care from surgery room to patient room to uh pharmaceutical to homes and and so on. So, how do we make AI help? And this is something that uh Isan has been leading a ton of this work also with Zing. um is that we have been looking at this problem of ambient intelligence for healthcare where we combine smart sensors with machine learning algorithms
+
+62
+00:41:46,000 --> 00:43:10,000
+to glean health critical insights from these situations in healthcare setup so that we can alert the patients or family members or doctors in time to help uh patients and again the fuller paper is in this particular paper we published a couple of years ago. Let me just give you a couple of examples. One example is this hand hygiene project which actually started way before co um and uh hand hygiene turns out to be really important for keeping hospital um infection low. Hospital acquired infection is actually
+
+63
+00:42:29,000 --> 00:43:40,000
+one of the leading causes of American patients fatality in our hospitals. It kills more than three times more people per year than car accidents nationwide. And it is really hard to control. Most of these germs are passed from patient room to patient room and then they they kind of just brew together. So what do we do? The hospitals try to use human auditors but we just talked about we don't even have enough nurses let alone hiring auditors and also this is you cannot hire enough of them. There's
+
+64
+00:43:05,000 --> 00:44:15,000
+human fatigue we just talked about human detention problem. So this is not a pretty prohibitive uh solution. There were some technological solution like RFID, you know, put the badge if the badge or the person wearing the badge is close to the u sink or the hand hygiene uh hand sanitizer dispenser, it gives you the hint that the person or most likely the doctor or the nurses is washing their hands. But that's very non-specific. You cannot guarantee and the hospital rooms are pretty small. Corridors are small and just standing
+
+65
+00:43:40,000 --> 00:44:59,000
+next to something doesn't mean you're doing it. So a few years ago we did this project where we put smart sensors that provides p protects privacy by just only gleaning depth information like the blue screen and the blue uh video there. And then we use vision computer vision algorithm to classify actions. Is the person washing hand or not washing hand? And uh the result is that if you compare ground truth with the uh algorithm output versus human outputs or human um detective detection results, you can see
+
+66
+00:44:19,000 --> 00:45:56,000
+algorithm is so much better and more consistent than than humans. Uh you have to almost show the same video to four humans to get almost as good as AI. And this is just not plausible. If it's one person, you can see how sparse the detection is and that's not good. So this is one application. Another application we uh we worked on is ICUs. ICU is where patients fights life and death. ICU is also where um 1% of US GDP is spent. So making ICU as effective as safely as possible is a top priority.
+
+67
+00:45:07,000 --> 00:46:28,000
+One of the goal well the goal of ICU is to to get our patient safely out of ICU and go into step down units or even go home. So uh one of the most important thing people have learned in ICU is to help patients to move proper movement which we call mobilization. It's actually important for recovery. But this is a very dicey situation. You have to get nurses to help. Doctors have to give orders. You have to move properly and it has to be in different time like designated time and you have to assess the movement and
+
+68
+00:45:48,000 --> 00:46:58,000
+all this is not easy right so we collaborated with Stanford as well as Utah's inter mountain hospital to put these smart sensors in ICU units and help doctors to monitor patient movement in this particular case four different kind of movements getting out of bed getting in bed getting out of chair getting in here. These things are so important for ICU patients. I know that it's for us it's a no-brainer, but this really is uh is is critical and you can see that AI can help to do the kind of
+
+69
+00:46:23,000 --> 00:47:51,000
+detection and prediction that uh that is so helpful for doctors especially when there is a labor shortage. Last but not the least example is aging in place. And this is just so important for you know many many reasons. People uh seniors want to live home independently and healthily. And uh uh remember during the beginning of co when we had so much fatality among the aging um seniors a lot has to do with hospital overrun and and overtaxed hospital system. So putting and keeping seniors safe and well in their homes is really critical
+
+70
+00:47:07,000 --> 00:48:28,000
+and using smart sensors we can help you know early detection of infection especially using thermal cameras or mobility we just talked about in ICU similar here or understanding sleep patterns or understanding dietary patterns all these are realms of possibilities by AI and smart sensors And then last but not least, what if there's still short labor shortage after smart sensors? The thing about smart sensors is that their their information gathering system, but they cannot go there and help to turn a patient or
+
+71
+00:47:48,000 --> 00:49:13,000
+bring water and medicine pills to the p uh elderly. So this brings us to to the last technical topic which is inbody AI or we would call a a large part of inbody AI is robotics and this is where I find it extremely exciting because it closes the loop between perception and action and if you think about the Cambrian explosion of evolution when eyes when there's onset of eyes, animals start to move. So we uh the area of robotics is where we can close the loop between seeing and doing. But it's not
+
+72
+00:48:30,000 --> 00:49:55,000
+easy, right? Robots, as much as we're very excited by them, still are very very slow. They are very very clumsy. It's very hard for them to uh adapt to a generalizable situation. And uh in today's robotic research we we as a field have have made a ton of progress and and Stanford is definitely one of the centers of robotic learning but still most of these work are kind of constrained in their setup are are short horizon tasks like pick and place and it it has you know it it has anecdotal
+
+73
+00:49:12,000 --> 00:50:33,000
+setup and lack of clinical sorry lack lack of standard uh benchmark. So let me just share with you a couple of work in our lab. Uh one work is uh a few years ago we're looking at how to bring robots to the wild. If we have to pre-desate the set of tasks, it's kind of unsatisfying. On the other hand, if you look at today's LLM, it's totally in a while. You can talk about anything. So my student Wong and a few students want to close this gap. So this idea is that um how do we give an open instruction to
+
+74
+00:49:53,000 --> 00:51:26,000
+a robot any instruction without pre-training everything in a in a in a closed world and the robot can do some tasks. So let's say your training set is open a drawer like that. in the wild you have doors like that. So how do you how do you make some uh progress in that problem and uh so the the goal is is is in the wild generalization and here's an a a result um you know or or overall algorithm um I don't know if this is so glitchy but whatever what you're saying is we want to tell this robot arm to open a
+
+75
+00:50:41,000 --> 00:52:16,000
+drawer by planning a motion path that avoids knocking down that flower and all this is all this instruction were not pre-trained. So what we do is actually we borrow uh the latest advances in LLM as well as in visual language model and the idea is that we use LLM and V uh uh LLM to give us a instruction set and then we use visual language model to help us to recognize or understand the environment and then we turn that into a motion planning app so that the robotic arm can execute. And because we're using
+
+76
+00:51:27,000 --> 00:53:01,000
+LLMs as well as VLMs, we don't have to we we are we get rid of the problem of training robot in a closed world and bring them to a more generalizable or in the wild. And the details is the instruction of open top drawer comes in. LLM turns this into like literally codes and then because of these instructions like drawer or handle um the uh we send this information to a VLM model and that model detects drawer and handle in the scene and then because of that it updates its information and then it
+
+77
+00:52:15,000 --> 00:53:26,000
+updates a motion motion map. This is presented by a heat map to show you where the robot arm should focus, where it should not focus. And with that, then you get give it another instruction. But watch out to the uh for the vase. Again, it goes through the same thing with LLM, writes the code or or um generates the code, send it through a VLM model. VLRL model detects the object and then updates the motion planning map. In this case, it's the negative, not the positive because you you want to avoid
+
+78
+00:52:51,000 --> 00:54:19,000
+that. And then combining with the previous map, you get a heat map of knowing where to avoid and where to go. And uh eventually um what we do is we do this for the motion planning map. We do it for rotation to gripper velocity. And then this is the result. Um actually let me just show you this. Um this is the actual result of a of the of the robot. And then we do this for many different tasks, right? We we can do it for articulated object manipulation. We can do it uh um we can you know here just many different examples you know
+
+79
+00:53:34,000 --> 00:55:13,000
+napkins or sweeping the floor. uh what is this getting toast the setting up table um and also dealing with online disturbances and so on. So, so this is one work. Another work I want to just show you um quickly um is that um overall uh robotics um research is still in lacking good benchmark. And while we're still experimenting in the in the labs, we know real world is so much more complex, so much more uncertain, have large variability, is so interactive and social and is has a lot of multitasking task. And then we know
+
+80
+00:54:24,000 --> 00:55:44,000
+that both natural language and computer vision has benefited a lot from setting up important largecale data sets for both training and benchmark. So in our lab we have been working on this project that is towards an ecological robotic learning building an ecological robotic learning environment and a uh and and and try to encourage researchers to benchmark against a large and diverse set of activities. And that's the behavior uh benchmark which is benchmark for everyday household activity in
+
+81
+00:55:04,000 --> 00:56:23,000
+virtual interactive and ecological environments. Now here's a question because this lecture has a lot to do with human values is who is to say which tasks robots should do. I know that every graduate students who are working on robotics just want two task. One is laundry the other one is dishwasher. That's great. Let but moving beyond grasu what are this what are the tasks we should get robots to do for us. So instead of us coming up with this task list we actually did a human- centered
+
+82
+00:55:41,000 --> 00:57:04,000
+survey to ask robots sorry to ask humans that what would you like robots to help you? Let me let me test this. Um would you like a robot to help you to clean the kitchen floor? Say yes or no. Okay, good. Um, normal people would say yes. Shoveling snow. >> Okay. Folding laundry. >> Okay, good. Cooking breakfast. >> See, we're getting mixture answers, right? >> What about opening Christmas gift? >> Right. Exactly. People are different. Like I actually think robot can do this
+
+83
+00:56:25,000 --> 00:57:59,000
+pretty well but we don't want it and there is we even ask one of the task we ask is buying wedding rings. Can you imagine that? Um so so what we did is actually we want to respect human preference. So we took a a bunch of government surveys from uh uh labor office in US and Europe and so on and clan together uh put together thousands of everyday activity tasks and then we went online to find people. We want to be as diverse as possible, but I I think we have room to improve. But we found 1,400 people and to answer these tasks
+
+84
+00:57:12,000 --> 00:58:33,000
+and tell us which task they want robots to help. And then we rank that. And you can see that just like glass students, people want robots to help with cleaning, a lot of cleaning, toilet cleaning, floor cleaning. But people don't want robots to play squash for you or to buy a wedding ring or to even mix baby cereals. There's a lot of tasks that matters to us as humans emotionally or socially or whatever. So we our goal is first we decided we doesn't uh we we have a principled way to uh decide which
+
+85
+00:57:52,000 --> 00:59:21,000
+are the thousand tasks that we want to train robots for and those are the tasks that's humans prefer to get help and um with that in mind we have to actually build a ver uh virtual environments. So we we act we scanned or or or acquired 3D scene from 50 different uh real world environments from restaurants to apartments to to uh grocery stores to to offices and so on. And then we acquired um this number is actually outdated. We require more than 10,000 object assets, 3D assets uh that has a lot of
+
+86
+00:58:37,000 --> 00:59:53,000
+properties whether it's articulation, deformability and all those properties. And then we uh we have to build a simulation environment. A lot of people have built simulation environment. Let me just fast forward. But uh our particular simulation environment was a collaboration with Nvidia's Omniverse group and we were going for building a physically, perceptually and also interactively high quality simulation environment and this you know especially taking account for example physical effects like
+
+87
+00:59:15,000 --> 01:00:40,000
+thermal transparency, deformability and so on. We also tested our uh behavior environment against other environments in terms of perceptual realism for from human user study. And you know here are some of the examples of physical interaction uh such as cloth or or liquids and so on. So there's a lot of nuance that has gone into this work and let me just fast forward and um and these are some benchmark we did compared to other uh other work. Okay, let me just fast forward. Um so this is ongoing work actually in in
+
+88
+00:59:58,000 --> 01:01:39,000
+our lab and because of this we're able to you know uh we are using behavior to help us to learn robotics to help us actually to push us to gather more interesting data and also to to use that for um for even cognitive studies. Let me just fast forward. Um uh one thing I want to share with you is that let me let me just share these numbers is today's algorithms still cannot do behavior tasks. And the of all these roles the top role is what we wish robots can do. Give them no privilege information. they have to be dropped in
+
+89
+01:00:48,000 --> 01:02:06,000
+the environment and do these tasks and we benchmarked three behavior task using today's uh robotic algorithm and the performance is just zero. And once you start to give more priv uh privileged information or make assumptions that make the task simpler like magic motion or some uh you know uh perfect memory and all that things start to get better. So this is this is if you look at it um you know uh only look at the top row you get pretty depressed by today's uh robots but as a grad student I hope
+
+90
+01:01:28,000 --> 01:02:47,000
+you're inspired because that means we have a lot of room to uh to grow. Um okay uh these are just different papers from our lab. I'm going to actually fast forward because I think uh we've talked enough about this. Um uh well uh by the way we're also doing digital twin of behavior in the digital environment as well as in the in the real world environment and that's that's a great way of test uh testing real to sim transfer. Again, this is a unsolved problem and um and uh there's a long way
+
+91
+01:02:07,000 --> 01:03:38,000
+to go. And this is in this particular case, we're showing you that this robot without speeding up. You can see how slow it is is trying to clean up this room. And uh uh you know, okay, hooray. Um this is actually uh some of the mistakes that this robot uh makes in for example it cannot pick up uh the bottle or earlier it just went the wrong way and uh um placed it in the wrong place. So there's still a lot of uh mistakes. Okay, let's uh let me um let me fast forward. Uh we're actually we're also
+
+92
+01:02:52,000 --> 01:04:21,000
+using this environment to study visually impaired patients and this is a great way of uh putting patients in a safe environment to um to to study. Uh, one last thing I want to show you is really super cool and and this is the last um technical work I want to show is that we also now are collaborating with um psychologists and doctors to study how we can use brain waves to control robots. So what you're seeing here is a demo where a grad student I think is wearing this EEG cap and that just is
+
+93
+01:03:36,000 --> 01:05:01,000
+sending instructions and the robotic arm is cooking a Japanese meal purely from thoughts. There's no invasive brain control. This is from electrical signals. What we had to do is to pre-train these thoughts. You have to pre-train the robotic arm with say lift or place or or drop or or whatever. And once you do that, this is an entire meal cooked based on the the wave. This is really sci-fi. And this this has happened last year. So I'm pretty excited by where all this is going. Combining vision and perception and
+
+94
+01:04:19,000 --> 01:05:48,000
+robotics and also, you know, helping helping people in clinical setting. This is really uh the future of this is helping severely paralyzed uh patients. Okay. So, so behavior project is really aimed at augmenting people. It's a large scale and diverse benchmark and it has realistic and ecological you know physics and perception. And this is the last part of what the last take-home message is that we not only want to build AI to just do things or see things. We really want to build it to help people. AI being an augmentation
+
+95
+01:05:03,000 --> 01:05:18,000
+tool or enhancing tool for humanity is very important instead of a tool that replace us.
+

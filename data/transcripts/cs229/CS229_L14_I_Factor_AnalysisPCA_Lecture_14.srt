@@ -1,0 +1,604 @@
+1
+00:00:05,000 --> 00:01:02,000
+thanks yeah I want to go through factor analysis um and continue our tour of em because it puts us in this position where we are going to have uh to make some pretty serious modeling assumptions to make progress and it's going to kind of force us to walk through uh what that looks like in an unsupervised way so that's what the factor analysis piece is we will then cover a little bit of PCA which is an old standby and it's good to contrast these two uh kind of methods together it's kind of the old more uh
+
+2
+00:00:33,000 --> 00:01:26,000
+you know less basian less probabilistic uh standby that people use a lot in unsupervised learning just to give you a sense of where we are in the course um the uh up next for us will be this problem called a which will be great that's going to be in your homework it's always one of people's favorite homework problems this is the cocktail party problem which we'll go through and if we have time I'm not sure we will but if we have time on our current trajectory we'll go through
+
+3
+00:01:00,000 --> 00:01:54,000
+something called weak supervision which is a which is a setup that looks just like em uh this expectation maximization setting except for we can solve the underlying problem exactly so some folks were asking questions last time hey why don't I run method XY or Z on this and there are these Laten problems where actually you can cut to the Chase and exactly solve the to the right answer you don't have to run this kind of back and forth style algorithm and so we'll see that if we have time and and kind of
+
+4
+00:01:27,000 --> 00:02:18,000
+give you a sense of of why that's interesting this is more modern stuff um that we'll we'll talk about all right now uh on to factor analysis this is what we're going to talk about and this is a setting where we have more Dimensions than we have data points now just by way of history when we used to give these lectures about factor analysis it seemed like kind of an odd situation why would you have so many more Dimensions that you that you cared about in your model than you have data
+
+5
+00:01:53,000 --> 00:02:47,000
+points but actually weirdly like if anything in the last couple of years modern machine learning has switched to that being almost the default we tend to train much much larger models as you saw than we have available data and there's a couple of reasons for that they're not the reasons that are in factor analysis just to be clear but this setting is actually a pretty interesting uh one and so we'll see how people addressed it initially right awesome so let's talk about factor analysis factor
+
+6
+00:02:26,000 --> 00:03:41,000
+analysis all right so we have many fewer points data points then dimensions that's the setting that we're in okay and kind of T notation this is n is much less than D okay so it's worth comparing this by the way with GMM and GMM if you remember we had only a couple of parameters right we had the source centers we had the source variances and we had the fre and we had the kind of fraction that were in each Source but we assumed implicitly we had a ton of photons if you remember from all of the different uh things that were
+
+7
+00:03:09,000 --> 00:04:02,000
+going on from all the different sources and so n was much much greater than D okay and that was kind of implicit in what we were doing but it's worth calling out um and the reason is is we would we would average over some sources and we didn't have to worry about a couple of problems which we'll highlight in this lecture okay all right so let me give you an example of how this happens because you know at first you may look at that and say like well is that really kind of realistic and even though I tell you it's kind of
+
+8
+00:03:35,000 --> 00:04:45,000
+become the default setting it's good to have something kind of concretely in mind so what's one way that this happens so one example which is you know actually Stanford based is that we could place sensors all over campus okay all over campus and let's say Those sensors read tons of information temperatures and wind speed all kinds of things and so they record at thousands of locations at thousands of locations locations and values okay so just a huge amount of information but so D is you
+
+9
+00:04:11,000 --> 00:05:13,000
+know in the thousands or tens of thousands or tens of thousands okay so these are like little smart dust sensors everywhere okay but they only record for 30 days but only for 30 days okay so we get like you know n here is we get 30 samples now the sample we get if you like is a measurement across the entirety of Campus so it's like we're getting a matrix that's kind of in the opposite direction from what we're used to it's skinny but it's not tall and skinny it's n rows and then the rows
+
+10
+00:04:43,000 --> 00:05:39,000
+are really really big okay all right so I would just point out maybe it's not obvious why it will be obvious hopefully in a second that we would want to fit a density to this but it kind of seems hopeless and the reason it seems hopeless is we've had every model that we've had had a parameter for every Dimension and so now there's a huge number intuitively a huge number of models uh that are out there that will all kind of satisfy this data if we were to run something like least
+
+11
+00:05:15,000 --> 00:06:06,000
+squares right if you only gave me five examples and you had a thousand uh Dimensions there are tons of models that line up on those five points right that kind of touch that rank five Subspace but all the rest of them are free so how do we pick from it and if we try to do a probabilistic thing it gets even worse okay so let's let's see the key idea and if it's not obvious to you that's a it's a problem we'll show you something very Concrete in a moment that it's a problem
+
+12
+00:05:41,000 --> 00:06:46,000
+so this is mainly intuition right now this is not mathematically grounded we'll show you the math in a second and what will happen is you'll see our equations will just break in some fundamental way and so our key idea to get out of this is that we're going to assume there is some structure because that's the tool we're using right now random variable that is not too complex and not too complex means that I can estimate it that's really what it means operationally and captures most of the
+
+13
+00:06:18,000 --> 00:07:09,000
+behavior captures the interesting Behavior right and this is the tired maximum in this course that you know all models are wrong some models are useful right it's not going to be a perfect model of what's going on but it captures most of the interesting behavior in this relatively compact way and so we'll see at the end of this uh little section we'll see a concrete generative model that that builds with these building blocks um and allows us to recover those parameters that's the key
+
+14
+00:06:43,000 --> 00:07:39,000
+idea okay so let's see the first problem with why GMM would have challenges here um and see the first first example and actually we're going to look at something even simpler than than GMM we're going to look at fitting a single gaussian okay so let's try and fit a single gaussian in this situation so I can make more concrete my assertion before like it's hard to fit models here so let's fit one gaussian okay so the gaussian has two parameters recall there's mu and sigma
+
+15
+00:07:14,000 --> 00:08:24,000
+Square so how would we be tempted to compute them so first we want to compute the mean of our data well that actually seems to kind of make sense we compute the sum here oops sum over all of our data 1 to n right so just make sure let me write the data because I should have written it out we have data points RN element of Rd just to make sure those types are in your head okay this is okay this works fine we compute the mean that seems fine it doesn't matter how high the dimensions are right you can compute the
+
+16
+00:07:49,000 --> 00:08:43,000
+mean and it's a sensible Sensible thing to do right may not be a great estimate of the center right because you may not have all combinations of the directions but it's it's still an okay enough fent the trouble comes when we look at the coari and I'm going to write here the coari in the full general form because we need to talk about the dimension because the dimension is high so I can't just use the one Sigma and if you remember you have some expression which roughly looks like
+
+17
+00:08:17,000 --> 00:09:27,000
+this x i minus mu t Okay so that's a fair enough quantity you can form that quantity but one thing cause it should cause us a little bit of pause what's the rank of well generally we've been assuming when we did linear regression and everything else the rank was at least D the number of Dimensions like it was a full rank object right but the problem here is that D is much bigger than n and I've just shown you that Sigma can be written as a sum of N rank one vectors and if you remember your linear algebra that
+
+18
+00:08:57,000 --> 00:10:16,000
+means that the rank here is less than which is always true the minimum of N and D which in this case is going to be strictly less than D because it's n is smaller than D that's what we're assuming okay so this isn't full rank so where does that cause us a problem well we have to go back and write our favorite function the gaussian likelihood and see where this causes a problem likelihood okay so remember our favorite thing look like this uh Sigma is equal to at 1 over 2 pi Sigma
+
+19
+00:09:40,000 --> 00:11:16,000
+12 x x i minus mu transpose Sigma inverse x i oh there there should be no x i sorry should just be X so I get through this the bottom of it uh so on okay awesome why is this formula problematic if Sigma doesn't have full rank well there's two parts that kind of don't make sense right one of them is this if it's not full rank the inverse doesn't make sense right it's not even defined and second this is the determinant what's the determinant zero zero now you're toast because that's one over zero this
+
+20
+00:10:34,000 --> 00:11:31,000
+is now infinity or something like it or undefined no matter what it's going to cause you a problem if you start to normalize by something like this okay so how are we going to fix this right so this by the way just to make sure that's clear this determinant is equal to zero okay now we're going to fix these issues just one second we're going to fix these issues by changing the model and that model is going to out and the thing that I want you to think about is we're going to try and make that coari
+
+21
+00:11:03,000 --> 00:12:07,000
+full rank okay and we're going to see various assumptions that we can place on the underlying noise model this will make sense in a minute that allow us to insist that Sigma in fact is full rank you had a question yeah I just Zer oh because the determin is the product of the igen values and at least some number of them are zero awesome okay so the way we're going to fix this is we're going to examine these simple models now the reason you know I'm going to put these models pedagogically and why I'm doing it in
+
+22
+00:11:38,000 --> 00:12:27,000
+this order is the final model is going to take these building blocks and put them together okay so you know if you were like really into the suspense of what's going on with our sigmas here like I've ruined it for you that's what's going to happen in about 20 minutes but what I'm going to show you are different ways that we can get around this challenge so that we can estimate the coari get a gaussian likelihood for that setting and they're all going to boil down to ways that we kind of make sure
+
+23
+00:12:02,000 --> 00:13:15,000
+that our coari is parameterized by something fewer than all of the roughly n squ parameters coari has to be positive 7 a definite so but it still has a lot of parameters okay so it's not all full not every Matrix is a coari matrix but a lot of them are okay all right so let's go through it now let me just recall the mle for G because it will make our uh life a little bit easier here uh call oops the reason I'm recalling this is we're just going to I want to store some facts or remind you of some facts that
+
+24
+00:12:44,000 --> 00:14:01,000
+will be useful now one thing just so you're clear like on on using this um these are just helpful things to know about um like kind of computing these em models again and again so hopefully this is useful practice um even if you're not Computing these so remember we the way we fit these things to data looks like this we sum over all of the data we take the log of 1 over two times the likelihood uh X of oh sorry there's a negative 1/2 here that doesn't change the story 12 x - mu transpose Sigma
+
+25
+00:13:21,000 --> 00:14:42,000
+inverse x - mu and so on okay now the this is equivalent to minimizing the log which we which we kind of do everywhere and expand out which is equivalent to minimizing this and you've seen this before I just want to remind you where it comes from sum I = 1 to n xus mu transpose Sigma inverse this is why I consistently dropped the one half because it doesn't matter but it is distracting okay all right all right now one key fact which we will use again and again and I'm just going to dispense of once is if Sigma is
+
+26
+00:14:06,000 --> 00:16:04,000
+full rank the coari is full rank then Sigma U of this function here which I'll just call uh uh F of mu or fi of mu is equal to the sum I equals 1 let me extend the purple blob pink blob 1 to n Sigma inverse X IUS U implies mu = 1 by n Su I equals 1 n so I apologize if this is too pedantic if not what I'm saying here is this is a plugin if we know no matter what that Sigma is full rank then I can use this estimate for Mu okay so I was saying before that the average was no problem so long as
+
+27
+00:15:04,000 --> 00:16:01,000
+Sigma is of the right form I can always do this and remember why if this is full rank I can pull it out this is the same argument we went through last time so ask me a question if it's not clear because you have seen this before and so then we satisfy from you we can just use that as a plugin for everything we do later sure so if it's not full rank so let's imagine that it had some null space then it could be then the this xus mu could be satisfied by either being identically zero which would be in the null space no
+
+28
+00:15:34,000 --> 00:16:40,000
+matter what or anything that's collinear with the null space that has like a so if the null space is you know a particular direction then it doesn't Define mu it can be anything along that direction um will be set to Zero by this right so it it means the mean wouldn't be the unique minimizer of it right cool' be zero plus that thing go ahead oh like part and the sum that's exactly right and the summation it was just so I didn't have to copy it again yeah this is just exactly this and this is yeah
+
+29
+00:16:09,000 --> 00:17:03,000
+this is the exact calculation we've seen a couple times this this is after heavy computation of the first line that we have done here yeah so this is basically saying these two are equivalent right we we saw this before that if we wanted to maximize likelihood it was equivalent to minimizing this loss functional I want to use that because I want to this this is a lot simpler and it doesn't have like all kinds of like extraneous terms and things that I need to to deal with and so I want to get to the point where
+
+30
+00:16:35,000 --> 00:17:38,000
+I can uh just operate on this so that I can give you some mathematical facts when I draw the pictures that's why that's why I'm doing it yeah you could do everything in terms of the original equation there's no harm or foul from doing that and you know yeah you may prefer to do it that way cool and we're using the fact that like the constants don't matter and all the usual stuff we go to minimizing okay so let's see our first building block there's a picture coming I don't
+
+31
+00:17:12,000 --> 00:17:57,000
+know why I think this will not peque your interest but I'm still going to tell you there's a picture coming that I think is very fun to draw uh that uses all the building blocks together and I'll highlight for you when we get there it's a it's a real privilege to draw this ridiculous picture for you and it's going to be really disappointing after this setup so I'm very excited for that's maximizes my enjoyment okay so here I want to think about the first building block that we're going to draw
+
+32
+00:17:34,000 --> 00:18:55,000
+this is not a fun picture to draw but it's it's okay so suppose that we assume that every direction makes has independent and identical independent and identical correlation or coari okay so if I think about the noise ball what does it look like I'll draw 2D here oops come on Snap two so what this means is that our model of kind of gaussian noise if you think about it so this will be Sigma is equal to Sigma s i okay so that means it's it's I and the only free parameter is this Sigma squar which is a
+
+33
+00:18:16,000 --> 00:19:32,000
+scalar this is a scalar okay so how many free parameters are there precisely one right the structure is the coari is Sigma sare * I so what does that actually look like it looks like I have a point which can be centered anywhere the gaussians can be centered anywhere they can have arbitrary means but their coari structure looks like circles okay one Circle second Circle they should be concentric the limitations of my notability skills okay there could be another one down here okay they all have the
+
+34
+00:18:53,000 --> 00:20:07,000
+same okay so you may look at this and say so this is like the picture of these Co variances are circles but I'm just trying to emphasize what this restriction means and so that circle is just parameterized by two point by two numbers you know vectors the center the MU and then its radius okay and that's what Sigma squ is okay so in this situation what is the mle what is the X well we know mu because this is full full rank why is this full rank because it's scal the identity as long as Sigma
+
+35
+00:19:32,000 --> 00:21:08,000
+squ is bigger than zero this is a uh this is a full rank Matrix right rank is exactly n so what is the mle well we're minimizing now over one free parameter and it looks something like this 1 to n x minus mu except for when we take the transpose here it's all times a scalar so I'll pull the scalar out in front and it will be minus Sigma squ okay plus d log Sigma squ right so the determinant of this thing is the dimension time Sigma squ well it's the determinant of this thing is Sigma to the 2D and the
+
+36
+00:20:26,000 --> 00:21:41,000
+log of that is D * log Sigma s okay determine as a product of the igen values all the igen values are Sigma squ how many igen values are there D so I'm just saying in a very complicated unnecessarily complicated way this is true then I'm just taking the log and writing it in that form okay so just for notational purposes let Z equal Sigma squ what does this actually look like well it's minimizing 1 / Z times this this thing is a constant here this does not depend on Sigma Square in any way so I'm just going to
+
+37
+00:21:04,000 --> 00:22:35,000
+call this c c plus d log Z Min Z so just take the derivative what do I get minus z/ 2 C + D / Z equals z and if I've done my job correctly this is going to be Z is equal to C c n d IE Sigma equal c n d okay just to write it to make sure it's just to unpack it so you understand so you don't get lost in the weird notational pieces this is basically what I'm saying this is the estimate okay IUS okay hopefully this makes sense what is it saying it's saying average over all of the different variances that
+
+38
+00:22:00,000 --> 00:23:19,000
+are there treat them as if they're basically ND of these things that are estimates that you're seeing Sigma ND times average over them and that's what you should get so another way to describe the rule here is subtract the mean and square all the entries substract mean and square roughly okay okay so what do you know at this point oh please question on the second line where we write the Min aren't we missing a sum over the um oh sorry so yes these are part of the two things so when this comes out
+
+39
+00:22:42,000 --> 00:23:41,000
+they should have an ND here sorry yeah the this my simplification on the fly to simplify my notes did not make sense that's a great C catch this thing is going to be C and this sum is inside each of the ends and so this should be ND sorry about that wonderful catch awesome please yeah so the the idea here is we have some direction and so one intuitive way to think about this is there's some radius that makes sense and you know how to fit a radius on any Dimension right so you know exactly how to do this if it
+
+40
+00:23:21,000 --> 00:24:06,000
+were one-dimensional and what this is basically saying is I Collapse all the variants in all directions and it's almost like I just lay them out in a line and average across all of them and what I'm saying is that's not too surprising this math is the correct way to understand what should happen that intuition is not going to help you too much but at least let you type check that like it makes sense and it has the right Dimension and what's great there as was pointed out was this ND is just
+
+41
+00:23:44,000 --> 00:24:42,000
+averaging over all the entries right like and the N has to come from from from averaging over all the entries uh so Sigma squar is a scaler so it's just going to be a single number but then we're going to multiply it times the identity so if you picture it it's just going to be that number number repeated on the diagonal yeah please [Music] hype right so yeah so and any model is always going to be a hypothetical situation we're always talking about what are we modeling here and so what
+
+42
+00:24:15,000 --> 00:25:06,000
+we're modeling here is let's imagine a situation where this would be appropriate it'd clearly be perfect in the case where we had noise that we knew was was actually the same magnitude in absolutely every direction and didn't depend on the underlying data we'll talk about procedures that try and make us close to that in the later part of the lecture but ignore that for one minute that will probably never be true empirically right for a variety of reasons but this is a pretty good
+
+43
+00:24:41,000 --> 00:25:33,000
+approximation if they don't fluctuate too much do you want to pay the expressive power of having to model all the different fluctuations in all the different possible ways all the different ellipses that you could possibly have and this is saying like if no if they're kind of an if they they have the even distribution then this is an OKAY model cool let's see a slightly uh let's see our second building block there are not lots of building blocks there are two okay let's see our second building
+
+44
+00:25:14,000 --> 00:26:43,000
+block all right building block two so Sigma is going to look like this it's going to be diagonal Sigma d square okay okay now what does this look like in my head these are AIS aligned ellipses what do I mean well they may differ like this oops that's pretty good all right so these these this noise parameter is still parameterized by a mean which we know how to set this is clearly full rank why is this clearly full rank well because all the numbers are greater than zero it's igen values
+
+45
+00:26:03,000 --> 00:27:04,000
+are all positive so it's full rank it's clearly it's also by the way clearly a p is clearly positive semide definite or positive definite because all those numbers are positive okay so it is a coari matrix and this is what it looks like it's basically saying that ites the ellipses the errors are not correlated across multiple Dimensions they're basically independent on each of the dimension and so the airor profile is going to look like a flat ellipse all right all right so this is basically saying I have
+
+46
+00:26:33,000 --> 00:27:46,000
+Dimensions that differ wildly but I don't care about how the often they interact right that's roughly the model that you have in your head right like there's a lot more variant in component one than component two that's worth modeling to me but not at all how they interact okay all right so we're going to set Z equal to Sigma I 2 as above same thing we did above we're going to minimize now over Z1 to ZD these are all scalar values all positive to doesn't matter too much sum
+
+47
+00:27:11,000 --> 00:28:41,000
+J D oh J equals 1 erase that one to d z minus 1 J times x IUS mu J 2 this is now a scalar Plus log Z okay and this is inside the parentheses are inside this thing just write it just because it's the way should associate okay oh that should be J see if I made any other bucks probably we'll get there all right so far so good what does this look like well the reason I wrote it out like this so first be clear about what we did here this broke out per dimens so really this is just D independent
+
+48
+00:27:57,000 --> 00:29:54,000
+problems right so what what should we expect we can go ahead and compute this thing but it's going to look like a problem we've solved many times before J sorry this J that's the typo there J square plus log Z J which implies Sigma j s = 1/ n sum J equals 1 to n sorry j is the dimension I = 1 x IUS mu i s let me make sure I have oh mu J mu J all right let me write that again so that it's clear since there were a bunch of typos there sum I goes from 1 to n x I jus mu j s okay so what's going on here
+
+49
+00:29:08,000 --> 00:30:11,000
+um the thing that's going on here is we have D independent problems that means we have D one-dimensional problems and this is exactly the estimate that we had for one-dimensional coari there's really nothing else going on there were a couple of bits here that were using the J mean and the J component it's like every component was handled independently okay all right we are ready to talk about our Factor model okay so what is this what is the purpose of me going through all this one is I want you to get very I want you to
+
+50
+00:29:40,000 --> 00:30:39,000
+be pretty comfortable with kind of going back and forth between hey what is my mle what does the structure I put in and how does that change my estimate okay that actually is pretty interesting you put in the different structure it reduces the number of free parameters and that allows you to estimate things with far fewer amounts of data we're going to combine that now in a pretty interesting way which is what the factor model actually is our Factor model okay and other reason to give this is it's an example of a more
+
+51
+00:30:12,000 --> 00:31:22,000
+sophisticated generative model than we've typically been used to yeah go back to the sure you explain the graphical interpretation of these sure so because so in general aarian Matrix is an ellipse you can picture that ellipse right where the different directions correspond to the igen values right uh and so what's going on here is that instead because we were putting it on uh as a kind of a on the diagonal that means that the stretch is only on the on the individual axis so like you have something that's access aligned
+
+52
+00:30:47,000 --> 00:31:37,000
+like the major axises have to be aligned so when would that be a reasonable model it be a reasonable model if you thought like there are different amounts of spread or different amounts of variance for every Dimension right the previous model said all the variance in any direction was effectively the same there was one parameter so that why it was a circle now it says there's different amounts in different directions but I'm not going to model their interaction in contrast a general coari Matrix can tilt
+
+53
+00:31:12,000 --> 00:32:06,000
+and say like no the principal Direction which we'll come to when we talk about PCA is in One Direction and I'm a little bit setting up for those kind of calculations later is why I draw these right so this this says I don't care about interactions between the features rough very roughly speaking okay basic that spread in each Direction same no no they're different there's a different parameter for every so there's Sigma one and sigma 2 are potentially different numbers right that's why it's that's why
+
+54
+00:31:39,000 --> 00:32:58,000
+it's an ellipse rather than a circle they're all the same it would be the circle cool awesome fantastic so let's look at our parameters there are going to be a lot of them but it gives us a more interesting generative model to look at and if you kind of Wade your way through this this you understand em you understand how these models work and hopefully it gives you confidence that you're not looking at just one setting okay r d byd it's going to be a diagonal matrix okay all right so let's see the model
+
+55
+00:32:20,000 --> 00:33:38,000
+and then the world's I don't know it's not really that remarkable a picture but I enjoy it all right PX of Z so we do the usual thing here that it factors as a lat model this is exactly the same since Z is our is our latent model okay by the way mu is an RD this is a linear transformation that we're going to learn this is a diagonal transformation hearkening back to what we just talked about and here is the way X is distributed X or sorry Z start with z is going to be some 01 so it's just some random noise Vector
+
+56
+00:33:05,000 --> 00:34:01,000
+in RS for Su s smaller than D okay this is this I'm going to call this s because I want you to think about it as the small Dimension so the latent structure is small we want to pick the latent structure to be much smaller D is thousand 10,000 a million a billion something like this we're going to pick s saying there's a small Subspace that characterizes and classifies all of its Behavior that's like the compression that's the bottleneck then we're going to say x and I'll walk through this
+
+57
+00:33:33,000 --> 00:34:50,000
+slowly in a second is this expression Epsilon okay all right so the model that generates X and I'll write this more compactly X is not just centered at the origin it has some mean z is going to be mapped from the small Dimension to the large Dimension by a transformation that we're going to learn so imagine the sampling procedure is Z gets selected if you knew Lambda you would map it up into Rd you'll shift it by Epsilon by mu the the mean that you're going to learn and then you're going to put some Epsilon
+
+58
+00:34:11,000 --> 00:35:44,000
+noise here okay all right now let's get the model for these things so Epsilon oops Epsilon is going to be normal it's noise so it'll have zero mean and it will have f as its parameters this implies by the way now we have all the information we could also write X is distributed as n mu+ Lambda Z Plus 5 please oh what is the meaning all yeah great question so let me just say so this is I just want to annotate this is the mean so I'm going to draw what goes on on this for an example
+
+59
+00:35:03,000 --> 00:35:45,000
+in one second that will answer this a little bit better than I'm able to because once you see what's going on but the intuition is you're going to sample in the small space you don't know where it is that's your latent variable that's your link to clusters that's the thing that you say like I don't know what it is but I know there's a small structure lurking out there then Lambda says from that small space I'm going to go into the big space right the D the D much
+
+60
+00:35:23,000 --> 00:36:08,000
+higher dimensional space and Lambda I'm going to learn that transformation that says how do I go from the small space to the big space and then the big space is going to be the actual dimensions so imagine I was I was actually had these sensors and they were getting temperature readings all over campus and they were getting wind readings all over campus well clearly they're correlated right like if I put a bunch of sensors all in a line they're not independent readings right there's some sensor and
+
+61
+00:35:46,000 --> 00:36:36,000
+then there's some map that tells me from the reading I got what should I expect at all the sensors with like pretty high probability like you could imagine such a map existing and so the Lambda is that map that goes from the kind of low Dimension to the high diens we're just doing it in a very abstract way and we're not specifying what those Dimensions even mean to start with right please um You probably don't want to set it greater than n for a variety reasons but like yeah like you'll see in a
+
+62
+00:36:13,000 --> 00:37:09,000
+second what the conditions are when you go to solve it great great question there's some condition that's lurking there you need to be able to estimate there's no free lunch right but yeah you it's going to be smaller than d right d is a billion and N is 20 there exists some s where we could potentially solve this that's the way to think about it not we can solve it for every awesome right so let's see an example of this whole thing where D is equal to two so not that high a dimension but
+
+63
+00:36:42,000 --> 00:38:17,000
+like good for drawing s is equal to 1 and N is equal to 5 okay and our model is X mu plus Lambda Z Plus Epsilon and let's see how the forward sampling works so how does it work one we generate Z1 to ZN from n01 so what does this look like all right so here's here's zero and we get let me see if I can draw this nicely we get a bunch of samples so maybe here's zero let me mark down zero zero oops that doesn't look right here zero so here's the let me draw the the density actually so the density
+
+64
+00:37:34,000 --> 00:38:47,000
+looks like something like this right this is the gaussian in you know Loosely interpreted artist rendition of gaussians then what I'll do is I'll sample so maybe I'll sample this point first I sample over here sample here sample here sample here those are my Five Points how did I pick them I don't know I sampled so like this is z oops this is z 1 this is Z2 I'm not remembering the order that I did it and it doesn't really matter Z3 Z5 Z4 okay so I just generated those in one
+
+65
+00:38:10,000 --> 00:39:49,000
+dimension all right now two what happens so now so far I've generate I've done this piece right so this character is handling this okay now I map by Lambda so let's suppose we've already learned Lambda so Lambda is equal to one two so what happens next now we're getting fancy take this copy paste so now we need the x-axis back so these things get mapped here's the line one two which goes to the origin okay what happens so that then these are all mapped onto the line oops it's a little
+
+66
+00:39:02,000 --> 00:40:41,000
+small but good enough this one's mapped all the way up here okay down here and down here okay so this point for example is this point is Lambda Z3 this point is Lambda Z2 so far so good so this whole thing now we're in dimension we're in the high dimension so we've gone from our small Dimension up to the whole dimension of all our sensors think in your head Dimension 10,000 not Dimension two okay now three we add mu what does that do I'm put that in green that's this piece
+
+67
+00:40:11,000 --> 00:42:06,000
+copy paste mu let's say is this is this Vector here this is Mu we add me to everything and that translates all our points now by mu and there's one off the screen over here somewhere okay this point is oops mu plus Lambda Z2 right it's this point translated by mu then four we add Epsilon noise and this Epsilon noise is full dimensional so I'm going make this in purple this character here right this is the equation that we're dealing with what happens next we get some purple stuff and it goes like
+
+68
+00:41:21,000 --> 00:42:34,000
+this oops make it a little bit thicker goes like this goes down here goes over there but it's full dimensional noise it lives in a d dimensional space and that is our final expression so for example this character here oops this character here is mu+ Lambda Z 2 plus Epsilon 2 and Epsilon 2 is the noise and no notice the noise is in different direction for each one right so I want this this is in by the way this is in the high dimensional space in in dimension d okay so what's going on here we were
+
+69
+00:42:01,000 --> 00:42:50,000
+talking about that sensor and temperature example so just kind of walk through the Z's here were generated in one dimension let's say that was the underlying true temperature that you were going to see several samples of it maybe at different times of the day right because Z was collected at various different times for different data points right we were collecting it many times in the day then we mapped using Lambda to say like oh if the temperature were kind of the the true temperature or
+
+70
+00:42:24,000 --> 00:43:18,000
+some hidden temperature was you know 50° then all of the other temperatures that are nearby are going to jiggle in a predictable amount predictable amount meaning Lambda Maps them from wherever their value was to the high dimensional space right but the problem is there's still some residual noise that fit may not be perfect right we can't predict things noise means like just stuff we don't want to model and that's where this purple comes in that's the Epsilon Jitter that's in in the high dimension
+
+71
+00:42:52,000 --> 00:44:17,000
+does that make sense and that's that's our underlying model and the data we see are the purple dots so the data are the purple dots that's what we actually see in our the data are the purple dots okay just to make sure it's xal mu + Lambda Z Plus Epsilon all right please oh it said assum that so so even though the sensors give us data Dimension no Dimension D which is really huge but are we assuming that the actual thing that we want to model like say the actual temperature Dimension much smaller than
+
+72
+00:43:39,000 --> 00:44:29,000
+that's exactly right so much smaller than D so what we're assuming is we have again I think the illustrative example which will get you most of the way there is I put a thousand temperature sensors in a row so I get a thousand numbers every time I measure them but if they're all close enough it feels like there should be one temperature and they're all kind of you know there's a mapping from them that mapping we're going to learn that's what Lambda is Lambda takes us from that one true temperature to our
+
+73
+00:44:04,000 --> 00:44:46,000
+guess at all the different temperatures but we're aware that that's imperfect and since we're aware that that's imperfect we also allow ourselves some error Epsilon in each one maybe one temperature sensor is damaged it's dirty someone walked by it someone blew on it who knows that's what Epsilon models does that make sense and so it's the small to big like it's like and that's what allows us to learn this because we're saying although there's this huge
+
+74
+00:44:25,000 --> 00:45:30,000
+amount of free parameters we only have little amount of data we have to make some compression and so that's what the latent structure is doing please um I have two questions so plus is that you essentially assuming the major assumtion of is that this is something close to it's linearly it's a linear form of data just having a bit of noise in it that's yeah so here we're making an assumption that's right we're making an assumption that there is a small distribu there's a there's a
+
+75
+00:44:58,000 --> 00:45:56,000
+distribution uh that's that's low and that there's a linear map up into the larger space you could imagine more sophisticated models that had a learnable nonlinear map into the larger space um and there are various reasons that may be hard in limited data regimes you may not have enough data to learn that piece um the second question pertains to S so s what would happen like and therefore it's easier to imagine what's actually happening but what would be the case when s is notal yeah wonderful question
+
+76
+00:45:27,000 --> 00:46:13,000
+and we'll get into this a little bit in PCA to and sometimes they're interpretable sometimes they're not but let's imagine when we come back to it we'll have this language of principal components in about 15 minutes that will maybe able to give a little bit more precise answer so I may punt there in a second the idea is that s captures kind of the important directions of variation so like if you imagine the temperature sensor so I have temperature and I have electrical current that are there and
+
+77
+00:45:49,000 --> 00:46:38,000
+maybe there's also some you know uh wind thing and if I combined all three of those I would get a really good estimate but I need an estimate of like the wind speed a location and all the rest then s would be some mixture potentially of those kind of you know true directions that are out there now often that story that we tell ourselves is difficult to verify because we don't actually get to see the latent variable and in fact we can get away with making a much weaker assumption which we'll make in PCA which
+
+78
+00:46:14,000 --> 00:47:00,000
+is basically that there exists some low dimensional space that captures our system and that turns out to be a fairly robust kinds of assumptions it's not that we know there are only these three parameters if we knew it was wind and temperature and we were just learning the map we would just feed that in right we would just measure that and feed that in we're hypothesizing that there exists this small bottleneck and that's what's going to allow us to learn in this setting and to me that's the really rich
+
+79
+00:46:37,000 --> 00:47:37,000
+pedagogical reason to teach this is like like it kind of forces you to think about like what can you really recover this is more of a statistics view of this part of machine learning but what can you really recover from data right [Music] so yeah you're just saying this is there exists something small you got um do you do this for every do you create this transformation for every data point wonderful question so here Lambda is across all the different data points this transformation so so if you
+
+80
+00:47:08,000 --> 00:47:59,000
+look at like this notation here like you'll see that Z is generated once uh per data point so there are n of those things n Laten samples there are also n Laten noise samples those are different for every data point that are there but Lambda is shared across all of them as is me in the model now if you knew something like you knew there were K clusters and there were K different uh Maps you could potentially fold that into your model or k different means but this is the model we're looking at now
+
+81
+00:47:34,000 --> 00:48:33,000
+doesn't necessarily need to be that way but for now that's what we're looking at one question do you understanding is we start from Z and then we work our way from we generate Z first then work our way to the data but how do we estimate like s or do we start from oh great question I I get exactly what you're saying so when we went up here remember in this model model so one of the messages is we start with this model and in the generative way of viewing things like the the the real
+
+82
+00:48:03,000 --> 00:48:51,000
+reason I like to keep this in the in the class in in a very fundamental way is because like it forces you to think about what is actually in the model like when you see the EM thing it's kind of in a similar situation where you're like oh there's just this one kind of hidden aspect to it this Z is latent to us so the part of the model is you pick s because it's one of the parameter so you have to tell me ahead of time I want you to model with you know a size s model and then you run this whole thing
+
+83
+00:48:27,000 --> 00:49:27,000
+forward and then our goal is among all those things that could have gone forward what are the most likely settings of the parameters in that model so we're not learning s in some sense we'll talk about in PCA when we're learning a linear Subspace we can effectively look at a particular measure and see if it's a if you know adding one more Dimension would be there and I'll come with some caveat great great questions awesome all right okay so we need one technical tool to make this whole thing go let's do
+
+84
+00:48:56,000 --> 00:50:10,000
+some technical tools I'm not sure that these are super useful to prove here um but I will happily Point them out to you um as we use them all right so here we're going to use this notation you probably have seen this before if not don't worry we'll review it right now X1 is an rd1 X2 is an rd2 and D equal D1 + D2 okay so this is just a nice way of partitioning this is because we're dealing with something that's linear and we can have this kind of block structure okay we can also do this for matrices
+
+85
+00:49:37,000 --> 00:51:14,000
+and that will allow us to State some theorems just a little bit more concisely Sigma 1 one Sigma 21 Sigma oh no so this should be 21 sorry why it's backwards one two Sigma 22 maybe I okay I hope I didn't do something notes all right so this is D1 this is D2 this is uh going to be D1 and this is going to be D2 all right and sigma i j if I've done my job should be oh it's going to be R that's why I did it the backwards high that makes more sense Sig my day is going to be uh d uh J or hold on let me actually change
+
+86
+00:50:27,000 --> 00:51:39,000
+the numbering just to make it consistent with the notes sorry this doesn't really matter conceptually but just to explain it okay one two all right so the point is is I can I can Factor this in some way and it makes sense to multiply a matrix in an obvious way if it's compatible with the blocks so like if I multiply this Matrix here x * Sigma I can write it in terms of these blocks hopefully that's clear right and it would be be Sigma 1 1 * Sigma 21 and that would be what I would want to put
+
+87
+00:51:02,000 --> 00:52:13,000
+there okay all right this is a very widely used notation and it's going to let us state two facts about gaussians that are really helpful if you're not familiar with it just take a look at it um and see so first one is the marginalization identity for gaussians X2 px1 X2 okay for gaussians this has a nice form this is not true in general this is why we love gussian so much really are that it has this really nice form px1 is going to be equal to a normal it's going to be distributed like a
+
+88
+00:51:38,000 --> 00:52:50,000
+normal mu11 sigma1 one okay this is called marginalization it basically means I can grab the mean that I want to grab and the coari I want to grab when I marginalize them out and this is because gaussians have this nice property um about you know being independent in these directions okay this is a much nastier statement Fact Two which we will use px1 conditioned on x2 is also gaussian pretty remarkable if I'm going to be honest like not a lot of distributions are closed in this way what I mean is closed if I take if I do
+
+89
+00:52:19,000 --> 00:53:24,000
+an operation like conditioning do I get back the same distribution that's actually pretty unlikely but gaussians it happens and so again it makes some of our calculations easier this is marginalization this is conditioning okay and so what are these two values this is going to be equal to mu1 plus sigma12 Sigma 22 and I'll put up notes and you can look and see the the notes do this X2 minus mu this looks super mysterious it's actually not but it's not probably worth going into too much
+
+90
+00:52:53,000 --> 00:53:48,000
+detail if you remember your Matrix inversion lemas if you don't again don't worry these are not super conceptual like important details it's just how this works you can go through and I can gladly upload a proof for you if that makes you feel more solidly grounded if not you can just use this okay and these are these formulas when I say it's not conceptually important you may think that's a copout maybe it is but really the reason is it doesn't matter to me because there's only one way these
+
+91
+00:53:21,000 --> 00:54:20,000
+formulas make sense the types all work out you have d1s and d2s and you're multiplying them in the right way otherwise formula is wrong okay okay so this is the Matrix inversion LMA if that helps you great I'm happy to prove it the thing that I care that you take away is that we have these formulas and we can use them later so when we do a conditioning step we can use them okay when we do a marginalization we can use them okay and this is I I realize this is like impossible to appreciate at this
+
+92
+00:53:50,000 --> 00:54:49,000
+moment probably but it's um It's relatively rare that we can go from uh distribution condition on it and get back a distribution right that we have the same what are called sufficient statistics but it happens here just that General please I think both of these we are assuming very deep dependencies between not just within different data like between data samples but also within the features of the data samples right uh so I wouldn't look at it through that lens these are mathematical
+
+93
+00:54:20,000 --> 00:55:31,000
+facts about gaussian distributions these have nothing to do with data per se this is just true about any kind of wild gaussian that you would want meet and so you would use it that way we are going to we are going to show in one second that that crazy model I just showed you can be written in kind of a nice way uh using these things so how do we use it so remember we have two variables n0 Sigma right all right and this is since Epsilon of Z the expected value of Z is equal to zero and the expected value of x equals
+
+94
+00:55:03,000 --> 00:55:54,000
+mu now we don't know Sigma yet we just say there's a coari out there we're going to derive what it is in one second but the point is is that whole Factor model basically boils down to some gigantic gaussian and that's going to be really helpful to us the problem is like this form like this is going to be data this is going to be hidden and so we're going to have to deal with marginalization and conditioning and all the rest of it to be able to recover it but the point is we can write that model
+
+95
+00:55:29,000 --> 00:56:31,000
+super compactly now I think if I wrote that first probably wouldn't be super happy maybe you'd be really happy I don't know maybe you're happy folks which line so and again you can type check these things just make sure it makes sense it's got to be a d byd map or an N byd map for everything to make sense and the types checked out if there are typos which I'm sure there are okay so let's try and now our job is to try and figure out what is Sigma and by the way this is kind of remarkable
+
+96
+00:56:07,000 --> 00:57:21,000
+like we went through this pretty elaborate discussion about um various different models you know how the model worked and lo and behold it's just some nice gaussian what is the so this is the so it's because it's block one one is the outer product of Z with itself well what's the outer product of Z with itself it's just the identity why is it the identity because that's the way we sampled remember we sampled in the low space this is using this fact oops is using this fact right so e expected value of ZZ
+
+97
+00:56:43,000 --> 00:58:40,000
+transpose that is exactly I okay what is sigma2 well it's going to be the expected value of Z * x minus mu transpose what is that actually equal well that's going to be the expected value of z z transpose right so x minus mu equals what it equals Lambda Z Plus Epsilon right that's just the model I just subtracted off the MU on both sides so it's going to be z z transpose um Lambda transpose Plus E Z Epsilon transpose now these two things are independent oops Z and Epsilon are independent so boom this goes to
+
+98
+00:57:42,000 --> 00:59:20,000
+zero this we just concluded oh sorry this we just concluded was the identity so this equals Lambda transpose and sigma 21 oops I write in proper in the other color Sigma 21 equals sigma12 transpose because that's it's a coari matrix positive it's symmetric okay the last one or you can just compute it take my word for it but you don't have to take my word for it is this one x minus mu xus mu transpose we just use this formula again that's going to be the expected value of Lambda Z Plus
+
+99
+00:58:34,000 --> 00:59:33,000
+Epsilon Lambda Z Plus Epsilon transpose we have some multiplications to do we know that all the cross terms with Epsilon are going to cancel out so this is going to look like and I this will maybe look mysterious so I'm GNA maybe I'll go a little bit slower here um then I wrote my notes Epsilon Epsilon transpose okay so why notice you're going to have an Epsilon times this term in the transpose but the expected value of Epsilon is zero so those ter cross term is going to cancel the only one
+
+100
+00:59:04,000 --> 01:00:14,000
+that's going to remain are this one and this one where the epsilons are multiplied by itself so both cross terms Fall Away what does this equal well we just saw this is a random variable this is a deterministic parameter of the problem this is going to be Lambda Lambda transpose and this is going to be plus the FI why did that happen this fi is the model sorry for the scrolling soe avert your eyes if it makes you nauseous is this character sound good so let's write the whole model in summary and again you can check the
+
+101
+00:59:44,000 --> 01:01:00,000
+types on this thing make sure I didn't make some silly mistake okay and we're good so now it's in this nice gaussian form and oh my gosh I claim you already know how to solve this Eep what is Qi of Z I won't go through the whole M algorithm remember is p z of I given x i and Theta what do we use here we only have two rules yeah use the conditional that's all we got use a conditional mstep well it's just a it's a normal distribution where we filled in the x's and we're marginalizing out after seeing
+
+102
+01:00:35,000 --> 01:01:45,000
+the X's that are in there or conditionally on the Z's we have closed forms you already know how to do this okay so what is the summary here we saw here this factor analysis structure that allowed us to have a lower dimensional space had this elaborate kind of sampling and moving around pretty wild uh set of generative models and it basically boiled down to a oneliner to Sho and Horn into the EM algorithm we had to use some fancy you know tricks with how you deal with normal distributions if you didn't use those
+
+103
+01:01:25,000 --> 01:02:23,000
+fancy tricks for normal distrib you would have to do some empirical extra work right you'd have to understand if I had a distribution that looked like blah and I wanted to marginalize or condition it what would I do on top okay yeah please oh because once we have this these are just like so think about what happens once we have the estimates for the Z then it's just conditioning on the Z's and removing them and we know how to estimate the parameters of a like this becomes just a stand
+
+104
+01:01:57,000 --> 01:02:48,000
+oop where's the formula sorry for the Mad scrolling crazy scrolling is here once you know Z you have a guess of Z then this is just fitting a gaussian with a unknown mu and sigma and you need to figure out what the sigma is that you're fitting but you know how to do that you so I guess this is something we've done you know maybe K lectures in a row and it is I agree with you like it is abstract and weird that that falls out and I want to say it in that abstract and weird way so that you're
+
+105
+01:02:23,000 --> 01:03:14,000
+not afraid of it because you're going to you know if you want to go into these things you want to use these things like it'll look very strange but once you get it in that form it's just kind of a plug and chug kind of mentality to to get all the results from things you already know derivatives you already know how to compute cool oh go ahead expectations so that's just the definition of coari so because I know the the distributions I want to compute what Sigma must be and I'm just trying
+
+106
+01:02:49,000 --> 01:03:59,000
+to tell you the reason I wrote it that way is to tell you there's nothing else going on in the model I'm just Computing the expectations I know the coari of the individual objects and that is telling me like that I can write it in this form cool all right let's use 20 minutes to do PCA and we should be in good shape all right PCA all right so PCA I'm gonna draw this little diagram to explain where we are principal component analysis so we looked I want to fill out this table you
+
+107
+01:03:31,000 --> 01:04:27,000
+say why do you want to fill out the table I don't know just how I do it I like that it fits also you should know it it's a important algorithm' be weird if we didn't teach it although probably a bu of you have seen it before if not don't worry about it so one of the things that's inside machine learning which is really kind of interesting historically I won't bore you too much with like you know the various tribes of like machine learning Theory and how how we got where we got
+
+108
+01:03:59,000 --> 01:04:51,000
+and who fought with whom at which conference although it's kind of funny because it like so bizarre but there are kind of two schools of thought of doing machine learning and uh you know at a at a kind of a broad level there kind of the basian school of thought which is everything should be written down as a probability distribution maximum likelihood we write these priors we use conjugate priors we kind of crank through the model and we have this forward story and then there's kind of another Camp that's like kind of
+
+109
+01:04:25,000 --> 01:05:12,000
+more the frequentist style world just from the stat side that was like we don't want to use probabilities we just want to have these kind of nice estimates they also like maximum likelihood they also like B rule but they differ in some ways of like how you approach modeling and what a valid model is like how you know to trust a model okay doesn't matter at all the point is almost everything in machine learning has kind of these two different approaches and I'll say at one point in my career early in my career I built a
+
+110
+01:04:48,000 --> 01:05:39,000
+system which was like very much in the probabilistic camp and then became kind of disillusioned with it and moved to doing something else um but there are merits to both approaches PCA is what we're going to talk about so that's just historical context I just want you to know there are many ways to Model A lot of these different problems and we're going to talk about this one here and I want you to explicitly contrast it with factor analysis which is the probabilistic version kind of a PCA in
+
+111
+01:05:14,000 --> 01:06:17,000
+the same way K means and GMM have a parallel structure okay you saw K means we did GMM they had a nice kind of rhythm of how they were solving the underlying problem so it was nice to put them together um these don't have that nice Rhythm but they they have something else that is nice to see all right so let's see PCA please oh okay so we're gonna be given pairs here and this is kind of a weird example but it's something that makes uh hopefully the main point clear okay so imagine someone gave
+
+112
+01:06:01,000 --> 01:07:10,000
+us a data set and this data set had a bunch of cars on it and the cars are going to be rated on like kind of highway miles per gallon and City okay and these are gas cars these aren't uh electric cars okay so they're kind of scattered all over this okay and I actually went and got the real data it's not that interesting but you know there's a couple that are substantially better substantially worse than the line okay now imagine these cluster up here just to give you kind of complete the story these are maybe
+
+113
+01:06:37,000 --> 01:07:43,000
+hybrids oops these are hybrids maybe these are SUVs they have bad gas mileage or trucks or something and these are economy cars I don't know okay clear what the visualization is is saying okay so we ask a question which at first seems kind of strange but you know it's it's a question we could ask nonetheless what does it mean for a car to have a good miles per gallon now some cars are going to be better on the city some cars are going to be better on the highway we can kind of like a single
+
+114
+01:07:20,000 --> 01:08:12,000
+direction or a single kind of way that says what is the component of principal variation right for good miles per gallon and that's kind of what we're trying to ask and by the way PCA is typically employed in these settings when we don't know too much about our data we want to visualize it in some way or get some understanding right modern methods kind of incorporate a lot of its ideas so you don't need to run it usually as a standalone ahead of time anymore like they worry about these features and
+
+115
+01:07:47,000 --> 01:09:00,000
+things but it it focuses on one thing I really think is great so how do we deal with this all right so the first thing we do is we take our data in the PCA worldview and we Center it okay okay now what does it mean Center we compute mu which is equal to 1 by n Su IAL 1 to n x i and this is and then we subtract mu from every Point here to get it to get the center of the data set at zero okay should be balanced in all ways this is just to make sure that the scale the raw numbers don't matter because we're going to talk about
+
+116
+01:08:32,000 --> 01:09:27,000
+geometry and also we're going to use some ideas from linear algebra and linear algebra likes things that go through the origin right we like linear Maps linear maps go through the origin so we want to like the origin has a special role linear algebra this is still Highway this is City okay now if I look and I just eyeball it roughly speaking it feels like the component of of variation is something like this right and what I mean is if I look along that direction that tells me like the more I go along
+
+117
+01:09:01,000 --> 01:09:45,000
+that the better the highway model is there's some variation that's that's around that but that's like good miles per gallon and and Below as you go those are like slightly worse so along this this line is kind of the principal direction of variation it doesn't capture everything right like there's this character way over here there's some character way over here there's an automated way of kind of den noising that his data sets and other things that I'm looking at and so what what we'll
+
+118
+01:09:23,000 --> 01:10:30,000
+talk about is this direction mu1 which will typically be a Vector is a component of principal variation okay this is very intuitive I'll Define it formula in a second you1 you1 okay and if I look I can still describe all my points this is just Linear alra by something that's orthogonal and I'll call it U2 okay now I'll construct U1 and U2 because I only care about their directions to be unit vectors okay and so you can kind of think about U1 as how good is the mile per gallon and U2 is kind of explaining
+
+119
+01:09:56,000 --> 01:11:03,000
+its first variance right like it's the first if you thought about it as probabilistic it would be like the first direction that they vary a COR varies and then like what's that second order effect you can imagine doing this in higher Dimensions all right formally one second we can write x i equals Alpha i1 * mu1 plus Alpha I2 mu2 and these are scalers okay this is just linear algebra please go ahead you had a question yeah we're just eyeballing it for now I'm saying that like looks
+
+120
+01:10:39,000 --> 01:11:29,000
+roughly correct we're going to find how do we find that line in just two minutes five minutes so let me once we write the definition let's come back and you and then hopefully your intuition and my intuition will be a little bit closer right but yeah that's a great question you're exact you're thinking exactly the right way why is that the right line why is this Maniac drawing that line right now the thing is is we may only decide by the way to use this as dimensionality we may only keep this
+
+121
+01:11:10,000 --> 01:12:20,000
+component okay because it explains more variation and that's going to be how we Define it variation okay so what we want to do here just so you're clear so here I drew it from two to one just as I was drawing before but think about if I had thousands of Dimensions you can't possibly visualize thousands of Dimensions it's really tough and I want to get it down to say you know two or three or five or 10 right I want to find those principal variance okay and so PCA also functions as a dimensionality reduction method
+
+122
+01:11:46,000 --> 01:12:32,000
+okay so here we showed just a two dimensional plot but imagine I gave you the cars have thousands of numbers and you want to get a very succinct description of them as just five numbers or I gave you 10,000 sensors as we were talking about before and you wanted to figure out give me three numbers which really describe every different individual sensor and its variation from that number it's very similar to factor analysis right like it's looking for that low dimensional Subspace that you
+
+123
+01:12:09,000 --> 01:13:12,000
+want in fact it is formally a low dimensional Subspace it is a dimension of Dimension two or three or k underneath the covers and we'll come to that in one second okay so at this point this is intuition you should have more questions and answers let me State the algorithm that we're going to do the pre-processing that we're going to do and then you'll see why some of these variation things are please go ahead I think what you're proposing is that yes X has number of principle but like most of them are
+
+124
+01:12:43,000 --> 01:13:36,000
+noise except for the initial that's what are you saying I'm saying great question so imagine I gave you this X1 to xn that live in some high dimensional space d then what I'm going to try and do is find a smaller number of directions but those directions are not necessarily aligned with the axis which means they're not like component 5 seven or 9 there's some mixture of all of them and so U is not aligned with an axis right it's some mixture of of the of the highway Direction and the city Direction
+
+125
+01:13:09,000 --> 01:14:06,000
+and I'm going to find that direction and then I'm going to say that's the direction that the data set varies most in there's the most spread in so I want to keep where you are on that line I'll project you on that line then maybe the second the third and that's going to be like a third kind of you know a three numbers that best capture you in the data said if you're an individual data point uh not noise but I'm just not modeling them yeah please I guess what happens
+
+126
+01:13:37,000 --> 01:14:29,000
+the relationship relationship yeah how does It capture the direction oh wonderful question so we'll come back to that in a little bit effectively what we're going to do is we're going to capture some variation that's there so there may actually be some of these hidden ation that are underneath the covers and we we won't model them well or we may only model them well in different pieces of data there are methods if I know that there's a nonlinear relationship between a lot of the different elements of data
+
+127
+01:14:07,000 --> 01:15:04,000
+that like I can I can capture here we're assuming there exists a linear Subspace and that's a fairly robust assumption so people do use more Advanced Techniques like tne and umap which do have actually the assumption that there's some very compressible nonlinear map that explains what's going on but PCA is kind of the the the first and the the cleanest to describe yeah awesome question okay so we Center the data by the way just I'm going to review this in one second I'm just trying to write so
+
+128
+01:14:35,000 --> 01:15:43,000
+we can get through this uh mu we know what it is 1 by n some I 1 to n x i okay we may need to rescale the components why is this well what if one component was miles per gallon and another was feet per gallon they're just just different by a factor of 5,000 there'd be a lot of variation in the feet per gallon right not the miles per gallon the numbers would be different so not only do we want to like Center them and get them both centered around zero we want to rescale them so that they have exactly
+
+129
+01:15:09,000 --> 01:16:17,000
+uh kind of the same width and what we'll do is we'll just divide by the variance by the sample variance right in that direction so that all the numbers are kind of like roughly normally distributed you should you should think okay so we're going to assume that the data are pre-processed if you actually do this method you should do the pre-processing so let's see PCA as an optimization problem all right oops Monkey Business I'll live with it okay all right so here's what we're trying to
+
+130
+01:15:54,000 --> 01:17:13,000
+solve and this will get back to some of the questions that were asked about hey what do we what do we uh why do we think this is a dire principal Direction okay we need we need a little bit of of uh of math before we can make that precise X okay so what we want to solve right what we have is we have some direction mu1 we have some other direction mu2 which is orthogonal this is mu1 we have some direction mu2 which is orthogonal we have these are unit vectors mui equal 1 are unit vectors and they're
+
+131
+01:16:33,000 --> 01:18:11,000
+orthogonal mui muj equals zero or equal sorry equals Delta i j sorry orthal okay so how do you find the closest point on this line to X well this line just to be clear can be parameterized as T * U1 for T element of R right it's just a line one-dimensional line and so to find Alpha how do we find Alpha above closest point that's the following expression alpha 1 equals the argman over Alpha of x - Alpha mu1 Norm Square okay right so hopefully this makes sense if I want to find the closest point
+
+132
+01:17:28,000 --> 01:18:47,000
+intuitively it should be on the line that's orthogonal here it's not a very great drawing but that's where it should be it should be projected onto this line and we can minimize over the whole line by minimizing over Alpha we do the standard thing here we compute the derivatives we multiply it out right so this is equivalent to when we multiply it out ARG men x² + Alpha Square * mu1 s minus 2 Alpha mu1 dox this is Argent over Alpha this doesn't change this is a function of the input this is
+
+133
+01:18:09,000 --> 01:19:58,000
+one so when we go to compute the derivative what do we get we get 2 Alpha minus to um UI 1.x okay or said more simply Alpha equals zero right this is the gradient with respect to Alpha so Alpha equals mu1 dox okay this is saying the dot product in this direction tells us exactly the closest point this is just differentiating this expression with respect to Alpha okay all right now you can generalize this to any set of directions orthogonal directions so if I have mu1 to Mu K element of Rd and X element of Rd how do I find the
+
+134
+01:19:07,000 --> 01:20:56,000
+closest point to the Subspace span by mui here we're going to use the fact that mui J Delta i j well it's going to be the following argman alpha 1 Alpha k x minus sum K = 1 to n or sorry Jal 1 to K Alpha J mu K now expand that out again exactly as we did before and you'll see that Alpha I is equal to mui or UI dotted into X this is the inner product if you like okay we call this quantity x minus some Alpha J UJ sorry this is UJ UJ s to K okay the residual okay so we have everything we
+
+135
+01:20:08,000 --> 01:21:01,000
+need rushing a little bit here but so the point I want to make is if you have a Subspace and you want to find the closest point in that Subspace to X that's the same as minimizing over all the possible directions in the Subspace this distance squared distance squared makes the computation easier then Al I if you solve it is going to break apart and the reason it's going to break apart is when you multiply it apart like this you're going to get products of mui and muj they will all go away so all you'll
+
+136
+01:20:35,000 --> 01:21:33,000
+be left with is a bunch of the alpha I and Alpha JS that are multiplied in exactly the same way as the 1D case and you should check that and this is you know if if you're Rusty on this this is from your linear algebra class and I'm super happy to write it out in more detail if that confuses you but for now hopefully we can we can just move through this okay this thing here is the residual that says how close am I what's my distance from X to the Subspace and that's going to feature
+
+137
+01:21:03,000 --> 01:21:59,000
+prominently in what we do next please so so what we're going to try and do is we're going to try and find a low dimensional Subspace and I'll describe how we're going to do it next and PCA when we're talking about what's the principal component of variation we're going to search across all the dire when we're looking for the principal component we're going to say which one of them has this for example there are two ways we can find PCA but has the smallest residual or what will be equivalent
+
+138
+01:21:36,000 --> 01:22:50,000
+maximizes the amount of alpha the amount we projected onto the subset okay so there are two ways you can do this so we can find PCA by one maximizing the projected amount that means trying to make alpha as large as possible right so if you give me a Subspace which is a section of of vectors I can compute the alphas by solving this problem I want to compute something so that a Direction so that for almost all the data points my Alphas are as large as possible so getting back to the earlier question
+
+139
+01:22:18,000 --> 01:23:18,000
+about why did I say that direction was the principal component of variation is because if I put it in that direction I was kind of explaining the most and the residuals the errors were small dually these residuals for every Point are as small as possible and we're going to minimize those in one second yeah go ahead we just we did so awesome question no not necessarily right because for example think about even if we we we normalized it there may be One Direction that explains for example the temperature how far it is
+
+140
+01:22:53,000 --> 01:23:50,000
+away from the heat source to my thousand temperature sensor example and there's one direction that explains that but there still could be variations in other directions that are not captured by any of the process and so they would be orthogonal to that so it's not necessary that the um that the all even though all the directions on average are normalized that for any particular Point like if there's a correlation would would would be the same okay so we actually normalize all the axis with the same
+
+141
+01:23:21,000 --> 01:24:36,000
+scale so all the axis are are are put into the same scale by taking individual component and Computing sample variance yeah multiply by a diagonal matrix please when we taking Al how do we take the AL is it the distance between the line and orally or great question so here alpha alpha is is basically T so it tells you how far along the line you're going to go so Alpha is constrained to live on the line so when we minimize over alha we're minimizing its coordinate along the line and that's well defined right there's
+
+142
+01:23:59,000 --> 01:24:56,000
+only there's a closest point here right we know that kind of intuitively from you know undergrad whatever whatever geometry we took right like that there's a closest point but this proves it right awesome cool please yeah so it's either you want to you want to capture as much of your data as possible and in the linear case it's either you want to you want to capture as much as possible or minimize the residual would turn out to be equivalent because here if you look at it because
+
+143
+01:24:28,000 --> 01:25:32,000
+these are unit vectors making Alpha JS bigger like if you if I had two sets of U's you know you and I'm comparing them if the alphas are bigger for this one on average than for this one then that says that they capture more of my data right because they're a projection the alphas are defined by the use yeah all right so let's find the component principal component of direction right so what this boils down to I'll just do one of the methods the maximization one you have to do the
+
+144
+01:24:59,000 --> 01:26:16,000
+other one in your homework by the way so I'm one reason to pay attention is this says look over all the directions sorry you okay so it says look over all the directions that are out there dot them into the data set this is Alpha right this is the alpha we were just talking about and try and maximize the one that captures most of it so if you imagine me sweeping that line across the earlier data set where we were looking here right here and I'm sweeping that line here here here my are all from the
+
+145
+01:25:43,000 --> 01:27:02,000
+origin sorry go away here here clearly this captures much more the alphas are much larger than they are here right just take the dot products right because it's just projecting onto a relatively narrow band doesn't capture as much spread I want more spread right it's quadratically more spread okay so how do we solve this question here well we need a couple of facts okay maybe we will pick this up in a little bit Yeah I that's probably best so let me ask me any questions about particular
+
+146
+01:26:24,000 --> 01:27:31,000
+spot we'll talk come back about how to solve uh this kind of equation in a second any other questions about this piece yeah you go back to essentially like this point only what we trying to so what you by maximizing projective softes you're just trying to ensure that whatever U we choose all initial on they Maxim the data point exactly right they they capture the most of the data so think about when we were going back to our earlier example this is this is important we were going to have U1 and
+
+147
+01:26:57,000 --> 01:27:58,000
+U2 that was like our basis right that's formly what it's called we want to capture so it turns out that the the squares of alpha 1 and Alpha 2 sum to the square of xi's components like their Norms are the same okay that's just a mathematical fact because these are these are this is what a basis is so so the the point is is we want to capture of these two we're going to throw away Alpha 2 if we only are allowed to compute one component so we want the the U that we select to be the one that for
+
+148
+01:27:28,000 --> 01:28:15,000
+most of the data captures some relevant information right like if we found something like this direction is mostly orthogonal to where the line that the data lives on so almost everybody's going to have like a projection that's really small like the data when I project onto the line is just going to be clustered really really tightly together whereas if I cluster if I project onto this line it's still going to be nice and spread out and this mathematically just says that it corresponds to either making sure that
+
+149
+01:27:51,000 --> 01:28:53,000
+the alphas overall are very close to the X's so they're larger on average or that the amount that I lose this is the residual is the amount that I lose from the other directions is equivalently small and and for for PCA and ukian space this is the the case not relevant for this class but there are other di there are other kinds of geometries where that's not true this happens to be true for ukan geometry if you decide to take nonukan geometry it's a great course what is the oh X I let me just write it again
+
+150
+01:28:24,000 --> 01:29:28,000
+nice catch yeah eyes don't show up very well with this pen in my handwriting which is Criminal since we use them so frequently just assume it's an I but that's all it goes on right so we're think about what this equation is saying what this optimization is saying it says pick over all the U's that are there we're normalizing we come back to why we normalize it doesn't really matter too much but what we want to do is explain as much of the data as we can okay awesome so uh next time we will
+
+151
+01:28:56,000 --> 01:29:22,000
+cover a little bit of igen values and how we solve this this is a this is an igen value problem and we'll cover the cocktail problem uh as well and you saw a little bit of of PCA thanks so much for your time and attention talk soon
+

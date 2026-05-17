@@ -1,0 +1,83 @@
+Stanford CS231n: Computer Vision / Deep Learning
+========================================================================
+
+Course Information:
+- Course: Stanford CS231n Computer Vision
+- Institution: Stanford University
+- Instructors: Fei-Fei Li, Justin Johnson, Serena Yeung
+- Playlist URL: https://www.youtube.com/playlist?list=PLoROMvodv4rOmsNzYBMe0gJY2XS8AQg16
+- Total Lectures: 18
+- Total Duration: ~22.5 hours
+
+Lecture List (Spring 2025):
+--------------------------
+01. Introduction
+02. Image Classification with Linear Classifiers
+03. Regularization and Optimization
+04. Neural Networks and Backpropagation
+05. Image Classification with CNNs
+06. CNN Architectures
+07. Recurrent Neural Networks
+08. Attention and Transformers
+09. Object Detection, Image Segmentation, Visualizing
+10. Video Understanding
+11. Large Scale Distributed Training
+12. Self-Supervised Learning
+13. Generative Models 1
+14. Generative Models 2
+15. 3D Vision
+16. Vision and Language
+17. Robot Learning
+18. Human-Centered AI
+
+Topics Covered:
+--------------
+- Image Classification (Linear Classifiers → CNNs)
+- Neural Networks and Backpropagation
+- Convolutional Neural Networks (CNNs)
+- CNN Architectures (ResNet, VGG, etc.)
+- Recurrent Neural Networks for Vision
+- Attention Mechanisms and Transformers
+- Object Detection and Image Segmentation
+- Visualization and Interpretability
+- Video Understanding
+- Large Scale Distributed Training
+- Self-Supervised Learning
+- Generative Models (GANs, VAEs, Diffusion)
+- 3D Vision and Geometry
+- Vision and Language (VQA, Captioning)
+- Robot Learning and Embodied AI
+- Human-Centered AI
+
+File Naming Convention:
+----------------------
+CS231n_LXX_T_Topic.srt
+
+Where:
+- XX: Lecture number (01-18)
+- T: Type indicator (I = Lecture)
+- Topic: Brief description of lecture content
+
+Transcripts Source:
+------------------
+NoteGPT (30-second interval transcripts with timestamps)
+
+Course Highlights:
+-----------------
+- Comprehensive computer vision curriculum
+- From basic classifiers to state-of-the-art deep learning
+- Covers both traditional and modern approaches
+- Includes cutting-edge topics like transformers and generative models
+- Practical applications in robotics, healthcare, and human-centered AI
+
+Processing Status:
+-----------------
+[ ] Upload transcripts (completed)
+[ ] Rename transcripts (completed)
+[ ] Process video chunks
+[ ] Generate embeddings
+[ ] Create FAISS index
+[ ] Test multi-modal queries
+[ ] Complete multi-modal RAG system
+
+Last Updated: 2026-05-17

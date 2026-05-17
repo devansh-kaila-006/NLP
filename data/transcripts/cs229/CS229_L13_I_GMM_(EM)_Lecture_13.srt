@@ -1,0 +1,600 @@
+1
+00:00:05,000 --> 00:01:02,000
+hello uh so welcome to our lecture on the EM algorithm so just to figure out where we are in the flow because we kind of have this flow of looking through a bunch of these unsupervised algorithms we got kind of got our uh you know hands dirty with k-means and GMM these were our first two unsupervised algorithms and what we're going to try and do is kind of generalize what happened there so that we can use it in many different settings and and move on from there so last time we saw these two algorithms kamines in
+
+2
+00:00:35,000 --> 00:01:25,000
+in GMM if you don't remember the GMM algorithm was the one that we had these photons that we were trying to fit gaussians to maybe three gaussians that look like that don't worry about if you don't remember the details just roughly what we're dealing with and the big idea we encountered was this idea of a latent variable and the latent variable in this setting if you remember was this fraction of points that come from a source so we didn't know how many points were coming from each one of those light
+
+3
+00:01:00,000 --> 00:01:54,000
+sources that were out there we had to estimate that once we estimated that then we would be able to go back and fit all the different parameters that are there okay okay um awesome so and that the fraction of points we also had to figure out the linkage the probability that every Source was coming from a point and then we could do the estimation and the main thing that I wanted you to take from both k-means and GMM was this main idea that we kind of guess the latent variable things is a great way to put it
+
+4
+00:01:27,000 --> 00:02:15,000
+and kind of how we have in the notes you guess where the where they're probabilistically linked that is what's the probability of this these points belong to Cluster one this point belongs to Cluster two so on and then once you have that you then solve some estimation problem that looks like a traditional supervised learning so that decomposition is quite important and we're going to try and uh kind of abstract that away and then we would estimate the other parameters that's what I mean by a kind of traditional
+
+5
+00:01:51,000 --> 00:02:42,000
+supervised thing now today what we're going to do is we're going to take a tour of em in latent variable models and try and cast them on a little bit more principled footing because last time the kind of the calculations were yeah it kind of makes sense that that's the average the weights in a cluster we'll try to derive the action that we're doing there from a more principled framework which is mle doesn't mean that it's right maximal likelihood is just a framework it happens to be though the
+
+6
+00:02:17,000 --> 00:03:14,000
+framework that we use throughout most of the class there are others in machine learning by the way but this is the one we're going to use so before I get started on kind of the rundown any questions there I'll start to write oh oh please [Music] what is the first step in here now what do we guess we could guess randomly an assignment of every point to the cluster the probability remember there was this dij if you don't recall we'll bring that up later don't worry about now but we
+
+7
+00:02:48,000 --> 00:03:34,000
+had to guess for every point x i which of the K clusters it belonged to and with what probability we could for example initialize that to uniform we don't know anything right and that's the thing something we may have some other heuristic guess that was what was going on in the k-means plus plus we have a smarter initialization but that's the how we get the process started once the process has started we just keep running those two Loops again and again and hopefully it will improve and we'll
+
+8
+00:03:11,000 --> 00:03:55,000
+capture in what sentence it improves you'll see this weird picture of a curve that we go up and that's going to be the the loss function awesome okay so we're going to look at the EM for latent variable algorithms and this is where it applies this is what it's for is dealing with various different Notions of latent variables and I'll I'll say this right now maybe a little bit cryptic and I'll come back to it either at the end of today's lecture in the next lecture when we pick these
+
+9
+00:03:35,000 --> 00:04:20,000
+latent variables there's kind of a little bit of an art what they're doing basically is they have that decoupling property if we knew this thing that we couldn't have observed then all of a sudden it becomes a really standard statistical estimation problem and somehow we are assuming structure and that's what we're putting into the latent variable so we're going to see walking through this today that structure we're assuming there's this probabilistic map out there that says
+
+10
+00:03:57,000 --> 00:04:46,000
+how often you know how likely every uh point is to go to Every cluster in other cases we'll see more sophisticated variants of this idea but it's it's actually fairly profound that's the that's the real key idea we can abstract all the algorithmic details into en same way we did for you know the the election the exponential family stuff okay now before we get started I want to take a technical detour and so it's really important that we have sign posting here because I'll say why is
+
+11
+00:04:22,000 --> 00:05:14,000
+this guy drawing these weird pictures the technical detail is I want to make sure that you understand uh this key result which is convexity and Jensen's inequality and the reason is I'll refer to this thing as we go through we're going to use it it's not like I'm just teaching you something for your health like this is actually going to be used in The Next Step it will actually in some sense be the entire algorithm like if you understand this in the simplest way then understanding the algorithm will make a
+
+12
+00:04:48,000 --> 00:05:33,000
+lot of sense so become a clear point where we apply Jensen's inequality where we make it tight those are the things that we're going to think about as we go through it okay so we're going to do this technical detailer and I'm going to try and show it to you in pictures because I think it's the most intuitive way to understand kind of the basic cases if you already know it don't worry it's just another another proof that you'll see then this will allow us to go to doing the EM algorithm as mle
+
+13
+00:05:10,000 --> 00:06:01,000
+and what I mean is we're going to be able to write down a formal loss function a likelihood function right that's what mle is we write down this loss function and then we maximize the likelihood and we're going to show that this actual algorithm is actually under the covers maximizing a likelihood function all right then I'm going to come back and I'm going to put GMM into this framework and this will answer some of the questions that we kind of you know iteratively heuristically answered like why are we
+
+14
+00:05:36,000 --> 00:06:20,000
+estimating those parameters in such a way and that will allow us to say yep GMM is an em algorithm and so it'll give us a principle to solve for all the weights if you remember there was those cluster centers the mues and the sigmas The Source centers mu's and sigmas and fractions and we're going to solve for all of those and this gives us a principal way to do it because we're we're sorry we're in this mle framework okay so we'll exercise it basically exercise the notation and then we almost
+
+15
+00:05:58,000 --> 00:06:49,000
+certainly will not have time for this today but I combine the notes and we'll go through that continue to go through them on Wednesday we'll go through what we call factor analysis okay and factor analysis is another model the reason I want to show it to you is it's different than gmms so it's a occupies a different space and it will kind of force you to look at the kind of decisions you're making right what are you modeling here and in particular we'll model a situation where like
+
+16
+00:06:23,000 --> 00:07:13,000
+traditional gaussians kind of couldn't fit the bill because we're modeling something that's huge and high dimensional and we have to assume some structure to be able to get the whole program to work and by comparing these two and what's similar to them hopefully you get a pretty good sense of of what em is and all the different places that it runs okay all right okay so far so good so if there are no questions we're going to go right into our technical detour which will lead
+
+17
+00:06:48,000 --> 00:07:43,000
+then into the EM algorithm as um as mle okay all right okay so here's our detour this is convexity and Jensen so this is a classical inequality and what I want to show you is that Jensen's inequality really is like convexity in another guys okay and it's a key result so I want to go slowly that's the only reason we're doing this okay so don't think that there's something super mysterious going on there isn't hopefully if I do my job well you'll just look at the pictures
+
+18
+00:07:21,000 --> 00:08:46,000
+and be like oh yeah that makes sense okay here's the line I see what's going on okay so first we're going to define a set as convex when we did this last time but just recall a set is convex if oops if four any A and B element of Omega is that Omega sorry for any of it the line between them is in Omega so I'll write this in math so it's precise because n Omega okay so so what does that mean so let's draw the picture first and we'll draw the math here's a convex set so it means no
+
+19
+00:08:04,000 --> 00:09:11,000
+matter how I pick a here's a and no matter how I pick B the line the straight line between them the geode stick between them those straight line is in a set this is convex okay in contrast just to see there's not a trivial definition this thing here which I drew very crappily but that's okay I'll draw it like this because actually you'll see why the bottom makes more sense to me in a second here we have one example so if I picked a here and I picked B here yep the the line is in the set but that doesn't
+
+20
+00:08:38,000 --> 00:09:59,000
+prove its convex it has to be convex for all of this choices and here if I prove if I put it for B lo and behold this would not be convex okay so let me draw write the math while I have the picture so this is in symbols for all Lambda element of zero one so this is how a parameterized going on the line a b element of Omega Lambda a plus 1 minus Lambda oops accidental stroke Lambda B is an element of Omega okay clear enough what that means this is just the line between a and b right I'm just saying that no matter how
+
+21
+00:09:18,000 --> 00:10:49,000
+I pick a and b and Lambda this thing still remains in the set which is just capturing this picture cool all right now we're going to use we're going to apply this to functions so given a function uh for right now we make it uh one one dimensional GF we're going to find the graph of that function as a set of X Y such that Y is greater than f of x okay f okay this is my definition so a function is going to be convex if it's graph is okay as I said okay so let's draw an example of this so
+
+22
+00:10:20,000 --> 00:11:22,000
+here's my function here's you know zero here's minus one here's one and I draw this character okay so this okay so the the Shaded region here so this function by the way the one that's in my head is going to be f is equal to x squared so if you're trying to if you're trying to correct for my artistic shortcomings this is f equals x squared it's a parabola it's a parabola kind of a bull shaped function all right now no matter how I pick the points and clearly I should really only have to
+
+23
+00:10:52,000 --> 00:11:52,000
+worry about picking on the edge so if I pick a point here a and I pick a point F of a I pick a point B and pick a point F of B the line between them right goes here it's not necessarily a straight line across I just happen to pick it that way go up it go down do whatever once okay now this function here will imagine we'll talk about a point Z later so I'll just say there's like a point Z that's going to live in the middle okay and this is this is B lives here let me erase zero and one because we don't
+
+24
+00:11:24,000 --> 00:12:38,000
+really need them their values are kind of unimportant to us there's just so you knew what I was drawing okay I'm going to draw a all right awesome all right now what is this function well this is uh I think it's x minus 1 x minus 2 squared looks like this and then it is graph is everything up here and this is not convex for the same reason I could pick a point here I pick a here I pick B here and the line between them is below the set so this is a convex function this is not convex okay
+
+25
+00:12:03,000 --> 00:13:17,000
+so let's look at this in symbols so so clear enough hopefully like trivial like oh you just drew two pictures twice and one you said was a function graph and the other one you didn't the function graph was open to the top but that shouldn't be really disturbing so far so good all right so what does this mean means for all Lambda element of 0 1 Lambda A F of a plus one minus Lambda these are as tuples b f of B is an element of Omega what does it mean to be an element of Omega it means that if I take any Z that's on
+
+26
+00:12:39,000 --> 00:14:08,000
+the path Lambda a to 1 minus Lambda B so any character that comes in between here in here then it had better be the case that Lambda F of a plus 1 minus Lambda F of B is greater than F of Z right so this is now Z F of Z this is z this is f of Z does that make sense just translating the definitions directly in the more cryptic language we usually just tell you every chord is below the function I'm sorry it's above the function sorry I'm drawing the wrong way above the function what does that mean
+
+27
+00:13:29,000 --> 00:14:28,000
+well a chord is just anything that connects two points here so like this character would be another chord it lies entirely above the graph of the function where the function actually lives here that's not case I just found two points so that the chord between them is actually below the function so it's not convex and intuitively the reason I drew these shapes is that convexity for shapes probably makes more intuitive sense 2D shapes but now hopefully you see they're really the same thing so your geometric
+
+28
+00:13:58,000 --> 00:15:15,000
+intuition and the function intuition are the same modulo that we change this definition here okay all right now let me see all right so one other one other bit here so we're gonna we'll actually prove this I think why not sounds like a fun thing to prove if f is twice differentiable um and for all x f double Prime of X is greater than zero then f is convex okay so this says these functions really are bull shaped right second derivative being positive means that they have this kind of positive curvature that looks
+
+29
+00:14:50,000 --> 00:15:45,000
+like they use right they're First Dimension the first derivative goes up and down but they're kind of always trending the first derivative is always getting more positive right it's negative on the left hand side positive on the right hand side that's what it means by bowl shaped okay so this isn't super this isn't super hard to prove but just because I think it will stall for a little bit in case you want to ask me questions I'm writing out a Taylor series for this F double Prime
+
+30
+00:15:19,000 --> 00:16:28,000
+let's get a minus d square okay plus let me drag that guy so it's a little clear okay and this is this a to a is just something in a b so maybe you remember this from um you know your Taylor series all I'm saying is I can write F of a as some point F of Z plus some first derivative information plus some second derivative information and then I'm using the second derivative of remainder so I'm saying there's some point on the interval where this is true okay same thing for B
+
+31
+00:16:00,000 --> 00:17:05,000
+this isn't super important for your conceptual understanding by the way like this is just to show that you know you can um that you can you know do what you want to do here that this this makes sense to you eight squared and okay now I claim it's convex so I just take what's the obvious thing to do I'm going to multiply this by Lambda I'm going to multiply this by one plus Lambda so that I get I have to make a statement about this right that's what's in my definition
+
+32
+00:16:32,000 --> 00:17:57,000
+above okay well that's just the same as adding F of Z for Lambda plus one minus Lambda that's just F of Z so that's good that appears notice here that I get 1 plus a uh times Lambda plus 1 minus the Lambda times B well that's just equal to Z exactly right so I get 0 here plus zero right this is just because Lambda a plus one minus Lambda b equals e Plus these things are all positive plus some constant that's greater than zero so that shows that this thing uh this inequality holds F of Z
+
+33
+00:17:17,000 --> 00:18:01,000
+please yeah this is this is Taylor's theorem great question so what's going on here if you remember Taylor's theorem is you can keep expanding and then you have the last term which is the remainder term and the remainder term says there exists some point that lives in a to B such that this holds with equality and I'm just using the remainder form of Taylor's theorem by the way if this this is really not important for your conceptual understanding I just want to show that it's one line that the
+
+34
+00:17:46,000 --> 00:18:55,000
+statement which is like sometimes mysterious about derivatives and causes people's heads to explode like why do the derivatives connected to the convexity It's like because of this this is all that's going on awesome you can freely forget this and just use the fact this fact in the course okay okay stalling done any more questions Awesome the real reason we want to go through the derivative thing is otherwise this this thing which we actually do care about this strongly convex this definition feels like it comes from
+
+35
+00:18:24,000 --> 00:19:28,000
+space aliens otherwise if for on a domain is if F Prime of X is greater than zero strictly greater than zero this is strict equality here okay that's where the strongly comebacks comes from or so this is actually strictly convex doesn't really matter but okay so for example f of x equals x squared which I told you was in my head well this gives me a simple test right its second derivative is two that's greater than zero it is the prototypical strongly convex function okay you also saw those one halves
+
+36
+00:18:57,000 --> 00:19:52,000
+floating around this is to make this parameter sometimes with the curvature one doesn't really matter okay the other function that I had which you can check and graph yourself is x squared x minus y 1 squared this is not convex compute the derivatives you'll see but it's the one that looks like the two bumps right that's a it's a quartic so that's what it looks like has two bumps positive discriminant okay awesome so at this point what do I care that you know not too much honestly
+
+37
+00:19:24,000 --> 00:20:28,000
+about this what I care that you know is that there's some way that you are familiar with geometrically what uh convexity means and you know that there are these tests in terms of the derivative the second derivative being non-negative is a good test for convexity and if you have a stronger condition you can get the strong or strict complexity okay all good all right now what we actually need Jensen's inequality now if I've done my job well this mysterious looking statement once I show you the connection
+
+38
+00:19:56,000 --> 00:21:27,000
+you go oh okay that makes sense it's because it's actually just saying something about convexity but it's got a fancy name and it's so useful so it's the following statement the expected value of f of x is greater than F of the expected value of x so long as f is convex okay why the heck would this happen let's take one example suppose X takes value a with prob I don't know Lambda and X takes value B with prob 1 minus Lambda then what is it saying it's saying the expected value of f of x
+
+39
+00:20:57,000 --> 00:22:20,000
+is equal to Lambda times F of a plus one minus Lambda F of B what is f of the expected value of x well it's F of Lambda a plus one minus Lambda B that's exactly the definition of convex the inequality this is convexity okay now one thing that is the other thing I want to to say for this is notice that this does not matter how I pick Lambda later I'm going to define a curve when I Define a curve and that curve is going to be as a result of sweeping some parameters in a high dimensional weird
+
+40
+00:21:45,000 --> 00:22:35,000
+space but basically it says no matter how I pick the parameters of that curve anywhere that lives on this thing that's a probability distribution a bunch of numbers that sum to one in the discrete case this inequality holds and that's going to allow me to build a lower Bound for my function and I'm going to Hill Climb using it we'll see that in just a minute that will become clear are there any questions about this piece here all right now you may look and say okay well this is only in the case when there are two
+
+41
+00:22:18,000 --> 00:23:08,000
+probabilities what happens when there are more you can just repeat by induction you have to do something fancier if you want something that's a full probability distribution this holds even if e is a continuous distribution I won't show you that because we're not going to go too far off we'll stop it you know kind of high school calculus sound good all right all right so now you know Jensen's theorem and hopefully you'll always get the inequality the right way and the weight
+
+42
+00:22:43,000 --> 00:23:42,000
+region you'll always get the inequality the right way is you'll draw the picture of the function and see the chord's always above it which one must be Z which one must be F of z f of Z must be below the quarter of the function that's exactly this cool right now everything is defined in the literature traditionally for convex if you take convex analysis like it's the way we Define things we actually don't want to use a convex function here because we're maximizing likelihood and this is just
+
+43
+00:23:12,000 --> 00:24:20,000
+notational pain right like if we were maybe we should have like you know minimize unlikelihood I don't know what we should have done but this is where we are so we need concave functions and what are concave functions G is concave if and only if minus G is convex right so we flip it upside down okay the prototypical one that we'll use if G of X for example is equal to log of x here's my picture of log of x you know probably not very good is that it's going to look something like this
+
+44
+00:23:52,000 --> 00:25:00,000
+go off this way and notice that if I take a chord of this function right that's a chord it's below court is below right which is what I should hope right if I flipped it upside down the chord would be above cool now also there are functions that are concave and convex right so what if h of X is equal to a times X plus b it's a Line chords are both not a no longer above and below it's it's actually concave and convex linear functions are concave and convex okay ends the detour
+
+45
+00:24:32,000 --> 00:25:20,000
+let's get back to machine learning okay so now we have the tools just to make sure what did I care that you got there you got this way that as long as we were dealing with probability distributions no matter which probability distribution we took we have this inequality we can get lower bounds we're going to use that in a second to draw some curves of a likelihood function that will hopefully be easier to optimize than the original function and we'll try an iterative algorithm that will look exactly like we talked
+
+46
+00:24:56,000 --> 00:26:08,000
+about before and the way we'll conceptualize it is we solve for some hidden parameter we solve and get a that gives us an entire family of possible solutions we solve on that and we iterate let me draw the picture after I give you the formal set okay oops all right so em algorithm has Max likelihood that's Max likelihood I'm just gonna put mle all right so remember this is the max likelihood formulation there's some Theta that lives out there we have some data I from 1 to n these
+
+47
+00:25:35,000 --> 00:27:00,000
+are our data points we take a log of the probability that we assign to the data given our parameters this is a way for us to compare different parameters right and recall these are the parameters params and this is the data so far so good right now we're working with latent variable models so latent variable models mean that P has a little bit of extra structure PX data this is a generic term right this is just one of the I terms it says the function factors this way looks like a sum over Z where Z is our
+
+48
+00:26:24,000 --> 00:27:27,000
+hidden or latent variable p x z Theta this is a latent variable right so remember Z was our GMM latent variable the cluster probability right so we have to sum or marginalize over all the possible choices of Z this is basically saying I don't know what Z is I have some probability distribution that I can compute over my data and Z given Theta and I don't since I don't know what Z is I the term is I marginalize it out means I sum over all the possible values and this will get me back a probability for
+
+49
+00:26:56,000 --> 00:27:54,000
+X right this is a sum over all possible Z's this will leave me with a probability for x or sorry probability for x is that clear ask a question please yeah wonderful question it's a property of the model in a real sense when we make a modeling decision we say there exists some structure out there like there exists a probabilistic assignment between photons and point sources you know one version of the prior is I tell you exactly where every Photon comes from that's clearly a very strong prior
+
+50
+00:27:31,000 --> 00:28:22,000
+if you knew that God speak go do it you just solve GDA If instead what you know is there exists some mapping that's out there then that structure that you're putting into your function and what I'm saying is that mathematically comes down to baking exactly the same okay and this is the mathematical form for all of those latent variable models so when we have that idea about latent structure we'll eventually put it into this mathematical form and we'll see a couple more examples wonderful question
+
+51
+00:27:56,000 --> 00:28:45,000
+in GMM this was exactly the Z there the notation isn't an accent it's the same Z yeah so the example that we had was the basically the whole lecture where Z was the probabilistic linking between sources and photons yeah yeah so that's that's one we'll have more examples later but I want to get through the algorithm in this abstract form and we can shoehorn more things into it and what I'll do afterwards is put GMM right down in this language we need a couple more things please
+
+52
+00:28:28,000 --> 00:29:15,000
+coming from a particular cluster um what is it expert like what is probability of X parameterized by Theta I think actually represent in this case in that like Photon example yeah exactly so remember if you there was I think it was said yesterday by someone here on that side of the room so I don't know if that's facial recognition helps you in the last lecture but was it was like imagine I was guessing all the photon models that were out there so each one was parameterized by some choice of zi
+
+53
+00:28:52,000 --> 00:29:43,000
+and then what I'm thinking about is what I want over that is that like across all those datas no matter how i instantiate z each one gives me a different probability distribution I can sum them up and that tells me given this data no matter is assigned or across marginalization cross always that it's assigned How likely is the data so PX data we've been using forever we use that from the supervised days we just inserted Z and said like well there's this wild Z that we can't observe but it
+
+54
+00:29:17,000 --> 00:30:12,000
+somehow constrains X it means that X like the relationship between Theta and x and that's what the model does awesome question very cool these are wonderful questions I'd much rather answer these than badly draw the pictures that come next we're going to get to those pictures no matter what so there's really no saving us all right let's get to the bad pictures all right so I'll try and leave this more or less on the screen here's the algorithm this is a picture which you know maybe won't make
+
+55
+00:29:47,000 --> 00:30:46,000
+perfect sense to start with but we'll get there I'll go all right so remember what a loss function looks like I'm drawing everything in 2D but of course this is in like horrible High dimensions this is my access is Theta and then what I have and I apologize I will use a bunch of colors I hope this is okay for people to see um if not let me know doesn't look like the most visible color but doesn't look like the least visible and I need a couple this is my loss function L Theta okay so
+
+56
+00:30:16,000 --> 00:31:04,000
+this is I'll write that in black there this is l l Theta okay so this is my lost curve okay this is L Theta here now remember it's not a nice concave or convex function right we wouldn't expect it to be we would hope because we're going to minimize it that it's concave that would be nice if it just looked like this like oh that'd be so great we would just climb to the top but we saw in a lot of the problems that we were after it doesn't look like that it has these kind of weird bends so we
+
+57
+00:30:41,000 --> 00:31:36,000
+had to settle that's another way of copying out and saying we had to settle for these local iterative Solutions that's all we're after we settled for that in kmm for in K means and we're going to settle for that in GM okay so how does the algorithm work we start with an initial guess now again you could ask these colors seem harder to read you start with an initial guess so Theta let's say at time T so it could be times zero right this is just the initial guess whatever it is
+
+58
+00:31:07,000 --> 00:32:01,000
+then what happens is this is mapped up to here which is L of theta T I haven't written anything I'm just giving notation this is just the value of the loss that I currently have I suspect there's a there's something up this this way I'd like to get so how do I do it how do I what's the algorithmic piece what I'm going to do is I'm going to form so the problem is optimizing over all those Z's seems daunting directly optimizing the L's so instead what I'm going to do
+
+59
+00:31:36,000 --> 00:32:22,000
+is I'm going to come up with a local curve okay and I'm going to call this curve l t of theta it's another function I'm only drawing a piece of it but it goes the whole distance right it's some some curve now we'll pick LT usually to be some nice kind of convex function something that's easy to optimize right so we're going to try and get that kind of easy to optimize function and then what we're going to do is we're going to optimize that function we're going to
+
+60
+00:31:58,000 --> 00:32:58,000
+find it's it's local maximum so it's local maximum for the sake of writing is let's say here and then we're going to set that to be Theta t plus 1. okay and this is now L of theta t plus one and we're going to again create some new curve LT plus 1 of theta based on that point okay and the key aspects of the point that I'll write in a second is this point is a lower bound this curve is a lower bound it's always below the loss so it's kind of a surrogate that I'm not overestimating my
+
+61
+00:32:29,000 --> 00:33:49,000
+progress and it's tight it meets at exactly that point so if I did happen to have the actual optimal value it would meet at that point so I wouldn't think and get fooled that there was a higher loss function somewhere else let me write those two things okay so first LT of theta is going to be less than L Theta we'll call this the lower bound property LT of theta t is going to be equal to l of theta t sometimes call this the type property okay Our Hope is LT is easier to optimize than l
+
+62
+00:33:19,000 --> 00:34:09,000
+so this picture the content is we're picking these like that was a really bad drawing of one but these picking these concave kinds of functions which are easy to maximize right that's what I mean by it kind of looks like a supervised thing then we maximize that and this is formalizing the back and forth we take that new maximum that we have which is our new best effort of parameters and then we then do it again and create another curve now the way we're going to create that curve you're going to see in one
+
+63
+00:33:44,000 --> 00:34:37,000
+minute is going to be Jensen's and that's the whole algorithm okay so I'll sketch the algorithm you don't you don't have math to talk about the algorithm but hopefully it's clear like what's going on easy to train surrogate we kind of slowly Hill Climb with that easy to train surrogate alternating back and forth and this is what we were doing in k-means this is what we were doing in gmms as well and just so it's super clear I want to make clear here Phi t plus one
+
+64
+00:34:13,000 --> 00:35:27,000
+this is nothing more than the ARG Max over Theta of LT of theta means I do Ma I do the optimization on the surrogate curve that I created all right I think that this description hopefully gives you some intuition of what's going on because otherwise the math is kind of bizarre um looking but we'll see so this is the rough algo I'm just restating what's in the thing I'm not giving you enough math this is going to be called not surprisingly the e-step this says given 5T find this curve
+
+65
+00:34:57,000 --> 00:36:08,000
+L of t and then the m-step and together at em given L of t set by T plus 1 equal to ARG Max by lt5 right so we could imagine doing some kind of uh gradient descent here but it's not clear how to deal with this marginalization that happens in the middle so if we did like some marginalization or some sampling we could do something that looked like that but it's because we have this decomposition we also know we have you can also imagine that we have like a decent solver for the inner loop because
+
+66
+00:35:44,000 --> 00:36:26,000
+it's this nice to solve thing I would say over time this split of like what's nice to solve and what's not right now I'm pitching it as you know kind of to you as like it must be concave and so it's nice but this kind of just means like I have an internal solver that's like fast and I kind of trust and I have something on the outside that's a latent variable that I'm like splitting up the modeling it's it's one of a number of decomposition strategies doesn't mean
+
+67
+00:36:05,000 --> 00:37:13,000
+it's the only way to solve it though wonderful question cool all right so the question is how do we construct L of t and I claim we know everything else so we'll come back to that claim in a second okay so let's look it's going to go term by term so let's look at a single term in our equation okay all right so I'm going to grab one of these characters just one and work with that okay so how do we construct it so right now we're trying to understand how to create this lft from this function
+
+68
+00:36:47,000 --> 00:37:53,000
+and you should roughly be thinking because I told you that Jensen's will have something to do with this okay now what we're going to do to put it in the form where Jensen's could be used looks wholly unmotivated okay totally unmotivated but it's to shoehorn into what we're doing and there's there's some motivation but it's kind of opaque so let's see what I'm going to do is something which at first glance seems strange now this is true formally for any Q Z that I pick
+
+69
+00:37:22,000 --> 00:38:34,000
+okay please so here I'm just introducing Q this is true for any cue right let's not worry about support issues but like I'm just putting in something that divides by one seems sort of unmotivated to do this now I'm going to only consider we get to pick Q so I'm going to pick cues so that I can use Jensen such that it's a probability distribution over the states such that the sum over Q Z equals one and Q Z is greater than or equal uh to zero okay I'm gonna call this property star
+
+70
+00:38:04,000 --> 00:39:11,000
+okay so I'm going to pick Q as a probability distribution I'll write that in a different color okay why because now I can make my argument one line that's the real reason so how does it work well okay good so we have this character copy and here this can also be written oops oops I don't want to use blue this can also be written as an expected value where Z is distributed like Q right of this weird looking quantity why is that well it's just the definition of expectation it is just
+
+71
+00:38:53,000 --> 00:39:53,000
+symbol pushing there is nothing deep going on but it's important symbol pushing because it means Jensen's Applause oops log of this thing sorry damn it I forgot a log okay I'm just transforming this thing internally into this notation yeah please Q is this function that we picked up here so Q is just some probability distribution and this is going to Define our curve getting just getting a little bit ahead of ourselves we're going to allow the curve is going to be parameterized by whatever probability
+
+72
+00:39:25,000 --> 00:40:09,000
+distribution we want so it's our degree of freedom freedom I'm just telling you something that's going to hold no matter how I select the probability of distribution the tool that I have in my Arsenal to do that is Jensen's inequality now I've turned this into an expectation and in one line I'm going to be able to turn it into a lower bound that works no matter how I pick it up graphically what I'm doing sorry to confuse folks who are copying is is basically show how to construct this LT
+
+73
+00:39:47,000 --> 00:41:37,000
+that's always a lower bound everywhere and that's where I'm going to use Jensen's inequality so let's see that next line we'll come back to this so this is less than I can pull the expectation out p x z ETA over Q Z this is Jensen okay log is concave this is equal to sum Q Z times log p x z Theta Q Z again just simple pushing okay so there's only one content line here okay the key holds for any Q satisfying star okay no matter how I pick the probability distribution this chain of reasoning goes through
+
+74
+00:41:03,000 --> 00:42:01,000
+please I believe the expectation yeah so this was exactly Jensen's inequality so if I scroll back up this was Jensen's inequality but because I was applying it to the the negative of it it's exactly the same piece right it reverses the inequality and so I'm just I'm directly applying that reasoning oh this thing into this thing yeah yeah sorry so this is just because Q of Z is a discrete distribution and the definition of expectation is this is a bunch of numbers that sum to one so this
+
+75
+00:41:44,000 --> 00:42:40,000
+is the dis this is an expectation with respect to some distribution in particular the one where z i occurs with probability Q of Z see I that's it it's again just simple pushing please [Music] yeah so you want to know how we ground it into an example is that what you're asking no no so there's no Phi here so apologies if there's something difficult to read there's a Theta here there's this new q that I've introduced Q is something that I've artificially introduced and I'm just saying that like
+
+76
+00:42:17,000 --> 00:43:11,000
+I've just proved all I've shown here is that I have a way of uh if you pick a cue that satisfies this I have a I have a way of lower bounding this function getting a family of lower bounds to it and I'm trying to give you the intuition of why I might want to do it it's so that I can construct those curves that come later because now this function is going to be much nicer to optimize but we haven't quite gotten there yet awesome okay so this is gonna this whole thing is this gives a family this is just what
+
+77
+00:42:46,000 --> 00:43:40,000
+I was saying there so you're you're right right ahead of it this gives a family of lower bounds namely this is how I get L of T Theta less than L Theta because term by term it's going to be low it's going to be less than or equal to now it's not it doesn't satisfy all our requirements because we have to make it tight so how do we make it tight that's the next piece but right now I have a way of going term by term from the likelihood function and getting lower Bounds at a particular
+
+78
+00:43:24,000 --> 00:44:06,000
+spot and it'll be a lower bound no matter where I am but I have to pick a certain cue to make this operational that's the piece so I have freedom and pick q and I'm going to pick a very specific cue and that's going to give me a lower bound and that's going to allow me to get the curve good yeah yeah so I said I was going to ignore the support we can imagine just for the sake of this lecture that it's strictly greater than zero so I don't run into weird things about what I mean
+
+79
+00:43:47,000 --> 00:44:43,000
+by divide by zero here because I'm controlling the multiplication in a head at a time like it does make sense but like you're right to point that out so just just think about it as greater than zero yeah wonderful question cool all right all right so now how do we make it tight so what we have to do the ins the the intuition here is that we want to make Jensen's inequality tight and the idea is if what's inside is constant imagine there was a constant inside that this term was constant for
+
+80
+00:44:21,000 --> 00:45:11,000
+all the different values of Z the expectation clearly doesn't matter right so if they were all the same then these two would actually be equal to one another right this is some value Alpha and then you would get a sum over all the alphas that were there they would sum to one boom done if they all have the same value here Alpha they would sum they would uh they would be here in the log and they would also sum in the same exact way so as long as this term is a constant that is it doesn't depend on Z
+
+81
+00:44:46,000 --> 00:46:10,000
+I'm in business right so what that means is I want to pick Q such that log P of x z Theta over Q Z equals c now before I had all kinds of freedoms to pick whatever cue I wanted now this is where the probability comes in so Q Z has to be related in some way to p x of Z for this to work go ahead uh what is z or C oh c is some constant this is a this is a constant independent of the uh you know just for some constancy it does not depend on Z independent of Z we don't care what its value is we just
+
+82
+00:45:32,000 --> 00:47:25,000
+care that it doesn't depend on Z in anyway and then it will be exact equality then Jensens will be equality okay all right so what is the Natural Choice well it's that Q Z should equal p of Z given X Theta why is that well this is also equal to so this is because P of X of Z of theta equals P of z x Theta P of X Theta so if I plug these in they cancel out and C is equal to log p x of theta okay so let me make sure this is clear note this just means note well and B I just reuse it reflexively just a signal QB
+
+83
+00:46:39,000 --> 00:48:01,000
+does depend on Theta and X so we're going to have this notation q i of Z because it depends on each different value so each data point is going to get its own different Q which is the log of How likely this thing is okay and we pick those for each eye so we're because we did this term by term we can pick that Q q1 Q2 Q3 all different and we pick them all so they satisfy this equation okay this thing has a very famous name so I'll write that while I was kind of stall for more questions so what we've
+
+84
+00:47:31,000 --> 00:49:27,000
+defined here it's called the evidence-based lower bound or the elbow which actually has a fairly like if you say elbow to a machine learning person they actually know what it is nothing we're making up it's a real thing so the elbow of x q Z equals the sum over Z Q Z log p x c Theta over Q Z okay and what we've shown is that L Theta is less than or equal to or is greater than or equal to the sum because we did this term by term of the elbow of X of I Q of I Theta sorry this is incorrect notation this is
+
+85
+00:48:44,000 --> 00:50:25,000
+Theta sorry the Z is marginalized away the Z can appear again okay for any QR satisfying stock sound good that was just restating the lower bound all I said is we went turn by turn through this thing so it holds for every term that we can pick Qi as long as it's a probability distribution it's a lower bound and then we also showed that L Theta t equals sum I 1 to n oboe x i q i Theta t for the choice of q i above okay so hopefully that picture makes sense again just to recap what's going on here
+
+86
+00:49:48,000 --> 00:50:39,000
+we have this opportunity to pick these these bounds and we'll use them in a second so hopefully become more clear exactly what we're kind of optimizing for here what we're going to do is you'll see how we picked the qis and all the rest in a second but this is basically saying that it satisfies the two properties that we had before we're going to pick where we are on the curve we're going to find this Con this kind of you know bull shape upside down thing we're going to then optimize that thing in a
+
+87
+00:50:14,000 --> 00:51:14,000
+second pick our new Theta T and then repeat and do another curve all right so let's let's do the wrap up and state the algorithm now with our our newly hard-earned language oh no so this is the these are both on the original loss these are just saying these are this is the LT here capital l this is each one of these is capital L basically right and then this one here is saying that at the particular point for that teeth instantiation this is where we are yeah all right so the wrap up is as follows
+
+88
+00:50:55,000 --> 00:52:02,000
+this is how this is what we can now write down the algorithm in the kind of full generality with mathematical Precision although it may still be a little bit opaque we set Qi of Z in the E step equal to the probability that z i given x i and Theta okay 4i equals 1 to n okay so this says that you're going to pick the QI distribution that says you know what's the probability that's kind of you know uh most informal or the exact probability that comes from your model knowing the data and the current
+
+89
+00:51:28,000 --> 00:52:30,000
+guess of your parameters right so you have some Theta at some time you plug it in you know the data point that you're looking at you condition on that you say what are the most likely values of the cluster linkage as we were talking about before the source linkage for this particular point you get a probability distribution over those you set them to qiz that's really what's going on it's your estimate of How likely that is then you take an m-step Theta t plus one equals ARG Max
+
+90
+00:52:03,000 --> 00:53:17,000
+over Theta of LT Theta which equals so LT Theta sorry like this LT theta equals this elbow sum x i the QI data okay your current guess of parameters so basically what it's saying is you give me a current guess of parameters I get the lower bound that's underneath the covers then I optimize that lower bound surrogate I get the Theta t plus one that gives me a new guess of parameters which defines yet a new curve a Qi for each one of what's going on then I go back yeah please Q oh sorry yeah good call
+
+91
+00:52:53,000 --> 00:54:01,000
+q i and this is Theta and I'm inconsistent with the semicolons too so you move this so there's a good distance distance this is an X this is a Q This is a Theta awesome please right so it just as before T starts at zero we have that initial guess let me go from there Theta is our current yes all right why does this terminate and it's basically for something that's kind of not very interesting or satisfying but it does this gives you a sequence that is monotonically increasing or
+
+92
+00:53:41,000 --> 00:54:40,000
+non-decreasing okay so it's possible that it would grind to to a halt but eventually like you know it has to be strict or some other things about how fast it terminates but it's not it's gonna it's a monotone sequence so we'll have a convergent subsequence it's really all that matters we don't say how fast it converges it's a separate issue is it globally optimal well no no just look at the picture and so to derive a counter example you would just find a likelihood function
+
+93
+00:54:18,000 --> 00:55:21,000
+that had those two bumps and you would run it in a particular lower bound setting and what it will do is it will gradually Hill Climb and this this is actually not great like it can't go back downhill right it's got to just continue to go up if it gets locked inside one of those bumps it's kind of toast so in summary what we saw here is we derived em as Emily okay as promised okay so just to recap what happened here we started with this notion around Jensen's and convexity so we looked at
+
+94
+00:54:58,000 --> 00:55:42,000
+pictures of convexity and we got an intuition of what sets our convex and what sets are not we wanted to use concave functions which are these kind of downward facing things the chords are always below them okay those are the loss functions because we wanted to maximize them the reason that was important is we had to do this back and forth iteration given a set of parameters we were going to find a surrogate that surrogate was going to be concave in our setting it's going to be one of those nice functions
+
+95
+00:55:20,000 --> 00:56:10,000
+that we were after we would use Jensen's inequality as a way of constructing that entire curve we needed the entire curve because we wanted to optimize it so it wasn't enough to find a point in a lower bound we needed to find the whole thing that was underneath it so we could run our ARG Max step and that was the setting where we learned all the parameters and estimate that in a way that was hopefully nice and easy to do right which was like you know estimate the means and the variance of the data that
+
+96
+00:55:45,000 --> 00:56:38,000
+we're given we'll run through an example of that this is a necessarily kind of abstract and confusing algorithm the best way to understand it is just to run it through a couple of the different examples em and the next one factor analysis and by the end you'd be like okay that makes sense it's a lot of notation because we're abstracting out a huge number of things that we're doing okay but in the end it's not so bad right you take the qis in this way except the thetas
+
+97
+00:56:11,000 --> 00:57:09,000
+do dissent on them or sent on this case do arguments okay all right so let's see it for our uh gaussian mixture model please uh so the termination condition is not really important or in the classical sense the thing is is that it's non it's non-uh decreasing so that like eventually there's a convergent subsequence of it and not telling you how fast it converges for example and it converges for the same reasons that gmms converge that we were like kind of going downhill if you remember it every time
+
+98
+00:56:46,000 --> 00:57:28,000
+like there was some loss functional that was decreasing and this is just saying there's something that's continually increasing when do you terminate it operationally like you're running this algorithm when do you decide you look and see if the loss of the likelihood function is not changing too much what is too much depend on depends on your data depends on the problem like sometimes point one is good enough if you have a huge amount of data and you're averaging over billions of
+
+99
+00:57:07,000 --> 00:58:05,000
+examples sometimes if you have uh you know only a a small amount of data you want to get to like machine precision and 10 to the minus 16. and so that's the way you decide when to do it this just says that it's not going to oscillate wildly it's a very weak statement what I'm making yeah please part of this is linked to the mle sort of aspect of it oh awesome yeah so we're gonna see the mle when we actually do the the computation here the reason it's linked to mle comes from a very simple
+
+100
+00:57:36,000 --> 00:58:24,000
+piece which is we started in this model where we were saying the way we're going to think about the world was to maximize the likelihood and that was like how we think about our data that's less disturbing to this group than it is so like I guess generally worldwide who think about this because like this is the only framework we've used in the course but that's what I mean we started with L Theta as what we were optimizing and then we derived this as a set of concerns we didn't get to a global
+
+101
+00:58:00,000 --> 00:58:58,000
+Optimum so I don't mean that like we definitely guaranteed that we got the maximum likelihood estimation just that you can phrase what's going on as mle and so when you get into other estimation problems and the sub problems you just apply the mle stuff you learned from the first half of the class and we'll see that in an example does that make sense awesome thank you for the question please uh oh it's tight because we went through this this small piece here which was that if we selected it as a constant in
+
+102
+00:58:31,000 --> 00:59:26,000
+this particular way so before we could pick any q and it was a lower bound as long as we did this then actually this line was no longer an inequality but was actually exact equality and it depended though that selection of Q depends on Theta and X awesome great question yeah and that's just making sure that the picture in your head is exactly right we go up to the loss curve we get something that's underneath it that touches at that one point and then any optimization we do there is actually
+
+103
+00:59:00,000 --> 01:00:24,000
+also optimization on the loss curve itself cool all right um four mixtures of gaussians or we call them GMM sorry all right all right so what's the e-step huh yeah I'm just going to copy down the thing because let's get the generic algorithms let me get the generic algorithm all right all right just so we have it on the screen so where's our warm-up not really a warm-up because we're almost out of time but here's remember if we saw how this worked P x y i and z i remember we factored it as a following
+
+104
+01:00:02,000 --> 01:01:14,000
+this is just Bayes rule nothing nothing crafty going on here not tricky zi was a multinomial okay this means Phi I greater than zero sum Phi I equals one okay and this was remember our in cluster J and so then once we knew given zi equals J then every cluster had a different shape so we had a different mean mu J and a different size or a variance mu J and I'm doing everything in one dimension but in two Dimensions you would have actually the whole covariance would be different these are the cluster size
+
+105
+01:00:47,000 --> 01:02:23,000
+descriptions cluster means okay right zi is our latent variable all right so let's take a look what does em actually do here so what does he know em is very general you can instantiate it right so what does it mean here so Q uh I of Z is going to be equal to p z i equals J given x i and so forth okay now what actually happened here when we wanted to understand what was the probability this is this is the probability that I the ith component belongs in J given what we've observed about x i and what we know about the
+
+106
+01:01:59,000 --> 01:03:19,000
+cluster shapes and their frequencies so if you remember we had this this diagram that I drew quite poorly the last time that said we had these two bumps which were our two gaussians let's say in one Dimensions that look like this this was mu 2. Sigma 2 square this was mu1 Sigma 1 square and the question is you give me a point here this is my x i How likely is it to belong to one or two cluster one or two right that's basically what we're asking what's the probability that this point
+
+107
+01:02:49,000 --> 01:04:02,000
+this ith Point here comes from one or two now remember if we just looked at this and these points and these two distributions were equal where the the fives were equal that is both sources were generating the same amount of information then we would say oh it's probably much more likely it belongs to this function cluster one then cluster two but if we knew if we knew say on the other hand if we knew Phi 2 was hugely bigger than Phi 1. right a billion points came from the second source and only one point came
+
+108
+01:03:27,000 --> 01:04:41,000
+from the First Source we'd probably say it's more likely that it would go to this right it would certainly boost its probability so now the question is how do we automate that reasoning and that is Bayes rule more likely and two so the automate this this is Bayes rule this is all we did last time Bayes rule it just weighs those two probabilities and tells us what should happen that's it okay we ran through exactly those calculations last time right let's take a look at the m-step now
+
+109
+01:04:11,000 --> 01:05:15,000
+in the m-step we have to compute derivatives I want to highlight only one thing here because it's something that causes people pain when they do their homeworks we have to compute derivatives so we're maximizing here over all the parameters Phi and mu and sigma Sigma is sorry all the covariances so these are the sigmas lowercase and the notation above these are all Theta or all yeah all Theta right so Theta is refers to all the parameters of the problem we were breaking it out into mues and sigmas and
+
+110
+01:04:44,000 --> 01:06:30,000
+fives those are all the things we're observing everything that's non-latent that's observed not hidden to us and when we were maximizing over from our elbow lower bound was this sum over z i q i z i log p x of I see I Theta over q i of z i okay this whole thing we're going to call Fi this is f i of theta okay hides a time in our notation all right so this thing is let's write it out because the Gory details will help us oh please there's a question he is just latent so I'm giving you the
+
+111
+01:05:50,000 --> 01:06:41,000
+intuition that's something that's hidden or not observed but formally it's just going to be anything that's a z z is latent that's our definite please foreign exactly right yeah this is exactly the instantiation of what we had above we reasoned about this through ad hoc reasons last time but it is exactly the elbow that we're now going to minimize with derivatives and to make it concrete I am either going to waste a bunch of your time or something will snap in your head and see how these things put
+
+112
+01:06:15,000 --> 01:06:56,000
+together I'm going to write out exactly what f i Theta is so that you can see like what the derivatives are that you will compute on this thing because right now it's probably pretty mysterious to you like there's elbows and there's peas and there's cues and like you can just write this thing down in computers derivatives and that's that's what you do I mean that's how this this whole method works just abstracted it like three orders of magnitude more than it should be
+
+113
+01:06:36,000 --> 01:07:26,000
+okay so let's see that piece oh please yeah that's gonna be so I'm just using that annotation to make sure it's clear that it depends on the eye it's actually just a z that you're summing over and it's summing over for example uh like we're imagining that it's discrete to make our notation a little bit nicer it would be summing over all of the different clusters that are possible there all the different sources How likely are you to be in cluster one two three four five so on you could also
+
+114
+01:07:06,000 --> 01:08:09,000
+we'll see later replace it with an integral if you had something really fancy that was there like if you had a continuous distribution over the hidden States yeah Frenzy what to feed us fee is greater than you know one source of culture yeah yeah so it is in fact because of this right here which I kind of glossed over Qi is exactly setting that is extending this function so I gloss over this really really quickly because it was the same calculation we did last time pzij to compute that we remember we expanded it
+
+115
+01:07:41,000 --> 01:08:38,000
+by Bayes rule we had two different components we had if you knew you were in a cluster How likely is the data point and then we had a term that said How likely is the cluster and those were the two functions that we put in and broke down by Bayes rule it's exactly the same you've got it perfectly yeah all right so let me write out this monstrosity just because it'll be potentially it has it has been in the past educational who knows if it's educational in the future in the future being like two seconds
+
+116
+01:08:09,000 --> 01:09:10,000
+from now all right I'm going to use a notation and hopefully it doesn't confuse you uh Qi equals ZJ so this is the the piece there so this is the weight this wi is the same wi we had before I'm sure you're intimately familiar with all the notation I use in the GMM lecture but it's the same w i j that we had before it's the weight that summarizes this probability just so I don't have to write that whole thing up okay all right so f i of theta is going to be equal to the sum
+
+117
+01:08:39,000 --> 01:10:25,000
+over J because now I'm summing over the cluster centers right the zi notation was still very abstract wji which was summing over this part here log and help us all 1 over 2 pi this is the covariance one-half this is the x of one half x i mu J Square well I decided to write this in for General things why do I care about that oh I see why okay transpose Sigma inverse X I mu J times by J oh I just missed it oh that hurts all right let me scoot so much better here on a whiteboard that's really catastrophic
+
+118
+01:09:40,000 --> 01:10:46,000
+5j okay let me make sure the brackets are clear I'm going to highlight the brackets like it's a syntax editor so make sure they're all there where they're supposed to be this blue goes with that one so on okay great and that means I'm missing a log perfect all right not so bad oh and this whole thing is unfortunately snap two yeah over w i j right that's just this piece is this piece this piece here this is the probability this is the gaussian remember from our model let's go back up here sorry for
+
+119
+01:10:13,000 --> 01:11:03,000
+all the scrolling this is our gaussian here this is the calcium distribution with Center J I did use a higher dimensional covariance because it's something you're going to have to compute so I've gone from 1D to higher Dimensions the notation doesn't change except for this is what the gaussian looks like instead of a square you you know that already and then there's there's the Phi J which is just multiplied times this you know horrible expression and this x parenthesis is so I don't have to write
+
+120
+01:10:38,000 --> 01:11:30,000
+it in superscript right just expert the function just a bad habit that I always use brackets for this it's historical and I would love to beat it out of myself if it were possible please uh right now the covariance does not depend on Z in our model the covariance here oops the covariance here is something that's that it depends on which cluster right so it depends on J sorry I just want to make sure I understand what you got yeah so I think if it means it depends on J yes the covariance could have different shapes
+
+121
+01:11:07,000 --> 01:12:24,000
+sign can be long and skinny some could be short and round yeah those depend on J so this thing here is a very polite way of saying this guy here should depend on J yeah good catch all right so now we can compute some some fun derivatives okay so let's compute mu J of f i of theta okay we have to estimate the mean right now and I'm going to do actually I'm going to do something slightly harder so apologies if you wrote that down let's do this there'll be just one extra line because it's all linear I'm going to sum
+
+122
+01:11:54,000 --> 01:13:19,000
+over all the data one to n okay so what this becomes is I sum equals 1 to n this is over all the data I get mu J here mu J times and then it's going to be WJ and I'm going to drop terms inside the log that obviously have nothing to do with mu J one half X mu J there's I uh T Sigma inverse J x i j all right and so just so you're clear what's going on here the log you know turns these these multiplications into additions so when I take derivatives like this doesn't show up anywhere because it does
+
+123
+01:12:39,000 --> 01:13:44,000
+Sigma doesn't depend on it and that means sorry it doesn't depend on mu and this doesn't depend on mu either so I'm left with these terms please go ahead just the term here and a function it is it is the likelihood function after we've picked Q at the particular iteration so it's just notation so I don't have to write this monstrosity every time I kept it um yeah wda doesn't have anything to do with uh Lambda J so it should be crossed out is that true let me make sure I'm gonna
+
+124
+01:13:29,000 --> 01:14:32,000
+mix something something crazy here no it shouldn't have anything to do with it but it will be multi sorry all right I see what's going on this is this is what's going on this is one half and this is a minus w a j is multiplied by it wij is uh take the derivative of the log it's going to be this times this thing plus yeah sorry thank you for the the notational issue yeah cool all right we're in business so what happens now well some mechanics that almost certainly will introduce bugs and you
+
+125
+01:14:06,000 --> 01:15:22,000
+will catch and it'll be great that's that's learning happening there and me making mistakes okay so when we actually compute this this is going to be Sigma J x i minus mu J you computed this a bunch of times all right so um yeah all good so we can so when can we pull this thing out that's repeated because it's full rank we can pull it out and and it's linear and we can it doesn't change anything so we want to set this to zero and use that Sigma J inverse Sigma J is full
+
+126
+01:14:50,000 --> 01:16:13,000
+rank that will become clear in a second why that matters so much because when we pull it out what do we get we get here Sigma J uh inverse times sum which is an unfortunate Collision I equals 1 to n w i j x i minus mu J equals zero okay but then because this is full rank the only way that this thing is zero is if it's identically zero right if this were non-full rank sorry the J is in the wrong spot that's extraordinarily confusing if this Matrix since this Matrix is full rank for this thing to be zero means
+
+127
+01:15:30,000 --> 01:17:01,000
+that this blue part is identically zero and so what that tells us is Mu J should be equal to sum I w i j x i over sum w i j yeah that's before okay so so far nothing happened we estimated the means by simply averaging their weighted averages and we computed this before and it's just a matter of computing the derivatives the one that I actually care about showing you by the way is 5j so let me just jump to that because we only have a minute or two left and I want to show you what happens in 5j so 5j is
+
+128
+01:16:21,000 --> 01:17:22,000
+constrained please sure okay sure also I would say you know ahead of time I do post all the notes online please feel free to take a reference to those notes too they will have potentially fewer typos than me trying to answer questions draw and generally be distracted can't focus that well I have to read them many times they still do have typos though so always look at the notes all right let me just show this one thing 5j is constrained okay so 5j is constrained and I just want to remind you of something that you probably
+
+129
+01:16:59,000 --> 01:17:49,000
+learned in high school or you know like freshman year and calculus I don't actually know when anyone learns anything anytime I say something that my students always get upset with me so I should just stop but I assume you've seen it before this moment about that you need a lagrangian okay no you haven't seen it that's fine too I will put if you want I'll post notes about how to compute lagrangians as well if you haven't seen this before this will trip you up in some way so when you
+
+130
+01:17:24,000 --> 01:18:33,000
+compute the derivative with respect to Phi J what happens is you're going to get something that says you have this weighted sum w-i-j times uh the derivative of Phi J log Phi J plus so if you just so if you just take this and compute the derivative it doesn't account for the constraint okay so you have a bunch of numbers that must sum to one so if you think about a if you think about your honest you're on a line let's say that you're optimizing on a line right if the gradient like let's
+
+131
+01:17:59,000 --> 01:18:49,000
+say that your points are on are on this line and you're saying like I want to optimize here this condition that you could imagine for an optimal solution is the gradient's identically zero right the the advantages that's good that's a point but what if the gradient is perpendicular to the line like it wants to push you only perpendicular and has no component moving you along the line right in that case this is still a critical point it's still potentially a minimum does that make sense because
+
+132
+01:18:24,000 --> 01:19:16,000
+it's not telling you that there's a minimum to your left and right it's you know along the line okay so the question is how do you encode that information that you don't you want to kind of screen off information that's orthogonal to the line and I'll write up a little note to show this this whole thing what you do is you introduce this thing called LaGrange multipliers and LaGrange multipliers and if you haven't seen them don't worry these are super easy to teach just say
+
+133
+01:18:51,000 --> 01:19:44,000
+this it's just an extra term here and this multiplier it's not obvious in this formulation what it's doing but this multiplier is basically the thing that's screening off things that are that are that are uh orthogonal to these constraints okay so this constraint here says Theta J is equal to one and you set this constraint equal to zero This this term equal to zero and it says if you're going off in a direction that that would not change any of their values that's okay you get to screen that off and I'll
+
+134
+01:19:20,000 --> 01:20:35,000
+make that geometric intuition I'll just post a one-page write-up for you please remind me in the thread and I will I will definitely do that if you don't do that you'll get the wrong answer that's also a motivation to learn it um and so what ends up happening here is you get something that says I get some I goes from 1 to n w i j over Phi of J plus Lambda equals zero and this implies that 5 of J is equal to 1 over Lambda sum I equals 1 to n of w i j okay and the Lambda is playing a very simple role
+
+135
+01:19:56,000 --> 01:21:28,000
+here it's just telling you like you have to normalize them in some way right now since in this case we can do it in an ad hoc way since Phi J is equal to one this implies the sum of Phi J is equal to negative 1 over Lambda sum i j w i j and this equals negative n over Lambda okay and that's the correct normalization right oh sorry this is equal to negative n oh sorry n over Lambda right and so now you can then go back and normalize and cancel out the Divide everything by one since this is just
+
+136
+01:20:42,000 --> 01:21:36,000
+this sum is equal to one I divide everything by 1 here and that tells me that Lambda must be equal to uh you know 1 over negative n right this is equal to one so this implies Lambda equals negative one by n it's just normalizing it's just doing the average which was weird to look at before but that allows us to compute all the things in the way we'd expect here it's totally natural so if you don't get the general rule that I'm trying to tell you the reason I'm trying
+
+137
+01:21:09,000 --> 01:21:55,000
+to tell you is I think we make you use it at some point this rule so just check it'll come up on a homework I don't think it comes on an exam but just flag something when you have a constraint when you have a constrained probability distribution you have to use a LaGrange multiplier that's all I care about that you understand in this case it makes total sense though because these numbers have to sum to one so if you don't have a normalization constant here you're adding up a bunch of numbers which
+
+138
+01:21:32,000 --> 01:22:20,000
+individually sum up to n right the sum over all of them is n you better normalize them in some way and this is just the principle that tells you you have to normalize them by by this n Factor okay so all I care that you take away if you've seen this a thousand times before don't worry I hope you had a nice rest if you've never seen this before I just want a flag for you when you minimize a function that's constrained make sure you use LaGrange multipliers I will put up a little tutorial about them you do
+
+139
+01:21:56,000 --> 01:22:46,000
+not need to spend a bunch of time on them it's just if you see some challenge where you're actually supposed to some problem where you're supposed to do it just have a little light bulb to go off says okay I got to look up how to do it in this case that's all I care about okay and you'll Trace through it in the notes please [Music] yeah it equals to minus sorry equals minus 1 over n because there's a negative sign everywhere so this minus Lambda is going to be equal to 1 by n so
+
+140
+01:22:29,000 --> 01:23:33,000
+I'm just going to write the final expression maybe that'll be less sorry oh this this arithmetic is what's bothering you sorry sorry this is true yeah yeah sorry I just swap them and even that's backwards from how I should do it I didn't see that sorry thank you right it's just supposed to average out so it looks the same awesome any questions about this all right because it's a probability distribution so again the issue here is Phi J is constrained by the model so if we go
+
+141
+01:23:16,000 --> 01:24:05,000
+back to this model this is a constraint on Phi J so whenever you have a probability distribution a multinomial probability distribution it's not just that the Phi eyes are non-negative which is the constraint we're almost ignoring but is that the Phi eyes equal one and so you couldn't for example set your probabilities to be 0.5 and 0.8 right they have to add up to one here because it's a multinomial so when we do the optimization we could for example prefer an optimization where we make all the
+
+142
+01:23:41,000 --> 01:24:31,000
+probabilities one but that would be an invalid setting and so that means these five J's we have constrained them oops constrain them to equal to one so now the question is when we do the gradient descent which is exactly the gradient descent we did before where does that show up and it shows up in this extra term here which is the LaGrange multiplier this thing is called a LaGrange multiplier the multiplier itself is called that okay and this is the constraint put into the normal form if you haven't seen this
+
+143
+01:24:08,000 --> 01:24:56,000
+before it'll look quite mysterious but what I was trying to do is I'm not going to teach you LaGrange multipliers in this class I'll put up something but the piece is here that it gets you back to an expression which makes sense in this setting and you needed something to average over because these numbers sum up to something that looks like n if you just compute it naively you'll get something that doesn't make any sense please no no there's no Sigma in here Sigma like for solution
+
+144
+01:24:38,000 --> 01:25:46,000
+uh no in this setting the sigma's out here I think what's confusing you maybe is this that these are not the same J's which which line oh oh oh I see I see I see I see sorry sorry yeah I was talking while I was saying thank you for the clarification that was really helpful apologies for that yes it's this constraint here sorry this is the constraint that was in our head yeah yeah and it just makes a mysterious reappearance here all right awesome okay so what is the message that I want
+
+145
+01:25:25,000 --> 01:26:20,000
+you to take away from this two things first message is GMM is an em algorithm okay that's really you know one of the the pieces that is there and this is interesting because we're going to see in the next lecture we're going to see a different example which is called factor analysis where Z has a very different form and it's meant to constrain the problem in a different way we went through in this lecture a couple of different steps we started with that convexity piece so we could get an
+
+146
+01:26:00,000 --> 01:26:52,000
+intuition for what these functions look like we didn't want to use convexity we use concavity and then we went through the EM algorithm which we formalized as kind of back and forth with using these curves over time once we had those curves what was happening was we would pick and optimize on those curves and we were getting these qis right the qi's played a starring role those became our W's here and they kind of add nastiness to all of the equations but not a tremendous amount of nastiness right they just add
+
+147
+01:26:26,000 --> 01:27:14,000
+little weights and expectations everywhere and then we ran exactly the kind of like you know standard supervised machine learning if you like or the stuff that you've been doing for mle for the entire quarter on those those properties then we introduced a ton of typos to keep you on your toes now I introduced on typos because I was talking while I was writing and I shouldn't have done that and so then we saw the two things that I cared about you highlight one is you know how to find means and these are just weighted
+
+148
+01:26:50,000 --> 01:27:35,000
+means and you should run through that calculation to make sure you know how to do it because I'm almost positively will ask you to do it at some point in the near future and then the second thing that I would tell you to do is when you have constraints you have to know how to optimize them you don't need to know the general theory of how you optimized against non-linear constraints but you should review how to do this when you have something that some still want it's not more complicated than what I wrote
+
+149
+01:27:12,000 --> 01:28:07,000
+here but make sure independently you go through it and ask questions I'm happy to ask questions I'm happy to point you for to different resources in the next class as I said what we're going to see is this notion of factor analysis and that is going to tell us how to apply em to a to a different kind of setting which at first glance will look like kind of impossible to do without a latent variable model and it's a pretty interesting scenario um and I think that's all I want to say
+
+150
+01:27:39,000 --> 01:27:53,000
+any last questions before we head out I'll stick around for a couple minutes as usual thanks so much for your time and attention
+
