@@ -185,6 +185,23 @@ RERANKING_CONFIG = {
 }
 
 # ===============================
+# Enhanced Reranking Configuration
+# ===============================
+ENHANCED_RERANKING_CONFIG = {
+    "primary_model": "cross-encoder/ms-marco-electra-base",  # Better model for higher precision
+    "fallback_model": "cross-encoder/ms-marco-MiniLM-L-6-v2",  # Fallback if primary unavailable
+    "top_n": 5,                     # Rerank to top N chunks
+    "batch_size": 32,               # Batch size for reranking
+    "threshold": 0.3,               # Base minimum relevance score (lowered for dynamic thresholding)
+
+    # Advanced features
+    "enable_query_expansion": True,      # Expand queries with related terms
+    "enable_diversity_reranking": True,  # Use MMR for diverse results
+    "enable_multi_stage": True,          # Use coarse-to-fine reranking
+    "enable_ensemble": False,            # Future: ensemble multiple rerankers
+}
+
+# ===============================
 # LLM Configuration (Gemini)
 # ===============================
 # Available models: gemini-2.0-flash, gemini-2.5-flash, gemini-3.1-flash-lite-preview

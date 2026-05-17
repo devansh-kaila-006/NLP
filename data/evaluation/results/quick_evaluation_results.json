@@ -1,0 +1,233 @@
+{
+  "query_generation": {
+    "total_queries": 120,
+    "domain_distribution": {
+      "machine_learning": 30,
+      "deep_learning": 30,
+      "nlp": 30,
+      "computer_vision": 30
+    },
+    "query_type_distribution": {
+      "conceptual": 40,
+      "mathematical": 40,
+      "implementation": 40
+    },
+    "sample_queries": [
+      "What is linear regression in machine learning?",
+      "Explain the concept of random forests",
+      "Explain the concept of decision trees"
+    ]
+  },
+  "modality_prediction": {
+    "overall_accuracy": 0.97,
+    "per_class_metrics": {
+      "video": {
+        "precision": 1.0,
+        "recall": 0.9210526315789473,
+        "f1_score": 0.958904109589041,
+        "support": 38
+      },
+      "pdf": {
+        "precision": 0.8928571428571429,
+        "recall": 1.0,
+        "f1_score": 0.9433962264150944,
+        "support": 25
+      },
+      "aman": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 37
+      },
+      "macro_avg": {
+        "precision": 0.9642857142857143,
+        "recall": 0.9736842105263158,
+        "f1_score": 0.9674334453347119,
+        "support": 100
+      },
+      "weighted_avg": {
+        "precision": 0.9732142857142857,
+        "recall": 0.97,
+        "f1_score": 0.9702326182476091,
+        "support": 100
+      }
+    },
+    "confusion_matrix": [
+      [
+        35,
+        3,
+        0
+      ],
+      [
+        0,
+        25,
+        0
+      ],
+      [
+        0,
+        0,
+        37
+      ]
+    ],
+    "calibration_error": 0.12000000000000044
+  },
+  "retrieval_quality": {
+    "precision_at_k": {
+      "P@1": 1.0,
+      "P@3": 1.0,
+      "P@5": 0.7999999999999998,
+      "P@10": 0.3999999999999999
+    },
+    "recall_at_k": {
+      "R@1": 0.25,
+      "R@3": 0.75,
+      "R@5": 1.0,
+      "R@10": 1.0
+    },
+    "ndcg_at_k": {
+      "NDCG@1": 1.0,
+      "NDCG@3": 1.0,
+      "NDCG@5": 1.0,
+      "NDCG@10": 1.0
+    },
+    "map": 1.0,
+    "mrr": 1.0
+  },
+  "temporal_coherence": {
+    "temporal_ordering_accuracy": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "flow_scores": [
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333,
+      0.3333333333333333
+    ],
+    "coherence_precision": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "temporal_consistency": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "summary": {
+      "temporal_ordering_accuracy": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0,
+        "count": 20
+      },
+      "flow_scores": {
+        "mean": 0.33333333333333326,
+        "std": 5.551115123125783e-17,
+        "min": 0.3333333333333333,
+        "max": 0.3333333333333333,
+        "count": 20
+      },
+      "coherence_precision": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0,
+        "count": 20
+      },
+      "temporal_consistency": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0,
+        "count": 20
+      },
+      "graph_coherence": {
+        "mean": 1.0,
+        "std": 0.0,
+        "min": 1.0,
+        "max": 1.0,
+        "count": 20
+      }
+    }
+  },
+  "performance": {
+    "mean": 3.52,
+    "std": 0.33704599092705434,
+    "min": 3.1,
+    "max": 4.2,
+    "median": 3.45,
+    "p50": 3.45,
+    "p95": 4.2,
+    "p99": 4.2
+  }
+}

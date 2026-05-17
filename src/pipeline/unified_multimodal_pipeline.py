@@ -7,10 +7,11 @@ from typing import List, Dict, Any
 from src.retrieval.retriever import Retriever
 from src.retrieval.multi_video_retriever import MultiVideoRetriever
 from src.reranking.cross_encoder_reranker import CrossEncoderReranker
+from src.reranking.enhanced_cross_encoder_reranker import EnhancedCrossEncoderReranker
 from src.generation.gemini_generator import GeminiGenerator
 from src.processors.video_chunker import VideoChunker
 from src.utils.logger import LoggerMixin
-from src.config import RETRIEVAL_CONFIG, RERANKING_CONFIG
+from src.config import RETRIEVAL_CONFIG, RERANKING_CONFIG, ENHANCED_RERANKING_CONFIG
 
 
 class UnifiedMultiModalRAGPipeline(LoggerMixin):
@@ -90,10 +91,16 @@ class UnifiedMultiModalRAGPipeline(LoggerMixin):
             self.logger.error(f"Multi-video retriever initialization failed: {e}")
             self.video_retriever = None
 
-        # Initialize reranker
+        # Initialize enhanced reranker for better precision
         self.reranker = None
         if use_reranker:
-            self.reranker = CrossEncoderReranker(RERANKING_CONFIG)
+            try:
+                self.reranker = EnhancedCrossEncoderReranker(ENHANCED_RERANKING_CONFIG)
+                self.logger.info("Enhanced cross-encoder reranker initialized")
+            except Exception as e:
+                self.logger.warning(f"Enhanced reranker initialization failed: {e}")
+                self.logger.info("Falling back to standard reranker")
+                self.reranker = CrossEncoderReranker(RERANKING_CONFIG)
 
         # Initialize generator
         self.generator = GeminiGenerator()
