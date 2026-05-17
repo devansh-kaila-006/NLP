@@ -1,0 +1,14 @@
+{
+  "modality_prediction": {
+    "error": "name 'Timer' is not defined"
+  },
+  "retrieval_quality": {
+    "error": "'NoneType' object has no attribute 'get'"
+  },
+  "temporal_coherence": {
+    "error": "name 'Timer' is not defined"
+  },
+  "performance": {
+    "error": "'Timer' object has no attribute 'elapsed_time'"
+  }
+}

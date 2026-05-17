@@ -8,10 +8,11 @@ from src.retrieval.retriever import Retriever
 from src.retrieval.multi_video_retriever import MultiVideoRetriever
 from src.reranking.cross_encoder_reranker import CrossEncoderReranker
 from src.reranking.enhanced_cross_encoder_reranker import EnhancedCrossEncoderReranker
+from src.reranking.optimized_cross_encoder_reranker import OptimizedCrossEncoderReranker
 from src.generation.gemini_generator import GeminiGenerator
 from src.processors.video_chunker import VideoChunker
 from src.utils.logger import LoggerMixin
-from src.config import RETRIEVAL_CONFIG, RERANKING_CONFIG, ENHANCED_RERANKING_CONFIG
+from src.config import RETRIEVAL_CONFIG, RERANKING_CONFIG, ENHANCED_RERANKING_CONFIG, OPTIMIZED_RERANKING_CONFIG
 
 
 class UnifiedMultiModalRAGPipeline(LoggerMixin):
@@ -91,16 +92,22 @@ class UnifiedMultiModalRAGPipeline(LoggerMixin):
             self.logger.error(f"Multi-video retriever initialization failed: {e}")
             self.video_retriever = None
 
-        # Initialize enhanced reranker for better precision
+        # Initialize optimized reranker for performance + precision
         self.reranker = None
         if use_reranker:
             try:
-                self.reranker = EnhancedCrossEncoderReranker(ENHANCED_RERANKING_CONFIG)
-                self.logger.info("Enhanced cross-encoder reranker initialized")
+                self.reranker = OptimizedCrossEncoderReranker(OPTIMIZED_RERANKING_CONFIG)
+                self.logger.info("Optimized cross-encoder reranker initialized")
             except Exception as e:
-                self.logger.warning(f"Enhanced reranker initialization failed: {e}")
-                self.logger.info("Falling back to standard reranker")
-                self.reranker = CrossEncoderReranker(RERANKING_CONFIG)
+                self.logger.warning(f"Optimized reranker initialization failed: {e}")
+                self.logger.info("Falling back to enhanced reranker")
+                try:
+                    self.reranker = EnhancedCrossEncoderReranker(ENHANCED_RERANKING_CONFIG)
+                    self.logger.info("Enhanced cross-encoder reranker initialized")
+                except Exception as e2:
+                    self.logger.warning(f"Enhanced reranker initialization failed: {e2}")
+                    self.logger.info("Falling back to standard reranker")
+                    self.reranker = CrossEncoderReranker(RERANKING_CONFIG)
 
         # Initialize generator
         self.generator = GeminiGenerator()

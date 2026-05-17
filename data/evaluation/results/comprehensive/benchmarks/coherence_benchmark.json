@@ -1,0 +1,311 @@
+{
+  "benchmark_type": "temporal_coherence",
+  "num_query_sets": 20,
+  "sequence_length": 5,
+  "creation_date": "2026-05-17T19:33:05.908684",
+  "sequential_queries": [
+    [
+      "What is batch normalization?",
+      "How does batch normalization work?",
+      "Why is batch normalization important?",
+      "How do you implement batch normalization?",
+      "What are the applications of batch normalization?"
+    ],
+    [
+      "What is data augmentation?",
+      "How does data augmentation work?",
+      "Why is data augmentation important?",
+      "How do you implement data augmentation?",
+      "What are the applications of data augmentation?"
+    ],
+    [
+      "What is dropout?",
+      "How does dropout work?",
+      "Why is dropout important?",
+      "How do you implement dropout?",
+      "What are the applications of dropout?"
+    ],
+    [
+      "What is convolutional neural networks?",
+      "How does convolutional neural networks work?",
+      "Why is convolutional neural networks important?",
+      "How do you implement convolutional neural networks?",
+      "What are the applications of convolutional neural networks?"
+    ],
+    [
+      "What is named entity recognition?",
+      "How does named entity recognition work?",
+      "Why is named entity recognition important?",
+      "How do you implement named entity recognition?",
+      "What are the applications of named entity recognition?"
+    ],
+    [
+      "What is loss functions?",
+      "How does loss functions work?",
+      "Why is loss functions important?",
+      "How do you implement loss functions?",
+      "What are the applications of loss functions?"
+    ],
+    [
+      "What is text classification?",
+      "How does text classification work?",
+      "Why is text classification important?",
+      "How do you implement text classification?",
+      "What are the applications of text classification?"
+    ],
+    [
+      "What is CNN architectures?",
+      "How does CNN architectures work?",
+      "Why is CNN architectures important?",
+      "How do you implement CNN architectures?",
+      "What are the applications of CNN architectures?"
+    ],
+    [
+      "What is regularization?",
+      "How does regularization work?",
+      "Why is regularization important?",
+      "How do you implement regularization?",
+      "What are the applications of regularization?"
+    ],
+    [
+      "What is object detection?",
+      "How does object detection work?",
+      "Why is object detection important?",
+      "How do you implement object detection?",
+      "What are the applications of object detection?"
+    ],
+    [
+      "What is random forests?",
+      "How does random forests work?",
+      "Why is random forests important?",
+      "How do you implement random forests?",
+      "What are the applications of random forests?"
+    ],
+    [
+      "What is attention mechanism?",
+      "How does attention mechanism work?",
+      "Why is attention mechanism important?",
+      "How do you implement attention mechanism?",
+      "What are the applications of attention mechanism?"
+    ],
+    [
+      "What is dropout?",
+      "How does dropout work?",
+      "Why is dropout important?",
+      "How do you implement dropout?",
+      "What are the applications of dropout?"
+    ],
+    [
+      "What is batch normalization?",
+      "How does batch normalization work?",
+      "Why is batch normalization important?",
+      "How do you implement batch normalization?",
+      "What are the applications of batch normalization?"
+    ],
+    [
+      "What is neural networks?",
+      "How does neural networks work?",
+      "Why is neural networks important?",
+      "How do you implement neural networks?",
+      "What are the applications of neural networks?"
+    ],
+    [
+      "What is decision trees?",
+      "How does decision trees work?",
+      "Why is decision trees important?",
+      "How do you implement decision trees?",
+      "What are the applications of decision trees?"
+    ],
+    [
+      "What is image segmentation?",
+      "How does image segmentation work?",
+      "Why is image segmentation important?",
+      "How do you implement image segmentation?",
+      "What are the applications of image segmentation?"
+    ],
+    [
+      "What is data augmentation?",
+      "How does data augmentation work?",
+      "Why is data augmentation important?",
+      "How do you implement data augmentation?",
+      "What are the applications of data augmentation?"
+    ],
+    [
+      "What is loss functions?",
+      "How does loss functions work?",
+      "Why is loss functions important?",
+      "How do you implement loss functions?",
+      "What are the applications of loss functions?"
+    ],
+    [
+      "What is data augmentation?",
+      "How does data augmentation work?",
+      "Why is data augmentation important?",
+      "How do you implement data augmentation?",
+      "What are the applications of data augmentation?"
+    ]
+  ],
+  "expected_orders": [
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ],
+    [
+      "chunk_0",
+      "chunk_1",
+      "chunk_2",
+      "chunk_3",
+      "chunk_4"
+    ]
+  ],
+  "metadata": {
+    "query_generator_version": "1.0",
+    "domain_distribution": {
+      "deep_learning": {
+        "count": 8,
+        "percentage": 0.4
+      },
+      "computer_vision": {
+        "count": 7,
+        "percentage": 0.35
+      },
+      "nlp": {
+        "count": 3,
+        "percentage": 0.15
+      },
+      "machine_learning": {
+        "count": 2,
+        "percentage": 0.1
+      }
+    }
+  }
+}

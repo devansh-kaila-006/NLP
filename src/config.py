@@ -202,6 +202,37 @@ ENHANCED_RERANKING_CONFIG = {
 }
 
 # ===============================
+# Optimized Reranking Configuration (Performance-Optimized)
+# ===============================
+OPTIMIZED_RERANKING_CONFIG = {
+    # Fast model for simple queries
+    "primary_model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    # Enhanced model for complex queries only
+    "enhanced_model": "cross-encoder/ms-marco-electra-base",
+
+    "top_n": 5,
+    "batch_size": 32,
+    "threshold": 0.5,
+
+    # Performance optimization features
+    "enable_query_complexity_detection": True,  # Detect complex vs simple queries
+    "enable_caching": True,                      # Cache reranking results
+    "enable_parallel_processing": False,         # Future: parallel processing
+
+    # Selective feature usage for performance
+    "enable_query_expansion": False,     # Disabled for performance
+    "enable_diversity_reranking": False,  # Disabled for performance
+    "enable_multi_stage": True,          # Enabled but optimized
+
+    # Complexity detection parameters
+    "complex_query_min_length": 50,      # Queries longer than this are complex
+    "complex_query_keywords": [
+        'explain', 'describe', 'analyze', 'compare',
+        'difference', 'how does', 'what is the relationship'
+    ]
+}
+
+# ===============================
 # LLM Configuration (Gemini)
 # ===============================
 # Available models: gemini-2.0-flash, gemini-2.5-flash, gemini-3.1-flash-lite-preview

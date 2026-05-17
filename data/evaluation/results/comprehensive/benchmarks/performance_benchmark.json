@@ -1,0 +1,60 @@
+{
+  "benchmark_type": "performance",
+  "num_queries": 24,
+  "iterations": 3,
+  "creation_date": "2026-05-17T19:33:05.917318",
+  "queries": [
+    "Explain the concept of decision trees",
+    "What is gradient descent in machine learning?",
+    "Derive the k-means clustering equation",
+    "What are the key mathematical properties of logistic regression?",
+    "What are the practical steps for gradient descent?",
+    "What are common challenges when implementing linear regression?",
+    "What are the advantages of using activation functions?",
+    "How does regularization improve deep learning models?",
+    "What are the mathematical properties of optimization algorithms?",
+    "What are the mathematical properties of regularization?",
+    "What are the best practices for implementing activation functions?",
+    "Show me a practical example of optimization algorithms",
+    "How does language models improve language models?",
+    "What are the applications of BERT in NLP?",
+    "Show the mathematical basis of language models",
+    "What is the attention mechanism formula for text classification?",
+    "What is the code for named entity recognition in NLP?",
+    "Show me a practical NLP example with named entity recognition",
+    "What is transfer learning in computer vision?",
+    "Explain how object detection works for image processing",
+    "What are the mathematical properties of feature extraction?",
+    "Derive the mathematical foundation of object detection",
+    "What are the best practices for implementing image segmentation?",
+    "Show me a practical vision example with data augmentation"
+  ],
+  "warmup_queries": [
+    "Explain the concept of decision trees",
+    "What is gradient descent in machine learning?",
+    "Derive the k-means clustering equation",
+    "What are the key mathematical properties of logistic regression?",
+    "What are the practical steps for gradient descent?"
+  ],
+  "metadata": {
+    "query_generator_version": "1.0",
+    "domain_distribution": {
+      "machine_learning": {
+        "count": 6,
+        "percentage": 0.25
+      },
+      "deep_learning": {
+        "count": 6,
+        "percentage": 0.25
+      },
+      "nlp": {
+        "count": 6,
+        "percentage": 0.25
+      },
+      "computer_vision": {
+        "count": 6,
+        "percentage": 0.25
+      }
+    }
+  }
+}

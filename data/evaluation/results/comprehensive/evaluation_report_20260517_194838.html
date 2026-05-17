@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Modal RAG System - Evaluation Report</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 30px;
+        }
+        .summary {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .metric {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 5px;
+            min-width: 200px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        .pass {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .fail {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .timestamp {
+            color: #7f8c8d;
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Multi-Modal RAG System - Evaluation Report</h1>
+        <p class="timestamp">Generated: 2026-05-17 19:48:38</p>
+
+        <div class="summary">
+            <h2>Executive Summary</h2>
+            <h3>System Performance Overview</h3>
+            <div class="metric">
+                <div class="metric-value">0.0%</div>
+                <div class="metric-label">Modality Prediction Accuracy</div>
+                <div class="fail">Status: FAIL</div>
+            </div>
+            
+            <div class="metric">
+                <div class="metric-value">0.0%</div>
+                <div class="metric-label">Retrieval Precision@5</div>
+                <div class="fail">Status: FAIL</div>
+            </div>
+            
+            <div class="metric">
+                <div class="metric-value">0.0%</div>
+                <div class="metric-label">Temporal Coherence</div>
+                <div class="fail">Status: FAIL</div>
+            </div>
+            
+            <div class="metric">
+                <div class="metric-value">0.00s</div>
+                <div class="metric-label">Average Query Time</div>
+                <div class="fail">Status: FAIL</div>
+            </div>
+            
+        </div>
+
+        
+        <div class="section">
+            <h2>Modality Prediction Evaluation</h2>
+            <h3>Cross-Modal Prediction Accuracy</h3>
+            <p>Evaluates the system's ability to predict which content modality (video/PDF/Aman.ai)
+            will provide the best answers for different query types.</p>
+
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+        <tr><td>Overall Accuracy</td><td>0.00%</td></tr></table></div>
+        <div class="section">
+            <h2>Retrieval Quality Evaluation</h2>
+            <h3>Multi-Modal Retrieval Effectiveness</h3>
+            <p>Evaluates the system's ability to retrieve relevant content across PDFs,
+            videos, and web content using standard information retrieval metrics.</p>
+
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+        <tr><td>MAP</td><td>0.0000</td></tr><tr><td>MRR</td><td>0.0000</td></tr></table></div>
+        <div class="section">
+            <h2>Temporal Coherence Evaluation</h2>
+            <h3>Video Chunk Temporal Consistency</h3>
+            <p>Evaluates the system's ability to maintain temporal consistency and
+            logical progression across retrieved video chunks.</p>
+
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+        </table></div>
+        <div class="section">
+            <h2>Performance Evaluation</h2>
+            <h3>System Performance Profiling</h3>
+            <p>Evaluates query latency, throughput, and resource utilization to ensure
+            production-ready performance.</p>
+
+            <table>
+                <tr>
+                    <th>Metric</th>
+                    <th>Value</th>
+                </tr>
+        <tr><td>Mean Query Time</td><td>0.000s</td></tr><tr><td>Std Query Time</td><td>0.000s</td></tr><tr><td>Min Query Time</td><td>0.000s</td></tr><tr><td>Max Query Time</td><td>0.000s</td></tr><tr><td>P50 (Median)</td><td>0.000s</td></tr><tr><td>P95</td><td>0.000s</td></tr><tr><td>P99</td><td>0.000s</td></tr></table></div>
+
+        <div class="section">
+            <h2>Conclusion & Recommendations</h2>
+            <h3>Summary and Recommendations</h3><ul><li><strong>Overall Performance:</strong> 0/0 evaluation criteria passed</li><li><strong>Modality Prediction:</strong> Consider improving prediction algorithm or expanding training data</li><li><strong>Retrieval Quality:</strong> Consider improving embedding models or reranking effectiveness</li><li><strong>Temporal Coherence:</strong> Consider improving temporal graph construction or path finding</li><li><strong>Performance:</strong> Consider optimizing query pipeline or implementing caching</li></ul>
+        </div>
+    </div>
+</body>
+</html>

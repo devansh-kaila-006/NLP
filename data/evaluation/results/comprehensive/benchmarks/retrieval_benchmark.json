@@ -1,0 +1,721 @@
+{
+  "benchmark_type": "retrieval_quality",
+  "num_queries": 48,
+  "top_k": 10,
+  "creation_date": "2026-05-17T19:33:05.906546",
+  "queries": [
+    "Explain the concept of random forests",
+    "Explain the concept of support vector machines",
+    "What are the main applications of random forests?",
+    "How does logistic regression work in ML?",
+    "Show the mathematical derivation of principal component analysis",
+    "What is the mathematical formula for linear regression?",
+    "What is the mathematical formula for principal component analysis?",
+    "Derive the linear regression equation",
+    "Show me an example of bias-variance tradeoff implementation",
+    "Show me an example of logistic regression implementation",
+    "What are the practical steps for linear regression?",
+    "Show me an example of support vector machines implementation",
+    "What are the advantages of using activation functions?",
+    "How does regularization improve deep learning models?",
+    "Explain how regularization works in deep learning",
+    "How does regularization improve deep learning models?",
+    "Derive the backpropagation equations for backpropagation",
+    "What is the gradient descent formula for dropout?",
+    "Derive the backpropagation equations for backpropagation",
+    "Show the mathematical formulation of dropout",
+    "Show me a practical example of batch normalization",
+    "Show me a practical example of batch normalization",
+    "What are the best practices for implementing regularization?",
+    "How do you implement dropout in PyTorch?",
+    "What are the applications of attention mechanism in NLP?",
+    "What is named entity recognition in natural language processing?",
+    "How does word embeddings improve language models?",
+    "How does transformer architecture improve language models?",
+    "What are the mathematical properties of transformer architecture?",
+    "What are the mathematical properties of BERT?",
+    "What is the attention mechanism formula for BERT?",
+    "What is the attention mechanism formula for attention mechanism?",
+    "How do you implement transformer architecture for text processing?",
+    "What is the code for sentiment analysis in NLP?",
+    "What is the code for machine translation in NLP?",
+    "Show me a practical NLP example with word embeddings",
+    "What is transfer learning in computer vision?",
+    "Explain how transfer learning works for image processing",
+    "What is feature extraction in computer vision?",
+    "What are the applications of transfer learning in CV?",
+    "Derive the mathematical foundation of object detection",
+    "Derive the mathematical foundation of object detection",
+    "What is the convolution formula for data augmentation?",
+    "Show the equations for object detection in vision",
+    "What is the code for data augmentation in CV?",
+    "What is the code for image classification in CV?",
+    "What are the best practices for implementing image segmentation?",
+    "What are the best practices for implementing convolutional neural networks?"
+  ],
+  "relevant_documents": [
+    [
+      "pdf_Scikit_learn_Docs",
+      "video_Unknown",
+      "aman_primer_Naive-Bayes",
+      "aman_primer_Decision-Trees-and-Ensemble-Methods",
+      "aman_primer_Conditional-Random-Fields"
+    ],
+    [
+      "pdf_Scikit_learn_Docs",
+      "video_CS231",
+      "video_CS224",
+      "video_CS229_L01",
+      "aman_primer_Naive-Bayes",
+      "aman_primer_Conditional-Random-Fields",
+      "aman_primer_Multiclass-vs-Multilabel-Classification"
+    ],
+    [
+      "pdf_Scikit_learn_Docs"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "video_CS229_L03",
+      "video_CS229_L04",
+      "video_CS224",
+      "aman_primer_Distributed-Training-Parallelism",
+      "aman_primer_Probability-Calibration",
+      "aman_primer_Evaluation-Metrics"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "pdf_Scikit_learn_Docs",
+      "video_CS229_L15",
+      "aman_primer_Evaluation-Metrics",
+      "aman_primer_Reinforcement-Learning",
+      "aman_primer_Distributed-Training-Parallelism"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "video_CS229_L07",
+      "video_CS231",
+      "video_CS229_L08",
+      "aman_primer_Evaluation-Metrics",
+      "aman_primer_Gradient-Descent-and-Backprop",
+      "aman_primer_Double-Descent"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "pdf_Scikit_learn_Docs",
+      "video_CS229_L15",
+      "aman_primer_Evaluation-Metrics",
+      "aman_primer_Reinforcement-Learning",
+      "aman_primer_Distributed-Training-Parallelism"
+    ],
+    [
+      "pdf_ML_Course_Notes"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "video_Unknown",
+      "video_CS229_L10",
+      "video_CS231",
+      "aman_primer_Double-Descent",
+      "aman_primer_Agentic-Design-Patterns",
+      "aman_primer_Bias-Variance-Tradeoff"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "video_CS229_L03",
+      "video_CS229_L04",
+      "video_CS224",
+      "aman_primer_RICE-Framework",
+      "aman_primer_Evaluation-Metrics",
+      "aman_primer_Naive-Bayes"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "pdf_Scikit_learn_Docs",
+      "video_CS229_L07",
+      "video_CS229_L01",
+      "aman_primer_Bias-Variance-Tradeoff",
+      "aman_primer_Gradient-Descent-and-Backprop",
+      "aman_primer_RICE-Framework"
+    ],
+    [
+      "pdf_Scikit_learn_Docs",
+      "video_CS231",
+      "video_Unknown",
+      "video_CS229_L07",
+      "aman_primer_Naive-Bayes",
+      "aman_primer_Multiclass-vs-Multilabel-Classification",
+      "aman_primer_Distributed-Training-Parallelism"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "pdf_DL_Textbook",
+      "video_CS231",
+      "aman_primer_Differential-Privacy",
+      "aman_primer_PyTorch-vs-TensorFlow",
+      "aman_primer_Agent-Skills"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "video_CS231",
+      "video_CS229_L11",
+      "aman_primer_Double-Descent",
+      "aman_primer_Distributed-Training-Parallelism",
+      "aman_primer_DeepSeek-Janus-Pro"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "video_CS224",
+      "video_CS229_L11",
+      "video_CS231",
+      "aman_primer_Distributed-Training-Parallelism",
+      "aman_primer_PyTorch-vs-TensorFlow",
+      "aman_primer_Hyperparameter-Tuning"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "video_CS231",
+      "video_CS229_L11",
+      "aman_primer_Double-Descent",
+      "aman_primer_Distributed-Training-Parallelism",
+      "aman_primer_DeepSeek-Janus-Pro"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "video_Unknown",
+      "video_CS231",
+      "aman_primer_Agentic-Design-Patterns",
+      "aman_primer_Gradient-Descent-and-Backprop",
+      "aman_primer_Evaluation-Metrics"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "aman_primer_Gradient-Descent-and-Backprop"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "video_Unknown",
+      "video_CS231",
+      "aman_primer_Agentic-Design-Patterns",
+      "aman_primer_Gradient-Descent-and-Backprop",
+      "aman_primer_Evaluation-Metrics"
+    ],
+    [
+      "pdf_DL_Textbook",
+      "video_CS224"
+    ],
+    [
+      "video_CS224"
+    ],
+    [
+      "video_CS224"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "video_CS231",
+      "video_CS229_L11",
+      "aman_primer_Differential-Privacy",
+      "aman_primer_Standardization-vs-Normalization",
+      "aman_primer_Hyperparameter-Tuning"
+    ],
+    [
+      "pdf_PyTorch_Docs",
+      "video_CS231",
+      "video_CS224",
+      "aman_primer_Distributed-Training-Parallelism"
+    ],
+    [
+      "pdf_DL_Textbook",
+      "pdf_ML_Course_Notes",
+      "video_CS224",
+      "video_CS231",
+      "aman_primer_Textual-Entailment",
+      "aman_primer_Context-Engineering",
+      "aman_primer_Document-Intelligence"
+    ],
+    [
+      "pdf_DL_Textbook",
+      "video_Unknown",
+      "video_CS231",
+      "video_CS224",
+      "aman_primer_NLP-Tasks",
+      "aman_primer_Textual-Entailment",
+      "aman_primer_Speculative-Decoding"
+    ],
+    [
+      "pdf_DL_Textbook",
+      "pdf_ML_Course_Notes",
+      "video_Unknown",
+      "video_MIT_DL_L06",
+      "aman_primer_DeepSeek-Janus-Pro",
+      "aman_primer_Knowledge-Graphs",
+      "aman_primer_Speculative-Decoding"
+    ],
+    [
+      "pdf_Scikit_learn_Docs",
+      "video_MIT_DL_L07",
+      "video_CS224",
+      "aman_primer_Gemma-3n",
+      "aman_primer_DeepSeek-Janus-Pro",
+      "aman_primer_Distributed-Training-Parallelism"
+    ],
+    [
+      "pdf_Scikit_learn_Docs",
+      "video_Unknown",
+      "video_CS224",
+      "video_CS229_L16",
+      "aman_primer_Gemma-3n",
+      "aman_primer_DeepSeek-Janus-Pro",
+      "aman_primer_PyTorch-vs-TensorFlow"
+    ],
+    [],
+    [],
+    [
+      "pdf_PyTorch_Docs",
+      "video_Unknown",
+      "video_CS231",
+      "aman_primer_Agentic-Design-Patterns",
+      "aman_primer_Model-Acceleration",
+      "aman_primer_Prompt-Engineering"
+    ],
+    [
+      "pdf_Scikit_learn_Docs",
+      "video_MIT_DL_L07",
+      "video_MIT_DL_L11",
+      "aman_primer_Gemma-3n",
+      "aman_primer_DeepSeek-Janus-Pro",
+      "aman_primer_Speculative-Decoding"
+    ],
+    [
+      "video_MIT_DL_L05",
+      "aman_primer_NLP-Tasks"
+    ],
+    [],
+    [
+      "pdf_DL_Textbook",
+      "pdf_ML_Course_Notes",
+      "video_CS224",
+      "aman_primer_Textual-Entailment",
+      "aman_primer_Context-Engineering",
+      "aman_primer_Speculative-Decoding"
+    ],
+    [],
+    [
+      "pdf_ML_Course_Notes",
+      "video_CS231",
+      "video_CS229_L16",
+      "aman_primer_Distributed-Training-Parallelism",
+      "aman_primer_DeepSeek-Janus-Pro",
+      "aman_primer_PyTorch-vs-TensorFlow"
+    ],
+    [
+      "pdf_Scikit_learn_Docs"
+    ],
+    [
+      "pdf_Scikit_learn_Docs",
+      "video_Unknown",
+      "aman_primer_Agentic-Design-Patterns",
+      "aman_primer_Transferability-Estimation",
+      "aman_primer_k-Nearest-Neighbors"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "pdf_Scikit_learn_Docs",
+      "video_CS231",
+      "aman_primer_ML-Runtimes",
+      "aman_primer_Evaluation-Metrics",
+      "aman_primer_Naive-Bayes"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "pdf_Scikit_learn_Docs",
+      "video_CS231",
+      "aman_primer_ML-Runtimes",
+      "aman_primer_Evaluation-Metrics",
+      "aman_primer_Naive-Bayes"
+    ],
+    [
+      "pdf_DL_Textbook",
+      "pdf_ML_Course_Notes",
+      "video_CS229_L16",
+      "video_Unknown",
+      "video_CS231",
+      "aman_primer_DeepSeek-Janus-Pro",
+      "aman_primer_ML-Runtimes",
+      "aman_primer_Distributed-Training-Parallelism"
+    ],
+    [
+      "video_CS231",
+      "video_MIT_DL_L03"
+    ],
+    [],
+    [],
+    [
+      "pdf_Scikit_learn_Docs",
+      "video_CS224",
+      "video_CS231",
+      "video_Unknown",
+      "aman_primer_Data-Imbalance",
+      "aman_primer_Model-Compression",
+      "aman_primer_Distributed-Training-Parallelism"
+    ],
+    [
+      "pdf_ML_Course_Notes",
+      "pdf_PyTorch_Docs",
+      "video_CS231",
+      "video_CS224",
+      "aman_primer_Model-Compression",
+      "aman_primer_Inductive-Bias",
+      "aman_primer_PyTorch-vs-TensorFlow"
+    ]
+  ],
+  "relevance_grades": {
+    "0": {
+      "pdf_Scikit_learn_Docs": 3,
+      "video_Unknown": 2,
+      "aman_primer_Naive-Bayes": 1,
+      "aman_primer_Decision-Trees-and-Ensemble-Methods": 0,
+      "aman_primer_Conditional-Random-Fields": -1
+    },
+    "1": {
+      "pdf_Scikit_learn_Docs": 3,
+      "video_CS231": 2,
+      "video_CS224": 1,
+      "video_CS229_L01": 0,
+      "aman_primer_Naive-Bayes": -1,
+      "aman_primer_Conditional-Random-Fields": -2,
+      "aman_primer_Multiclass-vs-Multilabel-Classification": -3
+    },
+    "2": {
+      "pdf_Scikit_learn_Docs": 3
+    },
+    "3": {
+      "pdf_ML_Course_Notes": 3,
+      "video_CS229_L03": 2,
+      "video_CS229_L04": 1,
+      "video_CS224": 0,
+      "aman_primer_Distributed-Training-Parallelism": -1,
+      "aman_primer_Probability-Calibration": -2,
+      "aman_primer_Evaluation-Metrics": -3
+    },
+    "4": {
+      "pdf_ML_Course_Notes": 3,
+      "pdf_Scikit_learn_Docs": 2,
+      "video_CS229_L15": 1,
+      "aman_primer_Evaluation-Metrics": 0,
+      "aman_primer_Reinforcement-Learning": -1,
+      "aman_primer_Distributed-Training-Parallelism": -2
+    },
+    "5": {
+      "pdf_ML_Course_Notes": 3,
+      "video_CS229_L07": 2,
+      "video_CS231": 1,
+      "video_CS229_L08": 0,
+      "aman_primer_Evaluation-Metrics": -1,
+      "aman_primer_Gradient-Descent-and-Backprop": -2,
+      "aman_primer_Double-Descent": -3
+    },
+    "6": {
+      "pdf_ML_Course_Notes": 3,
+      "pdf_Scikit_learn_Docs": 2,
+      "video_CS229_L15": 1,
+      "aman_primer_Evaluation-Metrics": 0,
+      "aman_primer_Reinforcement-Learning": -1,
+      "aman_primer_Distributed-Training-Parallelism": -2
+    },
+    "7": {
+      "pdf_ML_Course_Notes": 3
+    },
+    "8": {
+      "pdf_ML_Course_Notes": 3,
+      "video_Unknown": 2,
+      "video_CS229_L10": 1,
+      "video_CS231": 0,
+      "aman_primer_Double-Descent": -1,
+      "aman_primer_Agentic-Design-Patterns": -2,
+      "aman_primer_Bias-Variance-Tradeoff": -3
+    },
+    "9": {
+      "pdf_ML_Course_Notes": 3,
+      "video_CS229_L03": 2,
+      "video_CS229_L04": 1,
+      "video_CS224": 0,
+      "aman_primer_RICE-Framework": -1,
+      "aman_primer_Evaluation-Metrics": -2,
+      "aman_primer_Naive-Bayes": -3
+    },
+    "10": {
+      "pdf_ML_Course_Notes": 3,
+      "pdf_Scikit_learn_Docs": 2,
+      "video_CS229_L07": 1,
+      "video_CS229_L01": 0,
+      "aman_primer_Bias-Variance-Tradeoff": -1,
+      "aman_primer_Gradient-Descent-and-Backprop": -2,
+      "aman_primer_RICE-Framework": -3
+    },
+    "11": {
+      "pdf_Scikit_learn_Docs": 3,
+      "video_CS231": 2,
+      "video_Unknown": 1,
+      "video_CS229_L07": 0,
+      "aman_primer_Naive-Bayes": -1,
+      "aman_primer_Multiclass-vs-Multilabel-Classification": -2,
+      "aman_primer_Distributed-Training-Parallelism": -3
+    },
+    "12": {
+      "pdf_ML_Course_Notes": 3,
+      "pdf_DL_Textbook": 2,
+      "video_CS231": 1,
+      "aman_primer_Differential-Privacy": 0,
+      "aman_primer_PyTorch-vs-TensorFlow": -1,
+      "aman_primer_Agent-Skills": -2
+    },
+    "13": {
+      "pdf_ML_Course_Notes": 3,
+      "video_CS231": 2,
+      "video_CS229_L11": 1,
+      "aman_primer_Double-Descent": 0,
+      "aman_primer_Distributed-Training-Parallelism": -1,
+      "aman_primer_DeepSeek-Janus-Pro": -2
+    },
+    "14": {
+      "pdf_ML_Course_Notes": 3,
+      "video_CS224": 2,
+      "video_CS229_L11": 1,
+      "video_CS231": 0,
+      "aman_primer_Distributed-Training-Parallelism": -1,
+      "aman_primer_PyTorch-vs-TensorFlow": -2,
+      "aman_primer_Hyperparameter-Tuning": -3
+    },
+    "15": {
+      "pdf_ML_Course_Notes": 3,
+      "video_CS231": 2,
+      "video_CS229_L11": 1,
+      "aman_primer_Double-Descent": 0,
+      "aman_primer_Distributed-Training-Parallelism": -1,
+      "aman_primer_DeepSeek-Janus-Pro": -2
+    },
+    "16": {
+      "pdf_ML_Course_Notes": 3,
+      "video_Unknown": 2,
+      "video_CS231": 1,
+      "aman_primer_Agentic-Design-Patterns": 0,
+      "aman_primer_Gradient-Descent-and-Backprop": -1,
+      "aman_primer_Evaluation-Metrics": -2
+    },
+    "17": {
+      "pdf_ML_Course_Notes": 3,
+      "aman_primer_Gradient-Descent-and-Backprop": 2
+    },
+    "18": {
+      "pdf_ML_Course_Notes": 3,
+      "video_Unknown": 2,
+      "video_CS231": 1,
+      "aman_primer_Agentic-Design-Patterns": 0,
+      "aman_primer_Gradient-Descent-and-Backprop": -1,
+      "aman_primer_Evaluation-Metrics": -2
+    },
+    "19": {
+      "pdf_DL_Textbook": 3,
+      "video_CS224": 2
+    },
+    "20": {
+      "video_CS224": 3
+    },
+    "21": {
+      "video_CS224": 3
+    },
+    "22": {
+      "pdf_ML_Course_Notes": 3,
+      "video_CS231": 2,
+      "video_CS229_L11": 1,
+      "aman_primer_Differential-Privacy": 0,
+      "aman_primer_Standardization-vs-Normalization": -1,
+      "aman_primer_Hyperparameter-Tuning": -2
+    },
+    "23": {
+      "pdf_PyTorch_Docs": 3,
+      "video_CS231": 2,
+      "video_CS224": 1,
+      "aman_primer_Distributed-Training-Parallelism": 0
+    },
+    "24": {
+      "pdf_DL_Textbook": 3,
+      "pdf_ML_Course_Notes": 2,
+      "video_CS224": 1,
+      "video_CS231": 0,
+      "aman_primer_Textual-Entailment": -1,
+      "aman_primer_Context-Engineering": -2,
+      "aman_primer_Document-Intelligence": -3
+    },
+    "25": {
+      "pdf_DL_Textbook": 3,
+      "video_Unknown": 2,
+      "video_CS231": 1,
+      "video_CS224": 0,
+      "aman_primer_NLP-Tasks": -1,
+      "aman_primer_Textual-Entailment": -2,
+      "aman_primer_Speculative-Decoding": -3
+    },
+    "26": {
+      "pdf_DL_Textbook": 3,
+      "pdf_ML_Course_Notes": 2,
+      "video_Unknown": 1,
+      "video_MIT_DL_L06": 0,
+      "aman_primer_DeepSeek-Janus-Pro": -1,
+      "aman_primer_Knowledge-Graphs": -2,
+      "aman_primer_Speculative-Decoding": -3
+    },
+    "27": {
+      "pdf_Scikit_learn_Docs": 3,
+      "video_MIT_DL_L07": 2,
+      "video_CS224": 1,
+      "aman_primer_Gemma-3n": 0,
+      "aman_primer_DeepSeek-Janus-Pro": -1,
+      "aman_primer_Distributed-Training-Parallelism": -2
+    },
+    "28": {
+      "pdf_Scikit_learn_Docs": 3,
+      "video_Unknown": 2,
+      "video_CS224": 1,
+      "video_CS229_L16": 0,
+      "aman_primer_Gemma-3n": -1,
+      "aman_primer_DeepSeek-Janus-Pro": -2,
+      "aman_primer_PyTorch-vs-TensorFlow": -3
+    },
+    "29": {},
+    "30": {},
+    "31": {
+      "pdf_PyTorch_Docs": 3,
+      "video_Unknown": 2,
+      "video_CS231": 1,
+      "aman_primer_Agentic-Design-Patterns": 0,
+      "aman_primer_Model-Acceleration": -1,
+      "aman_primer_Prompt-Engineering": -2
+    },
+    "32": {
+      "pdf_Scikit_learn_Docs": 3,
+      "video_MIT_DL_L07": 2,
+      "video_MIT_DL_L11": 1,
+      "aman_primer_Gemma-3n": 0,
+      "aman_primer_DeepSeek-Janus-Pro": -1,
+      "aman_primer_Speculative-Decoding": -2
+    },
+    "33": {
+      "video_MIT_DL_L05": 3,
+      "aman_primer_NLP-Tasks": 2
+    },
+    "34": {},
+    "35": {
+      "pdf_DL_Textbook": 3,
+      "pdf_ML_Course_Notes": 2,
+      "video_CS224": 1,
+      "aman_primer_Textual-Entailment": 0,
+      "aman_primer_Context-Engineering": -1,
+      "aman_primer_Speculative-Decoding": -2
+    },
+    "36": {},
+    "37": {
+      "pdf_ML_Course_Notes": 3,
+      "video_CS231": 2,
+      "video_CS229_L16": 1,
+      "aman_primer_Distributed-Training-Parallelism": 0,
+      "aman_primer_DeepSeek-Janus-Pro": -1,
+      "aman_primer_PyTorch-vs-TensorFlow": -2
+    },
+    "38": {
+      "pdf_Scikit_learn_Docs": 3
+    },
+    "39": {
+      "pdf_Scikit_learn_Docs": 3,
+      "video_Unknown": 2,
+      "aman_primer_Agentic-Design-Patterns": 1,
+      "aman_primer_Transferability-Estimation": 0,
+      "aman_primer_k-Nearest-Neighbors": -1
+    },
+    "40": {
+      "pdf_ML_Course_Notes": 3,
+      "pdf_Scikit_learn_Docs": 2,
+      "video_CS231": 1,
+      "aman_primer_ML-Runtimes": 0,
+      "aman_primer_Evaluation-Metrics": -1,
+      "aman_primer_Naive-Bayes": -2
+    },
+    "41": {
+      "pdf_ML_Course_Notes": 3,
+      "pdf_Scikit_learn_Docs": 2,
+      "video_CS231": 1,
+      "aman_primer_ML-Runtimes": 0,
+      "aman_primer_Evaluation-Metrics": -1,
+      "aman_primer_Naive-Bayes": -2
+    },
+    "42": {
+      "pdf_DL_Textbook": 3,
+      "pdf_ML_Course_Notes": 2,
+      "video_CS229_L16": 1,
+      "video_Unknown": 0,
+      "video_CS231": -1,
+      "aman_primer_DeepSeek-Janus-Pro": -2,
+      "aman_primer_ML-Runtimes": -3,
+      "aman_primer_Distributed-Training-Parallelism": -4
+    },
+    "43": {
+      "video_CS231": 3,
+      "video_MIT_DL_L03": 2
+    },
+    "44": {},
+    "45": {},
+    "46": {
+      "pdf_Scikit_learn_Docs": 3,
+      "video_CS224": 2,
+      "video_CS231": 1,
+      "video_Unknown": 0,
+      "aman_primer_Data-Imbalance": -1,
+      "aman_primer_Model-Compression": -2,
+      "aman_primer_Distributed-Training-Parallelism": -3
+    },
+    "47": {
+      "pdf_ML_Course_Notes": 3,
+      "pdf_PyTorch_Docs": 2,
+      "video_CS231": 1,
+      "video_CS224": 0,
+      "aman_primer_Model-Compression": -1,
+      "aman_primer_Inductive-Bias": -2,
+      "aman_primer_PyTorch-vs-TensorFlow": -3
+    }
+  },
+  "metadata": {
+    "query_generator_version": "1.0",
+    "domain_distribution": {
+      "machine_learning": {
+        "count": 12,
+        "percentage": 0.25
+      },
+      "deep_learning": {
+        "count": 12,
+        "percentage": 0.25
+      },
+      "nlp": {
+        "count": 12,
+        "percentage": 0.25
+      },
+      "computer_vision": {
+        "count": 12,
+        "percentage": 0.25
+      }
+    },
+    "query_type_distribution": {
+      "conceptual": {
+        "count": 16,
+        "percentage": 0.3333333333333333
+      },
+      "mathematical": {
+        "count": 16,
+        "percentage": 0.3333333333333333
+      },
+      "implementation": {
+        "count": 16,
+        "percentage": 0.3333333333333333
+      }
+    }
+  }
+}
