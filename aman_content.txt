@@ -1,0 +1,160 @@
+Overview
+Here’s a hand-picked selection of articles on AI fundamentals/concepts that cover the entire process of building neural nets to training them to evaluating results.
+Model Architecture
+Linear and Logistic Regression
+k-Nearest Neighbors
+Clustering
+Support Vector Machines (SVM)
+Naive Bayes
+Decision Trees and Ensemble Methods
+ML Algorithms Comparative Analysis
+DL Architectures Comparative Analysis
+Neural Architectures
+Encoder vs. Decoder vs. Encoder-Decoder Models
+Generative Adversarial Networks (GANs)
+Diffusion Models
+Graph Neural Networks
+Attention
+Transformers
+Parameter Efficient Fine-Tuning
+Dropout
+Token Sampling Methods
+Separable Convolutions
+Inductive Bias
+Convolutional Neural Networks
+Reinforcement Learning
+Mixture-of-Experts (MoE)
+State Space Models
+FlashAttention
+Model Acceleration
+Data Foundations
+Data Sampling
+Data Imbalance
+Data Quality/Filtering
+Standardization vs. Normalization
+Inter-Annotator Agreement
+Learning Paradigms
+Xavier Initialization
+Padding and Packing
+Regularization
+Gradient Descent and Backprop
+Activation Functions
+Loss Functions
+Activation Functions
+Fine-tuning Models
+Splitting Datasets
+Batchnorm
+Double Descent
+Fine-Tuning and Evaluating BERT
+Training Loss > Validation Loss?
+Bias Variance Tradeoff
+Gradient Accumulation and Checkpointing
+Personally Identifiable Information (PII)
+Hypernetworks
+Distributed Training Parallelism
+k-Fold Cross Validation
+Knowledge Graphs
+NLP/LLMs/Agents
+Embeddings
+Prompt Engineering
+Context Engineering
+NLP Tasks
+Preprocessing
+Tokenization
+Overview of Large Language Models (LLMs)
+Diffusion LLMs / Discrete Diffusion Models
+Policy/Preference Optimization
+Agents
+Agentic Reinforcement Learning
+Agentic Design Patterns
+Agent Skills
+LLM-as-a-Judge / Autoraters
+Speculative Decoding
+Reinforcement Fine-Tuning
+Machine Translation
+Factuality in LLMs
+Reasoning in LLMs
+Hallucination Detection and Mitigation
+AI Text Detection Techniques
+Named Entity Recognition
+Textual Entailment
+Retrieval Augmented Generation (RAG)
+LLM Context Length Extension
+Document Intelligence
+Code Mixing and Switching
+Large Language Model Ops (LLMOps)
+Vision
+Vision Transformer (ViT)
+Receptive Field
+Residual/Skip Connections
+GPT-4o Native Image Generation
+Speech
+Speech Processing
+Multimodal AI/VLMs
+Overview of Vision-Language Models (VLMs)
+VLM Architectures
+Computer Control
+Offline/Online Evaluation
+Evaluation Metrics
+LLM/VLM Benchmarks
+F-Beta Score
+Online (A/B) Testing
+MLOps
+Data Drift
+MLOps Tooling
+MLOps Testing
+On-Device AI
+Model Compression
+Federated Learning
+Differential Privacy
+On-device Transformers
+Project Planning, Scheduling, Execution
+Objectives and Key Results (OKRs)
+RICE Framework
+Gantt Charts
+Project Management
+Models
+BERT
+GPT
+CLIP
+Meena
+ChatGPT
+GPT-4
+Llama
+Alpaca
+Gemini
+Toolformer
+Visual ChatGPT
+TaskMatrix.AI
+BigBird
+OpenAI o1
+DeepSeek-R1
+DeepSeek Janus-Pro
+Gemma 3n
+Qwen 3
+Claude 4
+Veo 3
+DeepSeek-V4
+Miscellaneous
+Ilya Sutskever’s Top 30
+GPU Architecture
+Debugging Model Training
+ML Runtimes
+Chain Rule
+Bayes’ Theorem
+Probability Calibration
+Multiclass vs. Multilabel Classification
+N-Dimensional Tensor Product
+PyTorch vs. TensorFlow
+Approximate Nearest Neighbors – Similarity Search
+Transferability Estimation
+TensorBoard
+Convolutional Neural Networks for Text Classification
+Relationship between Hidden Markov Models and Naive Bayes
+Maximum Entropy Markov Models
+Conditional Random Fields
+Hyperparameters
+Hyperparameter Tuning
+Hyperparameter Logging
+Practice
+Interview Questions

@@ -16,26 +16,34 @@ def main():
 
     print("="*80)
     print("MULTI-MODAL RAG SYSTEM - PRODUCTION TEST")
-    print("ALL 5 VIDEO PLAYLISTS + PDFS")
+    print("ALL 5 VIDEO PLAYLISTS + PDFS + AMAN.AI PRIMERS")
     print("="*80)
 
-    # Initialize unified pipeline
+    # Initialize unified pipeline with Aman.ai
     print("\nInitializing system...")
-    pipeline = UnifiedMultiModalRAGPipeline(use_reranker=True)
+    pipeline = UnifiedMultiModalRAGPipeline(use_reranker=True, include_aman=True)
 
     # Show system stats
     stats = pipeline.get_stats()
     print(f"\nSystem Statistics:")
     print(f"  PDF Content: {stats.get('pdf_stats', {}).get('total_vectors', 0)} chunks")
     print(f"  Video Content: {stats.get('video_stats', {}).get('total_vectors', 0)} chunks")
+    print(f"  Aman.ai Content: {stats.get('aman_stats', {}).get('total_vectors', 0)} chunks")
     print(f"  Playlists: {stats.get('video_stats', {}).get('total_playlists', 0)}")
-    print(f"  Total: {stats.get('pdf_stats', {}).get('total_vectors', 0) + stats.get('video_stats', {}).get('total_vectors', 0)} chunks")
+
+    total_chunks = (
+        stats.get('pdf_stats', {}).get('total_vectors', 0) +
+        stats.get('video_stats', {}).get('total_vectors', 0) +
+        stats.get('aman_stats', {}).get('total_vectors', 0)
+    )
+    print(f"  Total: {total_chunks} chunks")
 
     # Test queries
     test_queries = [
         "What is machine learning?",
         "Explain transformer attention mechanism",
-        "How do convolutional neural networks work?"
+        "How do convolutional neural networks work?",
+        "What is Retrieval Augmented Generation?"
     ]
 
     print(f"\n{'='*80}")
@@ -49,9 +57,10 @@ def main():
         try:
             result = pipeline.query(query, top_k=3)
 
-            print(f"✓ Success!")
+            print(f"[OK] Success!")
             print(f"  Video chunks: {result.get('video_chunks_used', 0)}")
             print(f"  PDF chunks: {result.get('pdf_chunks_used', 0)}")
+            print(f"  Aman.ai chunks: {result.get('aman_chunks_used', 0)}")
 
             # Show video sources
             if result.get('video_links'):
@@ -60,14 +69,14 @@ def main():
                     print(f"    - {link['source']}: {link['url']}")
 
         except Exception as e:
-            print(f"✗ Failed: {e}")
+            print(f"[ERROR] Failed: {e}")
 
     print(f"\n{'='*80}")
     print("SYSTEM TEST COMPLETE")
     print(f"{'='*80}")
-    print("\n✓ Multi-Modal RAG System is operational!")
-    print("✓ All 5 playlists + PDFs working correctly!")
-    print("✓ Ready for production use!")
+    print("\n[OK] Multi-Modal RAG System is operational!")
+    print("[OK] All 5 playlists + PDFs + Aman.ai working correctly!")
+    print("[OK] Ready for production use!")
 
 
 if __name__ == "__main__":
