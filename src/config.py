@@ -304,6 +304,67 @@ PERFORMANCE_CONFIG = {
 }
 
 # ===============================
+# RAG Evaluation Configuration
+# ===============================
+RAG_EVALUATION_CONFIG = {
+    # RAGAS Framework Configuration
+    "enable_ragas": True,                    # Enable RAGAS evaluation
+    "ragas_metrics": [
+        "faithfulness",                       # Answer faithfulness to context
+        "answer_relevance",                   # Answer relevance to query
+        "context_relevance",                  # Context relevance to query
+        "context_precision",                  # Precision of retrieved context
+        "context_recall"                      # Recall of relevant context
+    ],
+
+    # Ground Truth Configuration
+    "ground_truth_dir": DATA_DIR / "ground_truth",
+    "synthetic_ground_truth_file": DATA_DIR / "ground_truth" / "synthetic_ground_truth.json",
+
+    # Synthetic Ground Truth Generation
+    "ground_truth_generation": {
+        "model": "gpt-4-turbo",               # Model for synthetic ground truth
+        "temperature": 0.1,                   # Low temperature for consistency
+        "max_tokens": 2048,                   # Max length for reference answers
+        "quality_threshold": 0.8              # Minimum quality score
+    },
+
+    # Similarity Metrics Configuration
+    "similarity_metrics": {
+        "rouge": {
+            "type": "rougeL",                 # ROUGE-L metric
+            "threshold": 0.6                  # Minimum ROUGE score
+        },
+        "bleu": {
+            "max_ngrams": 4,                  # Up to 4-grams
+            "threshold": 0.4                  # Minimum BLEU score
+        },
+        "bert_score": {
+            "model": "bert-base-uncased",     # BERT model for similarity
+            "threshold": 0.8                  # Minimum BERT score
+        }
+    },
+
+    # Multi-Modal Specific Metrics
+    "multimodal_metrics": {
+        "cross_modal_consistency": True,      # Measure consistency across modalities
+        "temporal_coherence_quality": True,   # Measure temporal logical flow
+        "multimodal_context_utilization": True, # Measure effective use of modalities
+        "source_diversity": True,             # Measure source diversity
+        "citation_accuracy": True             # Measure citation accuracy
+    },
+
+    # Evaluation Batching
+    "batch_size": 10,                        # Batch size for evaluation
+    "max_concurrent_evaluations": 3,         # Max concurrent evaluations
+
+    # Reporting
+    "generate_html_report": True,            # Generate HTML evaluation reports
+    "save_detailed_metrics": True,           # Save detailed per-query metrics
+    "comparison_with_baseline": True        # Compare with baseline methods
+}
+
+# ===============================
 # Metadata Configuration
 # ===============================
 METADATA_SCHEMA = {
