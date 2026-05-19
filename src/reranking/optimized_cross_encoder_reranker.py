@@ -227,10 +227,10 @@ class OptimizedCrossEncoderReranker(LoggerMixin):
         # Select top N with simple threshold
         reranked = []
         for score, chunk in scored_chunks[:top_n]:
-            if score >= self.base_threshold:
-                chunk_copy = chunk.copy()
-                chunk_copy['rerank_score'] = float(score)
-                reranked.append(chunk_copy)
+            # Always include top chunks regardless of threshold to prevent empty results
+            chunk_copy = chunk.copy()
+            chunk_copy['rerank_score'] = float(score)
+            reranked.append(chunk_copy)
 
         self.logger.info(f"Fast reranking: {len(chunks)} -> {len(reranked)} chunks")
         return reranked

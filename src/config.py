@@ -212,7 +212,7 @@ OPTIMIZED_RERANKING_CONFIG = {
 
     "top_n": 5,
     "batch_size": 32,
-    "threshold": 0.5,
+    "threshold": 0.0,  # Lowered from 0.5 to prevent filtering all chunks
 
     # Performance optimization features
     "enable_query_complexity_detection": True,  # Detect complex vs simple queries

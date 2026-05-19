@@ -358,8 +358,8 @@ class OptimizedMultiModalRAGPipeline(LoggerMixin):
 
         # Step 4: Generate answer
         generation_start = time.time()
-        context = self._prepare_context(all_chunks)
-        answer = self.generator.generate(question, context)
+        response = self.generator.query(question, all_chunks)
+        answer = response.get('answer', '') if isinstance(response, dict) else response
         timings['generation'] = time.time() - generation_start
 
         # Step 5: Apply temporal coherence for video chunks
