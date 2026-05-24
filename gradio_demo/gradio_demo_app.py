@@ -15,10 +15,13 @@ Date: 2026-05-17
 import gradio as gr
 from typing import List, Dict, Any, Tuple
 import sys
+import os
 from pathlib import Path
 
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add project root to path and set working directory
+PROJECT_ROOT = Path(__file__).parent.parent.resolve()
+sys.path.insert(0, str(PROJECT_ROOT))
+os.chdir(str(PROJECT_ROOT))
 
 from src.pipeline.optimized_multimodal_pipeline import OptimizedMultiModalRAGPipeline
 from gradio_demo.gradio_utils import (
@@ -729,7 +732,7 @@ if __name__ == "__main__":
 
     interface.launch(
         server_name="0.0.0.0",
-        server_port=7861,  # Try different port to avoid conflicts
+        server_port=7863,  # Changed to 7863 to avoid all port conflicts
         share=False,  # Set to True for public URL
         show_error=True,
         quiet=False
