@@ -1,0 +1,506 @@
+[
+  {
+    "id": 1,
+    "query": "What is machine learning and how does it differ from traditional programming?",
+    "answer": "Traditional programming requires explicit, hard-coded rules and inputs to produce outputs. Machine learning reverses this: it takes data and known outputs to train a model, which automatically discovers the underlying rules and patterns. In traditional programming, humans explicitly define the logic and rules, while in machine learning, the system learns patterns from data without being explicitly programmed with those rules. ML algorithms generalize from examples rather than following predetermined instructions.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 2,
+    "query": "Explain the difference between supervised, unsupervised, and reinforcement learning",
+    "answer": "Supervised learning trains on labeled data with input-output pairs to predict outcomes. The algorithm learns from examples where the correct answer is provided. Unsupervised learning analyzes unlabeled data to discover hidden patterns or groupings without any predefined labels. It finds structure in data on its own. Reinforcement learning trains an agent to make decisions via trial-and-error using a system of rewards and penalties. The agent learns optimal behaviors through interaction with an environment, receiving feedback in the form of rewards or punishments for its actions.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 3,
+    "query": "What is overfitting and how can it be prevented?",
+    "answer": "Overfitting occurs when a model learns the training data's noise and details too well, causing poor performance on unseen data. The model memorizes specific training examples rather than learning generalizable patterns. It can be prevented using regularization techniques like L1 and L2 regularization, cross-validation to ensure generalization, pruning for decision trees, dropout for neural networks, gathering more training data, reducing model complexity, early stopping during training, and using data augmentation to increase effective dataset size.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 4,
+    "query": "Explain the bias-variance tradeoff in machine learning",
+    "answer": "Bias is the error from overly simplistic assumptions that cause underfitting - the model fails to capture important patterns in the data. Variance is the error from extreme sensitivity to training data fluctuations that causes overfitting - the model captures random noise instead of true patterns. The tradeoff represents the fundamental challenge of minimizing both simultaneously to find an optimal model that generalizes well. As model complexity increases, bias decreases but variance increases. The goal is to find the sweet spot that minimizes total error on unseen data.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 5,
+    "query": "What is cross-validation and why is it important?",
+    "answer": "Cross-validation, particularly K-fold cross-validation, splits the dataset into multiple subsets or folds. It iteratively trains the model on some folds and validates it on the remaining fold, rotating through all combinations. It is important because it provides a reliable, robust estimate of model performance and ensures the model isn't just memorizing a single train-test split. Cross-validation helps detect overfitting, provides better utilization of limited data, and gives more confidence in model performance metrics by testing on multiple validation sets.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 6,
+    "query": "How does the k-nearest neighbors algorithm work?",
+    "answer": "KNN is a non-parametric, lazy learning algorithm that classifies a data point or predicts its value based on the majority vote or average of the 'k' closest data points in the feature space. Distance between points is typically measured using Euclidean distance, though other metrics like Manhattan or Minkowski distance can be used. For classification, the algorithm assigns the most common class among the k nearest neighbors. For regression, it averages the values of the k nearest neighbors. The choice of k affects the model's bias-variance tradeoff.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 7,
+    "query": "Explain the decision tree algorithm and its advantages",
+    "answer": "Decision trees recursively split data based on feature values that maximize information gain or minimize impurity using metrics like Gini impurity or Entropy. The tree grows by selecting the best split at each node until stopping criteria are met. Advantages include high interpretability and explainability - the tree can be visualized and understood easily. Minimal data preprocessing is required as trees handle both numerical and categorical data without scaling. They can capture non-linear relationships and interactions between features, and they're robust to outliers.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 8,
+    "query": "What is random forest and how does it improve upon decision trees?",
+    "answer": "Random Forest is an ensemble method that builds a forest of independent decision trees trained on random subsets of data using bootstrap sampling or bagging. Each tree also considers only a random subset of features at each split. It improves upon single decision trees by drastically reducing variance and preventing overfitting without increasing bias. The ensemble approach averages multiple trees' predictions, leading to more stable and accurate results. Random forests maintain interpretability through feature importance scores while improving predictive performance significantly.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 9,
+    "query": "How does support vector machine (SVM) work?",
+    "answer": "SVM finds the optimal hyperplane in an n-dimensional space that maximizes the margin or distance between different classes of data points. The algorithm identifies support vectors - the critical data points closest to the decision boundary. For non-linearly separable data, SVM uses the kernel trick to project features into higher-dimensional spaces where they become linearly separable. Common kernels include linear, polynomial, and radial basis function RBF. SVM can handle both classification and regression tasks by finding optimal boundaries that maximize separation between classes.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 10,
+    "query": "Explain the naive Bayes classifier and its applications",
+    "answer": "Naive Bayes is a probabilistic classifier based on Bayes' Theorem, operating under the naive assumption that all features are completely independent given the class label. Despite this simplifying assumption, it often performs well in practice. The classifier calculates the probability of each class given the feature values and predicts the most probable class. Common applications include spam filtering and email classification, text classification and sentiment analysis, document categorization, medical diagnosis, and recommendation systems. It's particularly effective with high-dimensional text data.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 11,
+    "query": "What is gradient descent and how does it optimize machine learning models?",
+    "answer": "Gradient descent is an iterative optimization algorithm used to minimize a model's loss function. It calculates the partial derivatives or gradients of the loss function with respect to the model parameters. The algorithm then updates the weights in the opposite direction of the gradient to step toward the global minimum. Each iteration moves the parameters in the direction that steepest descends the loss surface. The size of each step is controlled by the learning rate hyperparameter. This process continues until convergence or a maximum number of iterations is reached.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 12,
+    "query": "Explain the difference between batch gradient descent, stochastic gradient descent, and mini-batch gradient descent",
+    "answer": "Batch Gradient Descent computes gradients using the entire dataset at once, making it computationally expensive and slow but stable. It provides accurate gradient estimates but requires memory for the full dataset. Stochastic Gradient Descent SGD updates parameters using one random sample at a time, making it fast but noisy and less stable. Mini-Batch Gradient Descent updates parameters using small random subsets or batches of data, typically 32 to 512 samples, balancing the computational efficiency of SGD with the stability of Batch gradient descent. It's the most commonly used variant in practice for training deep neural networks.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 13,
+    "query": "What is the difference between L1 and L2 regularization?",
+    "answer": "L1 regularization or Lasso adds the absolute values of the weights as a penalty term to the loss function. This can drive some weights completely to zero, effectively performing automated feature selection by eliminating irrelevant features. L2 regularization or Ridge adds the squared values of the weights as a penalty term. This shrinks weights close to zero but rarely makes them exactly zero, keeping all features in the model. L1 tends to produce sparse solutions, while L2 distributes penalty more evenly. The choice between them depends on whether feature selection is desired and the correlation structure of features.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 14,
+    "query": "How does the learning rate affect model training?",
+    "answer": "The learning rate determines the step size taken toward the minimum during optimization. If it is too large, training may overshoot the minimum and diverge or oscillate, failing to converge. If it is too small, training will be incredibly slow and risks getting trapped in local minima or saddle points. An optimal learning rate balances convergence speed with stability. Learning rate schedules that decay over time or adaptive optimizers like Adam that adjust learning rates per parameter can help find the right balance. The learning rate is one of the most critical hyperparameters to tune in machine learning.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 15,
+    "query": "What is early stopping and when should it be used?",
+    "answer": "Early stopping is a regularization technique that monitors a model's performance on a validation set during training and halts the training process as soon as the validation loss begins to increase. Increasing validation loss indicates the onset of overfitting - the model is starting to memorize training data rather than generalize. It should be used when training deep neural networks, when computational resources are limited, when dealing with small datasets, or when the model shows signs of overfitting. Early stopping prevents unnecessary training while maintaining good generalization performance.",
+    "category": "ML",
+    "status": "success"
+  },
+  {
+    "id": 16,
+    "query": "What is a neural network and how does it differ from traditional machine learning?",
+    "answer": "A neural network is a computational model inspired by biological brains, consisting of layers of interconnected nodes or neurons that pass signals to one another. Each neuron applies a weighted sum followed by a non-linear activation function. It differs from traditional machine learning by performing automated feature engineering and representation learning. Neural networks learn complex hierarchical representations directly from raw data like images or text without manual feature extraction. Traditional ML requires careful feature engineering by domain experts, while neural networks can discover relevant features automatically through training on large datasets.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 17,
+    "query": "Explain the architecture of convolutional neural networks (CNNs)",
+    "answer": "CNNs are specialized neural network architectures designed for grid-like data such as images. Their architecture consists of convolutional layers that use learnable filters or kernels to extract local spatial features like edges and textures. These are followed by activation layers, typically using ReLU non-linearity. Pooling layers perform downsampling to reduce spatial dimensions and achieve translation invariance. Fully connected layers at the end perform the final classification or regression. The architecture typically alternates between convolution and pooling layers, progressively extracting more abstract features while reducing spatial resolution.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 18,
+    "query": "What are the key components of recurrent neural networks (RNNs)?",
+    "answer": "The key components of an RNN are its recurrent hidden states and a feedback loop that allows sequential information to persist over time. The architecture maps an input sequence to a hidden state vector that updates at each time step using both the current input and previous hidden memory. This recurrent connection creates a form of memory that allows information to flow across time steps. The hidden state acts as a summary of all previous inputs in the sequence. Simple RNNs struggle with long-term dependencies due to vanishing gradients, leading to variants like LSTMs and GRUs with improved memory mechanisms.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 19,
+    "query": "How does the transformer architecture work?",
+    "answer": "The Transformer processes sequential data entirely in parallel rather than recurrently, enabling much faster training. It relies heavily on the self-attention mechanism to model global dependencies between all positions in the input sequence. The architecture utilizes an encoder-decoder stack where each layer contains multi-head self-attention and feed-forward neural network sub-layers. Positional encodings are added to retain sequence order information since the model processes all positions simultaneously. Multi-head attention dynamically weighs the importance of different tokens when producing each output representation, allowing the model to focus on relevant parts of the input.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 20,
+    "query": "What is the difference between RNNs and LSTMs?",
+    "answer": "Standard RNNs have short-term memory due to the vanishing gradient problem over long sequences, making it difficult to learn long-range dependencies. Gradients shrink exponentially during backpropagation through time, leaving early layers virtually untrained. LSTMs or Long Short-Term Memory networks introduce a complex internal cell state regulated by three gating mechanisms. The forget gate controls what information to discard, the input gate controls what new information to store, and the output gate controls what information to output. These gates allow LSTMs to actively maintain and track long-term dependencies across long sequences.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 21,
+    "query": "Explain backpropagation and how it works in neural networks",
+    "answer": "Backpropagation is the algorithm used to train neural networks by computing gradients efficiently. It computes the gradient of the loss function with respect to each weight by applying the calculus chain rule, propagating errors backward from the output layer through the hidden layers. The forward pass computes the network's output and loss, while the backward pass computes gradients starting from the output layer and moving backward. These gradients are then used by an optimizer like gradient descent to update the weights. Backpropagation's efficiency comes from reusing computations and avoiding redundant calculations, making it feasible to train deep networks with millions of parameters.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 22,
+    "query": "What is the vanishing gradient problem and how can it be solved?",
+    "answer": "The vanishing gradient problem occurs when gradients shrink exponentially as they backpropagate through deep layers during training, leaving early layers virtually untrained. Small gradients result in negligible weight updates for early layers, preventing the network from learning long-range dependencies. It can be solved by using non-saturating activation functions like ReLU that don't squash gradients, proper weight initialization techniques like He or Xavier initialization to maintain gradient scale, residual connections as in ResNets that create gradient highways, and Batch Normalization which stabilizes the distribution of layer inputs. These techniques help gradients flow effectively through deep networks.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 23,
+    "query": "How does batch normalization help in training deep neural networks?",
+    "answer": "Batch Normalization normalizes the inputs of each layer across a mini-batch to have a mean of zero and a variance of one. This stabilizes training by mitigating internal covariate shift - the change in layer input distributions as parameters update. Benefits include allowing higher learning rates without divergence, smoother gradient flow through the network, reduced sensitivity to weight initialization, and acting as a mild regularizer that can sometimes eliminate the need for dropout. Batch Normalization significantly accelerates deep network training and often improves final model performance by making the optimization landscape smoother and easier to navigate.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 24,
+    "query": "What is dropout and how does it prevent overfitting?",
+    "answer": "Dropout randomly deactivates or drops a specified percentage of neurons during each training step, typically setting their outputs to zero. This forces the network to learn redundant representations and prevents neurons from co-adapting too much. During training, different random subsets of neurons are dropped each iteration, creating an ensemble effect. At test time, all neurons are used but their outputs are scaled. Dropout prevents overfitting by ensuring no single neuron or small group carries the sole weight of a specific feature. This redundancy improves the network's ability to generalize to unseen data.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 25,
+    "query": "Explain the difference between various activation functions (ReLU, sigmoid, tanh)",
+    "answer": "Sigmoid maps inputs to a range between 0 and 1, making it suitable for binary classification outputs, but causes vanishing gradients at extreme values due to its saturating nature. Tanh or hyperbolic tangent maps inputs to a range between -1 and 1, providing zero-centered outputs which can help optimization, but is still prone to vanishing gradients. ReLU or Rectified Linear Unit outputs 0 for negative inputs and returns the input unchanged for positive values. It computes incredibly fast, avoids vanishing gradients for positive values, and has become the default activation for hidden layers in most deep networks due to its simplicity and effectiveness.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 26,
+    "query": "What is transfer learning and when should it be used?",
+    "answer": "Transfer learning leverages a model pretrained on a massive source dataset like ImageNet for computer vision and applies its learned features to a new related target task. The pretrained model has already learned general features like edges and patterns that transfer well. It should be used when the target dataset is limited and insufficient for training from scratch, when training time or computational resources are constrained, when the source and target tasks share low-level feature similarities, or when the target task performance benefits from features learned on large-scale data. Transfer learning can dramatically improve performance on small datasets while reducing training time.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 27,
+    "query": "Explain the concept of attention mechanism in neural networks",
+    "answer": "The attention mechanism allows a network to dynamically focus on specific, highly relevant parts of an input sequence when generating each part of an output, rather than compressing an entire input sequence into a single fixed-length context vector. It computes attention weights that determine how much focus to place on different input positions. The mechanism enables the model to selectively attend to relevant information while ignoring irrelevant parts. This is particularly useful for long sequences where different parts may have varying importance. Attention has become fundamental in many architectures, especially in natural language processing tasks.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 28,
+    "query": "What is self-attention and how does it work?",
+    "answer": "Self-attention relates different positions of a single sequence to compute a representation of the same sequence, enabling each element to attend to all other elements in the sequence. It creates three vectors for each token: Query, Key, and Value. The attention score is computed by taking the dot product of the Query with all Keys to determine how much focus to put on every other token. These scores are normalized using softmax and then used to weight the Value vectors. This mechanism allows the model to capture dependencies between all positions in the sequence, regardless of their distance from each other, enabling better understanding of context and relationships.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 29,
+    "query": "How does the transformer architecture differ from traditional sequence models?",
+    "answer": "Traditional sequence models like RNNs and LSTMs process data sequentially step-by-step, making them inherently slow to train and prone to forgetting distant context information. They struggle with long-range dependencies due to their sequential nature. Transformers process entire sequences simultaneously in parallel, achieving far superior computational efficiency and scaling with modern hardware. They capture long-range context flawlessly using self-attention rather than recurrence, allowing direct connections between any two positions in the sequence. This architectural difference makes transformers much more effective at modeling long sequences and has led to their dominance in natural language processing tasks.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 30,
+    "query": "What are the key differences between BERT and GPT models?",
+    "answer": "BERT or Bidirectional Encoder Representations from Transformers uses an encoder-only architecture trained bidirectionally to understand context from both left and right simultaneously. This bidirectional understanding makes it ideal for classification tasks, named entity recognition, and question answering where full context matters. GPT or Generative Pre-trained Transformer uses a decoder-only architecture trained autoregressively or left-to-right to predict the next token in sequence. This makes it optimized for generative tasks like text completion, story generation, and dialogue. BERT excels at understanding while GPT excels at generation, representing the two main paradigms in transformer-based language models.",
+    "category": "DL",
+    "status": "success"
+  },
+  {
+    "id": 31,
+    "query": "What is word embedding and why is it important for NLP?",
+    "answer": "Word embedding represents words as continuous vectors in a high-dimensional space, capturing semantic meanings so similar words sit close together. Unlike traditional one-hot encoding, embeddings capture rich semantic and syntactic relationships between words. This is important for NLP because it enables models to generalize across related words, capture word similarities and analogies, reduce dimensionality compared to sparse representations, and serve as foundational input features for virtually all modern NLP systems. Word embeddings like Word2Vec, GloVe, and fastText have revolutionized NLP by providing dense, meaningful representations of language.",
+    "category": "NLP",
+    "status": "success"
+  },
+  {
+    "id": 32,
+    "query": "Explain the difference between Word2Vec and GloVe embeddings",
+    "answer": "Word2Vec predicts words based on local context windows, using either skip-gram predicting surrounding words from target words or continuous bag-of-words predicting target words from context. GloVe relies on global co-occurrence statistics across the entire text corpus, using matrix factorization on word-word co-occurrence counts. Word2Vec is better at capturing syntactic and semantic relationships through local patterns, while GloVe excels at capturing global word relationships and rare words through corpus-wide statistics. Word2Vec trains more efficiently on smaller corpora, while GloVe provides better performance on larger datasets with more diverse vocabulary.",
+    "category": "NLP",
+    "status": "success"
+  },
+  {
+    "id": 33,
+    "query": "What is named entity recognition (NER) and how does it work?",
+    "answer": "Named entity recognition locates and classifies mentions in text into categories like names, places, dates, organizations, and other predefined entity types using sequence labeling. NER works by treating entity detection as a sequence tagging problem where each token is assigned a label indicating whether it's part of an entity and what type. Modern approaches use bidirectional LSTMs or transformer architectures with CRF layers to capture dependencies between labels. The system learns patterns from annotated training data to identify boundaries and types of entities, handling challenges like ambiguous names, nested entities, and domain-specific terminology.",
+    "category": "NLP",
+    "status": "success"
+  },
+  {
+    "id": 34,
+    "query": "How does recurrent neural network language modeling work?",
+    "answer": "Recurrent neural network language models process text sequentially, updating an internal hidden state memory to predict the next token based on all previous context. At each time step, the model takes the current word embedding and previous hidden state to compute a new hidden state that summarizes all preceding words. This hidden state is then used to predict probability distributions over the vocabulary for the next token. Training maximizes the likelihood of correct next words, and during generation, the model samples or selects from these predictions to continue text autoregressively.",
+    "category": "NLP",
+    "status": "success"
+  },
+  {
+    "id": 35,
+    "query": "Explain the transformer architecture for NLP tasks",
+    "answer": "The transformer architecture processes text simultaneously using a self-attention mechanism to track relationships between all words in a sequence. Each transformer layer contains multi-head self-attention that allows each token to attend to all other tokens, capturing both syntactic and semantic relationships regardless of distance. Positional encodings provide sequence order information since the architecture processes all tokens in parallel. Feed-forward networks transform the attended representations. For NLP tasks, BERT-style encoders are used for understanding tasks like classification, while GPT-style decoders are used for generation tasks, with variations like T5 and BART combining both.",
+    "category": "NLP",
+    "status": "success"
+  },
+  {
+    "id": 36,
+    "query": "What is BERT and how does it improve upon previous NLP models?",
+    "answer": "BERT is a bidirectional transformer model trained by masking random words and forcing the model to predict them, allowing it to read context from both sides at once rather than only left-to-right. This bidirectional training enables BERT to build rich representations that capture full sentence context. BERT improves upon previous models by using deep transformer architectures instead of shallow LSTMs, pretraining on massive unlabeled text corpora before task-specific fine-tuning, and employing masked language modeling objectives that force understanding of bidirectional context. These innovations allow BERT to achieve state-of-the-art results on virtually all NLP understanding tasks.",
+    "category": "NLP",
+    "status": "success"
+  },
+  {
+    "id": 37,
+    "query": "How does GPT generate coherent text?",
+    "answer": "GPT generates text autoregressively by predicting the next token in a sequence based on the context of all previous tokens. At each step, the transformer decoder processes the entire current sequence through self-attention to build a contextual representation, then predicts probability distributions over the vocabulary for the next token. The model samples or selects from this distribution and appends the chosen token to the sequence, repeating the process. This autoregressive generation, combined with massive pretraining on diverse text data, enables GPT to produce fluent, coherent text that maintains thematic consistency and logical flow over long passages.",
+    "category": "NLP",
+    "status": "success"
+  },
+  {
+    "id": 38,
+    "query": "What is sentiment analysis and what are its applications?",
+    "answer": "Sentiment analysis identifies emotional tones in text to classify user opinions for brand monitoring and customer feedback. The task typically involves classifying text as positive, negative, or neutral, though more sophisticated systems detect specific emotions like joy, anger, or sadness. Modern approaches use transformer models fine-tuned on sentiment-labeled data to capture nuanced expressions and context. Applications include brand reputation monitoring, customer satisfaction analysis, social media trend tracking, product review analysis, market research, political opinion polling, and customer service prioritization based on sentiment intensity.",
+    "category": "NLP",
+    "status": "success"
+  },
+  {
+    "id": 39,
+    "query": "Explain the machine translation pipeline and its challenges",
+    "answer": "The machine translation pipeline encodes source text into contextual representations and decodes them to a target language, typically using sequence-to-sequence transformer architectures. Modern systems use encoder-decoder transformers with attention mechanisms that map source tokens to target tokens autoregressively. Key challenges include handling idioms and expressions that don't translate literally, dealing with low-resource languages lacking training data, maintaining document-level coherence across long passages, preserving proper names and technical terms, and addressing morphological richness in languages with complex word structures. Neural machine translation has dramatically improved quality but still struggles with cultural nuances and domain-specific terminology.",
+    "category": "NLP",
+    "status": "success"
+  },
+  {
+    "id": 40,
+    "query": "What is question answering and how do modern QA systems work?",
+    "answer": "Question answering systems extract answers from reference text or use generative retrieval models to synthesize custom responses. Extractive QA systems like BERT for QA locate answer spans within documents using start/end position predictions. Abstractive QA systems generate novel answers using sequence-to-sequence models. Modern systems combine retrieval with generation, finding relevant documents then synthesizing answers. They employ transformer architectures for understanding both questions and contexts, use transfer learning from large pretraining corpora, and incorporate reasoning capabilities for multi-hop questions that require connecting information across multiple documents.",
+    "category": "NLP",
+    "status": "success"
+  },
+  {
+    "id": 41,
+    "query": "What are the main challenges in natural language understanding?",
+    "answer": "Main challenges in natural language understanding include word ambiguity where single words have multiple meanings depending on context, sarcasm and figurative language that subvert literal interpretation, long-range context dependencies that require tracking information across documents, and a lack of common-sense knowledge about how the world works that humans take for granted. Additional challenges include handling negation and quantifiers correctly, understanding implicit references and pronoun antecedents, processing informal language with errors and variations, and scaling understanding to multiple languages with different grammatical structures and cultural contexts.",
+    "category": "NLP",
+    "status": "success"
+  },
+  {
+    "id": 42,
+    "query": "How do modern chatbots handle context and maintain conversation?",
+    "answer": "Modern chatbots maintain conversation context by feeding a rolling history window of the dialogue back into the large language model. The conversation history includes previous user messages and bot responses, providing context for current understanding. Advanced systems use specialized architectures like dialogue transformers designed specifically for multi-turn conversations. They manage context through techniques like conversation summarization for long dialogues, explicit state tracking for task-oriented conversations, persona and style consistency mechanisms, and retrieval of relevant past exchanges. Context window limitations are managed by selectively including the most relevant recent exchanges.",
+    "category": "NLP",
+    "status": "success"
+  },
+  {
+    "id": 43,
+    "query": "What is computer vision and what are its main applications?",
+    "answer": "Computer vision enables software to extract meaningful insights from digital images and videos for automation, robotics, and diagnostics. Main applications include autonomous vehicles navigating roads and detecting obstacles, medical imaging analysis for disease diagnosis, facial recognition for security and authentication, industrial quality control and defect detection, augmented reality overlaying digital information on real scenes, agricultural monitoring and yield estimation, surveillance and security monitoring, sports analytics and performance tracking, and content-based image retrieval and organization.",
+    "category": "CV",
+    "status": "success"
+  },
+  {
+    "id": 44,
+    "query": "Explain how image classification works with CNNs",
+    "answer": "Image classification with CNNs passes pixels through convolutional layers to extract visual features, which are then used to predict a single label for the entire image. Early convolutional layers detect low-level features like edges, colors, and textures. Deeper layers combine these into higher-level features like shapes, object parts, and complex patterns. Pooling layers progressively reduce spatial dimensions while increasing feature depth. Final fully connected layers use these features to predict class probabilities. The network learns optimal filters through training on labeled examples, automatically discovering hierarchical feature representations without manual engineering.",
+    "category": "CV",
+    "status": "success"
+  },
+  {
+    "id": 45,
+    "query": "What is object detection and how does it differ from image classification?",
+    "answer": "Object detection identifies individual objects within an image and outputs their specific locations using spatial bounding boxes. Unlike image classification which assigns a single label to an entire image, object detection must localize multiple objects simultaneously and classify each one. Modern systems use region proposal networks to generate candidate bounding boxes, then classify and refine each region. Architectures like Faster R-CNN, YOLO, and SSD use convolutional feature maps with specialized heads for detection. Object detection is more complex than classification due to varying numbers of objects per image, scale variations, and the need for precise localization.",
+    "category": "CV",
+    "status": "success"
+  },
+  {
+    "id": 46,
+    "query": "How does semantic segmentation work in computer vision?",
+    "answer": "Semantic segmentation performs pixel-level classification, assigning every single pixel in an image to a corresponding category label. Unlike object detection that draws bounding boxes, segmentation provides precise object boundaries at pixel granularity. Modern approaches use fully convolutional networks with encoder-decoder architectures. The encoder extracts features at multiple scales, while the decoder upsamples to match original image resolution. Skip connections combine low-level details with high-level semantics. Techniques like U-Net, DeepLab, and Mask R-CNN have advanced segmentation capabilities, enabling applications in medical imaging, autonomous driving, and scene understanding.",
+    "category": "CV",
+    "status": "success"
+  },
+  {
+    "id": 47,
+    "query": "Explain the concept of transfer learning in computer vision",
+    "answer": "Transfer learning in computer vision adapts a neural network pre-trained on a massive dataset to a new, smaller task to save training time and improve performance. Networks pretrained on ImageNet have learned rich visual features like edges, textures, and object parts that transfer to many vision tasks. By fine-tuning these networks on target datasets, practitioners achieve better results with less data and training time. Transfer learning is particularly valuable when the target dataset is small, when computational resources are limited, or when the target task shares visual concepts with the source domain. This approach has become standard practice in computer vision.",
+    "category": "CV",
+    "status": "success"
+  },
+  {
+    "id": 48,
+    "query": "What is image segmentation and how does it differ from object detection?",
+    "answer": "Object detection draws rough bounding boxes around items, whereas image segmentation maps the exact pixel boundaries of objects, providing much more precise localization. While detection indicates where objects are with rectangular regions, segmentation delineates the exact shape and extent of each object at pixel level. There are two main types: semantic segmentation assigns each pixel to a category without distinguishing individual instances, while instance segmentation separates different objects of the same class. Segmentation is more challenging than detection due to the need for precise boundary delineation and handling of objects at multiple scales.",
+    "category": "CV",
+    "status": "success"
+  },
+  {
+    "id": 49,
+    "query": "What is face recognition and how does it work?",
+    "answer": "Face recognition detects a face, converts its features into a unique vector embedding, and matches it against a database of known identities. The process involves face localization to find faces in images, alignment to normalize pose and expression, feature extraction using deep convolutional networks that produce embeddings where similar faces cluster together, and matching by computing similarity between query embeddings and database entries. Modern systems use siamese networks trained on millions of faces to learn robust representations invariant to lighting, pose, age, and expression. Applications include security, authentication, and social media photo organization.",
+    "category": "CV",
+    "status": "success"
+  },
+  {
+    "id": 50,
+    "query": "How do modern vision transformers compare to CNNs for image tasks?",
+    "answer": "Vision transformers split images into sequential patches, scaling better on massive datasets than CNNs by capturing global context more efficiently. While CNNs process images through local receptive fields that gradually expand, transformers use self-attention to connect all patches directly, capturing long-range dependencies from the start. Vision transformers require more data to train effectively but achieve better performance when sufficient data is available. CNNs remain more efficient for smaller datasets and applications requiring fast inference. The transformer architecture enables better scaling with model size and data volume, making them increasingly dominant for large-scale vision applications.",
+    "category": "CV",
+    "status": "success"
+  },
+  {
+    "id": 51,
+    "query": "What is prompt engineering and why is it important for large language models?",
+    "answer": "Prompt engineering is the process of structuring input text to guide large language models into generating accurate, specific outputs. It focuses on operational contexts like system instructions defining roles and tasks, retrieval-augmented generation providing relevant context, and logical chain scaffolding breaking down complex reasoning. Effective prompting compensates for model limitations, steers outputs toward desired formats and quality levels, and enables models to perform tasks they weren't explicitly trained on. As LLMs become more capable, prompt engineering has emerged as a critical skill for maximizing model performance and reliability in production applications.",
+    "category": "Advanced",
+    "status": "success"
+  },
+  {
+    "id": 52,
+    "query": "Explain the concept of few-shot learning and its advantages",
+    "answer": "Few-shot learning allows a model to generalize and perform a new task using only a tiny handful of training examples rather than requiring thousands of samples. This approach leverages meta-learning where models learn how to learn, transfer learning from related tasks, and sophisticated pattern recognition capabilities. Advantages include rapid adaptation to new tasks with minimal data, reduced data collection and labeling costs, ability to handle rare classes and long-tail distributions, and more practical deployment in scenarios where data is scarce. Few-shot learning bridges the gap between zero-shot learning with no examples and traditional supervised learning requiring large datasets.",
+    "category": "Advanced",
+    "status": "success"
+  },
+  {
+    "id": 53,
+    "query": "What is reinforcement learning and how does it work?",
+    "answer": "Reinforcement learning is a framework where an autonomous agent learns to make decisions by taking actions to maximize environmental rewards. The agent interacts with an environment by observing states, taking actions, and receiving rewards or penalties. Learning occurs through trial and error, with the agent discovering which actions lead to favorable outcomes. Value functions estimate long-term expected rewards, while policies map states to actions. Modern RL uses deep neural networks to handle complex state spaces, algorithms like Q-learning, policy gradients, and actor-critic methods for optimization, and exploration strategies to balance trying new actions versus exploiting known good ones.",
+    "category": "Advanced",
+    "status": "success"
+  },
+  {
+    "id": 54,
+    "query": "How does multi-modal learning combine different types of data?",
+    "answer": "Multi-modal learning projects different data types like text and images into a shared vector space to learn joint representations. The approach combines encoders for each modality that produce compatible embeddings, fusion mechanisms that integrate information across modalities, and training objectives that leverage correspondence between modalities. By learning aligned representations, models can transfer knowledge between modalities, handle missing modalities more robustly, and achieve better performance on tasks requiring multiple input types. Applications include image captioning, visual question answering, and multimodal sentiment analysis.",
+    "category": "Advanced",
+    "status": "success"
+  },
+  {
+    "id": 55,
+    "query": "What are generative adversarial networks (GANs) and how do they work?",
+    "answer": "Generative adversarial networks pit a generator making fake data against a discriminator trying to detect it, improving overall quality through adversarial training. The generator creates synthetic samples attempting to fool the discriminator, while the discriminator learns to distinguish real from fake samples. This minimax game drives both networks to improve: the generator produces increasingly realistic samples, and the discriminator becomes more discerning. Training continues until equilibrium where generated samples are indistinguishable from real data. GANs have achieved remarkable results in image generation, style transfer, and data augmentation, though training remains challenging due to instability and mode collapse.",
+    "category": "Advanced",
+    "status": "success"
+  },
+  {
+    "id": 56,
+    "query": "Explain the difference between discriminative and generative models",
+    "answer": "Discriminative models learn boundary lines to classify data inputs by modeling the conditional probability of labels given features. They directly learn decision boundaries between classes without concern for how data is distributed. Generative models learn the actual distribution to create new data by modeling the joint probability of features and labels. They can generate new samples and capture underlying data structure. Discriminative models typically achieve better classification performance when sufficient labeled data is available, while generative models offer more flexibility for tasks like data generation, missing data imputation, and semi-supervised learning where unlabeled data can be leveraged.",
+    "category": "Advanced",
+    "status": "success"
+  },
+  {
+    "id": 57,
+    "query": "What are the main applications of deep learning in healthcare?",
+    "answer": "Deep learning in healthcare powers automated medical imaging analysis for radiology and pathology, genetic sequencing analysis for personalized medicine, risk prediction models for patient outcomes, and accelerated drug discovery through molecular modeling. Applications include diagnostic assistance from medical images like X-rays and MRIs, disease progression prediction, treatment response forecasting, electronic health record analysis, drug target identification and compound generation, surgical robotics and guidance systems, and wearable device monitoring for continuous health assessment. These technologies promise improved outcomes, reduced costs, and increased access to quality care.",
+    "category": "Advanced",
+    "status": "success"
+  },
+  {
+    "id": 58,
+    "query": "How is machine learning used in autonomous vehicles?",
+    "answer": "Machine learning in autonomous vehicles tracks surrounding objects through sensor fusion, maps environments using SLAM techniques, predicts trajectories of other road users, and plans driving paths through reinforcement learning. Perception systems use convolutional networks for object detection and classification from camera feeds, lidar processing, and radar interpretation. Prediction models forecast likely movements of vehicles, pedestrians, and cyclists. Planning systems learn driving policies through imitation learning from human drivers and reinforcement learning for decision making. ML also handles localization, sensor calibration, and fault detection, creating complete intelligent driving systems.",
+    "category": "Advanced",
+    "status": "success"
+  },
+  {
+    "id": 59,
+    "query": "What are the ethical considerations in AI development?",
+    "answer": "Ethical considerations in AI include algorithmic bias where models inherit and amplify societal prejudices, data privacy concerns regarding collection and usage of personal information, transparency in how decisions are made and systems operate, intellectual property questions about training data and generated content, and automation job displacement affecting workers and communities. Additional concerns include accountability for harmful decisions, dual-use technology risks, environmental impact of large-scale training, surveillance and civil liberties, and ensuring AI alignment with human values. Responsible AI development requires addressing these issues throughout the system lifecycle.",
+    "category": "Advanced",
+    "status": "success"
+  },
+  {
+    "id": 60,
+    "query": "Explain the concept of AI safety and why it's important",
+    "answer": "AI safety focuses on aligning model behavior with human values to prevent unintended harms or uncontrolled autonomous actions. As AI systems become more capable and autonomous, ensuring they behave as intended becomes critical. Safety concerns include specification problems where objectives don't capture true intentions, robustness to distribution shifts and adversarial inputs, reward hacking where agents exploit reward functions, and emergent behaviors not anticipated by designers. Long-term concerns involve controlling highly advanced systems that might surpass human intelligence. AI safety research develops technical solutions like interpretable models, value learning techniques, and verification methods to ensure reliable, beneficial AI systems.",
+    "category": "Advanced",
+    "status": "success"
+  },
+  {
+    "id": 61,
+    "query": "What is linear regression?",
+    "answer": "Linear regression is an algorithm that models a straight-line relationship between independent input variables and a continuous output variable. It assumes the relationship between inputs and output is linear and can be expressed as a weighted sum of features plus a bias term. The model learns optimal weight parameters by minimizing the sum of squared differences between predicted and actual values, typically using closed-form normal equations or gradient descent optimization. Linear regression serves as a fundamental building block for more complex models and provides interpretable coefficients that indicate the direction and magnitude of each feature's effect on the output.",
+    "category": "Evaluation",
+    "status": "success"
+  },
+  {
+    "id": 62,
+    "query": "What is a neural network?",
+    "answer": "A neural network is a computational pattern-recognition architecture composed of interconnected layers of nodes that process data using learned weights and non-linear transformations. Each neuron computes a weighted sum of inputs followed by an activation function that introduces non-linearity. Networks consist of input layers receiving raw features, hidden layers performing successive transformations, and output layers producing predictions. Deep networks have multiple hidden layers enabling hierarchical feature learning. Training involves forward propagation of signals and backpropagation of errors to adjust weights, allowing the network to learn complex patterns and relationships directly from data.",
+    "category": "Evaluation",
+    "status": "success"
+  },
+  {
+    "id": 63,
+    "query": "What is NLP?",
+    "answer": "NLP is a subfield of artificial intelligence focused on enabling computer systems to analyze, understand, and generate human languages. It combines computational linguistics with machine learning and deep learning to process text and speech. NLP tasks include text classification, named entity recognition, machine translation, question answering, sentiment analysis, and language generation. Modern NLP relies heavily on transformer architectures pre-trained on massive text corpora, enabling transfer learning to specific tasks. Applications span search engines, translation services, chatbots, document analysis, and voice assistants.",
+    "category": "Evaluation",
+    "status": "success"
+  },
+  {
+    "id": 64,
+    "query": "Compare and contrast different optimization algorithms used in machine learning",
+    "answer": "Optimization algorithms differ in step updates: SGD computes quickly using single points but has high variance; Momentum accelerates past flat areas by accumulating velocity; Adam combines adaptive learning rates with momentum for fast convergence. SGD provides unbiased but noisy gradients, Momentum adds exponential moving averages of gradients to damp oscillations, and Adam maintains per-parameter learning rates that adapt based on gradient magnitudes. Advanced variants include AdaGrad for sparse data, RMSprop for non-stationary objectives, and Nadam combining Nesterov momentum with Adam. Choice depends on data characteristics, computational constraints, and convergence requirements.",
+    "category": "Evaluation",
+    "status": "success"
+  },
+  {
+    "id": 65,
+    "query": "Analyze the trade-offs between bias and variance in model performance",
+    "answer": "The bias-variance trade-off balances underfitting and overfitting. High bias models simplify assumptions too much, failing to capture relevant patterns and consistently underperforming across both training and test data. High variance models are overly sensitive to training noise, performing well on training data but poorly on unseen data. The optimal model minimizes the sum of bias squared, variance, and irreducible error. Model complexity controls this trade-off: simple models have high bias and low variance, complex models have low bias and high variance. Techniques like cross-validation, regularization, and ensemble methods help find the sweet spot.",
+    "category": "Evaluation",
+    "status": "success"
+  },
+  {
+    "id": 66,
+    "query": "Evaluate the strengths and weaknesses of transformer models",
+    "answer": "Transformers excel at capturing long-range dependencies in parallel, but suffer from high quadratic computational complexity relative to input text length. Strengths include superior performance on sequence tasks, ability to model relationships regardless of distance, parallel processing enabling fast training, and transferability across diverse NLP applications. Weaknesses include computational and memory costs scaling quadratically with sequence length, requiring massive pretraining data and compute resources, difficulty with very long sequences despite positional encodings, and interpretability challenges due to complex attention patterns. Variants like efficient attention and sparse transformers address some limitations.",
+    "category": "Evaluation",
+    "status": "success"
+  },
+  {
+    "id": 67,
+    "query": "Derive the gradient descent update rule for linear regression",
+    "answer": "The gradient descent update rule for linear regression modifies parameters by subtracting the scaled average error of predictions multiplied by the inputs. Starting with the mean squared error loss, the gradient with respect to weights is computed as the negative correlation between input features and prediction errors. The update rule subtracts the learning rate times this gradient from current weights, moving parameters in the direction that reduces loss. Mathematically, weights are updated as w_new equals w_old minus learning rate times the partial derivative of loss with respect to weights. This process iteratively adjusts the linear regression coefficients toward optimal values that minimize prediction error.",
+    "category": "Evaluation",
+    "status": "success"
+  },
+  {
+    "id": 68,
+    "query": "Explain the mathematical formulation of the attention mechanism",
+    "answer": "The attention mechanism scales the dot-product of queries and keys, passes them through a softmax function, and multiplies the weights by the values. For each query vector, attention computes compatibility scores with all key vectors through dot products or other similarity functions. These scores are normalized using softmax to create attention weights that sum to one. The final output is the weighted sum of value vectors using these weights. This formulation allows the model to focus on relevant parts of the input while attending less to irrelevant parts. Multi-head attention extends this by running multiple attention operations in parallel with different learned projections.",
+    "category": "Evaluation",
+    "status": "success"
+  },
+  {
+    "id": 69,
+    "query": "What is the computational complexity of support vector machines?",
+    "answer": "Support vector machines feature a training computational complexity that scales quadratically or cubically with sample size, making them slow for large datasets. The quadratic programming problem requires computing and storing kernel matrices of size n by n for n training examples, leading to memory usage that grows quadratically. In practice, this limits SVMs to tens of thousands of samples rather than millions. Prediction complexity scales linearly with the number of support vectors, which can still be substantial. Approximation methods like stochastic gradient SVMs and linear SVMs reduce complexity for large-scale applications but sacrifice some of the theoretical guarantees of the exact formulation.",
+    "category": "Evaluation",
+    "status": "success"
+  },
+  {
+    "id": 70,
+    "query": "How would you apply machine learning to solve a real-world classification problem?",
+    "answer": "Solving a classification problem involves parsing data, separating test splits, engineering features, selecting a baseline model, and tuning hyperparameters. The process begins with understanding the problem domain and data characteristics. Data is cleaned and split into training, validation, and test sets. Features are engineered or extracted, possibly using dimensionality reduction. A simple baseline model is trained to establish performance benchmarks. Multiple models are then compared using cross-validation, with hyperparameters tuned via grid or random search. The best model is evaluated on the test set and deployed with monitoring for performance drift.",
+    "category": "Evaluation",
+    "status": "success"
+  },
+  {
+    "id": 71,
+    "query": "What are the best practices for training deep neural networks?",
+    "answer": "Best practices for training deep neural networks include input normalization, proper weight initialization, dropout regularization, and learning rate decay. Normalizing inputs to zero mean and unit variance stabilizes training. Weight initialization like He or Xavier prevents vanishing or exploding gradients. Dropout randomly deactivates neurons to prevent overfitting. Learning rate schedules or adaptive optimizers like Adam control step sizes during training. Additional practices include batch normalization for stable gradients, early stopping to prevent overfitting, data augmentation to increase effective training data, and monitoring both training and validation metrics to detect problems.",
+    "category": "Evaluation",
+    "status": "success"
+  },
+  {
+    "id": 72,
+    "query": "How do you handle imbalanced datasets in machine learning?",
+    "answer": "Handling imbalanced datasets requires data techniques like SMOTE oversampling, loss adjustments like class weights, or focusing on F1 metrics over accuracy. Data-level approaches include oversampling minority classes with SMOTE or duplicating examples, undersampling majority classes, and generating synthetic samples. Algorithm-level methods use class weights to penalize misclassifying minority examples more heavily, modify decision thresholds, or use ensemble methods designed for imbalance. Evaluation requires appropriate metrics like precision, recall, F1-score, and AUC-ROC rather than accuracy, which can be misleading when classes are imbalanced.",
+    "category": "Evaluation",
+    "status": "success"
+  }
+]
